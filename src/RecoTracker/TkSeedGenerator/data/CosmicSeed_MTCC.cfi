@@ -1,0 +1,11 @@
+ module cosmicseedfinder= CosmicSeedGenerator{
+     InputTag matchedRecHits = siStripMatchedRecHits:matchedRecHit
+     InputTag rphirecHits    = siStripMatchedRecHits:rphiRecHit
+     InputTag stereorecHits  = siStripMatchedRecHits:stereoRecHit
+     double ptMin=0.9
+     double originRadius=150
+     double originHalfLength=90
+     double originZPosition=0
+     string TTRHBuilder        =  "WithTrackAngle"	
+     untracked string GeometricStructure  = "MTCC"
+    }

@@ -1,0 +1,8 @@
+# stripCPE
+include "RecoLocalTracker/SiStripRecHitConverter/data/StripCPEfromTrackAngle.cfi"
+# pixelCPE
+include "RecoLocalTracker/SiPixelRecHits/data/PixelCPEParmError.cfi"
+include "RecoTracker/TkSeedGenerator/data/CosmicSeed.cff"
+
+include "RecoTracker/SingleTrackPattern/data/CosmicTrackFinder.cfi"
+

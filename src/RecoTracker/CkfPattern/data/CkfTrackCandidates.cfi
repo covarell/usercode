@@ -1,0 +1,20 @@
+#
+# This cfi should be included to run the CkfTrackCandidateMaker 
+#
+
+module ckfTrackCandidates = CkfTrackCandidateMaker
+  {	
+     #bool   seedCleaning         = false
+     string SeedProducer          = "globalMixedSeeds"
+     string SeedLabel             = ""
+     string TrajectoryBuilder    = "CkfTrajectoryBuilder"
+
+
+# nested parameter set for TransientInitialStateEstimator
+     PSet TransientInitialStateEstimatorParameters =
+      {
+         string propagatorAlongTISE    = "PropagatorWithMaterial"
+         string propagatorOppositeTISE = "PropagatorWithMaterialOpposite"
+      }	
+
+  }

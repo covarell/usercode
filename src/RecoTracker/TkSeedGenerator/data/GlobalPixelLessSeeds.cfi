@@ -1,0 +1,12 @@
+module globalPixelLessSeeds = GlobalPixelLessSeedGenerator{
+
+        InputTag matchedRecHits  = siStripMatchedRecHits:matchedRecHit
+	InputTag rphiRecHits     = siStripMatchedRecHits:rphiRecHit
+        InputTag stereoRecHits   = siStripMatchedRecHits:stereoRecHit
+	double ptMin=0.9
+	double originRadius=0.2
+	double originHalfLength=15
+	double originZPosition=0
+	string TTRHBuilder        =  "TTRHBuilder4GlobalPixelLessSeeds"
+
+}
