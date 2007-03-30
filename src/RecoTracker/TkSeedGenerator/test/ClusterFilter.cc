@@ -52,6 +52,13 @@ GlobalPoint ClusterFilter::toGlobal(const LocalPoint& local, const StripGeomDetU
 }
 
 bool ClusterFilter::check(const LocalPoint& local, const StripGeomDetUnit* detunit){
-	if (detunit->specificType().isBarrel()) return toGlobal(local, detunit).y()>0;
-	else return true;
+        std::string filterCriteria = conf_.getParameter<std::string>("filterCriteria");
+        if ( filterCriteria == "PositiveY") {
+	  if (detunit->specificType().isBarrel()) return toGlobal(local, detunit).y()>0;
+	  else return true;
+        } else if ( filterCriteria == "ApproxSectorTest" ) {
+          if (detunit->specificType().isBarrel()) return (toGlobal(local, detunit).y()>0 && toGlobal(local, detunit).phi()<1.92);
+          else return true;
+	}
+	return true;
 }
