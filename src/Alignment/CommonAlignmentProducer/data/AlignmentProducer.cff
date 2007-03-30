@@ -14,7 +14,7 @@ looper = AlignmentProducer
     untracked bool isData = false
  
     untracked uint32 maxLoops = 1
-    InputTag tkTag = cosmictrackrefitter:
+    InputTag tkTag = AlignmentTracks:
     InputTag tjTag = cosmictrackrefitter:
     InputTag simTag = g4SimHits:
 

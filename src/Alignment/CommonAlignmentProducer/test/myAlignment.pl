@@ -13,7 +13,7 @@ elsif ( $host =~ /lxcms/ )  { $location="lxcmsg1"; }
 # job steering ----------------------------------------------------------------
 
 # name of job
-$jobname="DataTIBhalfB-x";
+$jobname="AliTIBlaySS-xb-prova2";
 
 # cfg file
 $steering="AlignCosmics.cfg";
@@ -29,7 +29,7 @@ $authfile="authentication.xml";
 $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=150000;
+$nevent=10000;
 
 # first event
 $firstev=0;
@@ -38,7 +38,7 @@ $firstev=0;
 $njobs=1;
 
 # number of iterations (excluding initial step)
-$iterations=25;
+$iterations=30;
 
 # interactive or lxbatch queue
 $farm="I";

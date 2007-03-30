@@ -396,7 +396,6 @@ AlignmentProducer::duringLoop( const edm::Event& event,
   // Run the alignment algorithm
   theAlignmentAlgo->run(  setup, m_algoResults ,*(m_SimCollection.product()) );
 
-
 //   // Retrieve trajectories and tracks from the event
 //   edm::InputTag tkTag = theParameterSet.getParameter<edm::InputTag>("tkTag");
 //   edm::Handle<TrajTrackAssociationCollection> m_TrajTracksMap;

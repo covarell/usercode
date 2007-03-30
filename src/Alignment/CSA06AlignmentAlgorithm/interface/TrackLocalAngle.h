@@ -23,6 +23,8 @@
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
+#include "AnalysisDataFormats/SiStripClusterInfo/interface/SiStripClusterInfo.h"
 
 class TrackLocalAngle 
 {
@@ -33,6 +35,8 @@ class TrackLocalAngle
   virtual ~TrackLocalAngle();
  
   std::pair<float,float> findtrackangle(const TrajectoryMeasurement& theTM);
+
+  std::pair<float,float> findhitcharge(const TrajectoryMeasurement& theTM);
 
  private:
 	

@@ -1,0 +1,13 @@
+	source = PoolSource { 
+		
+		untracked vstring fileNames = { 
+                   "/store/data/2007/3/24/TAC-TIBTOB-120-DAQ-EDM-CMSSW_1_3_0_pre6-DIGI-RECO-Run-00006217/DIGI-RECO/0000/5E8C53AF-A7DD-DB11-A1D9-0002B3D8FDCA.root",
+                   "/store/data/2007/3/24/TAC-TIBTOB-120-DAQ-EDM-CMSSW_1_3_0_pre6-DIGI-RECO-Run-00006217/DIGI-RECO/0000/72CD3E0B-A7DD-DB11-BC66-00304856114E.root",
+                   "/store/data/2007/3/27/TAC-TIBTOB-120-DAQ-EDM-CMSSW_1_3_0_pre6-DIGI-RECO-Run-00006219/DIGI-RECO/0000/4E0E9B3A-90DD-DB11-92D8-000E0C4D31AF.root",
+                   "/store/data/2007/3/27/TAC-TIBTOB-120-DAQ-EDM-CMSSW_1_3_0_pre6-DIGI-RECO-Run-00006219/DIGI-RECO/0000/5E3372C9-90DD-DB11-B711-0002B3AFB406.root"
+		}
+
+		untracked int32 maxEvents   = 100
+		untracked uint32 skipEvents = 0
+	
+	}	   

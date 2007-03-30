@@ -14,7 +14,7 @@
 #include "Alignment/CSA06AlignmentAlgorithm/interface/CSA06UserVariablesIORoot.h"
 #include "Alignment/CommonAlignment/interface/AlignableNavigator.h"  
 
-#include "Alignment/CSA06AlignmentAlgorithm/interface/TrajectoryMeasurementResidual.h"
+// #include "Alignment/CSA06AlignmentAlgorithm/interface/TrajectoryMeasurementResidual.h"
 
 #include <fstream>
 
@@ -61,6 +61,7 @@ CSA06AlignmentAlgorithm::CSA06AlignmentAlgorithm(const edm::ParameterSet& cfg):
   aperp[2]=vaperp[2];
 
   theMinimumNumberOfHits = cfg.getParameter<int>("minimumNumberOfHits");
+  // theMinimumHitsOnTrack = cfg.getParameter<int>("minimumHitsOnTrack");  
   theMaxRelParameterError = cfg.getParameter<double>("maxRelParameterError");
 
   // for collector mode (parallel processing)
@@ -253,6 +254,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 
   TrajectoryStateCombiner tsoscomb;
   TrackerAlignableId id;
+  // TrajectoryMeasurementResidual *TMR;   
 
   int itr=0;
   int itrsim=0;
@@ -325,7 +327,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
       vector<const TransientTrackingRecHit*> hitvec;
       vector<TrajectoryStateOnSurface> tsosvec;
       vector<TrajectoryMeasurement> tmvec;
-    
+
       // loop over measurements	
       vector<TrajectoryMeasurement> measurements = traj->measurements();
       for (vector<TrajectoryMeasurement>::iterator im=measurements.begin();
@@ -343,7 +345,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	    tsoscomb.combine(meas.forwardPredictedState(),
 			     meas.backwardPredictedState());
 	  hitvec.push_back(hit);
-	  tmvec.push_back(meas);
+          tmvec.push_back(meas);
 	  tsosvec.push_back(tsosc);
 
 	}
@@ -360,11 +362,11 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
       vector<TrajectoryStateOnSurface>::const_iterator itsos = tsosvec.begin();
       vector<const TransientTrackingRecHit*>::const_iterator ihit = hitvec.begin();
       vector<TrajectoryMeasurement>::const_iterator imea = tmvec.begin();
-      
+
       // loop over vectors(hit,tsos)
       while (itsos != tsosvec.end()) 
 	{
-     
+	  
 	  // get trajectory impact point
 	  LocalPoint alvec = (*itsos).localPosition();
 	  AlgebraicVector pos(2);
@@ -376,7 +378,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	  ipcovmat[0][0] = (*itsos).localError().positionError().xx();
 	  ipcovmat[1][1] = (*itsos).localError().positionError().yy();
 	  ipcovmat[0][1] = (*itsos).localError().positionError().xy();
-	  
+	    
 	  // get hit local position and covariance
 	  AlgebraicVector coor(2);
 	  coor[0] = (*ihit)->localPosition().x();
@@ -397,12 +399,59 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	  
 	  // get relevant Alignable
 	  Alignable* ali=aap.alignableFromAlignableDet(alidet);
-
+	  
 	  if (ali!=0) {
-	    // get Alignment Parameters
+	    
+	    std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
+	    std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
+
+	    // fill hit parameters in root tree
+	    if (ahit<MAXHIT) {
+              // Sensor position
+	      m_hType[ahit] = typeAndLay.first;
+              m_hFwBw[ahit] = 99999;
+              m_hLayer[ahit] = 99999;
+              m_hIntExt[ahit] = 99999;
+              m_hStrRod[ahit] = 99999;
+              m_hModule[ahit] = 99999;
+              if (numbScheme.at(0)) {
+                m_hFwBw[ahit] = numbScheme.at(0);
+		m_hLayer[ahit] = numbScheme.at(1);
+		m_hIntExt[ahit] = numbScheme.at(2);
+		m_hStrRod[ahit] = numbScheme.at(3);
+		m_hModule[ahit] = numbScheme.at(4);
+	      }
+              // Which track it belongs to
+	      m_hOwnerTrack[ahit] = allTracks;
+              // Geometrical position
+	      m_hR[ahit] = (*ihit)->globalPosition().perp();
+	      m_hPhi[ahit] = (*ihit)->globalPosition().phi();
+	      m_hZ[ahit] = (*ihit)->globalPosition().z();
+	      m_hLocalX[ahit] = (*ihit)->localPosition().x();
+	      m_hLocalY[ahit] = (*ihit)->localPosition().y();
+	      m_hLocalZ[ahit] = (*ihit)->localPosition().z();
+              // Local track angle
+	      std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
+	      m_hLocalAngleMono[ahit] = monoStereoAng.first;
+	      m_hLocalAngleSter[ahit] = monoStereoAng.second;
+              // Cluster charge 
+              std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea);
+	      m_hChargeMono[ahit] = monoStereoCha.first;
+	      m_hChargeSter[ahit] = monoStereoCha.second;
+              // Residuals and errors
+	      m_Xres[ahit] = coor[0] - pos[0];
+	      m_Yres[ahit] = coor[1] - pos[1];    
+	      m_Xerr[ahit] = sqrt(covmat[0][0]);
+	      m_Yerr[ahit] = sqrt(covmat[1][1]);
+	      
+	      ahit++;
+	      m_allHits=ahit;
+	    }
+
+            // get Alignment Parameters
 	    AlignmentParameters* params = ali->alignmentParameters();
 	    // get derivatives
-	    AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
+	    AlgebraicMatrix derivs = params->selectedDerivatives(*itsos,alidet);
 	    
 	    // invert covariance matrix
 	    int ierr; 
@@ -413,7 +462,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	    }
 	    
 	    // calculate user parameters
-	    int npar=derivs.num_row();
+	    int npar = derivs.num_row();
 	    AlgebraicSymMatrix thisjtvj(npar);
 	    AlgebraicVector thisjtve(npar);
 	    thisjtvj=covmat.similarity(derivs);
@@ -425,36 +474,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	    uservar->jtvj += thisjtvj;
 	    uservar->jtve += thisjtve;
 	    uservar->nhit ++;
-
-            std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
-            TrajectoryMeasurementResidual *TMR = new TrajectoryMeasurementResidual(*imea);
-            
-            // fill hit parameters in root tree
-	    if (ahit<MAXHIT) {
-	      m_hType[ahit] = typeAndLay.first;
-              m_hLayer[ahit] = typeAndLay.second;
-	      m_hOwnerTrack[ahit] = allTracks;
-              m_hR[ahit] = (*ihit)->globalPosition().perp();
-	      m_hPhi[ahit] = (*ihit)->globalPosition().phi();
-              m_hZ[ahit] = (*ihit)->globalPosition().z();
-	      m_hLocalX[ahit] = (*ihit)->localPosition().x();
-	      m_hLocalY[ahit] = (*ihit)->localPosition().y();
-              m_hLocalZ[ahit] = (*ihit)->localPosition().z();
-	      std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
-              m_hLocalAngle[ahit] = monoStereoAng.first; 
-              m_UresLoc[ahit] = coor[0] - pos[0];
-              m_VresLoc[ahit] = coor[1] - pos[1];
-              // m_UresLoc[ahit] = TMR->localXResidual();
-              // m_VresLoc[ahit] = TMR->localYResidual();
-              m_UerrLoc[ahit] = TMR->localXError();
-              m_VerrLoc[ahit] = TMR->localYError();
-	      m_Xres[ahit] = TMR->measurementXResidual();
-              m_Yres[ahit] = TMR->measurementYResidual();
-              m_Xerr[ahit] = TMR->measurementXError();
-              m_Yerr[ahit] = TMR->measurementYError(); 
-	      ahit++;
-	      m_allHits=ahit;
-	    } 
+ 
 	  }
 	  
 	  itsos++;
@@ -463,6 +483,7 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	} 
     }
     allTracks++;
+    
   } // end of track loop
 
   // fill eventwise root tree (with prescale defined in pset)
@@ -602,6 +623,10 @@ void CSA06AlignmentAlgorithm::bookRoot(void)
   theTree->Branch("allHits", &m_allHits, "allHits/I");
   theTree->Branch("hType",    m_hType,   "hType[allHits]/I");
   theTree->Branch("hLayer",   m_hLayer,  "hLayer[allHits]/I");
+  theTree->Branch("hFwBw",    m_hFwBw,   "hFwBw[allHits]/I");
+  theTree->Branch("hIntExt",  m_hIntExt, "hIntExt[allHits]/I");
+  theTree->Branch("hStrRod",  m_hStrRod, "hStrRod[allHits]/I");
+  theTree->Branch("hModule",  m_hModule, "hModule[allHits]/I");
   theTree->Branch("hOwnerTrack",m_hOwnerTrack,"hOwnerTrack[allHits]/I"); 
   theTree->Branch("hR",       m_hR,      "hR[allHits]/F");
   theTree->Branch("hPhi",     m_hPhi,    "hPhi[allHits]/F");
@@ -609,13 +634,10 @@ void CSA06AlignmentAlgorithm::bookRoot(void)
   theTree->Branch("hLocalX",  m_hLocalX, "hLocalX[allHits]/F");
   theTree->Branch("hLocalY",  m_hLocalY, "hLocalY[allHits]/F");
   theTree->Branch("hLocalZ",  m_hLocalZ, "hLocalZ[allHits]/F");
-  theTree->Branch("hLocalAngle",m_hLocalAngle,"hLocalAngle[allHits]/F");
-  theTree->Branch("uresLoc",  m_UresLoc, "uresLoc[allHits]/F");
-  theTree->Branch("vresLoc",  m_VresLoc, "vresLoc[allHits]/F");
-  theTree->Branch("uerrLoc",  m_UerrLoc, "uerrLoc[allHits]/F");
-  theTree->Branch("verrLoc",  m_VerrLoc, "verrLoc[allHits]/F");
-  // theTree->Branch("uresCSA06",m_UresCSA06, "uresCSA06[allHits]/F");
-  // theTree->Branch("vresCSA06",m_VresCSA06, "vresCSA06[allHits]/F");
+  theTree->Branch("hLocalAngleMono",m_hLocalAngleMono,"hLocalAngleMono[allHits]/F");
+  theTree->Branch("hLocalAngleSter",m_hLocalAngleSter,"hLocalAngleSter[allHits]/F");
+  theTree->Branch("hChargeMono",m_hChargeMono,"hChargeMono[allHits]/F");
+  theTree->Branch("hChargeSter",m_hChargeSter,"hChargeSter[allHits]/F");
   theTree->Branch("xres",     m_Xres,    "xres[allHits]/F");
   theTree->Branch("yres",     m_Yres,    "yres[allHits]/F");
   theTree->Branch("xerr",     m_Xerr,    "xerr[allHits]/F");
@@ -814,3 +836,27 @@ void CSA06AlignmentAlgorithm::collector(void)
 
 }
 
+std::vector<unsigned int> CSA06AlignmentAlgorithm::storeNumberingScheme(const DetId& detid, int type)
+{
+  std::vector<unsigned int> numbScheme;
+  if (type == int(StripSubdetector::TIB)) {
+    TIBDetId myTIBid( detid ); 
+    std::vector<unsigned int> stringPos = myTIBid.string();
+    numbScheme.push_back(stringPos.at(0));   //   TIB+ / TIB-
+    numbScheme.push_back(myTIBid.layer());   //   layer
+    numbScheme.push_back(stringPos.at(1));   //   int / ext
+    numbScheme.push_back(stringPos.at(2));   //   string
+    numbScheme.push_back(myTIBid.module());  //   module
+  } else if (type == int(StripSubdetector::TOB)) {
+    TOBDetId myTOBid( detid ); 
+    std::vector<unsigned int> rodPos = myTOBid.rod();
+    numbScheme.push_back(rodPos.at(0));      //   TOB+ / TOB-
+    numbScheme.push_back(myTOBid.layer());   //   layer
+    numbScheme.push_back( 1 );               //   dummy
+    numbScheme.push_back(rodPos.at(1));   //   rod
+    numbScheme.push_back(myTOBid.module());  //   module
+  } else {
+    numbScheme.push_back( 0 ); 
+  }
+  return numbScheme;
+}

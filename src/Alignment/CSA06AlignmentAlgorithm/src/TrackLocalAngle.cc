@@ -37,6 +37,44 @@ TrackLocalAngle::TrackLocalAngle(const TrackerGeometry* tracker)
 // Virtual destructor needed.
 TrackLocalAngle::~TrackLocalAngle() {  }  
 
+std::pair<float,float> TrackLocalAngle::findhitcharge(const TrajectoryMeasurement& theTM)
+{
+  
+  std::pair<float,float> monostereocha; 
+  float charge1 = -9999.;
+  float charge2 = -9999.;
+
+  const TransientTrackingRecHit::ConstRecHitPointer thit=theTM.recHit();
+  const SiStripMatchedRecHit2D* matchedhit = dynamic_cast<const SiStripMatchedRecHit2D*>((*thit).hit());
+  const SiStripRecHit2D* hit = dynamic_cast<const SiStripRecHit2D*>((*thit).hit());
+
+  if (matchedhit) { //if matched hit...
+
+    // THIS IS THE POINTER TO THE MONO HIT OF A MATCHED HIT 
+    const SiStripRecHit2D *monohit=matchedhit->monoHit();    
+    const SiStripCluster* monocluster = &*(monohit->cluster());
+    SiStripClusterInfo monoinfo( *monocluster );
+    charge1 = monoinfo.charge();  // /monoinfo.noise();     
+
+    // THIS IS THE POINTER TO THE STEREO HIT OF A MATCHED HIT 
+    const SiStripRecHit2D *stereohit=matchedhit->stereoHit();   
+    const SiStripCluster* stereocluster =&*(stereohit->cluster());
+    SiStripClusterInfo stereoinfo( *stereocluster );
+    charge2 = stereoinfo.charge();  // /stereoinfo.noise(); 
+
+  }
+  else if (hit) {
+    
+    //  hit= POINTER TO THE RECHIT
+    const SiStripCluster* cluster = &*(hit->cluster());
+    SiStripClusterInfo info( *cluster );
+    charge1 = info.charge();  // /info.noise(); 
+  }
+
+  monostereocha = make_pair(charge1, charge2); 
+  return monostereocha;
+}
+
 std::pair<float,float> TrackLocalAngle::findtrackangle(const TrajectoryMeasurement& theTM)
 {
   
@@ -58,14 +96,8 @@ std::pair<float,float> TrackLocalAngle::findtrackangle(const TrajectoryMeasureme
     
     GlobalVector gtrkdir=gdet->toGlobal(trackdirection);
       
-    //cluster and trackdirection on mono det
-    
-    // THIS IS THE POINTER TO THE MONO HIT OF A MATCHED HIT 
-    const SiStripRecHit2D *monohit=matchedhit->monoHit();
-    
-    const edm::Ref<edm::DetSetVector<SiStripCluster>, SiStripCluster, edm::refhelper::FindForDetSetVector<SiStripCluster> > monocluster=monohit->cluster();
-    const GeomDetUnit * monodet=gdet->monoDet();
-    
+    //trackdirection on monodet
+    const GeomDetUnit * monodet=gdet->monoDet();    
     LocalVector monotkdir=monodet->toLocal(gtrkdir);
    
     if(monotkdir.z() != 0){
@@ -75,11 +107,6 @@ std::pair<float,float> TrackLocalAngle::findtrackangle(const TrajectoryMeasureme
     }
   
     //cluster and trackdirection on stereo det
-    
-    // THIS IS THE POINTER TO THE STEREO HIT OF A MATCHED HIT 
-    const SiStripRecHit2D *stereohit=matchedhit->stereoHit();
-    
-    const edm::Ref<edm::DetSetVector<SiStripCluster>, SiStripCluster, edm::refhelper::FindForDetSetVector<SiStripCluster> > stereocluster=stereohit->cluster();
     const GeomDetUnit * stereodet=gdet->stereoDet(); 
     LocalVector stereotkdir=stereodet->toLocal(gtrkdir);
     
@@ -92,8 +119,6 @@ std::pair<float,float> TrackLocalAngle::findtrackangle(const TrajectoryMeasureme
     
   }
   else if (hit) {
-    //  hit= POINTER TO THE RECHIT
-    const edm::Ref<edm::DetSetVector<SiStripCluster>, SiStripCluster, edm::refhelper::FindForDetSetVector<SiStripCluster> > cluster=hit->cluster();
     
     if(trackdirection.z()!=0){
       

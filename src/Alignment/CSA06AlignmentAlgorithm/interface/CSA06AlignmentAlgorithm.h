@@ -9,6 +9,10 @@
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentIORoot.h"
 #include "Alignment/CSA06AlignmentAlgorithm/interface/TrackLocalAngle.h"
 
+#include "DataFormats/SiStripDetId/interface/TIBDetId.h"
+#include "DataFormats/SiStripDetId/interface/TOBDetId.h"
+#include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
+
 #include "TFile.h"
 #include "TTree.h"
 
@@ -55,6 +59,7 @@ class CSA06AlignmentAlgorithm : public AlignmentAlgorithmBase
   void fillRoot(void);
   bool calcParameters(Alignable* ali);
   void collector(void);
+  std::vector<unsigned int> storeNumberingScheme(const DetId& detid, int type);
 
   // private data members
 
@@ -79,6 +84,8 @@ class CSA06AlignmentAlgorithm : public AlignmentAlgorithmBase
   std::string apeparam;
   // min number of hits on alignable to calc parameters
   int theMinimumNumberOfHits;
+  // min number of hits on alignables to consider a track
+  // int theMinimumHitsOnTrack;
   // max allowed rel error on parameter (else not used)
   double theMaxRelParameterError;
   // collector mode (parallel processing)
@@ -106,10 +113,10 @@ class CSA06AlignmentAlgorithm : public AlignmentAlgorithmBase
   int m_Ntracks,m_allHits,m_Nhits[MAXREC];
   float m_Pt[MAXREC],m_Eta[MAXREC],m_Phi[MAXREC],m_Chi2n[MAXREC];
   int m_hType[MAXHIT], m_hLayer[MAXHIT], m_hOwnerTrack[MAXHIT];
+  int m_hFwBw[MAXHIT], m_hIntExt[MAXHIT], m_hStrRod[MAXHIT], m_hModule[MAXHIT];
   float m_hR[MAXHIT],m_hPhi[MAXHIT],m_hZ[MAXHIT];
   float m_hLocalX[MAXHIT],m_hLocalY[MAXHIT],m_hLocalZ[MAXHIT];
-  float m_hLocalAngle[MAXHIT]; 
-  float m_UresLoc[MAXHIT],m_VresLoc[MAXHIT],m_UerrLoc[MAXHIT],m_VerrLoc[MAXHIT];
+  float m_hLocalAngleMono[MAXHIT], m_hLocalAngleSter[MAXHIT], m_hChargeMono[MAXHIT], m_hChargeSter[MAXHIT]; 
   float m_Xres[MAXHIT],m_Yres[MAXHIT],m_Xerr[MAXHIT],m_Yerr[MAXHIT];
 
   // variables for alignable-wise tree
