@@ -1,0 +1,9 @@
+<use name=FWCore/Utilities>
+<use name=FWCore/Framework>
+<use name=root>
+
+<library file=FindEvtGenParts.cc name=FindEvtGenParts>
+  <use name=FWCore/Framework>
+  <flags SEAL_PLUGIN_NAME="FindEvtGenParts">
+</library>
+
