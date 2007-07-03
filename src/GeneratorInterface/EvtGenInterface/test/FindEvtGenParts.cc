@@ -51,7 +51,14 @@ void FindEvtGenParts::analyze(const edm::Event& event, const edm::EventSetup& se
   char p[100];
   char partType[100];
   char partName2[100];
-  char lundIdstr[100]; 
+  char lundIdstr[100];
+  char mass[100];
+  char width[100];
+  char dm[100];
+  char spin[10];
+  char charge[10];
+  char lifetime[100];
+  char lundKc[10];
 
   while (!feof(decfile)) {
      fscanf(decfile, "%s", firstWord) ;
@@ -61,8 +68,10 @@ void FindEvtGenParts::analyze(const edm::Event& event, const edm::EventSetup& se
        while (!feof(pdtfile)) {
          fscanf(pdtfile, "%s", add);
 	 if (!strcmp(add,"add")) {
-           fscanf(pdtfile, "%s%s%s%s",  p, partType, partName2, lundIdstr) ;
-	   if ( !strcmp(partName,partName2) ) *outfile << lundIdstr << endl;
+           fscanf(pdtfile, "%s%s%s%s%s",  p, partType, partName2, lundIdstr, mass) ;
+           fscanf(pdtfile, "%s%s%s%s%s%s", width, dm, spin, charge, lifetime, lundKc ) ;
+	   // if ( !strcmp(partName,partName2) ) *outfile << lundKc << endl;
+           if ( !strcmp(partName,partName2) ) *outfile << lundIdstr << endl;
 	 }
        }
        fclose(pdtfile);
