@@ -5,13 +5,11 @@
 // constructor ----------------------------------------------------------------
 
 AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
-  conf_(cfg),
   applyBasicCuts( cfg.getParameter<bool>( "applyBasicCuts" ) ),
   applyNHighestPt( cfg.getParameter<bool>( "applyNHighestPt" ) ),
   applyMultiplicityFilter( cfg.getParameter<bool>( "applyMultiplicityFilter" ) ),
   nHighestPt( cfg.getParameter<int>( "nHighestPt" ) ),
   minMultiplicity ( cfg.getParameter<int>( "minMultiplicity" ) ),
-  maxMultiplicity ( cfg.getParameter<int>( "maxMultiplicity" ) ),
   ptMin( cfg.getParameter<double>( "ptMin" ) ),
   ptMax( cfg.getParameter<double>( "ptMax" ) ),
   etaMin( cfg.getParameter<double>( "etaMin" ) ),
@@ -40,13 +38,6 @@ AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
 	edm::LogInfo("AlignmentTrackSelector") 
 	  << "apply multiplicity filter N>=" << minMultiplicity;
 
-  edm::ParameterSet minHitsPerSubdet = conf_.getParameter<edm::ParameterSet>( "minHitsPerSubDet" );
-  minHitsinTIB = minHitsPerSubdet.getUntrackedParameter<int>( "inTIB" , 0 );
-  minHitsinTOB = minHitsPerSubdet.getUntrackedParameter<int>( "inTOB" , 0 );
-  minHitsinTID = minHitsPerSubdet.getUntrackedParameter<int>( "inTID" , 0 );
-  minHitsinTEC = minHitsPerSubdet.getUntrackedParameter<int>( "inTEC" , 0 );
-
-  TkMap = new TrackerAlignableId();
 }
 
 // destructor -----------------------------------------------------------------
@@ -70,7 +61,7 @@ AlignmentTrackSelector::select(const Tracks& tracks, const edm::Event& evt) cons
 
   // apply minimum multiplicity requirement (if selected)
   if (applyMultiplicityFilter) {
-    if (result.size()<(unsigned int)minMultiplicity || result.size()>(unsigned int)maxMultiplicity ) result.clear();
+    if (result.size()<(unsigned int)minMultiplicity) result.clear();
   }
 
   //edm::LogDebug("AlignmentTrackSelector") << "tracks all,kept: " << tracks.size() << "," << result.size();
@@ -92,12 +83,8 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks) const
     float pt=trackp->pt();
     float eta=trackp->eta();
     float phi=trackp->phi();
-    int nhit = trackp->numberOfValidHits(); 
+    int nhit = trackp->recHitsSize(); 
     float chi2n = trackp->normalizedChi2();
-    int nhitinTIB = 0;
-    int nhitinTOB = 0;
-    int nhitinTID = 0;
-    int nhitinTEC = 0;
 
     //edm::LogDebug("AlignmentTrackSelector") << " pt,eta,phi,nhit: "
     //  <<pt<<","<<eta<<","<<phi<<","<<nhit;
@@ -107,20 +94,7 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks) const
        && phi>phiMin && phi<phiMax 
        && nhit>=nHitMin && nhit<=nHitMax
        && chi2n<chi2nMax) {
-
-         for (trackingRecHit_iterator iHit = trackp->recHitsBegin(); iHit != trackp->recHitsEnd(); iHit++) {
-	   std::pair<int,int> typeAndLay = TkMap->typeAndLayerFromDetId( (*iHit)->geographicalId() );
-	   int type = typeAndLay.first; 
-           if (type == int(StripSubdetector::TIB)) nhitinTIB++;
-           if (type == int(StripSubdetector::TOB)) nhitinTOB++;
-           if (type == int(StripSubdetector::TID)) nhitinTID++;
-           if (type == int(StripSubdetector::TEC)) nhitinTEC++;
-         }
-         
-         if (nhitinTIB>=minHitsinTIB &&
-             nhitinTOB>=minHitsinTOB &&
-             nhitinTID>=minHitsinTID &&
-             nhitinTEC>=minHitsinTEC ) result.push_back(trackp);
+      result.push_back(trackp);
     }
   }
 

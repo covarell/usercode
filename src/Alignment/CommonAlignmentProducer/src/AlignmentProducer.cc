@@ -1,13 +1,13 @@
 /// \file AlignmentProducer.cc
 ///
 ///  \author    : Frederic Ronga
-///  Revision   : $Revision: 1.25 $
-///  last update: $Date: 2007/02/19 17:46:02 $
-///  by         : $Author: pivarski $
+///  Revision   : $Revision: 1.28 $
+///  last update: $Date: 2007/03/27 19:45:06 $
+///  by         : $Author: fronga $
 
 #include "Alignment/CommonAlignmentProducer/interface/AlignmentProducer.h"
 
-#include "TrackingTools/PatternTools/interface/Trajectory.h" 
+#include "TrackingTools/PatternTools/interface/TrajTrackAssociation.h"
 
 // System include files
 #include <memory>
@@ -42,23 +42,20 @@
 #include "CondFormats/DataRecord/interface/CSCAlignmentErrorRcd.h"
 
 // Tracking 	 
-#include "TrackingTools/PatternTools/interface/TrajTrackAssociation.h"
+#include "TrackingTools/PatternTools/interface/Trajectory.h" 
 
 // Alignment
 #include "CondFormats/Alignment/interface/Alignments.h"
 #include "CondFormats/Alignment/interface/AlignmentErrors.h"
 #include "Alignment/TrackerAlignment/interface/TrackerScenarioBuilder.h"
 #include "Alignment/MuonAlignment/interface/MuonScenarioBuilder.h"
-#include "Alignment/CommonAlignmentParametrization/interface/AlignmentTransformations.h"
+#include "Alignment/CommonAlignment/interface/Utilities.h"
 #include "Alignment/CommonAlignmentParametrization/interface/RigidBodyAlignmentParameters.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentAlgorithmPluginFactory.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentParameterSelector.h"
 
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "SimDataFormats/Track/interface/SimTrack.h"
-
-using namespace std;
-using namespace edm;
 
 //_____________________________________________________________________________
 AlignmentProducer::AlignmentProducer(const edm::ParameterSet& iConfig) :
@@ -71,7 +68,7 @@ AlignmentProducer::AlignmentProducer(const edm::ParameterSet& iConfig) :
   doMisalignmentScenario_(iConfig.getParameter<bool>("doMisalignmentScenario")),
   saveToDB_(iConfig.getParameter<bool>("saveToDB")),
   doTracker_( iConfig.getUntrackedParameter<bool>("doTracker") ),
-  doMuon_( iConfig.getUntrackedParameter<bool>("doMuon") ),
+  doMuon_( iConfig.getUntrackedParameter<bool>("doMuon") ) ,
   isData_( iConfig.getUntrackedParameter<bool>("isData") )
 {
 
@@ -96,7 +93,6 @@ AlignmentProducer::AlignmentProducer(const edm::ParameterSet& iConfig) :
   // Check if found
   if ( !theAlignmentAlgo )
 	throw cms::Exception("BadConfig") << "Couldn't find algorithm called " << algoName;
-
 }
 
 
@@ -108,8 +104,8 @@ AlignmentProducer::~AlignmentProducer()
   // delete theAlignmentParameterStore;
   // delete theAlignmentParameterBuilder;
 
-  // if (doTracker_) delete theAlignableTracker;
-  // if (doMuon_)    delete theAlignableMuon;
+  // if (theAlignableTracker) delete theAlignableTracker;
+  // if (theAlignableMuon)    delete theAlignableMuon;
 
 }
 
@@ -146,7 +142,6 @@ AlignmentProducer::produceCSC( const MuonGeometryRecord& iRecord )
 // Initialize algorithm
 void AlignmentProducer::beginOfJob( const edm::EventSetup& iSetup )
 {
-
   edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::beginOfJob";
 
   nevent_ = 0;
@@ -235,24 +230,6 @@ void AlignmentProducer::beginOfJob( const edm::EventSetup& iSetup )
   // Initialize alignment algorithm
   theAlignmentAlgo->initialize( iSetup, theAlignableTracker,
                                 theAlignableMuon, theAlignmentParameterStore );
-  edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::beginOfJob" 
-                            << "Now physically apply alignments to  geometry...";
-
-  // Actually execute all misalignments
-  if ( doTracker_ ) {
-    std::auto_ptr<Alignments> alignments(theAlignableTracker->alignments());
-    std::auto_ptr<AlignmentErrors> alignmentErrors(theAlignableTracker->alignmentErrors());
-    aligner.applyAlignments<TrackerGeometry>( &(*theTracker),&(*alignments),&(*alignmentErrors));
-  }
-  if ( doMuon_ ) {
-    std::auto_ptr<Alignments>      dtAlignments(       theAlignableMuon->dtAlignments());
-    std::auto_ptr<AlignmentErrors> dtAlignmentErrors(  theAlignableMuon->dtAlignmentErrors());
-    std::auto_ptr<Alignments>      cscAlignments(      theAlignableMuon->cscAlignments());
-    std::auto_ptr<AlignmentErrors> cscAlignmentErrors( theAlignableMuon->cscAlignmentErrors());
-
-    aligner.applyAlignments<DTGeometry>( &(*theMuonDT), &(*dtAlignments), &(*dtAlignmentErrors) );
-    aligner.applyAlignments<CSCGeometry>( &(*theMuonCSC), &(*cscAlignments), &(*cscAlignmentErrors) );
-  }
 }
 
 //_____________________________________________________________________________
@@ -260,9 +237,6 @@ void AlignmentProducer::beginOfJob( const edm::EventSetup& iSetup )
 void AlignmentProducer::endOfJob()
 {
 
-  edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::endOfJob" 
-                            << "Terminating algorithm.";
-  theAlignmentAlgo->terminate();
 
   // Save alignments to database
   if (saveToDB_) {
@@ -342,6 +316,29 @@ void AlignmentProducer::startingNewLoop(unsigned int iLoop )
 {
   edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::startingNewLoop" 
                             << "Starting loop number " << iLoop;
+
+  theAlignmentAlgo->startNewLoop();
+
+  edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::startingNewLoop" 
+                            << "Now physically apply alignments to  geometry...";
+
+
+  // Propagate changes to reconstruction geometry (from initialisation or iteration)
+  GeometryAligner aligner;
+  if ( doTracker_ ) {
+    std::auto_ptr<Alignments> alignments(theAlignableTracker->alignments());
+    std::auto_ptr<AlignmentErrors> alignmentErrors(theAlignableTracker->alignmentErrors());
+    aligner.applyAlignments<TrackerGeometry>( &(*theTracker),&(*alignments),&(*alignmentErrors));
+  }
+  if ( doMuon_ ) {
+    std::auto_ptr<Alignments>      dtAlignments(       theAlignableMuon->dtAlignments());
+    std::auto_ptr<AlignmentErrors> dtAlignmentErrors(  theAlignableMuon->dtAlignmentErrors());
+    std::auto_ptr<Alignments>      cscAlignments(      theAlignableMuon->cscAlignments());
+    std::auto_ptr<AlignmentErrors> cscAlignmentErrors( theAlignableMuon->cscAlignmentErrors());
+
+    aligner.applyAlignments<DTGeometry>( &(*theMuonDT), &(*dtAlignments), &(*dtAlignmentErrors) );
+    aligner.applyAlignments<CSCGeometry>( &(*theMuonCSC), &(*cscAlignments), &(*cscAlignmentErrors) );
+  }
 }
 
 
@@ -352,6 +349,10 @@ AlignmentProducer::endOfLoop(const edm::EventSetup& iSetup, unsigned int iLoop)
 {
   edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::endOfLoop" 
                             << "Ending loop " << iLoop;
+
+  edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::endOfLoop" 
+                            << "Terminating algorithm.";
+  theAlignmentAlgo->terminate();
 
   if ( iLoop == theMaxLoops-1 || iLoop >= theMaxLoops ) return kStop;
   else return kContinue;
@@ -370,7 +371,7 @@ AlignmentProducer::duringLoop( const edm::Event& event,
       edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::duringLoop" 
                                 << "Events processed: " << nevent_;
 
-  // Retrieve trajectories and tracks from the event 
+  // Retrieve trajectories and tracks from the event
   edm::InputTag tkTag = theParameterSet.getParameter<edm::InputTag>("tkTag");
   edm::Handle<reco::TrackCollection> m_TrackCollection;
   event.getByLabel( tkTag, m_TrackCollection );
@@ -378,9 +379,9 @@ AlignmentProducer::duringLoop( const edm::Event& event,
   edm::Handle<std::vector<Trajectory> > m_TrajectoryCollection;
   event.getByLabel( tjTag, m_TrajectoryCollection );
   edm::InputTag simTag = theParameterSet.getParameter<edm::InputTag>("simTag");
-  edm::Handle<SimTrackContainer> m_SimCollection;
+  edm::Handle<edm::SimTrackContainer> m_SimCollection;
   if (!isData_) event.getByLabel( simTag, m_SimCollection );
- 
+  
   // Form pairs of trajectories and tracks
   ConstTrajTrackPairCollection m_algoResults;
   reco::TrackCollection::const_iterator   iTrack = m_TrackCollection->begin();
@@ -392,23 +393,21 @@ AlignmentProducer::duringLoop( const edm::Event& event,
         throw cms::Exception("TrajTrackMismatch") << "Couldn't pair trajectory and track";
       m_algoResults.push_back( aPair );
     }
-
+ 
   // Run the alignment algorithm
   theAlignmentAlgo->run(  setup, m_algoResults ,*(m_SimCollection.product()) );
 
-//   // Retrieve trajectories and tracks from the event
-//   edm::InputTag tkTag = theParameterSet.getParameter<edm::InputTag>("tkTag");
-//   edm::Handle<TrajTrackAssociationCollection> m_TrajTracksMap;
-//   event.getByLabel( tkTag, m_TrajTracksMap );
+  /* edm::InputTag tjTag = theParameterSet.getParameter<edm::InputTag>("tjTkAssociationMapTag");
+  edm::Handle<TrajTrackAssociationCollection> m_TrajTracksMap;
+  event.getByLabel( tjTag, m_TrajTracksMap );
 
-//   // Form pairs of trajectories and tracks
-//   ConstTrajTrackPairCollection trajTracks;
-//   for ( TrajTrackAssociationCollection::const_iterator iPair = m_TrajTracksMap->begin();
-//         iPair != m_TrajTracksMap->end(); iPair++ )
-//     trajTracks.push_back( ConstTrajTrackPair( &(*(*iPair).key), &(*(*iPair).val) ) );
+  ConstTrajTrackPairCollection trajTracks;
+  for ( TrajTrackAssociationCollection::const_iterator iPair = m_TrajTracksMap->begin();
+        iPair != m_TrajTracksMap->end(); iPair++ )
+	trajTracks.push_back( ConstTrajTrackPair( &(*(*iPair).key), &(*(*iPair).val) ) );  */
 
-//   // Run the alignment algorithm
-//   theAlignmentAlgo->run(  setup, trajTracks );
+  // Run the alignment algorithm
+  // theAlignmentAlgo->run(  setup, trajTracks );
 
   return kContinue;
 }
@@ -438,49 +437,44 @@ void AlignmentProducer::simpleMisalignment_(const Alignables &alivec, const std:
       output << "the active parameters of each alignable.";
     }
 
-    for (vector<Alignable*>::const_iterator it = alivec.begin(); it != alivec.end(); ++it) {
+    for (std::vector<Alignable*>::const_iterator it = alivec.begin(); it != alivec.end(); ++it) {
       Alignable* ali=(*it);
-      vector<bool> mysel(commSel.empty() ? ali->alignmentParameters()->selector() : commSel);
+      std::vector<bool> mysel(commSel.empty() ? ali->alignmentParameters()->selector() : commSel);
 
-      if (abs(shift)>0.00001) {
-        AlgebraicVector s(3);
-        s[0]=0; s[1]=0; s[2]=0;  
-        if (mysel[RigidBodyAlignmentParameters::dx]) {
-          s[0]=shift*double(random()%1000-500)/500.;
-        }
-        if (mysel[RigidBodyAlignmentParameters::dy]) {
-          s[1]=shift*double(random()%1000-500)/500.;
-        }
-        if (mysel[RigidBodyAlignmentParameters::dz]) {
-          s[2]=shift*double(random()%1000-500)/500.;
-        }
+      if (std::abs(shift)>0.00001) {
+
+        double s0 = mysel[RigidBodyAlignmentParameters::dx] ?
+	  shift*double(random()%1000-500)/500. : 0.;
+
+        double s1 = mysel[RigidBodyAlignmentParameters::dy] ?
+          shift*double(random()%1000-500)/500. : 0.;
+
+        double s2 = mysel[RigidBodyAlignmentParameters::dz] ?
+          shift*double(random()%1000-500)/500. : 0.;
         
-        GlobalVector globalshift;
-        if (local) {
-          globalshift = ali->surface().toGlobal(Local3DVector(s[0],s[1],s[2]));
-        } else {
-          globalshift = Global3DVector(s[0],s[1],s[2]);
-        }
-        ali->move(globalshift);
+        if (local)
+          ali->move( ali->surface().toGlobal(align::LocalVector(s0,s1,s2)) );
+	else
+          ali->move( align::GlobalVector(s0,s1,s2) );
 
       //AlignmentPositionError ape(dx,dy,dz);
       //ali->addAlignmentPositionError(ape);
       }
 
-      if (abs(rot)>0.00001) {
-        AlgebraicVector r(3);
-        r[0]=0; r[1]=0; r[2]=0;
+      if (std::abs(rot)>0.00001) {
+	align::EulerAngles r(3);
+
         if (mysel[RigidBodyAlignmentParameters::dalpha]) {
-          r[0]=rot*double(random()%1000-500)/500.;
+          r(1)=rot*double(random()%1000-500)/500.;
         }
         if (mysel[RigidBodyAlignmentParameters::dbeta]) {
-          r[1]=rot*double(random()%1000-500)/500.;
+          r(2)=rot*double(random()%1000-500)/500.;
         }
         if (mysel[RigidBodyAlignmentParameters::dgamma]) {
-          r[2]=rot*double(random()%1000-500)/500.;
+          r(3)=rot*double(random()%1000-500)/500.;
         }
-        AlignmentTransformations TkAT;
-        Surface::RotationType mrot = TkAT.rotationType(TkAT.rotMatrix3(r));
+
+        align::RotationType mrot = align::toMatrix(r);
         if (local) ali->rotateInLocalFrame(mrot);
         else ali->rotateInGlobalFrame(mrot);
         
@@ -519,33 +513,34 @@ void AlignmentProducer::createGeometries_( const edm::EventSetup& iSetup )
    }
 }
 
-
 //__________________________________________________________________________________________________
-const bool AlignmentProducer::trajTrackMatch_( const ConstTrajTrackPair& pair ) const
+const bool AlignmentProducer::trajTrackMatch_( const ConstTrajTrackPair& pair )
+const
 {
-
+ 
   // Compare a trajectory and a track
   // Currently based on rec.hits. comparison
-
-
+ 
+ 
   // 1. - should have same number of hits
-  if ( pair.first->measurements().size() != pair.second->recHitsSize() ) return false;
-
+  if ( pair.first->measurements().size() != pair.second->recHitsSize() ) return
+false;
+ 
   // 2. - compare hits
   Trajectory::ConstRecHitContainer recHits( pair.first->recHits() );
   trackingRecHit_iterator iTkHit = pair.second->recHitsBegin();
-
+ 
   for ( Trajectory::ConstRecHitContainer::const_iterator iTjHit = recHits.begin();
         iTjHit != recHits.end(); ++iTjHit, ++iTkHit )
     {
-
+ 
       if ( (*iTjHit)->isValid() && (*iTkHit)->isValid() ) // Skip invalid hits
         {
-
+ 
           // Module Id
           if ( (*iTjHit)->geographicalId() != (*iTkHit)->geographicalId() )
             return false;
-
+ 
           // Local position
           if ( fabs((*iTjHit)->localPosition().x() - (*iTkHit)->localPosition().x()) > 1.e-12
                || fabs((*iTjHit)->localPosition().y() - (*iTkHit)->localPosition().y()) > 1.e-12
@@ -554,7 +549,7 @@ const bool AlignmentProducer::trajTrackMatch_( const ConstTrajTrackPair& pair ) 
             return false;
         }
     }
-
+ 
   return true;
-
+ 
 }

@@ -8,12 +8,12 @@ $host=`echo \$HOST`;
 if    ( $host =~ /fpslife/ ) { $location="fpslife"; }
 elsif ( $host =~ /lxplus/ )  { $location="lxplus"; }
 elsif ( $host =~ /cnaf/ )    { $location="cnaf"; }
-elsif ( $host =~ /lxcms/ )  { $location="lxcmsg1"; }
+elsif ( $host =~ /lxcms/ )   { $location="lxcmsg1"; }
 
 # job steering ----------------------------------------------------------------
 
 # name of job
-$jobname="AliTIBlaySS-xb-prova2";
+$jobname="FnalTIBstr-xg-all";
 
 # cfg file
 $steering="AlignCosmics.cfg";
@@ -25,27 +25,27 @@ $dbfiles="Alignments.db condbcatalog.xml";
 $authfile="authentication.xml";
 
 # db input file
-# $sqlitefile="CSA06Scenario.db"; $condbcatalogfile="condbcatalog.xml";
+# $sqlitefile="HIPScenario.db"; $condbcatalogfile="condbcatalog.xml";
 $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=10000;
+$nevent=4000;
 
 # first event
 $firstev=0;
 
 # number of jobs
-$njobs=1;
+$njobs=20;
 
 # number of iterations (excluding initial step)
-$iterations=30;
+$iterations=20;
 
 # interactive or lxbatch queue
-$farm="I";
+# $farm="I";
 # $farm="8nm"; $resource="";
-# $farm="dedicated -R cmsalca";
+$farm="dedicated -R cmsalca";
 
-$cmsswvers="CMSSW_1_3_0_pre5";
+$cmsswvers="CMSSW_1_3_1";
 $scramarch="slc3_ia32_gcc323";
 $scram=scramv1;
 
@@ -55,15 +55,15 @@ $sleeptime=30;
 # site-specific paths etc
 
 if ( $location eq "lxcmsg1" ) {
-  $homedir="/afs/cern.ch/user/c/covarell";
+  $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment";
   $basedir="${homedir}/${cmsswvers}";
   $outdir="/data/covarell/joboutput";
 }
 elsif ( $location eq "lxplus" ) {
-  die "ERROR: Root files for the analysis are on lxcmsg1!\n";
-#  $homedir="/afs/cern.ch/user/f/fpschill";
-#  $basedir="${homedir}/${cmsswvers}";
-#  $outdir="${homedir}/scratch0/joboutput";
+  # die "ERROR: Root files for the analysis are on lxcmsg1!\n";
+   $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment";
+   $basedir="${homedir}/${cmsswvers}";
+   $outdir="/afs/cern.ch/user/c/covarell/scratch0/joboutput";
 }
 elsif ( $location eq "fpslife" ) {
    die "ERROR: location: $location unsupported!\n";
@@ -87,11 +87,11 @@ $workdir="${basedir}/src/Alignment/CommonAlignmentProducer/test";
 
 print "\n";
 print "-------------------------------------------------------------------------------\n";
-print "A l i g n m e n t \n";
+print "H I P   A l i g n m e n t \n";
 print "-------------------------------------------------------------------------------\n";
 print "Location: $location\n";
 print "Workdir: ${workdir}\n";
-print "Outdir: ${outdir}\n";
+print "Outdir: ${outdir}/${jobname}/${cmsswvers}\n";
 if ($njobs>1) { 
   print "Parallel Jobs: ${njobs} with $nevent events per job\n";
 }
@@ -114,6 +114,7 @@ cd $cmsswvers;
 mkdir -p lib/${scramarch};
 mkdir -p bin/${scramarch};
 mkdir -p config/${scramarch};
+mkdir -p module/${scramarch};
 cp $basedir/lib/${scramarch}/* lib/${scramarch} > /dev/null;
 cp $basedir/module/${scramarch}/* module/${scramarch} > /dev/null;
 ");
@@ -192,9 +193,9 @@ system("cp ${workdir}/$steering $dir/cfgfile");
 $repl="
   replace PoolSource.maxEvents  = 1
   replace PoolSource.skipEvents = 0
-  replace AlignmentProducer.CSA06AlignmentAlgorithm.collectorActive = true
-  replace AlignmentProducer.CSA06AlignmentAlgorithm.collectorNJobs = $njobs
-  replace AlignmentProducer.CSA06AlignmentAlgorithm.collectorPath = \"../\"
+  replace HIPAlignmentAlgorithm.collectorActive = true
+  replace HIPAlignmentAlgorithm.collectorNJobs = $njobs
+  replace HIPAlignmentAlgorithm.collectorPath = \"../\"
 ";
 replace("$dir/cfgfile",$repl);
 
@@ -298,7 +299,7 @@ sub run_collector
     subjob
   ");
   if ($iteration gt 0) {
-    system("cp $dir/job1/CSA06AlignmentEvents.root $dir/main");
+    system("cp $dir/job1/HIPAlignmentEvents.root $dir/main");
   }
 
   return 0;
