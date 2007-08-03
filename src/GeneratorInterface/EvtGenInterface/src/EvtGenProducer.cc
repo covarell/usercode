@@ -14,7 +14,7 @@
 //
 // Original Author:  Nello Nappi
 //         Created:  Fri May 11 15:19:32 CEST 2007
-// $Id$
+// $Id: EvtGenProducer.cc,v 1.2 2007/07/03 13:29:15 covarell Exp $
 //
 //
 #include "FWCore/PluginManager/interface/PluginManager.h"
@@ -32,6 +32,7 @@
 
 #include "GeneratorInterface/EvtGenInterface/interface/EvtGenProducer.h"
 #include "GeneratorInterface/EvtGenInterface/interface/myEvtRandomEngine.h"
+
 
 #include <iostream>
 
@@ -64,12 +65,14 @@ EvtGenProducer::EvtGenProducer(edm::ParameterSet const & p)
   produces<edm::HepMCProduct>();   // declare 
     
   m_EvtGen = new EvtGen (decay_table.c_str(),pdt.c_str(),the_engine);  // 4 th parameter should be rad cor
+  // EvtPythia::pythiaInit(0);      // Patrick Robbe's advice
 
   std::vector<std::string>::const_iterator i;
   nforced=0;
   for (i=forced_names.begin(); i!=forced_names.end(); ++i)   // i will point to strings containing
                                                             // names of particles with forced decay
     {
+      nforced++;
       EvtId found = EvtPDL::getId(*i);        // EvtPDL::getID finds the EvtId corresponding to name
       if (found.getId()==-1)
 	{
@@ -84,6 +87,7 @@ EvtGenProducer::EvtGenProducer(edm::ParameterSet const & p)
       forced_Evt.push_back(found);                   // forced_Evt is the list of EvtId's
       forced_Hep.push_back(EvtPDL::getStdHep(found));// forced_Hep is the list of stdhep codes
     }
+
 }
 
 EvtGenProducer::~EvtGenProducer() 
@@ -124,9 +128,11 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
   for (HepMC::GenEvent::particle_const_iterator p=Evt->particles_begin(); p != Evt->particles_end(); ++p)
     {
       int status = (*p)->status();
+ 
       if(status!=2)                 // only not decayed (status = 2 ) particles
 	{ 
 	  int idHep = (*p)->pdg_id();
+
 	  int do_force=0;
 	  for(int i=0;i<nforced;i++)           // First check if part with forced decay
 	    {                                  // In that case do not decay immediately 
@@ -145,7 +151,7 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
 		  do_force=1;
 		}
 	    }
-	  if(do_force==0)         // particels with decays not forced are decayed immediately 
+	  if(do_force==0)         // particles with decays not forced are decayed immediately 
 	    {
 	      idEvt = EvtPDL::evtIdFromStdHep(idHep);
 	      ipart = idEvt.getId();
@@ -161,7 +167,10 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
       int which = nlist*m_flat->fire(); if(which==nlist)which=nlist-1;
 	  for(int k=0;k<nlist;k++)
 	    {
-	      if(k==which)decay(listp[k],forced_Evt[k]);      // decay as alias
+	      if(k==which)
+		{
+		  decay(listp[k],forced_Evt[k]);           // decay as alias
+		}
 	      else
 		{
 		  int id_non_alias=forced_Evt[k].getId();
@@ -171,6 +180,7 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
 	    }
     }
 }
+
 
 void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt)
 {
@@ -199,7 +209,7 @@ void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt)
       partEvt = new EvtHighSpinParticle();
       break;
     default:
-      std::cout << "Unknown spintype in EvtSpinType!" ;   
+      std::cout << "Unknown spintype in EvtSpinType!" << std::endl;   
       return;
     }
     EvtVector4R momEvt;                    // translate particle 4 momentum from Hep to Evt formaT
@@ -207,8 +217,11 @@ void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt)
     momHep=partHep->momentum();
     momEvt.set(momHep.t(),momHep.x(),momHep.y(),momHep.z());
     partEvt->init(idEvt,momEvt);
-    m_EvtGen->generateDecay(partEvt);
-    //.... translate to StdHep format ?   ......
+    partEvt->setDiagonalSpinDensity();        // unpolarized ??? ... check & see if Pythia has polarization
+    //    partEvt->printParticle();                    // DEBUG
+    partEvt->decay();                    
+
+
     partEvt->deleteTree();
 }        
 
