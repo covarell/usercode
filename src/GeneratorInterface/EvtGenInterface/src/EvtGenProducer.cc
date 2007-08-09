@@ -23,9 +23,12 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "HepMC/IO_HEPEVT.h"
 
 #include "FWCore/Utilities/interface/Exception.h"
-
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/Run.h"
+#include "Utilities/General/interface/FileInPath.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
 #include "CLHEP/Random/Random.h"
@@ -99,6 +102,8 @@ EvtGenProducer::~EvtGenProducer()
 
 void EvtGenProducer::beginJob(const edm::EventSetup & es)
 {
+  ntotal = 0;
+  std::cout << " EvtGenProducer starting ... " << std::endl;
   /*    StaticRandomEngineSetUnset random(m_engine);
 
     std::cout << " EvtGenProducer initializing " << std::endl;
@@ -107,12 +112,13 @@ void EvtGenProducer::beginJob(const edm::EventSetup & es)
 }
  
 void EvtGenProducer::endJob()
-{ std::cout << " EvtGenProducer terminating " << std::endl; }
+{ std::cout << " EvtGenProducer terminating ... " << std::endl; }
  
 void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
 {
   int idHep,ipart,status;
   EvtId idEvt;
+  std::auto_ptr<edm::HepMCProduct> new_product( new edm::HepMCProduct() ); 
 
   edm::Handle< edm::HepMCProduct > EvtHandle ;
   e.getByLabel( "source", EvtHandle ) ;
@@ -127,11 +133,11 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
   int index[10];       // list of candidates to be forced 
   for (HepMC::GenEvent::particle_const_iterator p=Evt->particles_begin(); p != Evt->particles_end(); ++p)
     {
-      int status = (*p)->status();
+      status = (*p)->status();
  
-      if(status!=2)                 // only not decayed (status = 2 ) particles
+      if(status!=2)                 // only not decayed (status = 2) particles
 	{ 
-	  int idHep = (*p)->pdg_id();
+	  idHep = (*p)->pdg_id();
 
 	  int do_force=0;
 	  for(int i=0;i<nforced;i++)           // First check if part with forced decay
@@ -164,7 +170,8 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
   if(nlist!=0)
     {
       // decide randomly which one to decay as alias
-      int which = nlist*m_flat->fire(); if(which==nlist)which=nlist-1;
+      int which = (int)(nlist*m_flat->fire()); 
+      if(which==nlist)which=nlist-1;
 	  for(int k=0;k<nlist;k++)
 	    {
 	      if(k==which)
@@ -179,11 +186,24 @@ void EvtGenProducer::produce(edm::Event & e, const edm::EventSetup & es)
 		}
 	    }
     }
+
+    HepMC::IO_HEPEVT conv;
+    //HepMC::GenEvent* evt = conv.getGenEventfromHEPEVT();
+    HepMC::GenEvent* evt = conv.read_next_event();
+    evt->set_signal_process_id( Evt->signal_process_id() );
+    evt->set_event_scale( Evt->event_scale() );
+    evt->set_event_number( Evt->event_number() );
+
+    if (evt) new_product->addHepMCData( evt );
+
+    e.put( new_product );
+
 }
 
 
 void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt)
 {
+  // Set spin type
   EvtSpinType::spintype stype = EvtPDL::getSpinType(idEvt);
   EvtParticle* partEvt;
     switch (stype){
@@ -212,17 +232,35 @@ void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt)
       std::cout << "Unknown spintype in EvtSpinType!" << std::endl;   
       return;
     }
-    EvtVector4R momEvt;                    // translate particle 4 momentum from Hep to Evt formaT
-    CLHEP::HepLorentzVector momHep;
-    momHep=partHep->momentum();
+
+    // Generate decay
+    EvtVector4R momEvt; // translate particle 4 momentum from Hep to Evt format
+    HepMC::FourVector momHep = partHep->momentum();
     momEvt.set(momHep.t(),momHep.x(),momHep.y(),momHep.z());
     partEvt->init(idEvt,momEvt);
-    partEvt->setDiagonalSpinDensity();        // unpolarized ??? ... check & see if Pythia has polarization
-    //    partEvt->printParticle();                    // DEBUG
+    partEvt->setDiagonalSpinDensity();        // unpolarized ??? 
     partEvt->decay();                    
 
-
+    if (ntotal % 2000 == 0) {
+      partEvt->printParticle();                    // DEBUG
+      partEvt->printTree();
+      std::cout << "--------------------------------------------" << std::endl;
+    }
+    ntotal++;
     partEvt->deleteTree();
+
+    // Store particle in HEPEVT format
+    static EvtStdHep evtstdhep;
+    static EvtSecondary evtsecondary;
+    EvtId        list_of_stable[10];
+    EvtParticle* stable_parent[10];
+        
+    list_of_stable[0]=EvtId(-1,-1);
+    stable_parent[0]=0;
+    
+    evtstdhep.init();
+    evtsecondary.init();
+    partEvt->makeStdHep(evtstdhep,evtsecondary,list_of_stable);
 }        
 
 /* StaticRandomEngineSetUnset::StaticRandomEngineSetUnset() {
@@ -257,5 +295,5 @@ StaticRandomEngineSetUnset::~StaticRandomEngineSetUnset() {
 CLHEP::HepRandomEngine*
 StaticRandomEngineSetUnset::getEngine() const { return m_currentEngine; } */
 
-DEFINE_FWK_MODULE(EvtGenProducer);
+// DEFINE_FWK_MODULE(EvtGenProducer);
  

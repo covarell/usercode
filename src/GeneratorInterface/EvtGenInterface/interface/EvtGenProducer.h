@@ -44,10 +44,16 @@
 #include "EvtGenBase/EvtRaritaSchwingerParticle.hh"
 #include "EvtGenBase/EvtTensorParticle.hh"
 #include "EvtGenBase/EvtHighSpinParticle.hh"
+#include "EvtGenBase/EvtStdHep.hh"
+#include "EvtGenBase/EvtSecondary.hh"
 
 namespace CLHEP {
   class HepRandomEngine;
   class RandFlat;
+}
+
+namespace HepMC {
+  class GenParticle;
 }
 
 class EvtGenProducer : public edm::EDProducer
@@ -70,5 +76,6 @@ private:
   std::vector<EvtId> forced_Evt;     // EvtId's of particels with forced decay
   std::vector<int> forced_Hep;       // HepId's of particels with forced decay
   int nforced;                       // number of particels with forced decay
+  int ntotal;
 };
 
