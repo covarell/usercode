@@ -54,6 +54,7 @@ namespace CLHEP {
 
 namespace HepMC {
   class GenParticle;
+  class GenEvent;
 }
 
 class EvtGenProducer : public edm::EDProducer
@@ -67,7 +68,7 @@ private:
   virtual void beginJob(const edm::EventSetup & c);                
   virtual void endJob();                                           
   virtual void produce(edm::Event & e, const edm::EventSetup & c); 
-  void decay(HepMC::GenParticle* partHep, EvtId idEvt);
+  void decay(HepMC::GenParticle* partHep, EvtId idEvt, HepMC::GenEvent* theEvent);
   // member data 
 
 private:
