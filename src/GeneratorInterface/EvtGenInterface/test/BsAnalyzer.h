@@ -28,10 +28,16 @@ class BsAnalyzer : public edm::EDAnalyzer
      std::string theSrc ;
      TFile*      fOutputFile ;
      TH1D*       hGeneralId ;
+     TH1D*       hIdPhiDaugs ;
+     TH1D*       hHelicityAng ;
      TH1D*       hPtbs ;
      TH1D*       hPbs ;
      TH1D*       hPhibs ;
      TH1D*       hEtabs ;
+     TH1D*       hPtmu ;
+     TH1D*       hPmu ;
+     TH1D*       hPhimu ;
+     TH1D*       hEtamu ;
      TH1D*       hmumuMass ;
      TH1D*       hIdBsDaugs ;
      TH1D*       hIdBDaugs ;

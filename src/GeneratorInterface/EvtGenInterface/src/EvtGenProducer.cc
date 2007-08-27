@@ -23,7 +23,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-#include "HepMC/IO_HEPEVT.h"
+// #include "HepMC/IO_HEPEVT.h"
 
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -62,12 +62,15 @@ EvtGenProducer::EvtGenProducer(edm::ParameterSet const & p)
   std::string decay_table = p.getParameter<std::string>("decay_table");
   std::string pdt = p.getParameter<std::string>("particle_property_file");
   // any number of alias names for forced decays can be specified using dynamic std vector of strings
+  std::string user_decay = p.getUntrackedParameter<std::string>("user_decay_file","none");
   std::vector<std::string> forced_names = p.getParameter< std::vector<std::string> >("list_forced_decays");
     
   produces<edm::HepMCProduct>();   // declare 
     
   m_EvtGen = new EvtGen (decay_table.c_str(),pdt.c_str(),the_engine);  
   // 4 th parameter should be rad cor - set to PHOTOS (default)
+ 
+  if (user_decay != "none") m_EvtGen->readUDecay( user_decay.c_str() );
 
   std::vector<std::string>::const_iterator i;
   nforced=0;
@@ -245,7 +248,7 @@ void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt, HepMC::GenE
 
     // ********* Now add to the HepMC Event **********
 
-    // Then loop on evtstdhep to add vertexes, then particles
+    // Then loop on evtstdhep to add vertexes... 
     HepMC::GenVertex* theVerts[100];
     for (int ivert = 0; ivert < 100; ivert++) { 
       theVerts[ivert] = 0;
@@ -253,31 +256,29 @@ void EvtGenProducer::decay(HepMC::GenParticle* partHep, EvtId idEvt, HepMC::GenE
 
     for (int ipart = 0; ipart < evtstdhep.getNPart(); ipart++) {
       int theMum = evtstdhep.getFirstMother(ipart);
-      // std::cout << "Particle = " << ipart << std::endl;
       if (theMum != -1 && !theVerts[theMum]) {
+        EvtVector4R theVpos = evtstdhep.getX4(ipart) + posEvt;
 	theVerts[theMum] = 
-	  new HepMC::GenVertex(HepMC::FourVector(evtstdhep.getX4(ipart).get(0),
-						 evtstdhep.getX4(ipart).get(1),
-						 evtstdhep.getX4(ipart).get(2),
-						 evtstdhep.getX4(ipart).get(3)),0);
-	// theEvent->add_vertex( theVerts[theMum] ); 
-        // std::cout << "Mother = " << theMum << std::endl;
+	  new HepMC::GenVertex(HepMC::FourVector(theVpos.get(1),
+						 theVpos.get(2),
+						 theVpos.get(3),
+						 theVpos.get(0)),0);
       }
     }
 
-    // std::cout << "OK vertices" << std::endl;
+    // ...then particles
+    partHep->set_status(2);
+    theVerts[0]->add_particle_in( partHep );
 
-    for (int ipart2 = 0; ipart2 < evtstdhep.getNPart(); ipart2++) {
+    for (int ipart2 = 1; ipart2 < evtstdhep.getNPart(); ipart2++) {
       HepMC::GenParticle* thePart = 
-	new HepMC::GenParticle( HepMC::FourVector(evtstdhep.getP4(ipart2).get(0),
-						  evtstdhep.getP4(ipart2).get(1),
+	new HepMC::GenParticle( HepMC::FourVector(evtstdhep.getP4(ipart2).get(1),
 						  evtstdhep.getP4(ipart2).get(2),
-						  evtstdhep.getP4(ipart2).get(3)),
+						  evtstdhep.getP4(ipart2).get(3),
+						  evtstdhep.getP4(ipart2).get(0)),
 				evtstdhep.getStdHepID(ipart2),
 				evtstdhep.getIStat(ipart2));
       int theMum2 = evtstdhep.getFirstMother(ipart2);
-      // std::cout << "Particle = " << ipart2 << std::endl;
-      // std::cout << "Mother = " << theMum2 << std::endl;
       if (theMum2 != -1 && theVerts[theMum2]) theVerts[theMum2]->add_particle_out( thePart );
       if (theVerts[ipart2]) theVerts[ipart2]->add_particle_in( thePart );
     }

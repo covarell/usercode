@@ -51,8 +51,13 @@ void BsAnalyzer::beginJob( const EventSetup& )
    hPbs  = new TH1D( "hPbs",  "P Bs",  100,  0., 200. ) ;
    hPhibs = new TH1D( "hPhibs","Phi Bs",  100,  -3.14, 3.14) ;
    hEtabs = new TH1D( "hEtabs","Eta Bs",  100,  -15.0, 15.0) ;
-   hmumuMass = new TH1D( "hmumuMass","#mu^{+}#mu^{-} invariant mass",  100, 0., 10.0) ;
+   hPtmu = new TH1D( "hPtmu", "Pt Mu", 100,  0., 50. ) ;
+   hPmu  = new TH1D( "hPmu",  "P Mu",  100,  0., 200. ) ;
+   hPhimu = new TH1D( "hPhimu","Phi Mu",  100,  -3.14, 3.14) ;
+   hEtamu = new TH1D( "hEtamu","Eta Mu",  100,  -15.0, 15.0) ;
+   hmumuMass = new TH1D( "hmumuMass","#mu^{+}#mu^{-} invariant mass",  100, -1.0, 10.0) ;
    hIdBsDaugs = new TH1D( "hIdBsDaugs","LundIDs of the Bs's daughters",  100, -1000., 1000.) ;
+   hIdPhiDaugs = new TH1D( "hIdPhiDaugs","LundIDs of the phi's daughters",  100, -500., 500.) ;
    hIdBDaugs = new TH1D( "hIdBDaugs","LundIDs of the B's daughters",  100, -1000., 1000.) ;
 
    decayed = new ofstream("decayed.txt") ;
@@ -85,7 +90,7 @@ void BsAnalyzer::analyze( const Event& e, const EventSetup& )
        }
      }
      // if ( abs((*p)->pdg_id()) == 211 || abs((*p)->pdg_id()) == 213 ) (*p)->print(); // pi vs rho
-     if ( abs((*p)->pdg_id()) == 531 ) {  // B_s 
+     if ( (*p)->pdg_id() == 531 ) {  // B_s 
        nbs++;
        hPtbs->Fill((*p)->momentum().perp());
        hPbs->Fill( sqrt ( pow((*p)->momentum().px(),2)+pow((*p)->momentum().py(),2)+
@@ -105,14 +110,28 @@ void BsAnalyzer::analyze( const Event& e, const EventSetup& )
 	 }
        }
      }
+     if ( (*p)->pdg_id() == 333 ) {  // phi 
+       if (genvert) {
+         for ( HepMC::GenVertex::particles_out_const_iterator cp = genvert->particles_out_const_begin(); cp != genvert->particles_out_const_end(); ++cp ) {
+	   hIdPhiDaugs->Fill((*cp)->pdg_id());
+	 }
+       }
+     }
      if ( (*p)->pdg_id() == 13 ) { // mu+
+       hPtmu->Fill((*p)->momentum().perp());
+       hPmu->Fill( sqrt ( pow((*p)->momentum().px(),2)+pow((*p)->momentum().py(),2)+
+			  pow((*p)->momentum().pz(),2) )) ;
+       hPhimu->Fill((*p)->momentum().phi());
+       hEtamu->Fill((*p)->momentum().pseudoRapidity());
        for ( HepMC::GenEvent::particle_const_iterator p2 = Evt->particles_begin(); p2 != Evt->particles_end(); ++p2 ) {
 	 if ( (*p2)->pdg_id() == -13 ) { // mu-
 	   HepMC::FourVector pdiff;
+           cout << "MU+ " << (*p)->momentum().px() << " " << (*p)->momentum().py() << " " << (*p)->momentum().pz() << " " << (*p)->momentum().e() << endl;
+           cout << "MU- " << (*p2)->momentum().px() << " " << (*p2)->momentum().py() << " " << (*p2)->momentum().pz() << " " << (*p2)->momentum().e() << endl;
            pdiff.set((*p)->momentum().px() + (*p2)->momentum().px(),
 		     (*p)->momentum().py() + (*p2)->momentum().py(),
                      (*p)->momentum().pz() + (*p2)->momentum().pz(),
-                     (*p)->momentum().e() + (*p2)->momentum().e());
+		     (*p)->momentum().e() + (*p2)->momentum().e());
            hmumuMass->Fill(pdiff.m());
 	 }
        }
