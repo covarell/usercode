@@ -67,6 +67,7 @@ AlignmentProducer::AlignmentProducer(const edm::ParameterSet& iConfig) :
   applyDbAlignment_( iConfig.getUntrackedParameter<bool>("applyDbAlignment",false) ),
   doMisalignmentScenario_(iConfig.getParameter<bool>("doMisalignmentScenario")),
   saveToDB_(iConfig.getParameter<bool>("saveToDB")),
+  storeAPEInDB_(iConfig.getUntrackedParameter<bool>("storeAPEInDB",true)),
   doTracker_( iConfig.getUntrackedParameter<bool>("doTracker") ),
   doMuon_( iConfig.getUntrackedParameter<bool>("doMuon") ) ,
   isData_( iConfig.getUntrackedParameter<bool>("isData") )
@@ -262,14 +263,16 @@ void AlignmentProducer::endOfJob()
        else
 	  poolDbService->appendSinceTime<Alignments>( alignments, poolDbService->currentTime(), 
 						      alignRecordName );
-       if ( poolDbService->isNewTagRequest(errorRecordName) )
-	  poolDbService->createNewIOV<AlignmentErrors>( alignmentErrors, poolDbService->endOfTime(), 
-							errorRecordName );
-       else
-	  poolDbService->appendSinceTime<AlignmentErrors>( alignmentErrors, poolDbService->currentTime(), 
-							   errorRecordName );
+
+       if (storeAPEInDB_) {
+	 if ( poolDbService->isNewTagRequest(errorRecordName) )
+	   poolDbService->createNewIOV<AlignmentErrors>( alignmentErrors, poolDbService->endOfTime(), 
+							 errorRecordName );
+	 else
+	   poolDbService->appendSinceTime<AlignmentErrors>( alignmentErrors, poolDbService->currentTime(), 
+							    errorRecordName );
+       }
     }
- 
     if ( doMuon_ ) {
        // Get alignments+errors
        Alignments*      dtAlignments       = theAlignableMuon->dtAlignments();
@@ -371,44 +374,55 @@ AlignmentProducer::duringLoop( const edm::Event& event,
       edm::LogInfo("Alignment") << "@SUB=AlignmentProducer::duringLoop" 
                                 << "Events processed: " << nevent_;
 
-  // Retrieve trajectories and tracks from the event
-  edm::InputTag tkTag = theParameterSet.getParameter<edm::InputTag>("tkTag");
-  edm::Handle<reco::TrackCollection> m_TrackCollection;
-  event.getByLabel( tkTag, m_TrackCollection );
-  edm::InputTag tjTag = theParameterSet.getParameter<edm::InputTag>("tjTag");
-  edm::Handle<std::vector<Trajectory> > m_TrajectoryCollection;
-  event.getByLabel( tjTag, m_TrajectoryCollection );
-  edm::InputTag simTag = theParameterSet.getParameter<edm::InputTag>("simTag");
-  edm::Handle<edm::SimTrackContainer> m_SimCollection;
-  if (!isData_) event.getByLabel( simTag, m_SimCollection );
-  
-  // Form pairs of trajectories and tracks
-  ConstTrajTrackPairCollection m_algoResults;
-  reco::TrackCollection::const_iterator   iTrack = m_TrackCollection->begin();
-  std::vector<Trajectory>::const_iterator iTraj  = m_TrajectoryCollection->begin();
-  for ( ; iTrack != m_TrackCollection->end(); ++iTrack, ++iTraj )
-    {
-      ConstTrajTrackPair aPair(  &(*iTraj), &(*iTrack)  );
-      if ( !this->trajTrackMatch_( aPair ) )
-        throw cms::Exception("TrajTrackMismatch") << "Couldn't pair trajectory and track";
-      m_algoResults.push_back( aPair );
+  try {  
+    // Retrieve trajectories and tracks from the event
+    edm::InputTag tkTag = theParameterSet.getParameter<edm::InputTag>("tkTag");
+    edm::Handle<reco::TrackCollection> m_TrackCollection;
+    LogDebug("Alignment") << "tkTag = " << tkTag;
+    event.getByLabel( tkTag, m_TrackCollection );
+    edm::InputTag tjTag = theParameterSet.getParameter<edm::InputTag>("tjTag");
+    edm::Handle<std::vector<Trajectory> > m_TrajectoryCollection;
+    LogDebug("Alignment") << "tjTag = " << tjTag;
+    event.getByLabel( tjTag, m_TrajectoryCollection );
+    edm::InputTag simTag = theParameterSet.getParameter<edm::InputTag>("simTag");
+    edm::Handle<edm::SimTrackContainer> m_SimCollection;
+    if (!isData_) event.getByLabel( simTag, m_SimCollection );
+    
+    // Form pairs of trajectories and tracks
+    ConstTrajTrackPairCollection m_algoResults;
+    reco::TrackCollection::const_iterator   iTrack = m_TrackCollection->begin();
+    std::vector<Trajectory>::const_iterator iTraj  = m_TrajectoryCollection->begin();
+    for ( ; iTrack != m_TrackCollection->end(); ++iTrack, ++iTraj )
+      {
+	ConstTrajTrackPair aPair(  &(*iTraj), &(*iTrack)  );
+	LogDebug("Alignment") << "pt = " << (*iTrack).pt(); 
+	if ( !this->trajTrackMatch_( aPair ) )
+	  throw cms::Exception("TrajTrackMismatch") << "Couldn't pair trajectory and track";
+	m_algoResults.push_back( aPair );
+      }
+    
+    // Run the alignment algorithm
+    theAlignmentAlgo->run(  setup, m_algoResults ,*(m_SimCollection.product()) );
+    
+    /* edm::InputTag tjTag = theParameterSet.getParameter<edm::InputTag>("tjTkAssociationMapTag");
+       edm::Handle<TrajTrackAssociationCollection> m_TrajTracksMap;
+       event.getByLabel( tjTag, m_TrajTracksMap );
+       
+       ConstTrajTrackPairCollection trajTracks;
+       for ( TrajTrackAssociationCollection::const_iterator iPair = m_TrajTracksMap->begin();
+       iPair != m_TrajTracksMap->end(); iPair++ )
+       trajTracks.push_back( ConstTrajTrackPair( &(*(*iPair).key), &(*(*iPair).val) ) );  */
+    
+    // Run the alignment algorithm
+    // theAlignmentAlgo->run(  setup, trajTracks );
+
+  } catch(const edm::Exception& e) {
+    if ( e.categoryCode() != edm::errors::ProductNotFound ) {
+      //wrong reason for exception
+      throw;
     }
- 
-  // Run the alignment algorithm
-  theAlignmentAlgo->run(  setup, m_algoResults ,*(m_SimCollection.product()) );
-
-  /* edm::InputTag tjTag = theParameterSet.getParameter<edm::InputTag>("tjTkAssociationMapTag");
-  edm::Handle<TrajTrackAssociationCollection> m_TrajTracksMap;
-  event.getByLabel( tjTag, m_TrajTracksMap );
-
-  ConstTrajTrackPairCollection trajTracks;
-  for ( TrajTrackAssociationCollection::const_iterator iPair = m_TrajTracksMap->begin();
-        iPair != m_TrajTracksMap->end(); iPair++ )
-	trajTracks.push_back( ConstTrajTrackPair( &(*(*iPair).key), &(*(*iPair).val) ) );  */
-
-  // Run the alignment algorithm
-  // theAlignmentAlgo->run(  setup, trajTracks );
-
+  }
+  
   return kContinue;
 }
 

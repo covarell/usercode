@@ -13,29 +13,31 @@ elsif ( $host =~ /lxcms/ )   { $location="lxcmsg1"; }
 # job steering ----------------------------------------------------------------
 
 # name of job
-$jobname="DataTIBTOBlay-xzb-otherruns";
+$jobname="Pass3TIBTOBstr-xy-allfree-linAPE";
 
 # cfg file
-$steering="AlignRefitCosm.cfg";
+$steering="AlignPass3DBBoth.cfg";
 
-# db output files to be deleted except for last iteration
-$dbfiles="Alignments.db condbcatalog.xml";
+# db output files (to be deleted except for last iteration)
+$dbfiles="alignments.db alignments.xml";
+# $dbfiles="";
 
 # db authentication file to be copied to exec dir
 $authfile="authentication.xml";
 
 # db input file
-# $sqlitefile="HIPScenario.db"; $condbcatalogfile="condbcatalog.xml";
-$sqlitefile=""; $condbcatalogfile="";
+$sqlitefile="TibTidModuleSurvey_bigape.db"; $condbcatalogfile="TibTidModuleSurvey_bigape.xml";
+# $sqlitefile="alignments.db"; $condbcatalogfile="alignments.xml";
+# $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=7000;
+$nevent=18000;
 
 # first event
 $firstev=0;
 
 # number of jobs
-$njobs=16;
+$njobs=40;
 
 # number of iterations (excluding initial step)
 $iterations=10;
@@ -43,9 +45,9 @@ $iterations=10;
 # interactive or lxbatch queue
 # $farm="I";
 # $farm="8nm"; $resource="";
-$farm="dedicated -R cmsalca";
+$farm="dedicated -R cmscaf";
 
-$cmsswvers="CMSSW_1_3_1";
+$cmsswvers="CMSSW_1_3_6";
 $scramarch="slc3_ia32_gcc323";
 $scram=scramv1;
 
@@ -171,11 +173,18 @@ while ( ${ijob} <= ${njobs} ) {
 
   # create cfg file
   system("cp ${workdir}/$steering $dir/cfgfile");
+  if ($dbfiles) {
+      $repl="
+      replace PoolSource.maxEvents  = $nevent 
+      replace PoolSource.skipEvents = $ifirst 
+      replace AlignmentProducer.saveToDB = false
+    ";
+  } else {
   $repl="
-    replace PoolSource.maxEvents  = $nevent 
-    replace PoolSource.skipEvents = $ifirst 
-    replace AlignmentProducer.saveToDB = false
-  ";
+      replace PoolSource.maxEvents  = $nevent 
+      replace PoolSource.skipEvents = $ifirst 
+    ";
+  }
   replace("$dir/cfgfile",$repl);
 
   ${ijob}++;
@@ -359,8 +368,8 @@ $single=@_[1];
 
 system("mkdir $dir");
 system("cp ${workdir}/$authfile $dir");
-if ($sqlitefile !="") { system("cp ${workdir}/$sqlitefile $dir"); }
-if ($condbcatalogfile !="") { system("cp ${workdir}/$condbcatalogfile $dir"); }
+if ($sqlitefile) { system("cp ${workdir}/$sqlitefile $dir"); }
+if ($condbcatalogfile) { system("cp ${workdir}/$condbcatalogfile $dir"); }
 
 if ($single == 1) {
 
@@ -371,6 +380,7 @@ $subjob="#!/bin/zsh -f
 #BSUB -C 0
 cd $dir
 eval \`$scram runtime -sh\`
+export SCRAM_ARCH=slc3_ia32_gcc323
 rehash
 thisiter=1
 until ((thisiter > $iterations )); do
@@ -397,9 +407,10 @@ $subjob="#!/bin/zsh
 #BSUB -C 0
 cd $dir
 eval \`$scram runtime -sh\`
+export SCRAM_ARCH=slc3_ia32_gcc323
 rehash
 cat ../iteration.txt | read iter
-rm -f $dbfiles
+rm -f ${dbfiles}
 cmsRun cfgfile >& log.\$iter.log
 gzip log.\$iter.log
 mv alignment.log alignment.\$iter.log

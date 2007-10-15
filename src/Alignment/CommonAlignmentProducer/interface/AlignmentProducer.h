@@ -107,7 +107,7 @@ class AlignmentProducer : public edm::ESProducerLooper
 
   int stNFixAlignables_;
   double stRandomShift_,stRandomRotation_;
-  bool applyDbAlignment_,doMisalignmentScenario_,saveToDB_;
+  bool applyDbAlignment_,doMisalignmentScenario_,saveToDB_,storeAPEInDB_;
   bool doTracker_,doMuon_,isData_;
 
 };

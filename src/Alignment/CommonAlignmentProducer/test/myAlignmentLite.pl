@@ -13,10 +13,7 @@ elsif ( $host =~ /lxcms/ )  { $location="lxcmsg1"; }
 # job steering ----------------------------------------------------------------
 
 # name of job
-# $jobname="AliTIBhalfB-xa";
-
-# cfg file
-# $steering="AlignSimCosmics.cfg";
+$jobname="McTIBTOBstr-xy-phiRange2";
 
 # db output files to be deleted except for last iteration
 $dbfiles="Alignments.db condbcatalog.xml";
@@ -25,27 +22,30 @@ $dbfiles="Alignments.db condbcatalog.xml";
 $authfile="authentication.xml";
 
 # db input file
-# $sqlitefile="CSA06Scenario.db"; $condbcatalogfile="condbcatalog.xml";
+# $sqlitefile="HIPScenario.db"; $condbcatalogfile="condbcatalog.xml";
 $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=10000;
+$nevent=2000;
 
 # first event
 $firstev=0;
 
 # number of jobs
-$njobs=1;
+$njobs=8;
 
-# number of iterations (excluding initial step)
+#starting iteration
+$firstiteration=19;
+
+# number of total iterations (excluding initial step)
 $iterations=20;
 
 # interactive or lxbatch queue
-$farm="I";
+# $farm="I";
 # $farm="8nm"; $resource="";
-# $farm="dedicated -R cmsalca";
+$farm="dedicated -R cmsalca";
 
-$cmsswvers="CMSSW_1_3_0_pre5";
+$cmsswvers="CMSSW_1_3_1";
 $scramarch="slc3_ia32_gcc323";
 $scram=scramv1;
 
@@ -55,15 +55,15 @@ $sleeptime=30;
 # site-specific paths etc
 
 if ( $location eq "lxcmsg1" ) {
-  $homedir="/afs/cern.ch/user/c/covarell";
+  $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment-mc";
   $basedir="${homedir}/${cmsswvers}";
   $outdir="/data/covarell/joboutput";
 }
 elsif ( $location eq "lxplus" ) {
-  die "ERROR: Root files for the analysis are on lxcmsg1!\n";
-#  $homedir="/afs/cern.ch/user/f/fpschill";
-#  $basedir="${homedir}/${cmsswvers}";
-#  $outdir="${homedir}/scratch0/joboutput";
+  # die "ERROR: Root files for the analysis are on lxcmsg1!\n";
+   $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment-mc";
+   $basedir="${homedir}/${cmsswvers}";
+   $outdir="/afs/cern.ch/user/c/covarell/scratch0/joboutput";
 }
 elsif ( $location eq "fpslife" ) {
    die "ERROR: location: $location unsupported!\n";
@@ -100,15 +100,17 @@ else {
 }
 print "Iterations: ${iterations}\n";
 
-$odir=".";
+# $odir=".";
 
 # -----------------------------------------------------------------------------
 # create sandbox and set up local environment
 
-# system("
+system("
+cd $outdir/$jobname/$cmsswvers;
+");
 # rm -rf $outdir/$jobname;
 # mkdir $outdir/$jobname;
-# cd $outdir/$jobname;
+# cd $outdir/$jobname/$cmsswvers;
 # $scram project CMSSW $cmsswvers > /dev/null;
 # cd $cmsswvers;
 # mkdir -p lib/${scramarch};
@@ -122,9 +124,9 @@ $odir=".";
 # chdir "$basedir/src";
 # @cfgfilelist = `ls */*/*/*.cf?`;
 # foreach $file ( @cfgfilelist ) {
-#   system("tar rf cfg.tar $file");
-# }
-# system("cp cfg.tar $odir/$cmsswvers/src; rm cfg.tar; cd $odir/$cmsswvers/src; tar xf cfg.tar");
+#  system("tar rf cfg.tar $file");
+#  }
+#  system("cp cfg.tar $odir/$cmsswvers/src; rm cfg.tar; cd $odir/$cmsswvers/src; tar xf cfg.tar");
 
 
 # if one cpu create subjob and submit #########################################
@@ -153,7 +155,78 @@ if ($njobs == 1) {
 # PARALLEL ####################################################################
 
 else {
-  die "ERROR: myAlignmentLite is only for interactive running.";
+
+$ijob=1;
+$ifirst=$firstev;
+
+while ( ${ijob} <= ${njobs} ) {
+  print "Job ${ijob}/${njobs} starting at event $ifirst \n";
+  ${ijob}++;
+  ${ifirst}=${ifirst}+${nevent};
+};
+
+
+$dir="$outdir/$jobname/$cmsswvers";
+$iteration=$firstiteration;
+system("rm -f $dir/iteration.txt");
+open(FILE,">$dir/iteration.txt");
+print FILE "$firstiteration";
+close(FILE);
+
+# enter loop ... ==============================================================
+
+LOOP: {
+
+  # check if all are finished
+  if ($iteration gt $firstiteration ) { $alldone=&check_finished(); }
+
+  # need to run collector / resubmit for next iteration
+  if ( $alldone eq 1 or $iteration eq $firstiteration ) {
+
+    # run collector
+    print "Run collector for iteration $iteration ...\n";
+    $iret=&run_collector();
+    if ($iret ne 0) { die "ERROR in collector!\n";}
+
+    # submit jobs for next iteration
+    if ($iteration < $iterations) {
+      $iteration++;
+
+      system("rm -f $dir/iteration.txt");
+      open(FILE,">$dir/iteration.txt");
+      print FILE "$iteration";
+      close(FILE);
+
+      print "New iteration $iteration --------------------------------------------------------------\n";
+      print "Submit all jobs for iteration $iteration ...\n";
+      $iret=&submit_jobs;
+      if ($iret ne 0) { die "ERROR in submit jobs!\n";}
+
+      redo LOOP;
+    }
+    # we are done
+    else {
+      system("
+        cd $dir
+        rm -rf tmp src logs lib config bin
+     ");
+      print "Finished!\n";
+    }
+
+  }
+
+  # else, just wait ...
+  else {
+    # print "sleeping for $sleeptime seconds ...\n";
+    sleep($sleeptime);
+    redo LOOP;
+  }
+
+}
+
+# save some disk space
+system("cd $dir; rm -rf job*"); 
+
 }
 
 exit 0;
@@ -192,7 +265,7 @@ sub run_collector
     subjob
   ");
   if ($iteration gt 0) {
-    system("cp $dir/job1/CSA06AlignmentEvents.root $dir/main");
+    system("cp $dir/job1/HIPAlignmentEvents.root $dir/main");
   }
 
   return 0;

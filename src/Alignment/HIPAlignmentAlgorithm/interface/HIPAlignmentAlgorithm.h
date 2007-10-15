@@ -53,6 +53,7 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   bool calcParameters(Alignable* ali);
   void collector(void);
   std::vector<unsigned int> storeNumberingScheme(const DetId& detid, int type);
+  bool theHitSelection(float phi, float charge, float absxres);
 
   // private data members
 
@@ -85,6 +86,11 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   std::string theCollectorPath;
   int theEventPrescale,theCurrentPrescale;
 
+  // further hit selection
+  // edm::ParameterSet hitSelPars;
+  bool hitSelection;
+  double phiMinCut, phiMaxCut, chargeCut, outlierCut;
+
   bool useSurvey; // enable survey constraint if true
 
   // root tree variables
@@ -110,10 +116,9 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   float m_hLocalX[MAXHIT],m_hLocalY[MAXHIT],m_hLocalZ[MAXHIT];
   float m_hLocalAngleMono[MAXHIT], m_hLocalAngleSter[MAXHIT], m_hChargeMono[MAXHIT], m_hChargeSter[MAXHIT];
   float m_Xres[MAXHIT],m_Yres[MAXHIT],m_Xerr[MAXHIT],m_Yerr[MAXHIT];
+  float m_XerrHit[MAXHIT],m_XerrIP[MAXHIT];
 
   // variables for alignable-wise tree
-  //static const int MAXITER = 99;
-  //static const int MAXPAR = 6;
   int m2_Nhit,m2_Type,m2_Layer;
   float m2_Xpos, m2_Ypos, m2_Zpos, m2_Eta, m2_Phi; 
   int m2_Id,m2_ObjId;

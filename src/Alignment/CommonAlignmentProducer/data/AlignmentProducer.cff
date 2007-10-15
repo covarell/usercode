@@ -10,7 +10,7 @@ include "Alignment/MillePedeAlignmentAlgorithm/data/MillePedeAlignmentAlgorithm.
 include "Alignment/KalmanAlignmentAlgorithm/data/KalmanAlignmentAlgorithm.cfi"
 
 # DB configuration
-include "Alignment/CommonAlignmentProducer/data/DBConfiguration.cff"
+# include "Alignment/CommonAlignmentProducer/data/DBConfiguration.cff"
 
 looper = AlignmentProducer
 {
@@ -69,6 +69,42 @@ looper = AlignmentProducer
                vdouble rRanges   =  {}
                vdouble phiRanges =  {}
             }
+            PSet TOBSelOnly = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
+            PSet TOBSelOnlyL6 = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
+            PSet TOBSelOnlyL2 = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
+            PSet TIBSelOnlyL1 = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
+             PSet TOBSelOnlyL2inv = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
+            PSet TIBSelOnlyL1inv = {
+               vdouble etaRanges =  {}
+               vdouble zRanges   =  {}
+               vdouble rRanges   =  {}
+               vdouble phiRanges =  {}
+            }
         }
     }
 
@@ -110,7 +146,8 @@ looper = AlignmentProducer
 	
     # Save alignment corrections to DB: if true, requires configuration of PoolDBOutputService
     # See DBConfiguration.cff for an example
-    bool saveToDB = false
+    bool saveToDB = true
+    untracked bool storeAPEInDB = true
 
 }
 

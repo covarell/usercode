@@ -28,6 +28,12 @@ block HIPAlignmentAlgorithm = {
 		
 	int32 minimumNumberOfHits = 50
 	double maxRelParameterError = 1.0
+
+        bool hitFilter = false
+        untracked double phiMinCut = 0.
+        untracked double phiMaxCut = 3.15
+        untracked double chargeCut = 0.
+        untracked double outlierCut = 2000.
 	
 	bool collectorActive = false
 	int32 collectorNJobs = 0

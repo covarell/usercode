@@ -10,7 +10,9 @@ $originalcfg = "ReduceEventsCTF.cfg";
 # create cfg file
 system("cp ${workdir}/$originalcfg ${workdir}/tmp.cfg");
 
-$repl1= "             untracked vstring destinations = { \"cout\", \"reduce-" . $thisdata . "\" } \n           untracked vstring statistics = { \"cout\", \"reduce-" . $thisdata . "\" }";
+# $repl1= "             untracked vstring destinations = { \"cout\", \"reduce-" . $thisdata . "\" } \n           untracked vstring statistics = { \"cout\", \"reduce-" . $thisdata . "\" }";
+
+$repl1= "             untracked vstring destinations = { \"cout\" } \n           untracked vstring statistics = { \"cout\" }";
 
 $repl2= "             include \"Alignment/CommonAlignmentProducer/data/data-FNAL-". $thisdata . ".cfi\" \n             replace PoolSource.maxEvents = " ;
 if ($istest =~ /test/ ) { $repl2= $repl2 . "500" ;} 

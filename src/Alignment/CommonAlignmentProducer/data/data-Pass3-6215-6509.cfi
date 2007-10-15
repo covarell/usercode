@@ -1,0 +1,33 @@
+	source = PoolSource { 
+		
+		untracked vstring fileNames = { 
+         
+            'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006215_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006215_2.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006215_3.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006215_4.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006217_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006217_2.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006219_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006346_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006354_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006462_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006466_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006467_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006471_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006474_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006478_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006479_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006483_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006485_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006493_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006502_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006505_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006507_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006509_1.root'
+		}
+
+		untracked int32 maxEvents   = 100
+		untracked uint32 skipEvents = 0
+	
+	}	   

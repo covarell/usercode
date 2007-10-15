@@ -75,6 +75,13 @@ HIPAlignmentAlgorithm::HIPAlignmentAlgorithm(const edm::ParameterSet& cfg):
   theEventPrescale = cfg.getParameter<int>("eventPrescale");
   theCurrentPrescale = theEventPrescale;
 
+  // hitSelPars = cfg.getParameter<edm::ParameterSet>("hitSelectionParameters");
+  hitSelection = cfg.getParameter<bool>("hitFilter");
+  phiMaxCut = cfg.getUntrackedParameter<double>("phiMaxCut",3.15);
+  phiMinCut = cfg.getUntrackedParameter<double>("phiMinCut",0.);
+  chargeCut = cfg.getUntrackedParameter<double>("chargeCut",0.);
+  outlierCut = cfg.getUntrackedParameter<double>("outlierCut", 2000.);
+
   edm::LogWarning("Alignment") << "[HIPAlignmentAlgorithm] constructed.";
 
 }
@@ -398,10 +405,12 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 	m_Ntracks=itr;
       }
       
+      // cout << "This is track #" << m_Ntracks << " with " << nhit << " hits" << endl << endl;
       vector<const TransientTrackingRecHit*> hitvec;
       vector<TrajectoryStateOnSurface> tsosvec;
       vector<TrajectoryMeasurement> tmvec;
       
+      // int prova1 = 0;
       // loop over measurements	
       vector<TrajectoryMeasurement> measurements = traj->measurements();
       for (vector<TrajectoryMeasurement>::iterator im=measurements.begin();
@@ -409,8 +418,6 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 	TrajectoryMeasurement meas = *im;
 	const TransientTrackingRecHit* hit = &(*meas.recHit());
 	if (hit->isValid()  &&  theAlignableDetAccessor->detAndSubdetInMap( hit->geographicalId() )) {
-	  // this is the updated state (including the current hit)
-	  //TrajectoryStateOnSurface tsos=meas.updatedState();
 	  // combine fwd and bwd predicted state to get state 
 	  // which excludes current hit
 	  TrajectoryStateOnSurface tsosc = tsoscomb.combine(
@@ -419,12 +426,17 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 	  hitvec.push_back(hit);
 	  tmvec.push_back(meas);
 	  tsosvec.push_back(tsosc);
+          // cout << "Storing hit #" << prova1++ << endl;
 	}
       }
       
       // transform RecHit vector to AlignableDet vector
-      vector <AlignableDetOrUnitPtr> alidetvec = 
-	theAlignableDetAccessor->alignablesFromHits(hitvec);
+      vector <AlignableDet*> alidetvec =
+	theAlignableDetAccessor->alignableDetsFromHits(hitvec);
+      
+      // FLUCKE
+      // vector <AlignableDetOrUnitPtr> alidetvec = 
+      //  theAlignableDetAccessor->alignablesFromHits(hitvec);
       
       // get concatenated alignment parameters for list of alignables
       CompositeAlignmentParameters aap = 
@@ -434,13 +446,22 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
       vector<const TransientTrackingRecHit*>::const_iterator ihit=hitvec.begin();
       vector<TrajectoryMeasurement>::const_iterator imea = tmvec.begin();      
 
-      // loop over vectors(hit,tsos)
+      // int prova2 = 0;
+      // int prova3 = 0;
+
+      // loop over vectors(hit,tsos,meas)
       while (itsos != tsosvec.end()) 
 	{
+          // cout << "Trying hit #" << prova2++ << ":" << endl; 
 	  // get AlignableDet for this hit
 	  const GeomDet* det=(*ihit)->det();
-	  AlignableDetOrUnitPtr alidet = 
-	    theAlignableDetAccessor->alignableFromGeomDet(det);
+          
+          AlignableDet* alidet =
+	    theAlignableDetAccessor->alignableDetFromGeomDet(det);
+
+	  // FLUCKE
+	  // AlignableDetOrUnitPtr alidet = 
+	  //  theAlignableDetAccessor->alignableFromGeomDet(det);
 	  
 	  // get relevant Alignable
 	  Alignable* ali=aap.alignableFromAlignableDet(alidet);
@@ -450,7 +471,7 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 	  AlgebraicVector pos(2);
 	  pos[0]=alvec.x(); // local x
 	  pos[1]=alvec.y(); // local y
-	  
+	  // cout << "  impact point in (" << pos[0] << "," << pos[1] << ")" << endl;
 	  // get impact point covariance
 	  AlgebraicSymMatrix ipcovmat(2);
 	  ipcovmat[0][0] = (*itsos).localError().positionError().xx();
@@ -461,94 +482,107 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 	  AlgebraicVector coor(2);
 	  coor[0] = (*ihit)->localPosition().x();
 	  coor[1] = (*ihit)->localPosition().y();
-	  
+	  // cout << "  hit in (" << coor[0] << "," << coor[1] << ")" << endl;
+
 	  AlgebraicSymMatrix covmat(2);
 	  covmat[0][0] = (*ihit)->localPositionError().xx();
 	  covmat[1][1] = (*ihit)->localPositionError().yy();
 	  covmat[0][1] = (*ihit)->localPositionError().xy();
 	  
 	  // add hit and impact point covariance matrices
-	  covmat = covmat + ipcovmat;
+          AlgebraicSymMatrix totalerr(2); 
+	  totalerr = covmat + ipcovmat;
 
            // fill hit parameters in root tree
           std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
           std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
-           
+ 
           if (ahit<MAXHIT) {
-            // Sensor position
-            m_hType[ahit] = typeAndLay.first;
-            m_hFwBw[ahit] = 99999;
-            m_hLayer[ahit] = 99999;
-            m_hIntExt[ahit] = 99999;
-            m_hStrRod[ahit] = 99999;
-            m_hModule[ahit] = 99999;
-            if (numbScheme.at(0)) {
-              m_hFwBw[ahit] = numbScheme.at(0);
-              m_hLayer[ahit] = numbScheme.at(1);
-              m_hIntExt[ahit] = numbScheme.at(2);
-              m_hStrRod[ahit] = numbScheme.at(3);
-              m_hModule[ahit] = numbScheme.at(4);
-            }
-            // Which track it belongs to
-            m_hOwnerTrack[ahit] = allTracks;
-            // Geometrical position
-            m_hR[ahit] = (*ihit)->globalPosition().perp();
-            m_hPhi[ahit] = (*ihit)->globalPosition().phi();
-            m_hZ[ahit] = (*ihit)->globalPosition().z();
-            m_hLocalX[ahit] = (*ihit)->localPosition().x();
-            m_hLocalY[ahit] = (*ihit)->localPosition().y();
-            m_hLocalZ[ahit] = (*ihit)->localPosition().z();
-            // Local track angle
-            std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
-            m_hLocalAngleMono[ahit] = monoStereoAng.first;
-            m_hLocalAngleSter[ahit] = monoStereoAng.second;
-            // Cluster charge
+
+            float tempphi = (*ihit)->globalPosition().phi();
             std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea);
-            m_hChargeMono[ahit] = monoStereoCha.first;
-            m_hChargeSter[ahit] = monoStereoCha.second;
-            // Residuals and errors
-            m_Xres[ahit] = coor[0] - pos[0];
-            m_Yres[ahit] = coor[1] - pos[1];
-            m_Xerr[ahit] = sqrt(covmat[0][0]);
-            m_Yerr[ahit] = sqrt(covmat[1][1]);
-             
-            ahit++;
-            m_allHits=ahit;
-          }
+            float tempcharge = monoStereoCha.first;
+            float tempxres = coor[0] - pos[0];
+	    // cout << "Temp quantities " << tempphi << " " << tempcharge << " " << tempxres << endl;
 
-	  if (ali!=0) {	    
-	    
-	    // get Alignment Parameters
-	    AlignmentParameters* params = ali->alignmentParameters();
-	    // get derivatives
-	    AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
+	    if (theHitSelection( tempphi, tempcharge, fabs(tempxres) )) {
 
-	    // invert covariance matrix
-	    int ierr; 
-	    covmat.invert(ierr);
-	    if (ierr != 0) { 
-	      edm::LogError("Alignment") << "Matrix inversion failed!"; 
-	      return; 
+              // cout << "Passed hit #" << prova3++ << endl;
+	      // Sensor position
+	      m_hType[ahit] = typeAndLay.first;
+	      m_hFwBw[ahit] = 99999;
+	      m_hLayer[ahit] = 99999;
+	      m_hIntExt[ahit] = 99999;
+	      m_hStrRod[ahit] = 99999;
+	      m_hModule[ahit] = 99999;
+	      if (numbScheme.at(0)) {
+		m_hFwBw[ahit] = numbScheme.at(0);
+		m_hLayer[ahit] = numbScheme.at(1);
+		m_hIntExt[ahit] = numbScheme.at(2);
+		m_hStrRod[ahit] = numbScheme.at(3);
+		m_hModule[ahit] = numbScheme.at(4);
+	      }
+              // cout << "Temp quantities 2 " << tempphi << " " << tempcharge << " " << tempxres << endl;
+	      // Which track it belongs to
+	      m_hOwnerTrack[ahit] = allTracks;
+	      // Geometrical position
+	      m_hR[ahit] = (*ihit)->globalPosition().perp();
+	      m_hPhi[ahit] = tempphi;
+	      m_hZ[ahit] = (*ihit)->globalPosition().z();
+	      m_hLocalX[ahit] = (*ihit)->localPosition().x();
+	      m_hLocalY[ahit] = (*ihit)->localPosition().y();
+	      m_hLocalZ[ahit] = (*ihit)->localPosition().z();
+	      // Local track angle
+              std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
+	      m_hLocalAngleMono[ahit] = monoStereoAng.first;
+	      m_hLocalAngleSter[ahit] = monoStereoAng.second;
+	      // Cluster charge
+	      m_hChargeMono[ahit] = tempcharge;
+	      m_hChargeSter[ahit] = monoStereoCha.second;
+	      // Residuals and errors
+	      m_Xres[ahit] = tempxres;
+	      m_Yres[ahit] = coor[1] - pos[1];
+	      m_Xerr[ahit] = sqrt(totalerr[0][0]);
+	      m_Yerr[ahit] = sqrt(totalerr[1][1]);
+	      m_XerrHit[ahit] = sqrt(covmat[0][0]);
+	      m_XerrIP[ahit] = sqrt(ipcovmat[0][0]);
+	      
+	      m_allHits=ahit;	    
+	      ahit++;
+
+              if (ali!= 0) {
+		// get Alignment Parameters
+		AlignmentParameters* params = ali->alignmentParameters();
+		// get derivatives
+		AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
+		
+		// invert covariance matrix
+		int ierr; 
+		totalerr.invert(ierr);
+		if (ierr != 0) { 
+		  edm::LogError("Alignment") << "Matrix inversion failed!"; 
+		  return; 
+		}
+		
+		// calculate user parameters
+		int npar=derivs.num_row();
+		AlgebraicSymMatrix thisjtvj(npar);
+		AlgebraicVector thisjtve(npar);
+		thisjtvj=totalerr.similarity(derivs);
+		thisjtve=derivs * totalerr * (pos-coor);
+		
+		// access user variables (via AlignmentParameters)
+		HIPUserVariables* uservar =
+		  dynamic_cast<HIPUserVariables*>(params->userVariables());
+		uservar->jtvj += thisjtvj;
+		uservar->jtve += thisjtve;
+		uservar->nhit ++;
+	      }
 	    }
-	    
-	    // calculate user parameters
-	    int npar=derivs.num_row();
-	    AlgebraicSymMatrix thisjtvj(npar);
-	    AlgebraicVector thisjtve(npar);
-	    thisjtvj=covmat.similarity(derivs);
-	    thisjtve=derivs * covmat * (pos-coor);
-	    
-	    // access user variables (via AlignmentParameters)
-	    HIPUserVariables* uservar =
-	      dynamic_cast<HIPUserVariables*>(params->userVariables());
-	    uservar->jtvj += thisjtvj;
-	    uservar->jtve += thisjtve;
-	    uservar->nhit ++;
 	  }
-	  
 	  itsos++;
 	  ihit++;
-          imea++;
+	  imea++;
 	} 
 
       allTracks++;
@@ -711,6 +745,8 @@ void HIPAlignmentAlgorithm::bookRoot(void)
   theTree->Branch("yres",     m_Yres,    "yres[allHits]/F");
   theTree->Branch("xerr",     m_Xerr,    "xerr[allHits]/F");
   theTree->Branch("yerr",     m_Yerr,    "yerr[allHits]/F");
+  theTree->Branch("xerrHit",  m_XerrHit, "xerrHit[allHits]/F");
+  theTree->Branch("xerrIP",   m_XerrIP,  "xerrIP[allHits]/F");
 
   // book Alignable-wise ROOT Tree
 
@@ -928,4 +964,16 @@ std::vector<unsigned int> HIPAlignmentAlgorithm::storeNumberingScheme(const DetI
     numbScheme.push_back( 0 );
   }
   return numbScheme;
+}
+
+bool HIPAlignmentAlgorithm::theHitSelection(float phi, float charge, float absxres)
+{
+  if (!hitSelection) return true;
+  // hit-phi cut
+  if (phi < phiMinCut || phi > phiMaxCut) return false;
+  // cluster charge cut
+  if (charge < chargeCut) return false;
+  // outlier rejection cut
+  if (absxres > outlierCut) return false;
+  return true;
 }
