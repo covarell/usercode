@@ -1,10 +1,21 @@
+<use name=PhysicsTools/Parser>
+<use name=FWCore/ServiceRegistry>
 <use name=FWCore/Framework>
-
-<library file=StopAfterNEvents.cc>
-  <use name=FWCore/ParameterSet>
-</library>
-
-<library file=TFileService.cc>
-  <use name=PhysicsTools/UtilAlgos>
+<use name=FWCore/ServiceRegistry>
+<use name=FWCore/ParameterSet>
+<use name=FWCore/Utilities>
+<use name=DataFormats/Common>
+<use name=DataFormats/Provenance>
+<use name=root>
+<export>
+  <lib name=PhysicsToolsUtilAlgos>
+  <use name=PhysicsTools/Parser>
   <use name=FWCore/ServiceRegistry>
-</library>
+  <use name=FWCore/Framework>
+  <use name=FWCore/ServiceRegistry>
+  <use name=FWCore/ParameterSet>
+  <use name=FWCore/Utilities>
+  <use name=DataFormats/Common>
+  <use name=DataFormats/Provenance>
+  <use name=root>
+</export>
