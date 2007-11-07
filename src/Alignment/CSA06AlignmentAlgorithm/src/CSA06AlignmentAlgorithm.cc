@@ -2,11 +2,11 @@
 
 #include "TrackingTools/TrackFitters/interface/TrajectoryStateCombiner.h"
 
-#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-
 #include "Alignment/TrackerAlignment/interface/AlignableTracker.h"
 #include "Alignment/MuonAlignment/interface/AlignableMuon.h"
+
+#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
+#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 
 #include "Alignment/TrackerAlignment/interface/TrackerAlignableId.h"
 #include "Alignment/CSA06AlignmentAlgorithm/interface/CSA06AlignmentAlgorithm.h"
@@ -14,7 +14,6 @@
 #include "Alignment/CSA06AlignmentAlgorithm/interface/CSA06UserVariablesIORoot.h"
 #include "Alignment/CommonAlignment/interface/AlignableNavigator.h"  
 
-// #include "Alignment/CSA06AlignmentAlgorithm/interface/TrajectoryMeasurementResidual.h"
 
 #include <fstream>
 
@@ -61,11 +60,10 @@ CSA06AlignmentAlgorithm::CSA06AlignmentAlgorithm(const edm::ParameterSet& cfg):
   aperp[2]=vaperp[2];
 
   theMinimumNumberOfHits = cfg.getParameter<int>("minimumNumberOfHits");
-  // theMinimumHitsOnTrack = cfg.getParameter<int>("minimumHitsOnTrack");  
   theMaxRelParameterError = cfg.getParameter<double>("maxRelParameterError");
 
   // for collector mode (parallel processing)
-  isCollector=cfg.getParameter<bool>("collectorActive");  
+  isCollector=cfg.getParameter<bool>("collectorActive");
   theCollectorNJobs=cfg.getParameter<int>("collectorNJobs");
   theCollectorPath=cfg.getParameter<string>("collectorPath");
   if (isCollector) edm::LogWarning("Alignment") << "[CSA06AlignmentAlgorithm] Collector mode";
@@ -86,7 +84,6 @@ CSA06AlignmentAlgorithm::initialize( const edm::EventSetup& setup,
 {
   edm::LogWarning("Alignment") << "[CSA06AlignmentAlgorithm] Initializing...";
 
-  allTracks = 0;
   // accessor Det->AlignableDet
   if ( !muon )
     theAlignableDetAccessor = new AlignableNavigator(tracker);
@@ -167,11 +164,14 @@ CSA06AlignmentAlgorithm::initialize( const edm::EventSetup& setup,
 
   // run collector job if we are in parallel mode
   if (isCollector) collector();
-  
+
+  allTracks = 0;
+
   //for TrackAngle
   edm::ESHandle<TrackerGeometry> trackerGeom;
   setup.get<TrackerDigiGeometryRecord>().get( trackerGeom );
-  theAngleFinder = new TrackLocalAngle( trackerGeom.product() ); 
+  theAngleFinder = new TrackLocalAngle( trackerGeom.product() );
+
 }
 
 // Call at end of job ---------------------------------------------------------
@@ -248,13 +248,14 @@ void CSA06AlignmentAlgorithm::terminate(void)
 
 // Run the algorithm on trajectories and tracks -------------------------------
 
-void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTrajTrackPairCollection& tracks , const edm::SimTrackContainer& simcoll )
+void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup,
+				   const ConstTrajTrackPairCollection& tracks,
+                                   const edm::SimTrackContainer& simcoll )
 {
   if (isCollector) return;
 
   TrajectoryStateCombiner tsoscomb;
   TrackerAlignableId id;
-  // TrajectoryMeasurementResidual *TMR;   
 
   int itr=0;
   int itrsim=0;
@@ -269,39 +270,38 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
   float etasim = -9999.;
   float phisim = -9999.;
 
-   // loop over sim tracks 
+  // loop over sim tracks
   if (&simcoll) {
-    for(edm::SimTrackContainer::const_iterator trackCI = simcoll.begin(); 
-	trackCI != simcoll.end(); trackCI++) {
-      
+    for(edm::SimTrackContainer::const_iterator trackCI = simcoll.begin();
+        trackCI != simcoll.end(); trackCI++) {
+       
       ptsim    = trackCI->momentum().perp();
       etasim   = trackCI->momentum().eta();
       phisim   = trackCI->momentum().phi();
-      
-      // fill sim track parameters in root tree
+       
+      // *************** fill sim track parameters in root tree
       if (itrsim<MAXSIM) {
-	m_PtSim[itrsim]=ptsim;
-	m_EtaSim[itrsim]=etasim;
-	m_PhiSim[itrsim]=phisim;
-	itrsim++;
-	m_NtracksSim=itrsim;
+        m_PtSim[itrsim]=ptsim;
+        m_EtaSim[itrsim]=etasim;
+        m_PhiSim[itrsim]=phisim;
+        itrsim++;
+        m_NtracksSim=itrsim;
       }
     }
-
   }
 
   float pt = -9999.;
   float eta = -9999.;
   float phi = -9999.;
   float chi2n = -9999.;
-  int nhit = -9999; 
+  int nhit = -9999;
 
-  if ( tracks.size() > 0 ) {
-    
+  if (tracks.size() > 0) {
+
     // loop over tracks  
     for( ConstTrajTrackPairCollection::const_iterator it=tracks.begin();
 	 it!=tracks.end();it++) {
-      
+
       const Trajectory* traj = (*it).first;
       const reco::Track* track = (*it).second;
       
@@ -309,11 +309,11 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
       eta   = track->eta();
       phi   = track->phi();
       chi2n = track->normalizedChi2();
-      nhit  = track->numberOfValidHits(); 
+      nhit  = track->numberOfValidHits();
       
       if (verbose) edm::LogInfo("Alignment") << "New track pt,eta,phi,chi2n,hits: " << pt <<","<< eta <<","<< phi <<","<< chi2n << ","<<nhit;
       
-      // fill track parameters in root tree
+    // ***************** fill track parameters in root tree
       if (itr<MAXREC) {
 	m_Nhits[itr]=nhit;
 	m_Pt[itr]=pt;
@@ -324,30 +324,29 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	m_Ntracks=itr;
       }
       
+      if (verbose) cout << "This is track #" << m_Ntracks << " with " << nhit << " hits \n";
+      
       vector<const TransientTrackingRecHit*> hitvec;
       vector<TrajectoryStateOnSurface> tsosvec;
       vector<TrajectoryMeasurement> tmvec;
-
+      
       // loop over measurements	
       vector<TrajectoryMeasurement> measurements = traj->measurements();
       for (vector<TrajectoryMeasurement>::iterator im=measurements.begin();
 	   im!=measurements.end(); im++) {
 	TrajectoryMeasurement meas = *im;
 	const TransientTrackingRecHit* hit = &(*meas.recHit());
-       
 	if (hit->isValid()) {
-
 	  // this is the updated state (including the current hit)
-	  //TrajectoryStateOnSurface tsos=meas.updatedState();
+	  // TrajectoryStateOnSurface tsos=meas.updatedState();
 	  // combine fwd and bwd predicted state to get state 
 	  // which excludes current hit
-	  TrajectoryStateOnSurface tsosc = 
-	    tsoscomb.combine(meas.forwardPredictedState(),
-			     meas.backwardPredictedState());
+	  TrajectoryStateOnSurface tsosc = tsoscomb.combine(
+					   meas.forwardPredictedState(),
+					   meas.backwardPredictedState());
 	  hitvec.push_back(hit);
-          tmvec.push_back(meas);
+	  tmvec.push_back(meas);
 	  tsosvec.push_back(tsosc);
-
 	}
       }
       
@@ -355,42 +354,21 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
       vector <AlignableDet*> alidetvec = 
 	theAlignableDetAccessor->alignableDetsFromHits(hitvec);
       
-     // get concatenated alignment parameters for list of alignables
+      // get concatenated alignment parameters for list of alignables
       CompositeAlignmentParameters aap = 
 	theAlignmentParameterStore->selectParameters(alidetvec);
       
-      vector<TrajectoryStateOnSurface>::const_iterator itsos = tsosvec.begin();
-      vector<const TransientTrackingRecHit*>::const_iterator ihit = hitvec.begin();
-      vector<TrajectoryMeasurement>::const_iterator imea = tmvec.begin();
-
+      vector<TrajectoryStateOnSurface>::const_iterator itsos=tsosvec.begin();
+      vector<const TransientTrackingRecHit*>::const_iterator ihit=hitvec.begin();
+      vector<TrajectoryMeasurement>::const_iterator imea=tmvec.begin();
+      
+      int prova = 0;
+      
       // loop over vectors(hit,tsos)
       while (itsos != tsosvec.end()) 
 	{
 	  
-	  // get trajectory impact point
-	  LocalPoint alvec = (*itsos).localPosition();
-	  AlgebraicVector pos(2);
-	  pos[0]=alvec.x(); // local x
-	  pos[1]=alvec.y(); // local y
-	  
-	  // get impact point covariance
-	  AlgebraicSymMatrix ipcovmat(2);
-	  ipcovmat[0][0] = (*itsos).localError().positionError().xx();
-	  ipcovmat[1][1] = (*itsos).localError().positionError().yy();
-	  ipcovmat[0][1] = (*itsos).localError().positionError().xy();
-	    
-	  // get hit local position and covariance
-	  AlgebraicVector coor(2);
-	  coor[0] = (*ihit)->localPosition().x();
-	  coor[1] = (*ihit)->localPosition().y();
-	  
-	  AlgebraicSymMatrix covmat(2);
-	  covmat[0][0] = (*ihit)->localPositionError().xx();
-	  covmat[1][1] = (*ihit)->localPositionError().yy();
-	  covmat[0][1] = (*ihit)->localPositionError().xy();
-	  
-	  // add hit and impact point covariance matrices
-	  covmat = covmat + ipcovmat;
+	  if (verbose) cout << "Examining hit #" << prova++ << ": \n"; 
 	  
 	  // get AlignableDet for this hit
 	  const GeomDet* det=(*ihit)->det();
@@ -398,75 +376,124 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	    theAlignableDetAccessor->alignableDetFromGeomDet(det);
 	  
 	  // get relevant Alignable
-	  Alignable* ali=aap.alignableFromAlignableDet(alidet);
+	  Alignable* ali=aap.alignableFromAlignableDet(alidet); 
+	  
+	  // get trajectory impact point
+	  LocalPoint alvec = (*itsos).localPosition();
+	  AlgebraicVector pos(2);
+	  pos[0]=alvec.x(); // local x
+	  pos[1]=alvec.y(); // local y
+	  if (verbose) cout << "  impact point in (" << pos[0] << "," << pos[1] << ") \n";
+	  
+	  // get impact point covariance
+	  AlgebraicSymMatrix ipcovmat(2);
+	  ipcovmat[0][0] = (*itsos).localError().positionError().xx();
+	  ipcovmat[1][1] = (*itsos).localError().positionError().yy();
+	  ipcovmat[0][1] = (*itsos).localError().positionError().xy();
+	  if (verbose) cout << "  impact point error (" << sqrt(ipcovmat[0][0]) << "," << sqrt(ipcovmat[1][1]) << ") \n";
+	  
+	  // get hit local position and covariance
+	  AlgebraicVector coor(2);
+	  coor[0] = (*ihit)->localPosition().x();
+	  coor[1] = (*ihit)->localPosition().y();
+	  if (verbose) cout << "  hit in (" << coor[0] << "," << coor[1] << ") \n";
+	  
+	  AlgebraicSymMatrix covmat(2);
+	  covmat[0][0] = (*ihit)->localPositionError().xx();
+	  covmat[1][1] = (*ihit)->localPositionError().yy();
+	  covmat[0][1] = (*ihit)->localPositionError().xy();
+	  if (verbose) cout << "  hit error (" << sqrt(covmat[0][0]) << "," << sqrt(covmat[1][1]) << ") \n";
+	  
+	  // add hit and impact point covariance matrices
+	  AlgebraicSymMatrix totcovmat(2);
+	  totcovmat = covmat + ipcovmat;
+	  
+	  // ****************** fill hit parameters in root tree
+	  
+	  if (ahit<MAXHIT) {
+	    
+	    // Sensor position
+	    std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
+	    std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
+	    
+	    m_hType[ahit] = typeAndLay.first;
+	    m_hFwBw[ahit] = 99999;
+	    m_hLayer[ahit] = 99999;
+	    m_hIntExt[ahit] = 99999;
+	    m_hStrRod[ahit] = 99999;
+	    m_hModule[ahit] = 99999;
+	    if (numbScheme.at(0)) {
+	      m_hFwBw[ahit] = numbScheme.at(0);
+	      m_hLayer[ahit] = numbScheme.at(1);
+	      m_hIntExt[ahit] = numbScheme.at(2);
+	      m_hStrRod[ahit] = numbScheme.at(3);
+	      m_hModule[ahit] = numbScheme.at(4);
+	    }
+	    if (verbose) cout << "  hit on type " << m_hType[ahit] << ", layer " <<  m_hLayer[ahit] << ", int/ext " <<  m_hIntExt[ahit] << ", string/rod " << m_hStrRod[ahit] << ", module " <<  m_hModule[ahit] << " \n";
+	    
+	    // Which track it belongs to
+	    m_hOwnerTrack[ahit] = allTracks;
+	    // It is on alignable or not
+	    m_isOnAli[ahit] = 0;
+	    if (ali!=0) m_isOnAli[ahit] = 1;
+	    // Geometrical position
+	    m_hR[ahit] = (*ihit)->globalPosition().perp();
+	    m_hPhi[ahit] = (*ihit)->globalPosition().phi();
+	    m_hZ[ahit] = (*ihit)->globalPosition().z();
+	    m_hLocalX[ahit] = (*ihit)->localPosition().x();
+	    m_hLocalY[ahit] = (*ihit)->localPosition().y();
+	    m_hLocalZ[ahit] = (*ihit)->localPosition().z();
+	    // Local track angle
+	    std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
+	    m_hLocalAngleMono[ahit] = monoStereoAng.first;
+	    m_hLocalAngleSter[ahit] = monoStereoAng.second;
+	    // Cluster charge and barycenter 
+	    std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea );
+	    m_hChargeMono[ahit] = monoStereoCha.first;
+	    m_hChargeSter[ahit] = monoStereoCha.second;
+            std::pair<float,float> monoStereoBar = theAngleFinder->findhitbary(*imea );
+            m_hBarMono[ahit] = monoStereoBar.first;
+	    m_hBarSter[ahit] = monoStereoBar.second;
+	    // Residuals and errors
+	    m_Xres[ahit] = coor[0] - pos[0];
+	    m_Yres[ahit] = coor[1] - pos[1];
+	    m_Xerr[ahit] = sqrt(totcovmat[0][0]);
+	    m_Yerr[ahit] = sqrt(totcovmat[1][1]);
+	    m_XerrHit[ahit] = sqrt(covmat[0][0]);
+	    m_XerrIP[ahit] = sqrt(ipcovmat[0][0]);
+	    
+	    ahit++;
+	    m_allHits=ahit;	
+	  }
 	  
 	  if (ali!=0) {
 	    
-	    std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
-	    std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
-
-	    // fill hit parameters in root tree
-	    if (ahit<MAXHIT) {
-              // Sensor position
-	      m_hType[ahit] = typeAndLay.first;
-              m_hFwBw[ahit] = 99999;
-              m_hLayer[ahit] = 99999;
-              m_hIntExt[ahit] = 99999;
-              m_hStrRod[ahit] = 99999;
-              m_hModule[ahit] = 99999;
-              if (numbScheme.at(0)) {
-                m_hFwBw[ahit] = numbScheme.at(0);
-		m_hLayer[ahit] = numbScheme.at(1);
-		m_hIntExt[ahit] = numbScheme.at(2);
-		m_hStrRod[ahit] = numbScheme.at(3);
-		m_hModule[ahit] = numbScheme.at(4);
-	      }
-              // Which track it belongs to
-	      m_hOwnerTrack[ahit] = allTracks;
-              // Geometrical position
-	      m_hR[ahit] = (*ihit)->globalPosition().perp();
-	      m_hPhi[ahit] = (*ihit)->globalPosition().phi();
-	      m_hZ[ahit] = (*ihit)->globalPosition().z();
-	      m_hLocalX[ahit] = (*ihit)->localPosition().x();
-	      m_hLocalY[ahit] = (*ihit)->localPosition().y();
-	      m_hLocalZ[ahit] = (*ihit)->localPosition().z();
-              // Local track angle
-	      std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
-	      m_hLocalAngleMono[ahit] = monoStereoAng.first;
-	      m_hLocalAngleSter[ahit] = monoStereoAng.second;
-              // Cluster charge 
-              std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea);
-	      m_hChargeMono[ahit] = monoStereoCha.first;
-	      m_hChargeSter[ahit] = monoStereoCha.second;
-              // Residuals and errors
-	      m_Xres[ahit] = coor[0] - pos[0];
-	      m_Yres[ahit] = coor[1] - pos[1];    
-	      m_Xerr[ahit] = sqrt(covmat[0][0]);
-	      m_Yerr[ahit] = sqrt(covmat[1][1]);
-	      
-	      ahit++;
-	      m_allHits=ahit;
-	    }
-
-            // get Alignment Parameters
+	    if (verbose) cout << "********************************************************** \n This hit is on a floated object! \n";
+	    
+	    // get Alignment Parameters
 	    AlignmentParameters* params = ali->alignmentParameters();
 	    // get derivatives
-	    AlgebraicMatrix derivs = params->selectedDerivatives(*itsos,alidet);
+	    AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
 	    
 	    // invert covariance matrix
 	    int ierr; 
-	    covmat.invert(ierr);
+	    totcovmat.invert(ierr);
 	    if (ierr != 0) { 
 	      edm::LogError("Alignment") << "Matrix inversion failed!"; 
 	      return; 
 	    }
 	    
 	    // calculate user parameters
-	    int npar = derivs.num_row();
+	    int npar=derivs.num_row();
 	    AlgebraicSymMatrix thisjtvj(npar);
 	    AlgebraicVector thisjtve(npar);
-	    thisjtvj=covmat.similarity(derivs);
-	    thisjtve=derivs * covmat * (pos-coor);
+	    thisjtvj=totcovmat.similarity(derivs);
+	    thisjtve=derivs * totcovmat * (pos-coor);
+	    if (verbose) {
+	      AlgebraicVector theminim(1); 
+	      theminim = totcovmat.similarityT(pos-coor);
+	      cout << "For this hit the chi2 contribution is " << theminim[0] << " \n ********************************************************** \n";
+	    }
 	    
 	    // access user variables (via AlignmentParameters)
 	    CSA06UserVariables* uservar =
@@ -474,25 +501,29 @@ void CSA06AlignmentAlgorithm::run( const edm::EventSetup& setup, const ConstTraj
 	    uservar->jtvj += thisjtvj;
 	    uservar->jtve += thisjtve;
 	    uservar->nhit ++;
- 
 	  }
 	  
 	  itsos++;
 	  ihit++;
-          imea++;
-	} 
-    }
-    allTracks++;
+	  imea++;
+	  
+	} // end fo hit loop
+      
+      allTracks++;
+    } // end of track loop
     
-  } // end of track loop
-
-  // fill eventwise root tree (with prescale defined in pset)
-  theCurrentPrescale--;
-  if (theCurrentPrescale<=0) {
-    theTree->Fill();
-    theCurrentPrescale=theEventPrescale;    
+    if (verbose) {
+      cout << "allHits = " << m_allHits << "\n";
+      if (allTracks) cout << "phiTrack = " << m_Phi[m_Ntracks-1] << "\n";
+    }
+    
+    // fill eventwise root tree (with prescale defined in pset)
+    theCurrentPrescale--;
+    if (theCurrentPrescale<=0) {
+      theTree->Fill();
+      theCurrentPrescale=theEventPrescale;
+    }
   }
-
 }
 
 // ----------------------------------------------------------------------------
@@ -552,12 +583,10 @@ void CSA06AlignmentAlgorithm::setAlignmentPositionError(void)
 
   // Printout for debug
   for ( int i=0; i<21; ++i ) {
-    double apelinstest=calcAPE(apesp,i,"linear");
-    double apeexpstest=calcAPE(apesp,i,"exponential");
-    double apelinrtest=calcAPE(aperp,i,"linear");
-    double apeexprtest=calcAPE(aperp,i,"exponential");
-    printf("APE: iter slin sexp rlin rexp: %5d %12.5f %12.5f %12.5f %12.5f\n",
-      i,apelinstest,apeexpstest,apelinrtest,apeexprtest);
+    double apestest=calcAPE(apesp,i,apeparam);
+    double apertest=calcAPE(aperp,i,apeparam);
+    printf("APE: iter pos rot: %5d %12.5f %12.5f\n",
+      i,apertest,apestest);
   }
 
   // set APE
@@ -576,7 +605,7 @@ CSA06AlignmentAlgorithm::calcAPE(double* par, int iter,std::string param)
   double diter=(double)iter;
 
   if (param == "linear") {
-    return max(0.,par[0]+((par[1]-par[0])/par[2])*diter);
+    return max(par[1],par[0]+((par[1]-par[0])/par[2])*diter);
   }
   else if (param == "exponential") {
     return max(0.,par[0]*(exp(-pow(diter,par[1])/par[2])));
@@ -608,26 +637,27 @@ void CSA06AlignmentAlgorithm::bookRoot(void)
 
   theTree  = new TTree(tname,"Eventwise tree");
 
-   //theTree->Branch("Run",     &m_Run,     "Run/I");
-  //theTree->Branch("Event",   &m_Event,   "Event/I");
-  theTree->Branch("NtracksSim", &m_NtracksSim, "NtracksSim/I");      
+  // theTree->Branch("Run",     &m_Run,     "Run/I");
+  // theTree->Branch("Event",   &m_Event,   "Event/I");
+  theTree->Branch("NtracksSim", &m_NtracksSim, "NtracksSim/I");
   theTree->Branch("PtSim",       m_PtSim,      "PtSim[NtracksSim]/F");
   theTree->Branch("EtaSim",      m_EtaSim,     "EtaSim[NtracksSim]/F");
   theTree->Branch("PhiSim",      m_PhiSim,     "PhiSim[NtracksSim]/F");
   theTree->Branch("Ntracks", &m_Ntracks, "Ntracks/I");
-  theTree->Branch("Nhits",    m_Nhits,   "Nhits[Ntracks]/I");       
+  theTree->Branch("Nhits",    m_Nhits,   "Nhits[Ntracks]/I");
   theTree->Branch("Pt",       m_Pt,      "Pt[Ntracks]/F");
   theTree->Branch("Eta",      m_Eta,     "Eta[Ntracks]/F");
   theTree->Branch("Phi",      m_Phi,     "Phi[Ntracks]/F");
   theTree->Branch("Chi2n",    m_Chi2n,   "Chi2n[Ntracks]/F");
   theTree->Branch("allHits", &m_allHits, "allHits/I");
+  theTree->Branch("isOnAli",  m_isOnAli, "isOnAli[allHits]/I");
   theTree->Branch("hType",    m_hType,   "hType[allHits]/I");
   theTree->Branch("hLayer",   m_hLayer,  "hLayer[allHits]/I");
   theTree->Branch("hFwBw",    m_hFwBw,   "hFwBw[allHits]/I");
   theTree->Branch("hIntExt",  m_hIntExt, "hIntExt[allHits]/I");
   theTree->Branch("hStrRod",  m_hStrRod, "hStrRod[allHits]/I");
   theTree->Branch("hModule",  m_hModule, "hModule[allHits]/I");
-  theTree->Branch("hOwnerTrack",m_hOwnerTrack,"hOwnerTrack[allHits]/I"); 
+  theTree->Branch("hOwnerTrack",m_hOwnerTrack,"hOwnerTrack[allHits]/I");
   theTree->Branch("hR",       m_hR,      "hR[allHits]/F");
   theTree->Branch("hPhi",     m_hPhi,    "hPhi[allHits]/F");
   theTree->Branch("hZ",       m_hZ,      "hZ[allHits]/F");
@@ -638,10 +668,14 @@ void CSA06AlignmentAlgorithm::bookRoot(void)
   theTree->Branch("hLocalAngleSter",m_hLocalAngleSter,"hLocalAngleSter[allHits]/F");
   theTree->Branch("hChargeMono",m_hChargeMono,"hChargeMono[allHits]/F");
   theTree->Branch("hChargeSter",m_hChargeSter,"hChargeSter[allHits]/F");
+  theTree->Branch("hBarMono",m_hBarMono,"hBarMono[allHits]/F");
+  theTree->Branch("hBarSter",m_hBarSter,"hBarSter[allHits]/F");
   theTree->Branch("xres",     m_Xres,    "xres[allHits]/F");
   theTree->Branch("yres",     m_Yres,    "yres[allHits]/F");
   theTree->Branch("xerr",     m_Xerr,    "xerr[allHits]/F");
-  theTree->Branch("yerr",     m_Yerr,    "yerr[allHits]/F"); 
+  theTree->Branch("yerr",     m_Yerr,    "yerr[allHits]/F");
+  theTree->Branch("xerrHit",  m_XerrHit, "xerrHit[allHits]/F");
+  theTree->Branch("xerrIP",   m_XerrIP,  "xerrIP[allHits]/F");
 
   // book Alignable-wise ROOT Tree
 
@@ -840,7 +874,7 @@ std::vector<unsigned int> CSA06AlignmentAlgorithm::storeNumberingScheme(const De
 {
   std::vector<unsigned int> numbScheme;
   if (type == int(StripSubdetector::TIB)) {
-    TIBDetId myTIBid( detid ); 
+    TIBDetId myTIBid( detid );
     std::vector<unsigned int> stringPos = myTIBid.string();
     numbScheme.push_back(stringPos.at(0));   //   TIB+ / TIB-
     numbScheme.push_back(myTIBid.layer());   //   layer
@@ -848,15 +882,15 @@ std::vector<unsigned int> CSA06AlignmentAlgorithm::storeNumberingScheme(const De
     numbScheme.push_back(stringPos.at(2));   //   string
     numbScheme.push_back(myTIBid.module());  //   module
   } else if (type == int(StripSubdetector::TOB)) {
-    TOBDetId myTOBid( detid ); 
+    TOBDetId myTOBid( detid );
     std::vector<unsigned int> rodPos = myTOBid.rod();
     numbScheme.push_back(rodPos.at(0));      //   TOB+ / TOB-
     numbScheme.push_back(myTOBid.layer());   //   layer
     numbScheme.push_back( 1 );               //   dummy
-    numbScheme.push_back(rodPos.at(1));   //   rod
+    numbScheme.push_back(rodPos.at(1));      //   rod
     numbScheme.push_back(myTOBid.module());  //   module
   } else {
-    numbScheme.push_back( 0 ); 
+    numbScheme.push_back( 0 );
   }
   return numbScheme;
 }

@@ -9,6 +9,13 @@
 
 #include "DataFormats/TrackCandidate/interface/TrackCandidateCollection.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "SimDataFormats/Track/interface/SimTrack.h"
+
+// GF: I prefer the following instead, but needs fixed includes in CSA06AlignmentAlgorithm:
+// namespace reco {
+//   class Track;
+// }
 
 // Framework
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -18,9 +25,11 @@
 #include "Alignment/TrackerAlignment/interface/AlignableTracker.h"
 #include "Alignment/MuonAlignment/interface/AlignableMuon.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentParameterStore.h"
+// GF: I prefer the following, but no time to check for possible fixes needed in other code...
+// class AlignableTracker;
+// class AlignableMuon;
+// class AlignmentParameterStore;
 
-#include "SimDataFormats/Track/interface/SimTrackContainer.h"
-#include "SimDataFormats/Track/interface/SimTrack.h"
 
 class Trajectory;
 
@@ -48,10 +57,6 @@ public:
   virtual void terminate(void) = 0;
 
   /// Run the algorithm on trajectories and tracks (must be implemented in derived class)
-  //  virtual void run( const edm::EventSetup& setup,
-  //                  const ConstTrajTrackPairCollection& tracks) = 0;
-
-  //Add SimTracks
   virtual void run( const edm::EventSetup& setup,
                     const ConstTrajTrackPairCollection& tracks,
                     const edm::SimTrackContainer& simcoll ) = 0;

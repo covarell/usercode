@@ -27,7 +27,7 @@
            ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006509_1.root'
 		}
 
-		untracked int32 maxEvents   = 100
+		untracked int32 maxEvents   = 1000
 		untracked uint32 skipEvents = 0
 	
 	}	   

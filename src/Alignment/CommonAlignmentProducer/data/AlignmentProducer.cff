@@ -5,22 +5,17 @@ include "Alignment/TrackerAlignment/data/Scenarios.cff"
 #  replace TrackerShortTermScenario.TPEs.scale = 10.
 
 # algorithms
-include "Alignment/HIPAlignmentAlgorithm/data/HIPAlignmentAlgorithm.cfi"
+include "Alignment/CSA06AlignmentAlgorithm/data/CSA06AlignmentAlgorithm.cfi"
 include "Alignment/MillePedeAlignmentAlgorithm/data/MillePedeAlignmentAlgorithm.cfi"
 include "Alignment/KalmanAlignmentAlgorithm/data/KalmanAlignmentAlgorithm.cfi"
-
-# DB configuration
-# include "Alignment/CommonAlignmentProducer/data/DBConfiguration.cff"
 
 looper = AlignmentProducer
 {
     untracked uint32 maxLoops = 1
-    # InputTag tjTkAssociationMapTag = TrackRefitter
-
     untracked bool isData = false
-  
-    InputTag tkTag = cosmictrackrefitter:
-    InputTag tjTag = cosmictrackrefitter:
+
+    InputTag tkTag = TrackRefitter
+    InputTag tjTag = TrackRefitter
     InputTag simTag = g4SimHits:
 
     untracked bool doTracker = true
@@ -63,6 +58,7 @@ looper = AlignmentProducer
             #   vdouble rRanges   =  {}
             #   vdouble phiRanges =  {1.5, -0.5} # a phi-slice covering the +-pi sign flip
             # }
+
             PSet TIBSelOnly = {
                vdouble etaRanges =  {}
                vdouble zRanges   =  {}
@@ -138,7 +134,7 @@ looper = AlignmentProducer
 	
     # Choose one algorithm
     PSet algoConfig = {
-		using HIPAlignmentAlgorithm
+		using CSA06AlignmentAlgorithm
         # using MillePedeAlignmentAlgorithm
         # using KalmanAlignmentAlgorithm
     }
@@ -147,7 +143,6 @@ looper = AlignmentProducer
     # Save alignment corrections to DB: if true, requires configuration of PoolDBOutputService
     # See DBConfiguration.cff for an example
     bool saveToDB = true
-    untracked bool storeAPEInDB = true
 
 }
 

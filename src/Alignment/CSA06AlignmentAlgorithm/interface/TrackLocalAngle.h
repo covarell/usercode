@@ -38,6 +38,8 @@ class TrackLocalAngle
 
   std::pair<float,float> findhitcharge(const TrajectoryMeasurement& theTM);
 
+  std::pair<float,float> findhitbary(const TrajectoryMeasurement& theTM);
+
  private:
 	
   const TrackerGeometry * tracker_;

@@ -9,6 +9,9 @@ AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
   applyBasicCuts( cfg.getParameter<bool>( "applyBasicCuts" ) ),
   applyNHighestPt( cfg.getParameter<bool>( "applyNHighestPt" ) ),
   applyMultiplicityFilter( cfg.getParameter<bool>( "applyMultiplicityFilter" ) ),
+  seedOnlyFromAbove( cfg.getParameter<bool>( "seedOnlyFromAbove" ) ),
+  applyIsolation( cfg.getParameter<bool>( "applyIsolationCut" ) ),
+  chargeCheck( cfg.getParameter<bool>( "applyChargeCheck" ) ),
   nHighestPt( cfg.getParameter<int>( "nHighestPt" ) ),
   minMultiplicity ( cfg.getParameter<int>( "minMultiplicity" ) ),
   maxMultiplicity ( cfg.getParameter<int>( "maxMultiplicity" ) ),
@@ -20,7 +23,10 @@ AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
   phiMax( cfg.getParameter<double>( "phiMax" ) ),
   nHitMin( cfg.getParameter<double>( "nHitMin" ) ),
   nHitMax( cfg.getParameter<double>( "nHitMax" ) ),
-  chi2nMax( cfg.getParameter<double>( "chi2nMax" ) )
+  chi2nMax( cfg.getParameter<double>( "chi2nMax" ) ),
+  isoCut( cfg.getParameter<double>( "isolationCut" ) ),
+  chargeCut( cfg.getParameter<double>( "chargeCut" ) )
+  
 {
 
   if (applyBasicCuts)
@@ -38,7 +44,7 @@ AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
 
   if (applyMultiplicityFilter)
 	edm::LogInfo("AlignmentTrackSelector") 
-	  << "apply multiplicity filter N>= " << minMultiplicity << "and N<= " << maxMultiplicity;
+	  << "apply multiplicity filter N >= " << minMultiplicity << " and N <= " << maxMultiplicity;
 
   edm::ParameterSet minHitsPerSubdet = conf_.getParameter<edm::ParameterSet>( "minHitsPerSubDet" );
   minHitsinTIB = minHitsPerSubdet.getParameter<int>( "inTIB" );
@@ -61,12 +67,12 @@ AlignmentTrackSelector::~AlignmentTrackSelector()
 // do selection ---------------------------------------------------------------
 
 AlignmentTrackSelector::Tracks 
-AlignmentTrackSelector::select(const Tracks& tracks, const edm::Event& evt) const 
+AlignmentTrackSelector::select(const Tracks& tracks, const edm::Event& evt, const edm::EventSetup& es ) const 
 {
   Tracks result=tracks;
 
   // apply basic track cuts (if selected)
-  if (applyBasicCuts)  result= this->basicCuts(result);
+  if (applyBasicCuts)  result= this->basicCuts(result, evt, es);
 
   // filter N tracks with highest Pt (if selected)
   if (applyNHighestPt) result= this->theNHighestPtTracks(result);
@@ -85,7 +91,7 @@ AlignmentTrackSelector::select(const Tracks& tracks, const edm::Event& evt) cons
 // make basic cuts ------------------------------------------------------------
 
 AlignmentTrackSelector::Tracks 
-AlignmentTrackSelector::basicCuts(const Tracks& tracks) const 
+AlignmentTrackSelector::basicCuts(const Tracks& tracks, const edm::Event& evt, const edm::EventSetup& es ) const 
 {
   Tracks result;
 
@@ -110,23 +116,119 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks) const
        && phi>phiMin && phi<phiMax 
        && nhit>=nHitMin && nhit<=nHitMax
        && chi2n<chi2nMax) {
+ 
+      int thishit = 0;
+      bool okSeed = true;
+      bool okIso = true; 
+      bool okCharge = true;
 
-         for (trackingRecHit_iterator iHit = trackp->recHitsBegin(); iHit != trackp->recHitsEnd(); iHit++) {
-	   std::pair<int,int> typeAndLay = TkMap->typeAndLayerFromDetId( (*iHit)->geographicalId() );
-	   int type = typeAndLay.first; 
-           if (type == int(StripSubdetector::TIB)) nhitinTIB++;
-           if (type == int(StripSubdetector::TOB)) nhitinTOB++;
-           if (type == int(StripSubdetector::TID)) nhitinTID++;
-           if (type == int(StripSubdetector::TEC)) nhitinTEC++;
-         }
-         
-         if (nhitinTIB>=minHitsinTIB &&
-             nhitinTOB>=minHitsinTOB &&
-             nhitinTID>=minHitsinTID &&
-             nhitinTEC>=minHitsinTEC ) result.push_back(trackp);
+      for (trackingRecHit_iterator iHit = trackp->recHitsBegin(); iHit != trackp->recHitsEnd(); iHit++) {
+        thishit++;
+	std::pair<int,int> typeAndLay = TkMap->typeAndLayerFromDetId( (*iHit)->geographicalId() ); 
+	int type = typeAndLay.first; 
+
+        if (seedOnlyFromAbove && thishit == 1 && type == int(StripSubdetector::TOB)) okSeed = false;  
+	// if first hit is in TOB seed is from below (mysteries of tracking...)
+           
+        if ((*iHit)->isValid()) {
+
+	  if (chargeCheck) {
+            const TrackingRecHit* therechit = (*iHit).get();
+            float charge1 = 0;
+            float charge2 = 0;
+	    const SiStripMatchedRecHit2D* matchedhit = dynamic_cast<const SiStripMatchedRecHit2D*>(therechit);
+	    const SiStripRecHit2D* hit = dynamic_cast<const SiStripRecHit2D*>(therechit);
+	    
+	    if (matchedhit) {  
+	      const SiStripRecHit2D *monohit=matchedhit->monoHit();    
+	      const SiStripCluster* monocluster = &*(monohit->cluster());
+	      const std::vector<uint16_t> amplitudesmono( monocluster->amplitudes().begin(),
+							  monocluster->amplitudes().end());
+	      for(size_t ia=0; ia<amplitudesmono.size();ia++)
+		{ charge1+=amplitudesmono[ia];} 
+	      
+              const SiStripRecHit2D *stereohit=matchedhit->stereoHit();   
+	      const SiStripCluster* stereocluster = &*(stereohit->cluster());
+	      const std::vector<uint16_t> amplitudesstereo( stereocluster->amplitudes().begin(),
+							    stereocluster->amplitudes().end());
+	      for(size_t ia=0; ia<amplitudesstereo.size();ia++)
+		{charge2+=amplitudesstereo[ia];}
+	      // std::cout << "charge1 = " << charge1 << "\n";
+	      // std::cout << "charge2 = " << charge2 << "\n";
+	      if (charge1 < chargeCut || charge2 < chargeCut) okCharge = false;
+	    }
+	    else if (hit) {
+	      
+	      const SiStripCluster* cluster = &*(hit->cluster());
+	      const std::vector<uint16_t> amplitudes( cluster->amplitudes().begin(),
+						      cluster->amplitudes().end());
+	      for(size_t ia=0; ia<amplitudes.size();ia++)
+		{charge1+=amplitudes[ia];}
+	      // std::cout << "charge1 = " << charge1 << "\n";
+	      if (charge1 < chargeCut) okCharge = false;
+	    }
+	  }
+          
+	  if (applyIsolation) {
+
+            edm::ESHandle<TrackerGeometry> tracker;
+	    es.get<TrackerDigiGeometryRecord>().get(tracker);
+
+	    edm::Handle<SiStripRecHit2DCollection> rphirecHits;
+	    edm::InputTag rphirecHitsTag = conf_.getParameter<edm::InputTag>("rphirecHits");
+	    evt.getByLabel( rphirecHitsTag, rphirecHits );
+	    
+	    edm::Handle<SiStripMatchedRecHit2DCollection> matchedrecHits;
+	    edm::InputTag matchedrecHitsTag = conf_.getParameter<edm::InputTag>("matchedrecHits");
+	    evt.getByLabel( matchedrecHitsTag, matchedrecHits );
+	    
+	    SiStripRecHit2DCollection::const_iterator istripSt; 
+	    SiStripMatchedRecHit2DCollection::const_iterator istripStm; 
+	    SiStripRecHit2DCollection stripcollSt = *rphirecHits;
+	    SiStripMatchedRecHit2DCollection stripcollStm = *matchedrecHits;
+	    
+            DetId idet = (*iHit)->geographicalId(); 
+            GlobalPoint point = tracker->idToDet(idet)->surface().toGlobal((*iHit)->localPosition());
+ 
+	    for( istripSt=stripcollSt.begin(); istripSt!=stripcollSt.end(); istripSt++ ) {
+	      const SiStripRecHit2D *aHit = &*(istripSt);
+              DetId mydet1 = aHit->geographicalId(); 
+	      GlobalPoint point1 = tracker->idToDet(mydet1)->surface().toGlobal(aHit->localPosition());
+	      float theDistance = sqrt( pow(point1.x() - point.x(), 2) +
+					pow(point1.y() - point.y(), 2) +
+					pow(point1.z() - point.z(), 2) );
+	      // std::cout << "theDistance1 = " << theDistance << "\n";
+	      if (idet.rawId() == mydet1.rawId() && theDistance > 0.001 && theDistance < isoCut) okIso = false;
+	    }
+	    
+	    for( istripStm=stripcollStm.begin(); istripStm!=stripcollStm.end(); istripStm++ ) {
+	      const SiStripMatchedRecHit2D *aHit = &*(istripStm);
+	      DetId mydet2 = aHit->geographicalId(); 
+	      GlobalPoint point2 = tracker->idToDet(mydet2)->surface().toGlobal(aHit->localPosition());
+	      float theDistance = sqrt( pow(point2.x() - point.x(), 2) +
+					pow(point2.y() - point.y(), 2) +
+					pow(point2.z() - point.z(), 2) );
+              // std::cout << "theDistance1 = " << theDistance << "\n";
+	      if (idet.rawId() == mydet2.rawId() && theDistance > 0.001 && theDistance < isoCut) okIso = false;
+	    }
+	  }     
+            
+	  
+	  if (type == int(StripSubdetector::TIB)) nhitinTIB++;
+	  if (type == int(StripSubdetector::TOB)) nhitinTOB++;
+	  if (type == int(StripSubdetector::TID)) nhitinTID++;
+	  if (type == int(StripSubdetector::TEC)) nhitinTEC++;
+	}
+      }
+      
+      if (nhitinTIB>=minHitsinTIB &&
+	  nhitinTOB>=minHitsinTOB &&
+	  nhitinTID>=minHitsinTID &&
+	  nhitinTEC>=minHitsinTEC &&
+          okSeed && okIso && okCharge) result.push_back(trackp);
     }
   }
-
+  
   return result;
 }
 

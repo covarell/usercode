@@ -26,4 +26,14 @@
 		bool applyMultiplicityFilter = true
 		int32 minMultiplicity = 1
 		int32 maxMultiplicity = 999999
+
+                bool seedOnlyFromAbove = false
+
+                bool applyIsolationCut = false 
+                double isolationCut = 0.01
+                InputTag rphirecHits = siStripMatchedRecHits:rphiRecHit      
+                InputTag matchedrecHits = siStripMatchedRecHits:matchedRecHit 
+
+                bool applyChargeCheck = false
+                double chargeCut = 20.0
 	}

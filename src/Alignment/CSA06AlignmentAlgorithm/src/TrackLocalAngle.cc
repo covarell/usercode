@@ -41,8 +41,8 @@ std::pair<float,float> TrackLocalAngle::findhitcharge(const TrajectoryMeasuremen
 {
   
   std::pair<float,float> monostereocha; 
-  float charge1 = -9999.;
-  float charge2 = -9999.;
+  float charge1 = 0.;
+  float charge2 = 0.;
 
   const TransientTrackingRecHit::ConstRecHitPointer thit=theTM.recHit();
   const SiStripMatchedRecHit2D* matchedhit = dynamic_cast<const SiStripMatchedRecHit2D*>((*thit).hit());
@@ -53,26 +53,75 @@ std::pair<float,float> TrackLocalAngle::findhitcharge(const TrajectoryMeasuremen
     // THIS IS THE POINTER TO THE MONO HIT OF A MATCHED HIT 
     const SiStripRecHit2D *monohit=matchedhit->monoHit();    
     const SiStripCluster* monocluster = &*(monohit->cluster());
-    SiStripClusterInfo monoinfo( *monocluster );
-    charge1 = monoinfo.charge();  // /monoinfo.noise();     
+    const std::vector<uint16_t> amplitudesmono( monocluster->amplitudes().begin(),
+						monocluster->amplitudes().end());
+    for(size_t ia=0; ia<amplitudesmono.size();ia++)
+      {
+	charge1+=amplitudesmono[ia];             
+      } 
 
     // THIS IS THE POINTER TO THE STEREO HIT OF A MATCHED HIT 
     const SiStripRecHit2D *stereohit=matchedhit->stereoHit();   
-    const SiStripCluster* stereocluster =&*(stereohit->cluster());
-    SiStripClusterInfo stereoinfo( *stereocluster );
-    charge2 = stereoinfo.charge();  // /stereoinfo.noise(); 
-
+    const SiStripCluster* stereocluster = &*(stereohit->cluster());
+    const std::vector<uint16_t> amplitudesstereo( stereocluster->amplitudes().begin(),
+						  stereocluster->amplitudes().end());
+    for(size_t ia=0; ia<amplitudesstereo.size();ia++)
+      {
+	charge2+=amplitudesstereo[ia];             
+      }
+ 
   }
   else if (hit) {
     
     //  hit= POINTER TO THE RECHIT
     const SiStripCluster* cluster = &*(hit->cluster());
-    SiStripClusterInfo info( *cluster );
-    charge1 = info.charge();  // /info.noise(); 
+    const std::vector<uint16_t> amplitudes( cluster->amplitudes().begin(),
+					    cluster->amplitudes().end());
+    for(size_t ia=0; ia<amplitudes.size();ia++)
+      {
+	charge1+=amplitudes[ia];             
+      }
   }
 
   monostereocha = make_pair(charge1, charge2); 
   return monostereocha;
+}
+
+std::pair<float,float> TrackLocalAngle::findhitbary(const TrajectoryMeasurement& theTM)
+{
+  
+  std::pair<float,float> monostereobar; 
+  float bar1 = 0.;
+  float bar2 = 0.;
+
+  const TransientTrackingRecHit::ConstRecHitPointer thit=theTM.recHit();
+  const SiStripMatchedRecHit2D* matchedhit = dynamic_cast<const SiStripMatchedRecHit2D*>((*thit).hit());
+  const SiStripRecHit2D* hit = dynamic_cast<const SiStripRecHit2D*>((*thit).hit());
+
+  if (matchedhit) { //if matched hit...
+
+    // THIS IS THE POINTER TO THE MONO HIT OF A MATCHED HIT 
+    const SiStripRecHit2D *monohit=matchedhit->monoHit();    
+    const SiStripCluster* monocluster = &*(monohit->cluster());
+    bar1 = monocluster->barycenter(); 
+
+    // THIS IS THE POINTER TO THE STEREO HIT OF A MATCHED HIT 
+    const SiStripRecHit2D *stereohit=matchedhit->stereoHit();   
+    const SiStripCluster* stereocluster = &*(stereohit->cluster());
+    bar2 = stereocluster->barycenter();
+ 
+  }
+  else if (hit) {
+    
+    //  hit= POINTER TO THE RECHIT
+    const SiStripCluster* cluster = &*(hit->cluster());
+    const std::vector<uint16_t> amplitudes( cluster->amplitudes().begin(),
+					    cluster->amplitudes().end());
+    bar1 = cluster->barycenter();
+  }
+ 
+  monostereobar = make_pair(bar1, bar2); 
+  return monostereobar;
 }
 
 std::pair<float,float> TrackLocalAngle::findtrackangle(const TrajectoryMeasurement& theTM)

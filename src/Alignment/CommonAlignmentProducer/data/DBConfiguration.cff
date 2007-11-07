@@ -2,10 +2,8 @@
 # Required if AlignmentProducer.applyDbAlignment = true
 es_source = PoolDBESSource { 
     VPSet toGet = {
-        { string record = "TrackerAlignmentRcd" 
-           string tag = "TibTidTecAllSurvey_v1" },
-        { string record = "TrackerAlignmentErrorRcd" 
-           string tag = "TibTidTecAllSurveyAPE1000_v1" }
+        { string record = "TrackerAlignmentRcd" string tag = "TrackerCSA06Scenario" },
+        { string record = "TrackerAlignmentErrorRcd" string tag = "TrackerCSA06ScenarioErrors" }
     }
     bool loadAll = true
     string timetype = "runnumber" 
@@ -13,15 +11,28 @@ es_source = PoolDBESSource {
     untracked uint32 messagelevel = 0 // 0
 
     # (a) sq lite files (has to match toGet tag's used above)
-    string connect = "sqlite_file:/afs/cern.ch/user/c/covarell/scratch0/survey/CMSSW_1_4_0/src/Alignment/SurveyAnalysis/test/TibTidTecAllSurvey.db"
-    untracked string catalog = "file:/afs/cern.ch/user/c/covarell/scratch0/survey/CMSSW_1_4_0/src/Alignment/SurveyAnalysis/test/TibTidTecAllSurvey.xml"
+    # string connect = "sqlite_file:CSA06Scenario.db"
+    # untracked string catalog = "file:condbcatalog.xml"
     # (b) ORACLE
-    # string connect = "oracle://cms_orcoff_int2r/CMS_COND_ALIGNMENT"
-    #untracked string catalog = "relationalcatalog_oracle://cms_orcoff_int2r/CMS_COND_GENERAL"
+    string connect = "oracle://cms_orcoff_int2r/CMS_COND_ALIGNMENT"
+    untracked string catalog = "relationalcatalog_oracle://cms_orcoff_int2r/CMS_COND_GENERAL"
     untracked bool siteLocalConfig = false // oracle
     # (c) FRONTIER
     # string connect = "frontier://cms_conditions_data/CMS_COND_ALIGNMENT"
     # untracked bool siteLocalConfig = true // frontier
 }
 
-
+# Database output service
+# Required if AlignmentProducer.saveToDB = true
+service = PoolDBOutputService  {
+    string connect = "sqlite_file:Alignments.db"    
+    string timetype = "runnumber"    
+    untracked uint32 authenticationMethod = 1
+    untracked string catalog = "file:condbcatalog.xml"
+    VPSet toPut = {
+		{ untracked string containerName = "Alignments" 
+			string tag = "Alignments_init" },
+		{ untracked string containerName = "AlignmentErrors" 
+			string tag = "AlignmentErrors_init" }
+    }
+}

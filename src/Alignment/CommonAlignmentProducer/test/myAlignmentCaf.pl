@@ -13,10 +13,10 @@ elsif ( $host =~ /lxcms/ )   { $location="lxcmsg1"; }
 # job steering ----------------------------------------------------------------
 
 # name of job
-$jobname="Pass3TIBTOBstr-xy-allfree-linAPE";
+$jobname="Pass3TIBmod-x-outrej-20iter";
 
 # cfg file
-$steering="AlignPass3DBBoth.cfg";
+$steering="AlignTIBDBBoth_outrej.cfg";
 
 # db output files (to be deleted except for last iteration)
 $dbfiles="alignments.db alignments.xml";
@@ -26,21 +26,21 @@ $dbfiles="alignments.db alignments.xml";
 $authfile="authentication.xml";
 
 # db input file
-$sqlitefile="TibTidModuleSurvey_bigape.db"; $condbcatalogfile="TibTidModuleSurvey_bigape.xml";
-# $sqlitefile="alignments.db"; $condbcatalogfile="alignments.xml";
+# $sqlitefile="TibTidModuleSurvey_bigape.db"; $condbcatalogfile="TibTidModuleSurvey_bigape.xml";
+$sqlitefile="alignments_TOB.db"; $condbcatalogfile="alignments_TOB.xml";
 # $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=18000;
+$nevent=20000;
 
 # first event
 $firstev=0;
 
 # number of jobs
-$njobs=40;
+$njobs=20;
 
 # number of iterations (excluding initial step)
-$iterations=10;
+$iterations=20;
 
 # interactive or lxbatch queue
 # $farm="I";
@@ -57,13 +57,13 @@ $sleeptime=30;
 # site-specific paths etc
 
 if ( $location eq "lxcmsg1" ) {
-  $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment";
+  $homedir="/afs/cern.ch/user/c/covarell/scratch0/goodalign";
   $basedir="${homedir}/${cmsswvers}";
   $outdir="/data/covarell/joboutput";
 }
 elsif ( $location eq "lxplus" ) {
   # die "ERROR: Root files for the analysis are on lxcmsg1!\n";
-   $homedir="/afs/cern.ch/user/c/covarell/scratch0/alignment";
+   $homedir="/afs/cern.ch/user/c/covarell/scratch0/goodalign";
    $basedir="${homedir}/${cmsswvers}";
    $outdir="/afs/cern.ch/user/c/covarell/scratch0/joboutput";
 }
@@ -202,9 +202,9 @@ system("cp ${workdir}/$steering $dir/cfgfile");
 $repl="
   replace PoolSource.maxEvents  = 1
   replace PoolSource.skipEvents = 0
-  replace HIPAlignmentAlgorithm.collectorActive = true
-  replace HIPAlignmentAlgorithm.collectorNJobs = $njobs
-  replace HIPAlignmentAlgorithm.collectorPath = \"../\"
+  replace CSA06AlignmentAlgorithm.collectorActive = true
+  replace CSA06AlignmentAlgorithm.collectorNJobs = $njobs
+  replace CSA06AlignmentAlgorithm.collectorPath = \"../\"
 ";
 replace("$dir/cfgfile",$repl);
 
@@ -311,7 +311,7 @@ sub run_collector
     subjob
   ");
   if ($iteration gt 0) {
-    system("cp $dir/job1/HIPAlignmentEvents.root $dir/main");
+    system("cp $dir/job1/CSA06AlignmentEvents.root $dir/main");
   }
 
   return 0;
