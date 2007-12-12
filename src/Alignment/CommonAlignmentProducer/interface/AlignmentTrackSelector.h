@@ -17,6 +17,7 @@
 #include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit2DCollection.h"
 #include "DataFormats/SiStripCluster/interface/SiStripCluster.h"
 #include "AnalysisDataFormats/SiStripClusterInfo/interface/SiStripClusterInfo.h"
+#include "DataFormats/TrackerRecHit2D/interface/ProjectedSiStripRecHit2D.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include <vector>
@@ -58,10 +59,10 @@ class AlignmentTrackSelector
   /// private data members
   edm::ParameterSet conf_;
 
-  bool applyBasicCuts,applyNHighestPt,applyMultiplicityFilter,seedOnlyFromAbove, applyIsolation, chargeCheck;
+  bool applyBasicCuts,applyNHighestPt,applyMultiplicityFilter,applyIsolation, chargeCheck;
   int nHighestPt,minMultiplicity,maxMultiplicity;
-  double ptMin,ptMax,etaMin,etaMax,phiMin,phiMax,nHitMin,nHitMax,chi2nMax,isoCut, chargeCut;
-  int minHitsinTIB, minHitsinTOB, minHitsinTID, minHitsinTEC;
+  double ptMin,ptMax,etaMin,etaMax,phiMin,phiMax,nHitMin,nHitMax,chi2nMax,isoCut,chargeCut;
+  int minHitsinTIB, minHitsinTOB, minHitsinTID, minHitsinTEC, seedOnlyFromAbove;
 
   TrackerAlignableId *TkMap;
 };

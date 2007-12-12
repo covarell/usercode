@@ -27,7 +27,7 @@
 		int32 minMultiplicity = 1
 		int32 maxMultiplicity = 999999
 
-                bool seedOnlyFromAbove = false
+                int32 seedOnlyFrom = 0 
 
                 bool applyIsolationCut = false 
                 double isolationCut = 0.01

@@ -9,7 +9,7 @@ AlignmentTrackSelector::AlignmentTrackSelector(const edm::ParameterSet & cfg) :
   applyBasicCuts( cfg.getParameter<bool>( "applyBasicCuts" ) ),
   applyNHighestPt( cfg.getParameter<bool>( "applyNHighestPt" ) ),
   applyMultiplicityFilter( cfg.getParameter<bool>( "applyMultiplicityFilter" ) ),
-  seedOnlyFromAbove( cfg.getParameter<bool>( "seedOnlyFromAbove" ) ),
+  seedOnlyFromAbove( cfg.getParameter<int>( "seedOnlyFrom" ) ),
   applyIsolation( cfg.getParameter<bool>( "applyIsolationCut" ) ),
   chargeCheck( cfg.getParameter<bool>( "applyChargeCheck" ) ),
   nHighestPt( cfg.getParameter<int>( "nHighestPt" ) ),
@@ -127,9 +127,10 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks, const edm::Event& evt, c
 	std::pair<int,int> typeAndLay = TkMap->typeAndLayerFromDetId( (*iHit)->geographicalId() ); 
 	int type = typeAndLay.first; 
 
-        if (seedOnlyFromAbove && thishit == 1 && type == int(StripSubdetector::TOB)) okSeed = false;  
-	// if first hit is in TOB seed is from below (mysteries of tracking...)
-           
+        if (seedOnlyFromAbove == 1 && thishit == 1 && type == int(StripSubdetector::TOB)) okSeed = false;  
+	// if first hit is in TOB seed is from above 
+        if (seedOnlyFromAbove == 2 && thishit == 1 && type == int(StripSubdetector::TIB)) okSeed = false;  
+   
         if ((*iHit)->isValid()) {
 
 	  if (chargeCheck) {
@@ -138,7 +139,8 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks, const edm::Event& evt, c
             float charge2 = 0;
 	    const SiStripMatchedRecHit2D* matchedhit = dynamic_cast<const SiStripMatchedRecHit2D*>(therechit);
 	    const SiStripRecHit2D* hit = dynamic_cast<const SiStripRecHit2D*>(therechit);
-	    
+	    const ProjectedSiStripRecHit2D* unmatchedhit = dynamic_cast<const ProjectedSiStripRecHit2D*>(therechit);
+
 	    if (matchedhit) {  
 	      const SiStripRecHit2D *monohit=matchedhit->monoHit();    
 	      const SiStripCluster* monocluster = &*(monohit->cluster());
@@ -167,7 +169,18 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks, const edm::Event& evt, c
 	      // std::cout << "charge1 = " << charge1 << "\n";
 	      if (charge1 < chargeCut) okCharge = false;
 	    }
-	  }
+            else if (unmatchedhit) {
+      
+	      const SiStripRecHit2D orighit = unmatchedhit->originalHit(); 
+	      const SiStripCluster* origcluster = &*(orighit.cluster());
+	      const std::vector<uint16_t> amplitudes( origcluster->amplitudes().begin(),
+						      origcluster->amplitudes().end());
+	      for(size_t ia=0; ia<amplitudes.size();ia++)
+		{charge1+=amplitudes[ia];}
+	      // std::cout << "charge1 = " << charge1 << "\n";
+	      if (charge1 < chargeCut) okCharge = false;
+	    } 
+	  } 
           
 	  if (applyIsolation) {
 
