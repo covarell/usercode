@@ -1,9 +1,15 @@
 /// \file AlignmentProducer.cc
 ///
 ///  \author    : Frederic Ronga
+<<<<<<< AlignmentProducer.cc
 ///  Revision   : $Revision: 1.25 $
 ///  last update: $Date: 2007/02/19 17:46:02 $
 ///  by         : $Author: pivarski $
+=======
+///  Revision   : $Revision: 1.6 $
+///  last update: $Date: 2007/12/12 16:41:48 $
+///  by         : $Author: covarell $
+>>>>>>> 1.6
 
 #include "Alignment/CommonAlignmentProducer/interface/AlignmentProducer.h"
 

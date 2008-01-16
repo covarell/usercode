@@ -13,12 +13,14 @@ elsif ( $host =~ /lxcms/ )   { $location="lxcmsg1"; }
 # job steering ----------------------------------------------------------------
 
 # name of job
-$jobname="Pass3TIBmod-x-outrej-20iter";
+$jobname="ScintBTIBmod-xy-note";
 
 # cfg file
+# $steering="AlignTOBDBOut_outrej.cfg";
 $steering="AlignTIBDBBoth_outrej.cfg";
 
 # db output files (to be deleted except for last iteration)
+# $dbfiles="alignments_TOB.db alignments_TOB.xml";
 $dbfiles="alignments.db alignments.xml";
 # $dbfiles="";
 
@@ -31,7 +33,7 @@ $sqlitefile="alignments_TOB.db"; $condbcatalogfile="alignments_TOB.xml";
 # $sqlitefile=""; $condbcatalogfile="";
 
 # number of events per job
-$nevent=20000;
+$nevent=8000;
 
 # first event
 $firstev=0;
@@ -40,7 +42,7 @@ $firstev=0;
 $njobs=20;
 
 # number of iterations (excluding initial step)
-$iterations=20;
+$iterations=15;
 
 # interactive or lxbatch queue
 # $farm="I";

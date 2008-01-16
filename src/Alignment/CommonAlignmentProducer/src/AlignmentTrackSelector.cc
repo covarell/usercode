@@ -127,8 +127,8 @@ AlignmentTrackSelector::basicCuts(const Tracks& tracks, const edm::Event& evt, c
 	std::pair<int,int> typeAndLay = TkMap->typeAndLayerFromDetId( (*iHit)->geographicalId() ); 
 	int type = typeAndLay.first; 
 
-        if (seedOnlyFromAbove == 1 && thishit == 1 && type == int(StripSubdetector::TOB)) okSeed = false;  
-	// if first hit is in TOB seed is from above 
+        if (seedOnlyFromAbove == 1 && thishit == 1 && (type == int(StripSubdetector::TOB) || type == int(StripSubdetector::TEC))) okSeed = false;  
+	// if first hit is in TOB or TEC seed is from above 
         if (seedOnlyFromAbove == 2 && thishit == 1 && type == int(StripSubdetector::TIB)) okSeed = false;  
    
         if ((*iHit)->isValid()) {
