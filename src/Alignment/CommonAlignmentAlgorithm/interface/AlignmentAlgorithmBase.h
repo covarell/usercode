@@ -11,7 +11,6 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "SimDataFormats/Track/interface/SimTrack.h"
-
 // GF: I prefer the following instead, but needs fixed includes in CSA06AlignmentAlgorithm:
 // namespace reco {
 //   class Track;
@@ -52,6 +51,9 @@ public:
                            AlignableTracker* tracker,
                            AlignableMuon* muon,
                            AlignmentParameterStore* store ) = 0;
+   /// Call at start of loop
+   /// Default implementation is dummy for non-iterative algorithms
+   virtual void startNewLoop(void) {}
 
   /// Call at end of job (must be implemented in derived class)
   virtual void terminate(void) = 0;
@@ -59,7 +61,7 @@ public:
   /// Run the algorithm on trajectories and tracks (must be implemented in derived class)
   virtual void run( const edm::EventSetup& setup,
                     const ConstTrajTrackPairCollection& tracks,
-                    const edm::SimTrackContainer& simcoll ) = 0;
+		    const edm::SimTrackContainer& simcoll ) = 0;
 
 };
 

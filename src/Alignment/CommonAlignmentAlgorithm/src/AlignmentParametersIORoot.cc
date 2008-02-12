@@ -1,14 +1,13 @@
 // this class's header
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentParametersIORoot.h"
 
+#include "Alignment/CommonAlignment/interface/Alignable.h" 
+
 #include <TTree.h>
 
-#include "Alignment/CommonAlignmentParametrization/interface/CompositeRigidBodyAlignmentParameters.h"
 #include "Alignment/CommonAlignmentParametrization/interface/RigidBodyAlignmentParameters.h"
 
 #include "Alignment/TrackerAlignment/interface/TrackerAlignableId.h"
-
-
 
 // ----------------------------------------------------------------------------
 // constructor
@@ -29,6 +28,7 @@ void AlignmentParametersIORoot::createBranches(void)
   tree->Branch("covarSize", &theCovarRang, "CovarRang/I");
   tree->Branch("Cov",       &theCov,       "Cov[CovarRang]/D");
   tree->Branch("ObjId",     &theObjId,     "ObjId/I");
+  tree->Branch("HieraLevel",&theHieraLevel,"HieraLevel/I");
 }
 
 // ----------------------------------------------------------------------------
@@ -41,6 +41,7 @@ void AlignmentParametersIORoot::setBranchAddresses(void)
   tree->SetBranchAddress("Par",       &thePar);
   tree->SetBranchAddress("Cov",       &theCov);
   tree->SetBranchAddress("ObjId",     &theObjId);
+  tree->SetBranchAddress("HieraLevel",&theHieraLevel);
 }
 
 // ----------------------------------------------------------------------------
@@ -59,9 +60,9 @@ int AlignmentParametersIORoot::findEntry(unsigned int detId,int comp)
 // ----------------------------------------------------------------------------
 int AlignmentParametersIORoot::writeOne(Alignable* ali)
 {
-  AlignmentParameters* ap =ali->alignmentParameters();
-  AlgebraicVector params  = ap->parameters();
-  AlgebraicSymMatrix cov  = ap->covariance();
+  const AlignmentParameters* ap =ali->alignmentParameters();
+  const AlgebraicVector& params = ap->parameters();
+  const AlgebraicSymMatrix& cov = ap->covariance();
 
   theCovRang   = params.num_row();
   theCovarRang = theCovRang*(theCovRang+1)/2;
@@ -76,6 +77,7 @@ int AlignmentParametersIORoot::writeOne(Alignable* ali)
   TrackerAlignableId converter;
   theId = converter.alignableId(ali);
   theObjId = converter.alignableTypeId(ali);
+  theHieraLevel = ap->hierarchyLevel();
 
   tree->Fill();
   return 0;
@@ -90,10 +92,10 @@ AlignmentParameters* AlignmentParametersIORoot::readOne( Alignable* ali, int& ie
   int obj = converter.alignableTypeId(ali);
   unsigned int detInt = converter.alignableId(ali);
 
-  AlignmentParameters* alipar;
+  AlignmentParameters* alipar = 0;
   AlgebraicVector par(nParMax,0);
   AlgebraicSymMatrix cov(nParMax,0);
-  std::vector<bool> sel = ali->alignmentParameters()->selector();
+  const std::vector<bool> &sel = ali->alignmentParameters()->selector();
  
   int entry = findEntry(detInt,obj);
   if( entry != -1 ) 
@@ -108,10 +110,8 @@ AlignmentParameters* AlignmentParametersIORoot::readOne( Alignable* ali, int& ie
 			if(row-1<col) {cov[row][col]=theCov[count];count++;}
 		  }
 		} 
-	  if (obj == 0 ) // create parameters for sensor
-		alipar = new RigidBodyAlignmentParameters(ali,par,cov,sel);
-	  else // create parameters for composed object
-		alipar = new CompositeRigidBodyAlignmentParameters(ali,par,cov,sel);
+	  // FIXME: In future should check which kind of parameters to construct...
+	  alipar = new RigidBodyAlignmentParameters(ali,par,cov,sel);
 	  alipar->setValid(true); 
 	  ierr=0;
 	  return alipar;

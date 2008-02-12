@@ -1,9 +1,9 @@
 /** \file AlignmentParameterSelector.cc
  *  \author Gero Flucke, Nov. 2006
  *
- *  $Date: 2007/01/23 16:07:08 $
- *  $Revision: 1.5 $
- *  (last update by $Author: fronga $)
+ *  $Date: 2007/07/12 14:35:18 $
+ *  $Revision: 1.10 $
+ *  (last update by $Author: flucke $)
  */
 
 #include <cctype>
@@ -15,8 +15,8 @@
 
 #include "DataFormats/SiStripDetId/interface/StripSubdetector.h" // for enums TID/TIB/etc.
 
-#include "Geometry/Vector/interface/GlobalPoint.h"
-#include "Geometry/Vector/interface/Phi.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+#include "DataFormats/GeometryVector/interface/Phi.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -24,7 +24,7 @@
 //________________________________________________________________________________
 AlignmentParameterSelector::AlignmentParameterSelector(AlignableTracker *aliTracker) :
   theTracker(aliTracker), theMuon(0), theSelectedAlignables(), 
-  theRangesEta(), theRangesPhi(), theRangesR(), theRangesZ()
+  theRangesEta(), theRangesPhi(), theRangesR(), theRangesX(), theRangesY(), theRangesZ()
 {
   this->setSpecials(""); // init theOnlyDS, theOnlySS, theSelLayers, theMinLayer, theMaxLayer
 }
@@ -32,7 +32,7 @@ AlignmentParameterSelector::AlignmentParameterSelector(AlignableTracker *aliTrac
 //________________________________________________________________________________
 AlignmentParameterSelector::AlignmentParameterSelector(AlignableTracker *aliTracker, AlignableMuon* aliMuon) :
   theTracker(aliTracker), theMuon(aliMuon), theSelectedAlignables(), 
-  theRangesEta(), theRangesPhi(), theRangesR(), theRangesZ()
+  theRangesEta(), theRangesPhi(), theRangesR(), theRangesX(), theRangesY(), theRangesZ()
 {
   this->setSpecials(""); // init theOnlyDS, theOnlySS, theSelLayers, theMinLayer, theMaxLayer
 }
@@ -68,6 +68,8 @@ void AlignmentParameterSelector::clearGeometryCuts()
   theRangesEta.clear();
   theRangesPhi.clear();
   theRangesR.clear();
+  theRangesX.clear();
+  theRangesY.clear();
   theRangesZ.clear();
 }
 
@@ -80,7 +82,6 @@ unsigned int AlignmentParameterSelector::addSelections(const edm::ParameterSet &
   
   unsigned int addedSets = 0;
 
-  // loop via index instead of iterator due to possible enlargement inside loop
   for (unsigned int iSel = 0; iSel < selections.size(); ++iSel) {
 
     std::vector<std::string> decompSel(this->decompose(selections[iSel], ','));
@@ -111,6 +112,8 @@ void AlignmentParameterSelector::setGeometryCuts(const edm::ParameterSet &pSet)
   theRangesEta = pSet.getParameter<std::vector<double> >("etaRanges");
   theRangesPhi = pSet.getParameter<std::vector<double> >("phiRanges");
   theRangesR   = pSet.getParameter<std::vector<double> >("rRanges"  );
+  theRangesX   = pSet.getParameter<std::vector<double> >("xRanges"  );
+  theRangesY   = pSet.getParameter<std::vector<double> >("yRanges"  );
   theRangesZ   = pSet.getParameter<std::vector<double> >("zRanges"  );
 }
 
@@ -127,7 +130,6 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &name,
 unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInput, 
                                                       const std::vector<char> &paramSel)
 {
-
   const std::string name(this->setSpecials(nameInput)); // possibly changing name
 
   unsigned int numAli = 0;
@@ -167,6 +169,8 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
     numAli += this->add(theTracker->pixelHalfBarrelLadders(), paramSel);
   } else if (name == "PixelHalfBarrelLayers") {
     numAli += this->add(theTracker->pixelHalfBarrelLayers(), paramSel);
+  } else if (name == "PixelHalfBarrels") {
+    numAli += this->add(theTracker->pixelHalfBarrels(), paramSel);
   }
   //
   // PXEndcap
@@ -174,6 +178,7 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
   else if (name == "PXECDets") numAli += this->add(theTracker->pixelEndcapGeomDets(), paramSel);
   else if (name == "PXECPetals") numAli += this->add(theTracker->pixelEndcapPetals(), paramSel);
   else if (name == "PXECLayers") numAli += this->add(theTracker->pixelEndcapLayers(), paramSel);
+  else if (name == "PXEndCaps") numAli += this->add(theTracker->pixelEndCaps(), paramSel);
   //
   // Pixel Barrel+endcap
   //
@@ -190,6 +195,7 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
   //
   // TID
   //
+  else if (name == "TIDs")          numAli += this->add(theTracker->TIDs(), paramSel);
   else if (name == "TIDLayers")     numAli += this->add(theTracker->TIDLayers(), paramSel);
   else if (name == "TIDRings")      numAli += this->add(theTracker->TIDRings(), paramSel);
   else if (name == "TIDDets")       numAli += this->add(theTracker->TIDGeomDets(), paramSel);
@@ -199,6 +205,7 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
   else if (name == "TECDets")       numAli += this->add(theTracker->endcapGeomDets(), paramSel);
   else if (name == "TECPetals")     numAli += this->add(theTracker->endcapPetals(), paramSel);
   else if (name == "TECLayers")     numAli += this->add(theTracker->endcapLayers(), paramSel);
+  else if (name == "TECs")          numAli += this->add(theTracker->endCaps(), paramSel);
   //
   // StripEndcap (TID+TEC)
   //
@@ -231,13 +238,15 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
   //
   // Muon selection
   //
-  else if (name == "MuonDTChambers")  add(theMuon->DTChambers(), paramSel);
-  else if (name == "MuonDTStations")  add(theMuon->DTStations(), paramSel);
-  else if (name == "MuonDTWheels")    add(theMuon->DTWheels(), paramSel);
-  else if (name == "MuonBarrel")      add(theMuon->DTBarrel(), paramSel);
-  else if (name == "MuonCSCChambers") add(theMuon->CSCChambers(), paramSel);
-  else if (name == "MuonCSCStations") add(theMuon->CSCStations(), paramSel);
-  else if (name == "MuonEndcaps")     add(theMuon->CSCEndcaps(), paramSel);
+  else if (name == "MuonDTSuperLayers")  add(theMuon->DTSuperLayers(), paramSel);
+  else if (name == "MuonDTChambers")  	 add(theMuon->DTChambers(), paramSel);
+  else if (name == "MuonDTStations")  	 add(theMuon->DTStations(), paramSel);
+  else if (name == "MuonDTWheels")    	 add(theMuon->DTWheels(), paramSel);
+  else if (name == "MuonBarrel")      	 add(theMuon->DTBarrel(), paramSel);
+  else if (name == "MuonCSCLayers")   	 add(theMuon->CSCLayers(), paramSel);
+  else if (name == "MuonCSCChambers") 	 add(theMuon->CSCChambers(), paramSel);
+  else if (name == "MuonCSCStations") 	 add(theMuon->CSCStations(), paramSel);
+  else if (name == "MuonEndcaps")     	 add(theMuon->CSCEndcaps(), paramSel);
 
   else if (name == "AllMuonChambers") {
      add(theMuon->DTChambers(), paramSel);
@@ -267,7 +276,7 @@ unsigned int AlignmentParameterSelector::addSelection(const std::string &nameInp
   }
 
   this->setSpecials(""); // reset
-  
+
   return numAli;
 }
 
@@ -326,6 +335,8 @@ bool AlignmentParameterSelector::outsideRanges(const Alignable *alignable) const
   if (!theRangesEta.empty() && !this->insideRanges((position.eta()), theRangesEta)) return true;
   if (!theRangesPhi.empty() && !this->insideRanges((position.phi()), theRangesPhi,true))return true;
   if (!theRangesR.empty()   && !this->insideRanges((position.perp()),theRangesR)) return true;
+  if (!theRangesX.empty()   && !this->insideRanges((position.x()),   theRangesX)) return true;
+  if (!theRangesY.empty()   && !this->insideRanges((position.y()),   theRangesY)) return true;
   if (!theRangesZ.empty()   && !this->insideRanges((position.z()),   theRangesZ)) return true;
 
   return false;
