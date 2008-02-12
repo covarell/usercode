@@ -1,16 +1,28 @@
 <use name=Alignment/CommonAlignment>
 <use name=Alignment/CommonAlignmentAlgorithm>
+<use name=Alignment/CommonAlignmentProducer>
 <use name=Alignment/TrackerAlignment>
 <use name=FWCore/MessageLogger>
 <use name=FWCore/PluginManager>
 <use name=FWCore/Utilities>
 <use name=TrackingTools/PatternTools>
 <use name=TrackingTools/TrackFitters>
+<use name=DataFormats/DetId>
+<use name=DataFormats/SiStripDetId>
+<use name=DataFormats/TrackReco>
+<use name=DataFormats/TrackingRecHit>
+<use name=DataFormats/FEDRawData>
 <use name=rootcore>
-<flags SEALPLUGIN=1>
+<flags EDM_PLUGIN=1>
 <export>
   <use name=Alignment/CommonAlignment>
   <use name=Alignment/CommonAlignmentAlgorithm>
+  <use name=Alignment/CommonAlignmentProducer>
+  <use name=DataFormats/DetId>
+  <use name=DataFormats/SiStripDetId>
+  <use name=DataFormats/TrackReco>
+  <use name=DataFormats/TrackingRecHit>
+  <use name=DataFormats/FEDRawData>
   <lib name=AlignmentHIPAlignmentAlgorithm>
 </export>
 

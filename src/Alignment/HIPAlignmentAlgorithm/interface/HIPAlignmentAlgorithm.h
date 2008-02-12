@@ -1,9 +1,13 @@
 #ifndef Alignment_HIPAlignmentAlgorithm_HIPAlignmentAlgorithm_h
 #define Alignment_HIPAlignmentAlgorithm_HIPAlignmentAlgorithm_h
 
+#include "Alignment/CommonAlignment/interface/AlignableObjectId.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentAlgorithmBase.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentIORoot.h"
-#include "Alignment/HIPAlignmentAlgorithm/interface/TrackLocalAngle.h"
+#include "SimDataFormats/Track/interface/SimTrackContainer.h"
+#include "SimDataFormats/Track/interface/SimTrack.h"
+
+#include "Alignment/CommonAlignmentProducer/interface/TrackLocalAngle.h"
  
 #include "DataFormats/SiStripDetId/interface/TIBDetId.h"
 #include "DataFormats/SiStripDetId/interface/TOBDetId.h"
@@ -38,7 +42,7 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   /// Run the algorithm on trajectories and tracks
   void run( const edm::EventSetup& setup, 
 	    const ConstTrajTrackPairCollection& tracks,
-            const edm::SimTrackContainer& simcoll);
+	    const edm::SimTrackContainer& simcoll);
 
  private:
 
@@ -52,19 +56,20 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   void fillRoot(void);
   bool calcParameters(Alignable* ali);
   void collector(void);
+  // COSMICS
   std::vector<unsigned int> storeNumberingScheme(const DetId& detid, int type);
-  bool theHitSelection(float phi, float charge, float absxres);
 
   // private data members
 
   AlignmentParameterStore* theAlignmentParameterStore;
   std::vector<Alignable*> theAlignables;
   AlignableNavigator* theAlignableDetAccessor;
-  TrackLocalAngle* theAngleFinder;
 
   AlignmentIORoot    theIO;
   int ioerr;
   int theIteration;
+  // COSMICS
+  TrackLocalAngle* theAngleFinder;
 
   // steering parameters
 
@@ -76,6 +81,8 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   // alignment position error parameters
   double apesp[3],aperp[3];
   std::string apeparam;
+  // max allowed pull (residual / uncertainty) on a hit used in alignment
+  double theMaxAllowedHitPull;
   // min number of hits on alignable to calc parameters
   int theMinimumNumberOfHits;
   // max allowed rel error on parameter (else not used)
@@ -86,12 +93,7 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   std::string theCollectorPath;
   int theEventPrescale,theCurrentPrescale;
 
-  // further hit selection
-  // edm::ParameterSet hitSelPars;
-  bool hitSelection;
-  double phiMinCut, phiMaxCut, chargeCut, outlierCut;
-
-  bool useSurvey; // enable survey constraint if true
+  std::vector<AlignableObjectId::AlignableObjectIdType> theLevels; // for survey residuals
 
   // root tree variables
   TFile* theFile;
@@ -100,21 +102,23 @@ class HIPAlignmentAlgorithm : public AlignmentAlgorithmBase
   TTree* theTree2; // alignable-wise tree
 
   // variables for event-wise tree
+  // COSMICS
   static const int MAXSIM = 5;
   static const int MAXREC = 5;
   static const int MAXHIT = 99*MAXREC;
 
-  //int m_Run,m_Event;
+  // int m_Run,m_Event;
   int allTracks;
   int m_NtracksSim;
   float m_PtSim[MAXSIM],m_EtaSim[MAXSIM],m_PhiSim[MAXSIM];
   int m_Ntracks,m_allHits,m_Nhits[MAXREC];
   float m_Pt[MAXREC],m_Eta[MAXREC],m_Phi[MAXREC],m_Chi2n[MAXREC];
+  int m_isOnAli[MAXHIT];
   int m_hType[MAXHIT], m_hLayer[MAXHIT], m_hOwnerTrack[MAXHIT];
   int m_hFwBw[MAXHIT], m_hIntExt[MAXHIT], m_hStrRod[MAXHIT], m_hModule[MAXHIT];
   float m_hR[MAXHIT],m_hPhi[MAXHIT],m_hZ[MAXHIT];
   float m_hLocalX[MAXHIT],m_hLocalY[MAXHIT],m_hLocalZ[MAXHIT];
-  float m_hLocalAngleMono[MAXHIT], m_hLocalAngleSter[MAXHIT], m_hChargeMono[MAXHIT], m_hChargeSter[MAXHIT];
+  float m_hLocalAngleMono[MAXHIT], m_hLocalAngleSter[MAXHIT], m_hChargeMono[MAXHIT], m_hChargeSter[MAXHIT], m_hBarMono[MAXHIT], m_hBarSter[MAXHIT];
   float m_Xres[MAXHIT],m_Yres[MAXHIT],m_Xerr[MAXHIT],m_Yerr[MAXHIT];
   float m_XerrHit[MAXHIT],m_XerrIP[MAXHIT];
 

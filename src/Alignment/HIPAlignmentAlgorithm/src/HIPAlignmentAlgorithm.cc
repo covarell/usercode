@@ -8,12 +8,13 @@
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
 #include "TrackingTools/TrackFitters/interface/TrajectoryStateCombiner.h"
 
-#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-
 #include "Alignment/CommonAlignment/interface/AlignableNavigator.h"  
 // #include "Alignment/CommonAlignment/interface/SurveyDet.h"  
 #include "Alignment/CommonAlignment/interface/SurveyResidual.h"
+
+#include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
+#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
+
 #include "Alignment/HIPAlignmentAlgorithm/interface/HIPUserVariables.h"
 #include "Alignment/HIPAlignmentAlgorithm/interface/HIPUserVariablesIORoot.h"
 #include "Alignment/TrackerAlignment/interface/TrackerAlignableId.h"
@@ -31,7 +32,6 @@ HIPAlignmentAlgorithm::HIPAlignmentAlgorithm(const edm::ParameterSet& cfg):
   // parse parameters
 
   verbose = cfg.getParameter<bool>("verbosity");
-  useSurvey = cfg.getParameter<bool>("useSurvey");
 
   outpath = cfg.getParameter<string>("outpath");
   outfile = cfg.getParameter<string>("outfile");
@@ -63,6 +63,7 @@ HIPAlignmentAlgorithm::HIPAlignmentAlgorithm(const edm::ParameterSet& cfg):
   aperp[1]=vaperp[1];
   aperp[2]=vaperp[2];
 
+  theMaxAllowedHitPull = cfg.getParameter<double>("maxAllowedHitPull");
   theMinimumNumberOfHits = cfg.getParameter<int>("minimumNumberOfHits");
   theMaxRelParameterError = cfg.getParameter<double>("maxRelParameterError");
 
@@ -75,12 +76,14 @@ HIPAlignmentAlgorithm::HIPAlignmentAlgorithm(const edm::ParameterSet& cfg):
   theEventPrescale = cfg.getParameter<int>("eventPrescale");
   theCurrentPrescale = theEventPrescale;
 
-  // hitSelPars = cfg.getParameter<edm::ParameterSet>("hitSelectionParameters");
-  hitSelection = cfg.getParameter<bool>("hitFilter");
-  phiMaxCut = cfg.getUntrackedParameter<double>("phiMaxCut",3.15);
-  phiMinCut = cfg.getUntrackedParameter<double>("phiMinCut",0.);
-  chargeCut = cfg.getUntrackedParameter<double>("chargeCut",0.);
-  outlierCut = cfg.getUntrackedParameter<double>("outlierCut", 2000.);
+  AlignableObjectId dummy;
+
+  const std::vector<std::string>& levels = cfg.getUntrackedParameter< std::vector<std::string> >("surveyResiduals");
+
+  for (unsigned int l = 0; l < levels.size(); ++l)
+  {
+    theLevels.push_back( dummy.nameToType(levels[l]) );
+  }
 
   edm::LogWarning("Alignment") << "[HIPAlignmentAlgorithm] constructed.";
 
@@ -90,8 +93,8 @@ HIPAlignmentAlgorithm::HIPAlignmentAlgorithm(const edm::ParameterSet& cfg):
 
 void 
 HIPAlignmentAlgorithm::initialize( const edm::EventSetup& setup, 
-                                     AlignableTracker* tracker, AlignableMuon* muon, 
-                                     AlignmentParameterStore* store )
+				   AlignableTracker* tracker, AlignableMuon* muon, 
+				   AlignmentParameterStore* store )
 {
   edm::LogWarning("Alignment") << "[HIPAlignmentAlgorithm] Initializing...";
 
@@ -108,9 +111,11 @@ HIPAlignmentAlgorithm::initialize( const edm::EventSetup& setup,
 
   // get alignables
   theAlignables = theAlignmentParameterStore->alignables();
+
+  // COSMICS
   allTracks = 0;
 
-  //for TrackAngle
+  // for TrackAngle
   edm::ESHandle<TrackerGeometry> trackerGeom;
   setup.get<TrackerDigiGeometryRecord>().get( trackerGeom );
   theAngleFinder = new TrackLocalAngle( trackerGeom.product() );
@@ -178,7 +183,7 @@ void HIPAlignmentAlgorithm::startNewLoop( void )
   edm::LogWarning("Alignment") <<"[HIPAlignmentAlgorithm] Current Iteration number: " 
     << theIteration;
 
-  if (useSurvey)
+  if (theLevels.size() > 0)
   {
     edm::LogWarning("Alignment") << "[HIPAlignmentAlgorithm] Using survey constraint";
 
@@ -193,34 +198,15 @@ void HIPAlignmentAlgorithm::startNewLoop( void )
       HIPUserVariables* uservar =
 	dynamic_cast<HIPUserVariables*>(ap->userVariables());
 
-      std::vector<const Alignable*> terminals;
-
-      ali->deepComponents(terminals);
-
-      unsigned int nTerminal = terminals.size();
-
-      for (unsigned int j = 0; j < nTerminal; ++j)
+      for (unsigned int l = 0; l < theLevels.size(); ++l)
       {
-	const Alignable* term = terminals[j];
+        SurveyResidual res(*ali, theLevels[l]);
 
-	SurveyResidual res1(*term, AlignableObjectId::AlignablePetal);
-	SurveyResidual res2(*term, AlignableObjectId::AlignableEndcapLayer);
-	SurveyResidual res3(*term, AlignableObjectId::AlignableEndcap);
+        AlgebraicSymMatrix invCov = res.inverseCovariance();
 
-	AlgebraicSymMatrix invCov1(6, 1); // identity
-	AlgebraicSymMatrix invCov2(6, 1); // identity
-	AlgebraicSymMatrix invCov3(6, 1); // identity
-
-	invCov1 /= (1e-3 * 1e-3); // hard-code error for now; 10 um
-	invCov2 /= (1e-3 * 1e-3); // hard-code error for now; 10 um
-	invCov3 /= (1e-3 * 1e-3); // hard-code error for now; 10 um
-
-	uservar->jtvj += invCov1;
-	uservar->jtvj += invCov2;
-	uservar->jtvj += invCov3;
-	uservar->jtve += invCov1 * res1.sensorResidual();
-	uservar->jtve += invCov2 * res2.sensorResidual();
-	uservar->jtve += invCov3 * res3.sensorResidual();
+        uservar->jtvj += invCov;
+        uservar->jtve += invCov * res.sensorResidual();
+      }
 
 // 	align::LocalVectors residuals = res1.pointsResidual();
 
@@ -239,7 +225,6 @@ void HIPAlignmentAlgorithm::startNewLoop( void )
 // 	  uservar->jtve += J * (invCov1 * e);
 // 	}
 
-      }
     }
   }
 
@@ -330,22 +315,18 @@ void HIPAlignmentAlgorithm::terminate(void)
 
 void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
 				 const ConstTrajTrackPairCollection& tracks,
-                                 const edm::SimTrackContainer& simcoll )
+				 const edm::SimTrackContainer& simcoll)
 {
   if (isCollector) return;
 
   TrajectoryStateCombiner tsoscomb;
   TrackerAlignableId id;
 
-  int itr=0;
-  int itrsim=0;
-  int ahit=0;
-  m_Ntracks=0;
-  m_NtracksSim=0;
-  m_allHits=0;
- 
+  int itr=0;  int itrsim=0;  int ahit=0;
+  m_Ntracks=0; m_NtracksSim=0; m_allHits=0;
   theFile->cd();
- 
+
+  // COSMICS
   float ptsim = -9999.;
   float etasim = -9999.;
   float phisim = -9999.;
@@ -355,11 +336,11 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
     for(edm::SimTrackContainer::const_iterator trackCI = simcoll.begin();
         trackCI != simcoll.end(); trackCI++) {
        
-      ptsim    = trackCI->momentum().perp();
+      ptsim    = trackCI->momentum().pt();
       etasim   = trackCI->momentum().eta();
       phisim   = trackCI->momentum().phi();
        
-      // fill sim track parameters in root tree
+      // *************** fill sim track parameters in root tree
       if (itrsim<MAXSIM) {
         m_PtSim[itrsim]=ptsim;
         m_EtaSim[itrsim]=etasim;
@@ -368,9 +349,8 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
         m_NtracksSim=itrsim;
       }
     }
- 
   }
- 
+
   float pt = -9999.;
   float eta = -9999.;
   float phi = -9999.;
@@ -378,222 +358,248 @@ void HIPAlignmentAlgorithm::run( const edm::EventSetup& setup,
   int nhit = -9999;
 
   // loop over tracks  
-  if ( tracks.size() > 0 ) {
- 
-    for( ConstTrajTrackPairCollection::const_iterator it=tracks.begin();
-	 it!=tracks.end();it++) {
+  for( ConstTrajTrackPairCollection::const_iterator it=tracks.begin();
+       it!=tracks.end();it++) {
 
-      const Trajectory* traj = (*it).first;
-      const reco::Track* track = (*it).second;
-      
-      pt    = track->pt();
-      eta   = track->eta();
-      phi   = track->phi();
-      chi2n = track->normalizedChi2();
-      nhit  = track->numberOfValidHits();
-      
-      if (verbose) edm::LogInfo("Alignment") << "New track pt,eta,phi,chi2n,hits: " << pt <<","<< eta <<","<< phi <<","<< chi2n << ","<<nhit;
-      
-      // fill track parameters in root tree
-      if (itr<MAXREC) {
-	m_Nhits[itr]=nhit;
-	m_Pt[itr]=pt;
-	m_Eta[itr]=eta;
-	m_Phi[itr]=phi;
-	m_Chi2n[itr]=chi2n;
-	itr++;
-	m_Ntracks=itr;
+    const Trajectory* traj = (*it).first;
+    const reco::Track* track = (*it).second;
+
+    pt    = track->pt();
+    eta   = track->eta();
+    phi   = track->phi();
+    chi2n = track->normalizedChi2();
+    nhit  = track->numberOfValidHits();
+
+    if (verbose) edm::LogInfo("Alignment") << "New track pt,eta,phi,chi2n,hits: " << pt <<","<< eta <<","<< phi <<","<< chi2n << ","<<nhit;
+
+    // fill track parameters in root tree
+    if (itr<MAXREC) {
+      m_Nhits[itr]=nhit;
+      m_Pt[itr]=pt;
+      m_Eta[itr]=eta;
+      m_Phi[itr]=phi;
+      m_Chi2n[itr]=chi2n;
+      itr++;
+      m_Ntracks=itr;
+    }
+
+    if (verbose) cout << "This is track #" << m_Ntracks << " with " << nhit << " hits \n";
+    
+    // COSMICS
+    vector<TrajectoryMeasurement> tmvec;
+    vector<const TransientTrackingRecHit*> hitvec;
+    vector<TrajectoryStateOnSurface> tsosvec;
+
+    // loop over measurements	
+    vector<TrajectoryMeasurement> measurements = traj->measurements();
+    for (vector<TrajectoryMeasurement>::iterator im=measurements.begin();
+		 im!=measurements.end(); im++) {
+      TrajectoryMeasurement meas = *im;
+      const TransientTrackingRecHit* hit = &(*meas.recHit());
+      if (hit->isValid() /* &&  theAlignableDetAccessor->detAndSubdetInMap( hit->geographicalId() )*/ ) {
+        // this is the updated state (including the current hit)
+        // TrajectoryStateOnSurface tsos=meas.updatedState();
+        // combine fwd and bwd predicted state to get state 
+        // which excludes current hit
+
+        // COSMICS 
+        TrajectoryStateOnSurface tsosc = tsoscomb.combine(
+                                         meas.forwardPredictedState(),
+                                         meas.backwardPredictedState());
+        hitvec.push_back(hit);
+        tmvec.push_back(meas);
+        tsosvec.push_back(tsosc);
       }
+    }
+    
+    // transform RecHit vector to AlignableDet vector
+    vector <AlignableDetOrUnitPtr> alidetvec = 
+      theAlignableDetAccessor->alignablesFromHits(hitvec);
+
+    // get concatenated alignment parameters for list of alignables
+    CompositeAlignmentParameters aap = 
+      theAlignmentParameterStore->selectParameters(alidetvec);
+
+    vector<TrajectoryStateOnSurface>::const_iterator itsos=tsosvec.begin();
+    vector<const TransientTrackingRecHit*>::const_iterator ihit=hitvec.begin();
+    // COSMICS
+    vector<TrajectoryMeasurement>::const_iterator imea=tmvec.begin();
       
-      // cout << "This is track #" << m_Ntracks << " with " << nhit << " hits" << endl << endl;
-      vector<const TransientTrackingRecHit*> hitvec;
-      vector<TrajectoryStateOnSurface> tsosvec;
-      vector<TrajectoryMeasurement> tmvec;
+    int prova = 0;
+
+    // loop over vectors(hit,tsos, meas)
+    while (itsos != tsosvec.end()) 
+    {
+
+      if (verbose) cout << "Examining hit #" << prova++ << ": \n"; 
+
+      // get AlignableDet for this hit
+      const GeomDet* det=(*ihit)->det();
+      AlignableDetOrUnitPtr alidet = 
+	theAlignableDetAccessor->alignableFromGeomDet(det);
+
+      // get relevant Alignable
+      Alignable* ali=aap.alignableFromAlignableDet(alidet);
+
+      // get trajectory impact point
+      LocalPoint alvec = (*itsos).localPosition();
+      AlgebraicVector pos(2);
+      pos[0]=alvec.x(); // local x
+      pos[1]=alvec.y(); // local y
+      if (verbose) cout << "  impact point in (" << pos[0] << "," << pos[1] << ") \n";    
+
+      // get impact point covariance
+      AlgebraicSymMatrix ipcovmat(2);
+      ipcovmat[0][0] = (*itsos).localError().positionError().xx();
+      ipcovmat[1][1] = (*itsos).localError().positionError().yy();
+      ipcovmat[0][1] = (*itsos).localError().positionError().xy();
+      if (verbose) cout << "  impact point error (" << sqrt(ipcovmat[0][0]) << "," << sqrt(ipcovmat[1][1]) << ") \n";
       
-      // int prova1 = 0;
-      // loop over measurements	
-      vector<TrajectoryMeasurement> measurements = traj->measurements();
-      for (vector<TrajectoryMeasurement>::iterator im=measurements.begin();
-	   im!=measurements.end(); im++) {
-	TrajectoryMeasurement meas = *im;
-	const TransientTrackingRecHit* hit = &(*meas.recHit());
-	if (hit->isValid()  &&  theAlignableDetAccessor->detAndSubdetInMap( hit->geographicalId() )) {
-	  // combine fwd and bwd predicted state to get state 
-	  // which excludes current hit
-	  TrajectoryStateOnSurface tsosc = tsoscomb.combine(
-							    meas.forwardPredictedState(),
-							    meas.backwardPredictedState());
-	  hitvec.push_back(hit);
-	  tmvec.push_back(meas);
-	  tsosvec.push_back(tsosc);
-          // cout << "Storing hit #" << prova1++ << endl;
+      // get hit local position and covariance
+      AlgebraicVector coor(2);
+      coor[0] = (*ihit)->localPosition().x();
+      coor[1] = (*ihit)->localPosition().y();
+      if (verbose) cout << "  hit in (" << coor[0] << "," << coor[1] << ") \n";
+      
+      AlgebraicSymMatrix covmat(2);
+      covmat[0][0] = (*ihit)->localPositionError().xx();
+      covmat[1][1] = (*ihit)->localPositionError().yy();
+      covmat[0][1] = (*ihit)->localPositionError().xy();
+      if (verbose) cout << "  hit error (" << sqrt(covmat[0][0]) << "," << sqrt(covmat[1][1]) << ") \n";
+
+      // add hit and impact point covariance matrices
+      // COSMICS
+      AlgebraicSymMatrix totcovmat(2);
+      totcovmat = covmat + ipcovmat;
+
+      std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
+      
+      // use projected 2D recHits in alignment
+      // bool isProj = false; 
+      // DO NOT use projected 2D recHits in alignment
+      bool isProj = (typeAndLay.first == 3 || typeAndLay.first == 5) && (typeAndLay.second < 3) && (sqrt(totcovmat[0][0]) > 0.3 || sqrt(totcovmat[1][1]) > 3.0); 
+      // ****************** fill hit parameters in root tree
+	  
+      if (!isProj && ahit<MAXHIT) {
+	
+	// Sensor position	      
+	std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
+	m_hType[ahit] = typeAndLay.first;
+	m_hFwBw[ahit] = 99999;
+	m_hLayer[ahit] = 99999;
+	m_hIntExt[ahit] = 99999;
+	m_hStrRod[ahit] = 99999;
+	m_hModule[ahit] = 99999;
+	if (numbScheme.at(0)) {
+	  m_hFwBw[ahit] = numbScheme.at(0);
+	  m_hLayer[ahit] = numbScheme.at(1);
+	  m_hIntExt[ahit] = numbScheme.at(2);
+	  m_hStrRod[ahit] = numbScheme.at(3);
+	  m_hModule[ahit] = numbScheme.at(4);
+	}
+	if (verbose) cout << "  hit on type " << m_hType[ahit] << ", layer " <<  m_hLayer[ahit] << ", int/ext " <<  m_hIntExt[ahit] << ", string/rod " << m_hStrRod[ahit] << ", module " <<  m_hModule[ahit] << " \n";
+	
+	// Which track it belongs to
+	m_hOwnerTrack[ahit] = allTracks;
+	// It is on alignable or not
+	m_isOnAli[ahit] = 0;
+	if (theAlignableDetAccessor->detAndSubdetInMap( det->geographicalId() ) && ali!=0) m_isOnAli[ahit] = 1;
+	// Geometrical position
+	m_hR[ahit] = (*ihit)->globalPosition().perp();
+	m_hPhi[ahit] = (*ihit)->globalPosition().phi();
+	m_hZ[ahit] = (*ihit)->globalPosition().z();
+	m_hLocalX[ahit] = (*ihit)->localPosition().x();
+	m_hLocalY[ahit] = (*ihit)->localPosition().y();
+	m_hLocalZ[ahit] = (*ihit)->localPosition().z();
+	// Local track angle
+	std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
+	m_hLocalAngleMono[ahit] = monoStereoAng.first;
+	m_hLocalAngleSter[ahit] = monoStereoAng.second;
+	// Cluster charge and barycenter 
+	std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea );
+	m_hChargeMono[ahit] = monoStereoCha.first;
+	m_hChargeSter[ahit] = monoStereoCha.second;
+	std::pair<float,float> monoStereoBar = theAngleFinder->findhitbary(*imea );
+	m_hBarMono[ahit] = monoStereoBar.first;
+	m_hBarSter[ahit] = monoStereoBar.second;
+	// Residuals and errors
+	m_Xres[ahit] = coor[0] - pos[0];
+	m_Yres[ahit] = coor[1] - pos[1];
+	m_Xerr[ahit] = sqrt(totcovmat[0][0]);
+	m_Yerr[ahit] = sqrt(totcovmat[1][1]);
+	m_XerrHit[ahit] = sqrt(covmat[0][0]);
+	m_XerrIP[ahit] = sqrt(ipcovmat[0][0]);
+	
+	ahit++;
+	m_allHits=ahit;	
+      } 
+
+      if (theAlignableDetAccessor->detAndSubdetInMap( det->geographicalId() ) && ali!=0) {
+
+	// calculate the x pull and y pull of this hit
+	double xpull = 0.;
+	double ypull = 0.;
+	if (totcovmat[0][0] != 0.) xpull = (pos[0] - coor[0])/sqrt(fabs(totcovmat[0][0]));
+	if (totcovmat[1][1] != 0.) ypull = (pos[1] - coor[1])/sqrt(fabs(totcovmat[1][1]));
+
+	// get Alignment Parameters
+        AlignmentParameters* params = ali->alignmentParameters();
+        // get derivatives
+        AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
+
+        // invert covariance matrix
+        int ierr; 
+        totcovmat.invert(ierr);
+        if (ierr != 0) { 
+          edm::LogError("Alignment") << "Matrix inversion failed!"; 
+          return; 
+        }
+
+	bool useThisHit = (theMaxAllowedHitPull <= 0.);
+
+	// ignore track minus center-of-chamber "residual" from 1d hits (only muon drift tubes)
+	if ((*ihit)->dimension() == 1) {
+	   totcovmat[1][1] = 0.;
+	   totcovmat[0][1] = 0.;
+
+	   useThisHit = useThisHit || (fabs(xpull) < theMaxAllowedHitPull);
+	}
+	else {
+	   useThisHit = useThisHit || (fabs(xpull) < theMaxAllowedHitPull  &&  fabs(ypull) < theMaxAllowedHitPull);
+	}
+
+	if (useThisHit) {
+	   // calculate user parameters
+	   int npar=derivs.num_row();
+	   AlgebraicSymMatrix thisjtvj(npar);
+	   AlgebraicVector thisjtve(npar);
+	   thisjtvj=totcovmat.similarity(derivs);
+	   thisjtve=derivs * totcovmat * (pos-coor);
+
+	   // access user variables (via AlignmentParameters)
+	   HIPUserVariables* uservar =
+	      dynamic_cast<HIPUserVariables*>(params->userVariables());
+	   uservar->jtvj += thisjtvj;
+	   uservar->jtve += thisjtve;
+	   uservar->nhit ++;
 	}
       }
-      
-      // transform RecHit vector to AlignableDet vector
-      vector <AlignableDet*> alidetvec =
-	theAlignableDetAccessor->alignableDetsFromHits(hitvec);
-      
-      // FLUCKE
-      // vector <AlignableDetOrUnitPtr> alidetvec = 
-      //  theAlignableDetAccessor->alignablesFromHits(hitvec);
-      
-      // get concatenated alignment parameters for list of alignables
-      CompositeAlignmentParameters aap = 
-	theAlignmentParameterStore->selectParameters(alidetvec);
-      
-      vector<TrajectoryStateOnSurface>::const_iterator itsos=tsosvec.begin();
-      vector<const TransientTrackingRecHit*>::const_iterator ihit=hitvec.begin();
-      vector<TrajectoryMeasurement>::const_iterator imea = tmvec.begin();      
 
-      // int prova2 = 0;
-      // int prova3 = 0;
+      itsos++;
+      ihit++;
+      // COSMICS
+      imea++;
+    } // end of hit loop
+    // COSMICS 
+    allTracks++;
 
-      // loop over vectors(hit,tsos,meas)
-      while (itsos != tsosvec.end()) 
-	{
-          // cout << "Trying hit #" << prova2++ << ":" << endl; 
-	  // get AlignableDet for this hit
-	  const GeomDet* det=(*ihit)->det();
-          
-          AlignableDet* alidet =
-	    theAlignableDetAccessor->alignableDetFromGeomDet(det);
+  } // end of track loop
 
-	  // FLUCKE
-	  // AlignableDetOrUnitPtr alidet = 
-	  //  theAlignableDetAccessor->alignableFromGeomDet(det);
-	  
-	  // get relevant Alignable
-	  Alignable* ali=aap.alignableFromAlignableDet(alidet);
-	  
-          // get trajectory impact point
-	  LocalPoint alvec = (*itsos).localPosition();
-	  AlgebraicVector pos(2);
-	  pos[0]=alvec.x(); // local x
-	  pos[1]=alvec.y(); // local y
-	  // cout << "  impact point in (" << pos[0] << "," << pos[1] << ")" << endl;
-	  // get impact point covariance
-	  AlgebraicSymMatrix ipcovmat(2);
-	  ipcovmat[0][0] = (*itsos).localError().positionError().xx();
-	  ipcovmat[1][1] = (*itsos).localError().positionError().yy();
-	  ipcovmat[0][1] = (*itsos).localError().positionError().xy();
-	  
-	  // get hit local position and covariance
-	  AlgebraicVector coor(2);
-	  coor[0] = (*ihit)->localPosition().x();
-	  coor[1] = (*ihit)->localPosition().y();
-	  // cout << "  hit in (" << coor[0] << "," << coor[1] << ")" << endl;
-
-	  AlgebraicSymMatrix covmat(2);
-	  covmat[0][0] = (*ihit)->localPositionError().xx();
-	  covmat[1][1] = (*ihit)->localPositionError().yy();
-	  covmat[0][1] = (*ihit)->localPositionError().xy();
-	  
-	  // add hit and impact point covariance matrices
-          AlgebraicSymMatrix totalerr(2); 
-	  totalerr = covmat + ipcovmat;
-
-           // fill hit parameters in root tree
-          std::pair<int,int> typeAndLay = id.typeAndLayerFromGeomDet( *det );
-          std::vector<unsigned int> numbScheme = storeNumberingScheme(det->geographicalId() , typeAndLay.first);
- 
-          if (ahit<MAXHIT) {
-
-            float tempphi = (*ihit)->globalPosition().phi();
-            std::pair<float,float> monoStereoCha = theAngleFinder->findhitcharge(*imea);
-            float tempcharge = monoStereoCha.first;
-            float tempxres = coor[0] - pos[0];
-	    // cout << "Temp quantities " << tempphi << " " << tempcharge << " " << tempxres << endl;
-
-	    if (theHitSelection( tempphi, tempcharge, fabs(tempxres) )) {
-
-              // cout << "Passed hit #" << prova3++ << endl;
-	      // Sensor position
-	      m_hType[ahit] = typeAndLay.first;
-	      m_hFwBw[ahit] = 99999;
-	      m_hLayer[ahit] = 99999;
-	      m_hIntExt[ahit] = 99999;
-	      m_hStrRod[ahit] = 99999;
-	      m_hModule[ahit] = 99999;
-	      if (numbScheme.at(0)) {
-		m_hFwBw[ahit] = numbScheme.at(0);
-		m_hLayer[ahit] = numbScheme.at(1);
-		m_hIntExt[ahit] = numbScheme.at(2);
-		m_hStrRod[ahit] = numbScheme.at(3);
-		m_hModule[ahit] = numbScheme.at(4);
-	      }
-              // cout << "Temp quantities 2 " << tempphi << " " << tempcharge << " " << tempxres << endl;
-	      // Which track it belongs to
-	      m_hOwnerTrack[ahit] = allTracks;
-	      // Geometrical position
-	      m_hR[ahit] = (*ihit)->globalPosition().perp();
-	      m_hPhi[ahit] = tempphi;
-	      m_hZ[ahit] = (*ihit)->globalPosition().z();
-	      m_hLocalX[ahit] = (*ihit)->localPosition().x();
-	      m_hLocalY[ahit] = (*ihit)->localPosition().y();
-	      m_hLocalZ[ahit] = (*ihit)->localPosition().z();
-	      // Local track angle
-              std::pair<float,float> monoStereoAng = theAngleFinder->findtrackangle(*imea);
-	      m_hLocalAngleMono[ahit] = monoStereoAng.first;
-	      m_hLocalAngleSter[ahit] = monoStereoAng.second;
-	      // Cluster charge
-	      m_hChargeMono[ahit] = tempcharge;
-	      m_hChargeSter[ahit] = monoStereoCha.second;
-	      // Residuals and errors
-	      m_Xres[ahit] = tempxres;
-	      m_Yres[ahit] = coor[1] - pos[1];
-	      m_Xerr[ahit] = sqrt(totalerr[0][0]);
-	      m_Yerr[ahit] = sqrt(totalerr[1][1]);
-	      m_XerrHit[ahit] = sqrt(covmat[0][0]);
-	      m_XerrIP[ahit] = sqrt(ipcovmat[0][0]);
-	      
-	      m_allHits=ahit;	    
-	      ahit++;
-
-              if (ali!= 0) {
-		// get Alignment Parameters
-		AlignmentParameters* params = ali->alignmentParameters();
-		// get derivatives
-		AlgebraicMatrix derivs=params->selectedDerivatives(*itsos,alidet);
-		
-		// invert covariance matrix
-		int ierr; 
-		totalerr.invert(ierr);
-		if (ierr != 0) { 
-		  edm::LogError("Alignment") << "Matrix inversion failed!"; 
-		  return; 
-		}
-		
-		// calculate user parameters
-		int npar=derivs.num_row();
-		AlgebraicSymMatrix thisjtvj(npar);
-		AlgebraicVector thisjtve(npar);
-		thisjtvj=totalerr.similarity(derivs);
-		thisjtve=derivs * totalerr * (pos-coor);
-		
-		// access user variables (via AlignmentParameters)
-		HIPUserVariables* uservar =
-		  dynamic_cast<HIPUserVariables*>(params->userVariables());
-		uservar->jtvj += thisjtvj;
-		uservar->jtve += thisjtve;
-		uservar->nhit ++;
-	      }
-	    }
-	  }
-	  itsos++;
-	  ihit++;
-	  imea++;
-	} 
-
-      allTracks++;
-    } // end of track loop
-
-    // fill eventwise root tree (with prescale defined in pset)
-    theCurrentPrescale--;
-    if (theCurrentPrescale<=0) {
-      theTree->Fill();
-      theCurrentPrescale=theEventPrescale;
-    }
+  // fill eventwise root tree (with prescale defined in pset)
+  theCurrentPrescale--;
+  if (theCurrentPrescale<=0) {
+    theTree->Fill();
+    theCurrentPrescale=theEventPrescale;
   }
 
 }
@@ -678,8 +684,9 @@ HIPAlignmentAlgorithm::calcAPE(double* par, int iter,std::string param)
 {
   double diter=(double)iter;
 
+  //COSMICS
   if (param == "linear") {
-    return max(0.,par[0]+((par[1]-par[0])/par[2])*diter);
+    return max(par[1],par[0]+((par[1]-par[0])/par[2])*diter);
   }
   else if (param == "exponential") {
     return max(0.,par[0]*(exp(-pow(diter,par[1])/par[2])));
@@ -706,11 +713,13 @@ void HIPAlignmentAlgorithm::bookRoot(void)
   TString tname="T1";
   char iterString[5];
   sprintf(iterString, "%i",theIteration);
+  // COSMICS
   tname.Append("_");
   tname.Append(iterString);
 
   theTree  = new TTree(tname,"Eventwise tree");
 
+  // COSMICS
   //theTree->Branch("Run",     &m_Run,     "Run/I");
   //theTree->Branch("Event",   &m_Event,   "Event/I");
   theTree->Branch("NtracksSim", &m_NtracksSim, "NtracksSim/I");
@@ -724,6 +733,7 @@ void HIPAlignmentAlgorithm::bookRoot(void)
   theTree->Branch("Phi",      m_Phi,     "Phi[Ntracks]/F");
   theTree->Branch("Chi2n",    m_Chi2n,   "Chi2n[Ntracks]/F");
   theTree->Branch("allHits", &m_allHits, "allHits/I");
+  theTree->Branch("isOnAli",  m_isOnAli, "isOnAli[allHits]/I");
   theTree->Branch("hType",    m_hType,   "hType[allHits]/I");
   theTree->Branch("hLayer",   m_hLayer,  "hLayer[allHits]/I");
   theTree->Branch("hFwBw",    m_hFwBw,   "hFwBw[allHits]/I");
@@ -741,6 +751,8 @@ void HIPAlignmentAlgorithm::bookRoot(void)
   theTree->Branch("hLocalAngleSter",m_hLocalAngleSter,"hLocalAngleSter[allHits]/F");
   theTree->Branch("hChargeMono",m_hChargeMono,"hChargeMono[allHits]/F");
   theTree->Branch("hChargeSter",m_hChargeSter,"hChargeSter[allHits]/F");
+  theTree->Branch("hBarMono",m_hBarMono,"hBarMono[allHits]/F");
+  theTree->Branch("hBarSter",m_hBarSter,"hBarSter[allHits]/F");
   theTree->Branch("xres",     m_Xres,    "xres[allHits]/F");
   theTree->Branch("yres",     m_Yres,    "yres[allHits]/F");
   theTree->Branch("xerr",     m_Xerr,    "xerr[allHits]/F");
@@ -941,6 +953,7 @@ void HIPAlignmentAlgorithm::collector(void)
 
 }
 
+// COSMICS
 std::vector<unsigned int> HIPAlignmentAlgorithm::storeNumberingScheme(const DetId& detid, int type)
 {
   std::vector<unsigned int> numbScheme;
@@ -964,16 +977,4 @@ std::vector<unsigned int> HIPAlignmentAlgorithm::storeNumberingScheme(const DetI
     numbScheme.push_back( 0 );
   }
   return numbScheme;
-}
-
-bool HIPAlignmentAlgorithm::theHitSelection(float phi, float charge, float absxres)
-{
-  if (!hitSelection) return true;
-  // hit-phi cut
-  if (phi < phiMinCut || phi > phiMaxCut) return false;
-  // cluster charge cut
-  if (charge < chargeCut) return false;
-  // outlier rejection cut
-  if (absxres > outlierCut) return false;
-  return true;
 }

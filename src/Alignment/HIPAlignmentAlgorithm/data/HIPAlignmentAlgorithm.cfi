@@ -6,9 +6,8 @@ block HIPAlignmentAlgorithm = {
 
 	// Dump tracks before and after refit
 	bool debug = false
-	
 	bool verbosity = false
-        bool useSurvey = false
+
 	string outpath = "./"
 
         int32 eventPrescale = 20
@@ -26,18 +25,14 @@ block HIPAlignmentAlgorithm = {
 	vdouble apeSPar = { 0.2, 0.0, 3. }
 	vdouble apeRPar = { 0.0,  0.0, 3. }
 		
+        double maxAllowedHitPull = -1.
 	int32 minimumNumberOfHits = 50
 	double maxRelParameterError = 1.0
-
-        bool hitFilter = false
-        untracked double phiMinCut = 0.
-        untracked double phiMaxCut = 3.15
-        untracked double chargeCut = 0.
-        untracked double outlierCut = 2000.
 	
 	bool collectorActive = false
 	int32 collectorNJobs = 0
 	string collectorPath = ""
-	
+
+	untracked vstring surveyResiduals = {} # no survey constraint
 }
 
