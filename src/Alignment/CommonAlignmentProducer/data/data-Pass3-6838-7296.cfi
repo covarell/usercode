@@ -1,0 +1,30 @@
+	source = PoolSource { 
+		
+		untracked vstring fileNames = { 
+         
+            'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006838_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006884_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006912_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006914_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006916_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006917_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006920_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006922_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006923_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0006925_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007281_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007283_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007285_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007286_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007287_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007288_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007296_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007296_2.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run0007296_3.root'
+
+		}
+
+	#	untracked int32 maxEvents   = 1000
+	#	untracked uint32 skipEvents = 0
+	
+	}	   

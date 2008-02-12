@@ -7,9 +7,9 @@
 /// Description : calls alignment algorithms
 ///
 ///  \author    : Frederic Ronga
-///  Revision   : $Revision: 1.10 $
-///  last update: $Date: 2007/01/23 16:08:15 $
-///  by         : $Author: fronga $
+///  Revision   : $Revision: 1.6 $
+///  last update: $Date: 2007/07/09 14:33:20 $
+///  by         : $Author: pivarski $
 
 #include <vector>
 
@@ -25,6 +25,7 @@
 // Alignment
 #include "RecoTracker/TrackProducer/interface/TrackProducerBase.h"
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentAlgorithmBase.h"
+#include "Alignment/CommonAlignmentMonitor/interface/AlignmentMonitorBase.h"
 #include "Alignment/TrackerAlignment/interface/AlignableTracker.h"
 #include "Alignment/MuonAlignment/interface/AlignableMuon.h"
 
@@ -32,6 +33,8 @@
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentParameterStore.h"
 #include "Alignment/CommonAlignment/interface/Alignable.h"
 
+class Alignments;
+class SurveyErrors;
 
 class AlignmentProducer : public edm::ESProducerLooper
 {
@@ -80,13 +83,19 @@ class AlignmentProducer : public edm::ESProducerLooper
   /// Create tracker and muon geometries
   void createGeometries_( const edm::EventSetup& );
 
-  /// Check if a trajectory and a track match
-  const bool trajTrackMatch_( const ConstTrajTrackPair& pair ) const;
+  /// Add survey info to an alignable
+  void addSurveyInfo_(
+		      Alignable*
+		      );
 
   // private data members
 
+  unsigned int        theSurveyIndex;
+  const Alignments*   theSurveyValues;
+  const SurveyErrors* theSurveyErrors;
+
   AlignmentAlgorithmBase* theAlignmentAlgo;
-  AlignmentParameterBuilder* theAlignmentParameterBuilder;
+  std::vector<AlignmentMonitorBase*> theMonitors;
   AlignmentParameterStore* theAlignmentParameterStore;
 
   AlignableTracker* theAlignableTracker;
@@ -108,8 +117,8 @@ class AlignmentProducer : public edm::ESProducerLooper
   int stNFixAlignables_;
   double stRandomShift_,stRandomRotation_;
   bool applyDbAlignment_,doMisalignmentScenario_,saveToDB_;
-  bool doTracker_,doMuon_,isData_;
-
+  bool doTracker_,doMuon_;
+  bool useSurvey_,isData_; // true to read survey info from DB
 };
 
 #endif

@@ -1,0 +1,40 @@
+	source = PoolSource { 
+		
+		untracked vstring fileNames = { 
+               
+            # temp = -15 °C
+           'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012046_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012048_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012080_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012146_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012158_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012160_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012160_2.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012162_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012334_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012336_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012337_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012456_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012457_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012458_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012459_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012562_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012564_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012567_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012569_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012571_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012572_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012573_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012575_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012576_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012584_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012599_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012600_1.root'
+           ,'rfio:/castor/cern.ch/cms/store/trkalign/TIF/TIF-PASS3-SKIM-20070825/run00012603_1.root'
+            
+		}
+
+		untracked int32 maxEvents   = 100
+		untracked uint32 skipEvents = 0
+	
+	}	   

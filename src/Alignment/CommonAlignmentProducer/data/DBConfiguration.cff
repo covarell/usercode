@@ -1,38 +1,35 @@
+#
+# Example DB configuration: copy that in your cfg to read/write to DB
+#
+# 
+
 # Database input service 
 # Required if AlignmentProducer.applyDbAlignment = true
-es_source = PoolDBESSource { 
-    VPSet toGet = {
-        { string record = "TrackerAlignmentRcd" string tag = "TrackerCSA06Scenario" },
-        { string record = "TrackerAlignmentErrorRcd" string tag = "TrackerCSA06ScenarioErrors" }
+include "CondCore/DBCommon/data/CondDBSetup.cfi"
+es_source = PoolDBESSource {
+    using CondDBSetup
+    string connect = "sqlite_file:Alignments.db"    
+    #string connect = "frontier://FrontierDev/CMS_COND_ALIGNMENT" 
+    #Uncomment for < 1_7 (except Frontier) #untracked string catalog = "file:conddbcatalog.xml"
+    string timetype = "runnumber"
+    VPSet toGet = 
+    {
+        { string record = "TrackerAlignmentRcd"      string tag = "Tracker10pbScenario" },
+        { string record = "TrackerAlignmentErrorRcd" string tag = "Tracker10pbScenarioErrors" }
     }
-    bool loadAll = true
-    string timetype = "runnumber" 
-    untracked uint32 authenticationMethod = 1 // 1
-    untracked uint32 messagelevel = 0 // 0
-
-    # (a) sq lite files (has to match toGet tag's used above)
-    # string connect = "sqlite_file:CSA06Scenario.db"
-    # untracked string catalog = "file:condbcatalog.xml"
-    # (b) ORACLE
-    string connect = "oracle://cms_orcoff_int2r/CMS_COND_ALIGNMENT"
-    untracked string catalog = "relationalcatalog_oracle://cms_orcoff_int2r/CMS_COND_GENERAL"
-    untracked bool siteLocalConfig = false // oracle
-    # (c) FRONTIER
-    # string connect = "frontier://cms_conditions_data/CMS_COND_ALIGNMENT"
-    # untracked bool siteLocalConfig = true // frontier
 }
 
 # Database output service
 # Required if AlignmentProducer.saveToDB = true
-service = PoolDBOutputService  {
-    string connect = "sqlite_file:Alignments.db"    
-    string timetype = "runnumber"    
-    untracked uint32 authenticationMethod = 1
-    untracked string catalog = "file:condbcatalog.xml"
+include "CondCore/DBCommon/data/CondDBSetup.cfi"
+service = PoolDBOutputService {
+    using CondDBSetup
+    string connect = "sqlite_file:dataout.db"    
+    #Uncomment for < 1_7 #untracked string catalog = "file:catalogout.xml"
+    string timetype = "runnumber"
     VPSet toPut = {
-		{ untracked string containerName = "Alignments" 
-			string tag = "Alignments_init" },
-		{ untracked string containerName = "AlignmentErrors" 
-			string tag = "AlignmentErrors_init" }
+        { string record = "TrackerAlignmentRcd"      string tag = "<output tag>" },
+        { string record = "TrackerAlignmentErrorRcd" string tag = "<output error tag>" }
     }
 }
+

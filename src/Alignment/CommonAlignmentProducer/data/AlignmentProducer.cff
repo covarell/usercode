@@ -5,21 +5,20 @@ include "Alignment/TrackerAlignment/data/Scenarios.cff"
 #  replace TrackerShortTermScenario.TPEs.scale = 10.
 
 # algorithms
-include "Alignment/CSA06AlignmentAlgorithm/data/CSA06AlignmentAlgorithm.cfi"
+include "Alignment/HIPAlignmentAlgorithm/data/HIPAlignmentAlgorithm.cfi"
 include "Alignment/MillePedeAlignmentAlgorithm/data/MillePedeAlignmentAlgorithm.cfi"
 include "Alignment/KalmanAlignmentAlgorithm/data/KalmanAlignmentAlgorithm.cfi"
 
 looper = AlignmentProducer
 {
     untracked uint32 maxLoops = 1
-    untracked bool isData = false
-
-    InputTag tkTag = TrackRefitter
-    InputTag tjTag = TrackRefitter
-    InputTag simTag = g4SimHits:
+    InputTag tjTkAssociationMapTag = TrackRefitter
+    InputTag simtrackTag = g4SimHits
 
     untracked bool doTracker = true
     untracked bool doMuon    = false
+
+    untracked bool isData = false
 
     PSet ParameterBuilder = {
         PSet Selector = {
@@ -58,49 +57,31 @@ looper = AlignmentProducer
             #   vdouble rRanges   =  {}
             #   vdouble phiRanges =  {1.5, -0.5} # a phi-slice covering the +-pi sign flip
             # }
-
             PSet TIBSelOnly = {
                vdouble etaRanges =  {}
+               vdouble xRanges   =  {}
+               vdouble yRanges   =  {}	
                vdouble zRanges   =  {}
                vdouble rRanges   =  {}
                vdouble phiRanges =  {}
             }
             PSet TOBSelOnly = {
                vdouble etaRanges =  {}
+               vdouble xRanges   =  {}
+               vdouble yRanges   =  {}
                vdouble zRanges   =  {}
                vdouble rRanges   =  {}
                vdouble phiRanges =  {}
             }
             PSet TOBSelOnlyL6 = {
                vdouble etaRanges =  {}
+               vdouble xRanges   =  {}
+               vdouble yRanges   =  {} 
                vdouble zRanges   =  {}
                vdouble rRanges   =  {}
                vdouble phiRanges =  {}
             }
-            PSet TOBSelOnlyL2 = {
-               vdouble etaRanges =  {}
-               vdouble zRanges   =  {}
-               vdouble rRanges   =  {}
-               vdouble phiRanges =  {}
-            }
-            PSet TIBSelOnlyL1 = {
-               vdouble etaRanges =  {}
-               vdouble zRanges   =  {}
-               vdouble rRanges   =  {}
-               vdouble phiRanges =  {}
-            }
-             PSet TOBSelOnlyL2inv = {
-               vdouble etaRanges =  {}
-               vdouble zRanges   =  {}
-               vdouble rRanges   =  {}
-               vdouble phiRanges =  {}
-            }
-            PSet TIBSelOnlyL1inv = {
-               vdouble etaRanges =  {}
-               vdouble zRanges   =  {}
-               vdouble rRanges   =  {}
-               vdouble phiRanges =  {}
-            }
+            
         }
     }
 
@@ -122,7 +103,7 @@ looper = AlignmentProducer
     # misalignment scenario
     bool doMisalignmentScenario = false
     PSet MisalignmentScenario = { 
-      using TrackerShortTermScenario
+      using NoMovementsScenario
 
       #untracked bool fixTPB = 0
       #untracked bool fixTPE = 1
@@ -134,15 +115,21 @@ looper = AlignmentProducer
 	
     # Choose one algorithm
     PSet algoConfig = {
-		using CSA06AlignmentAlgorithm
+		using HIPAlignmentAlgorithm
         # using MillePedeAlignmentAlgorithm
         # using KalmanAlignmentAlgorithm
     }
 
+    PSet monitorConfig = {
+	untracked vstring monitors = {}
+    }
 	
     # Save alignment corrections to DB: if true, requires configuration of PoolDBOutputService
     # See DBConfiguration.cff for an example
     bool saveToDB = true
 
-}
+    # Read survey info from DB: if true, requires configuration of PoolDBESSource
+    # See Alignment/SurveyAnalysis/test/readDB.cfg for an example
+    bool useSurvey = false
 
+}

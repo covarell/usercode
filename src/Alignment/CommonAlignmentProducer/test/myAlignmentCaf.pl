@@ -16,8 +16,8 @@ elsif ( $host =~ /lxcms/ )   { $location="lxcmsg1"; }
 $jobname="ScintBTIBmod-xy-note";
 
 # cfg file
-# $steering="AlignTOBDBOut_outrej.cfg";
-$steering="AlignTIBDBBoth_outrej.cfg";
+# $steering="AlignTOB_TIFdata_pass4.cfg";
+$steering="AlignTIB_TIFdata_pass4.cfg";
 
 # db output files (to be deleted except for last iteration)
 # $dbfiles="alignments_TOB.db alignments_TOB.xml";
@@ -49,8 +49,8 @@ $iterations=15;
 # $farm="8nm"; $resource="";
 $farm="dedicated -R cmscaf";
 
-$cmsswvers="CMSSW_1_3_6";
-$scramarch="slc3_ia32_gcc323";
+$cmsswvers="CMSSW_1_7_5";
+$scramarch="slc4_ia32_gcc345";
 $scram=scramv1;
 
 # sleep time in seconds between two check cycles
@@ -204,9 +204,9 @@ system("cp ${workdir}/$steering $dir/cfgfile");
 $repl="
   replace PoolSource.maxEvents  = 1
   replace PoolSource.skipEvents = 0
-  replace CSA06AlignmentAlgorithm.collectorActive = true
-  replace CSA06AlignmentAlgorithm.collectorNJobs = $njobs
-  replace CSA06AlignmentAlgorithm.collectorPath = \"../\"
+  replace HIPAlignmentAlgorithm.collectorActive = true
+  replace HIPAlignmentAlgorithm.collectorNJobs = $njobs
+  replace HIPAlignmentAlgorithm.collectorPath = \"../\"
 ";
 replace("$dir/cfgfile",$repl);
 
@@ -313,7 +313,7 @@ sub run_collector
     subjob
   ");
   if ($iteration gt 0) {
-    system("cp $dir/job1/CSA06AlignmentEvents.root $dir/main");
+    system("cp $dir/job1/HIPAlignmentEvents.root $dir/main");
   }
 
   return 0;
@@ -382,7 +382,6 @@ $subjob="#!/bin/zsh -f
 #BSUB -C 0
 cd $dir
 eval \`$scram runtime -sh\`
-export SCRAM_ARCH=slc3_ia32_gcc323
 rehash
 thisiter=1
 until ((thisiter > $iterations )); do
@@ -409,7 +408,6 @@ $subjob="#!/bin/zsh
 #BSUB -C 0
 cd $dir
 eval \`$scram runtime -sh\`
-export SCRAM_ARCH=slc3_ia32_gcc323
 rehash
 cat ../iteration.txt | read iter
 rm -f ${dbfiles}
