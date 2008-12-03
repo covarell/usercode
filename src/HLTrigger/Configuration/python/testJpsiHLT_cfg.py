@@ -30,7 +30,8 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
      'rfio:/castor/cern.ch/user/c/covarell/Jpsi-nonp/inclJpsiee_GEN_SIM_RECO_1.root',
      'rfio:/castor/cern.ch/user/c/covarell/Jpsi-nonp/inclJpsiee_GEN_SIM_RECO_10.root',
-     'rfio:/castor/cern.ch/user/c/covarell/Jpsi-nonp/inclJpsiee_GEN_SIM_RECO_11.root'    
+     'rfio:/castor/cern.ch/user/c/covarell/Jpsi-nonp/inclJpsiee_GEN_SIM_RECO_11.root'
+     # 'rfio:/castor/cern.ch/user/r/ric/Upsilon/UpsilonToEE_1.root'
     )
 )
 
@@ -50,6 +51,10 @@ process.out = cms.OutputModule("PoolOutputModule",
         # SelectEvents = cms.vstring('HLT_DoubleEM5_Jpsi')
         # SelectEvents = cms.vstring('HLT_DoubleEM1e31_Jpsi')
         SelectEvents = cms.vstring('HLT_DoubleEM8e29_Jpsi')
+        # SelectEvents = cms.vstring('HLT_SingleEM8_Ups1s')
+        # SelectEvents = cms.vstring('HLT_DoubleEM5_Ups1s')
+        # SelectEvents = cms.vstring('HLT_DoubleEM1e31_Ups1s')
+        # SelectEvents = cms.vstring('HLT_DoubleEM8e29_Ups1s')
     )
 )
 
