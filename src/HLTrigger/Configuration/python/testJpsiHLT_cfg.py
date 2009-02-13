@@ -41,5 +41,5 @@ process.out = cms.OutputModule("PoolOutputModule",
 process.pp = cms.EndPath(process.out)
 process.schedule.append(process.pp)
 
-process.GlobalTag.globaltag = 'STARTUP_V7::All'
+process.GlobalTag.globaltag = 'IDEAL_V9::All'
 
