@@ -14,12 +14,12 @@
 #include <TClonesArray.h>
 
 static const unsigned int MAXMC = 10;
-static const unsigned int MAXMCMU = 20;
-static const unsigned int MAXMU = 20;
-static const unsigned int MAXMUCALO = 100;
+static const unsigned int MAXMCMU = 100;
+static const unsigned int MAXMU = 40;
+static const unsigned int MAXMUCALO = 200;
 static const unsigned int MAXQQ = 3000;
 static const unsigned int MAXCHIC = 3000;
-static const unsigned int MAXPRIVTX = 20;
+static const unsigned int MAXPRIVTX = 30;
 static const unsigned int MAXTRIG = 10;
 
 class JPsiTreeBase {
@@ -140,7 +140,7 @@ public :
    Char_t          L1TGlobal_Decision;
    Int_t           L1_mu_size;
    TClonesArray    *L1_mu_4mom;
-   Int_t           L1_mu_charge[10];   //[L1_mu_size]
+   Int_t           L1_mu_charge[50];   //[L1_mu_size]
    Int_t           HLTBits_size;
    Char_t          HLTBits_wasrun[8];   //[HLTBits_size]
    Char_t          HLTBits_accept[8];   //[HLTBits_size]
