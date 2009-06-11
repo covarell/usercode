@@ -59,8 +59,9 @@ $(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAna
 
 $(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)finalJPsiAnalysis.o $<
-$(OUTLIB)fitBfrac.o: $(INCLUDEDIR)/fitBfrac.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)fitBfrac.o $<
+
+$(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeDataSet.o $<
 
 JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
@@ -70,6 +71,15 @@ JPsiApp.clean:
 
 JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
+
+MassFit:  $(INCLUDEDIR)fitBfrac.cxx
+	$(CXX) $(CXXFLAGS) -o FitJpsiMass $(OUTLIB)/*.o $(GLIBS) $ $<
+
+sidebands:  $(INCLUDEDIR)fitSidebands.cxx
+	$(CXX) $(CXXFLAGS) -o Fitsidebands $(OUTLIB)/*.o $(GLIBS) $ $<
+
+lifebkg:  $(INCLUDEDIR)fitLifetime.cxx
+	$(CXX) $(CXXFLAGS) -o FitLifetime $(OUTLIB)/*.o $(GLIBS) $ $<
 
 JPsiFitApp.clean:
 	rm -f JPsiFitApp
