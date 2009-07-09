@@ -75,6 +75,12 @@ JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o
 MassFit:  $(INCLUDEDIR)fitBfrac.cxx
 	$(CXX) $(CXXFLAGS) -o FitJpsiMass $(OUTLIB)/*.o $(GLIBS) $ $<
 
+2DFit:    $(INCLUDEDIR)fit2D.cxx
+	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
+
+SmearFit: $(INCLUDEDIR)fitSmearFactor.cxx
+	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
+
 sidebands:  $(INCLUDEDIR)fitSidebands.cxx
 	$(CXX) $(CXXFLAGS) -o Fitsidebands $(OUTLIB)/*.o $(GLIBS) $ $<
 
