@@ -21,6 +21,9 @@
 #include "RooProdPdf.h"
 #include "RooFitResult.h"
 #include "RooAddModel.h"
+#include "RooGExpModel.h"
+#include "RooFFTConvPdf.h"
+#include "RooUniformBinning.h"
 
 using namespace RooFit;
 
@@ -78,7 +81,7 @@ int main(int argc, char* argv[]) {
   RooArgSet paramlist;
 
   //CONSIDER THE GG CASE
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
+  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
   GGdata->setWeightVar(MCweight);
 
   //JPSI MASS PARAMETRIZATION
@@ -178,9 +181,17 @@ int main(int argc, char* argv[]) {
   //signal prompt, same as zero lifetime background
 
   //signal non-prompt
-  RooRealVar taueff("taueff","Effective tau of the B meson",0.3,0.,1.);
+  RooRealVar taueff("taueff","Effective tau of the B meson",0.348,0.,1.);
+  //RooRealVar sigmaMC("sigmaMC","MC #sigma",0.3,0.,5.);
 
   paramlist.add(taueff);
+  //paramlist.add(sigmaMC);
+
+  //RooGExpModel physsigNP("physsigNP","Gauss + exp model",Jpsict,sigmaMC,taueff);
+
+  //RooUniformBinning FFTbin(Jpsict.getMin(),Jpsict.getMax(),1000,"cache");
+  //Jpsict.setBinning(FFTbin,"cache");
+  //RooFFTConvPdf sigNP("sigNP","Non-prompt signal",Jpsict,physsigNP,resol);
 
   RooDecay sigNP("sigNP","Non-prompt signal",Jpsict,taueff,resol,RooDecay::SingleSided);
 
@@ -189,9 +200,9 @@ int main(int argc, char* argv[]) {
   RooProdPdf totsigNP("totsigNP","Total non-prompt signal",RooArgList(sigMassPDF,sigNP));
   RooProdPdf totBKG("totBKG","Total background",RooArgList(GGsideFunct,bkgctauTOT));
 
-  RooRealVar NSigPR("NSigPR","Number of prompt signal events",4000.,10.,10000.);
-  RooRealVar NSigNP("NSigNP","Number of non-prompt signal events",900.,10.,10000.);
-  RooRealVar NBkg("NBkg","Number of background events",1400.,10.,10000.);
+  RooRealVar NSigPR("NSigPR","Number of prompt signal events",4000.,10.,1000000.);
+  RooRealVar NSigNP("NSigNP","Number of non-prompt signal events",900.,10.,1000000.);
+  RooRealVar NBkg("NBkg","Number of background events",1400.,10.,1000000.);
 
   paramlist.add(NSigPR);
   paramlist.add(NSigNP);
@@ -199,14 +210,14 @@ int main(int argc, char* argv[]) {
 
   RooAddPdf totPDF("totPDF","Total PDF",RooArgList(totsigPR,totsigNP,totBKG),RooArgList(NSigPR,NSigNP,NBkg));
 
-  paramlist.readFromFile("fit2dpars.txt");
+  paramlist.readFromFile("fit2dpars_GT.txt");
 
   RooFitResult* fitRes = totPDF.fitTo(*GGdata,Extended(1),Save(1),Minos(0));
 
   RooArgSet results(fitRes->floatParsFinal());
   RooArgSet conresults(fitRes->constPars());
   results.add(conresults);
-  results.writeToFile("fit2d_results.txt");
+  results.writeToFile("fit2d_results_GT.txt");
 
   RooPlot *GGmframe = JpsiMass.frame();
   GGmframe->SetTitle("2D fit for glb-glb muons (mass projection)");
@@ -220,7 +231,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();GGmframe->Draw();
-  c1.SaveAs("2DGGmassfit.gif");
+  c1.SaveAs("2DGTmassfit.gif");
 
   RooPlot *GGtframe = Jpsict.frame();
   GGtframe->SetTitle("2D fit for glb-glb muons (c #tau projection)");
@@ -235,7 +246,7 @@ int main(int argc, char* argv[]) {
   TCanvas c2;
   c2.cd();c2.SetLogy(1);
   c2.cd();GGtframe->Draw();
-  c2.SaveAs("2DGGtimefit.gif");
+  c2.SaveAs("2DGTtimefit.gif");
 
 
   /*
