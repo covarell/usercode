@@ -55,7 +55,7 @@ public :
    Double_t        Reco_mu_glb_d0err[MAXMU];   //[Reco_mu_glb_size]
    Double_t        Reco_mu_glb_dz[MAXMU];   //[Reco_mu_glb_size]
    Double_t        Reco_mu_glb_dzerr[MAXMU];   //[Reco_mu_glb_size]
-   Double_t        Reco_mu_glb_chi2[MAXMU];   //[Reco_mu_glb_size]
+   Double_t        Reco_mu_glb_normChi2[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitstrack[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitsDT[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitsCSC[MAXMU];   //[Reco_mu_glb_size]
@@ -73,10 +73,11 @@ public :
    Double_t        Reco_mu_trk_d0err[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_dz[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_dzerr[MAXMU];   //[Reco_mu_trk_size]
-   Double_t        Reco_mu_trk_chi2[MAXMU];   //[Reco_mu_trk_size]
+   Double_t        Reco_mu_trk_normChi2[MAXMU];   //[Reco_mu_trk_size]
    Int_t           Reco_mu_trk_nhitstrack[MAXMU];   //[Reco_mu_trk_size]
-   Int_t           Reco_mu_trk_nhitsDT[MAXMU];   //[Reco_mu_trk_size]
-   Int_t           Reco_mu_trk_nhitsCSC[MAXMU];   //[Reco_mu_trk_size]
+   // Int_t           Reco_mu_trk_nhitsDT[MAXMU];   //[Reco_mu_trk_size]
+   // Int_t           Reco_mu_trk_nhitsCSC[MAXMU];   //[Reco_mu_trk_size]
+   Int_t           Reco_mu_trk_PIDmask[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_caloComp[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_segmComp[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_iso[MAXMU];   //[Reco_mu_trk_size]
@@ -91,7 +92,7 @@ public :
    Double_t        Reco_mu_cal_d0err[MAXMUCALO];   //[Reco_mu_cal_size]
    Double_t        Reco_mu_cal_dz[MAXMUCALO];   //[Reco_mu_cal_size]
    Double_t        Reco_mu_cal_dzerr[MAXMUCALO];   //[Reco_mu_cal_size]
-   Double_t        Reco_mu_cal_chi2[MAXMUCALO];   //[Reco_mu_cal_size]
+   Double_t        Reco_mu_cal_normChi2[MAXMUCALO];   //[Reco_mu_cal_size]
    Int_t           Reco_mu_cal_nhitstrack[MAXMUCALO];   //[Reco_mu_cal_size]
    Double_t        Reco_mu_cal_caloComp[MAXMUCALO];   //[Reco_mu_cal_size]
    Int_t           Reco_mu_cal_charge[MAXMUCALO];   //[Reco_mu_cal_size]
@@ -201,7 +202,7 @@ public :
    TBranch        *b_Reco_mu_glb_d0err;   //!
    TBranch        *b_Reco_mu_glb_dz;   //!
    TBranch        *b_Reco_mu_glb_dzerr;   //!
-   TBranch        *b_Reco_mu_glb_chi2;   //!
+   TBranch        *b_Reco_mu_glb_normChi2;   //!
    TBranch        *b_Reco_mu_glb_nhitstrack;   //!
    TBranch        *b_Reco_mu_glb_nhitsDT;   //!
    TBranch        *b_Reco_mu_glb_nhitsCSC;   //!
@@ -219,10 +220,11 @@ public :
    TBranch        *b_Reco_mu_trk_d0err;   //!
    TBranch        *b_Reco_mu_trk_dz;   //!
    TBranch        *b_Reco_mu_trk_dzerr;   //!
-   TBranch        *b_Reco_mu_trk_chi2;   //!
+   TBranch        *b_Reco_mu_trk_normChi2;   //!
    TBranch        *b_Reco_mu_trk_nhitstrack;   //!
-   TBranch        *b_Reco_mu_trk_nhitsDT;   //!
-   TBranch        *b_Reco_mu_trk_nhitsCSC;   //!
+   // TBranch        *b_Reco_mu_trk_nhitsDT;   //!
+   // TBranch        *b_Reco_mu_trk_nhitsCSC;   //!
+   TBranch        *b_Reco_mu_trk_PIDmask;   //!
    TBranch        *b_Reco_mu_trk_caloComp;   //!
    TBranch        *b_Reco_mu_trk_segmComp;   //!
    TBranch        *b_Reco_mu_trk_iso;   //!
@@ -237,7 +239,7 @@ public :
    TBranch        *b_Reco_mu_cal_d0err;   //!
    TBranch        *b_Reco_mu_cal_dz;   //!
    TBranch        *b_Reco_mu_cal_dzerr;   //!
-   TBranch        *b_Reco_mu_cal_chi2;   //!
+   TBranch        *b_Reco_mu_cal_normChi2;   //!
    TBranch        *b_Reco_mu_cal_nhitstrack;   //!
    TBranch        *b_Reco_mu_cal_caloComp;   //!
    TBranch        *b_Reco_mu_cal_charge;   //!
@@ -445,7 +447,7 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_glb_d0err", Reco_mu_glb_d0err, &b_Reco_mu_glb_d0err);
    fChain->SetBranchAddress("Reco_mu_glb_dz", Reco_mu_glb_dz, &b_Reco_mu_glb_dz);
    fChain->SetBranchAddress("Reco_mu_glb_dzerr", Reco_mu_glb_dzerr, &b_Reco_mu_glb_dzerr);
-   fChain->SetBranchAddress("Reco_mu_glb_chi2", Reco_mu_glb_chi2, &b_Reco_mu_glb_chi2);
+   fChain->SetBranchAddress("Reco_mu_glb_normChi2", Reco_mu_glb_normChi2, &b_Reco_mu_glb_normChi2);
    fChain->SetBranchAddress("Reco_mu_glb_nhitstrack", Reco_mu_glb_nhitstrack, &b_Reco_mu_glb_nhitstrack);
    fChain->SetBranchAddress("Reco_mu_glb_nhitsDT", Reco_mu_glb_nhitsDT, &b_Reco_mu_glb_nhitsDT);
    fChain->SetBranchAddress("Reco_mu_glb_nhitsCSC", Reco_mu_glb_nhitsCSC, &b_Reco_mu_glb_nhitsCSC);
@@ -463,10 +465,11 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_trk_d0err", Reco_mu_trk_d0err, &b_Reco_mu_trk_d0err);
    fChain->SetBranchAddress("Reco_mu_trk_dz", Reco_mu_trk_dz, &b_Reco_mu_trk_dz);
    fChain->SetBranchAddress("Reco_mu_trk_dzerr", Reco_mu_trk_dzerr, &b_Reco_mu_trk_dzerr);
-   fChain->SetBranchAddress("Reco_mu_trk_chi2", Reco_mu_trk_chi2, &b_Reco_mu_trk_chi2);
+   fChain->SetBranchAddress("Reco_mu_trk_normChi2", Reco_mu_trk_normChi2, &b_Reco_mu_trk_normChi2);
    fChain->SetBranchAddress("Reco_mu_trk_nhitstrack", Reco_mu_trk_nhitstrack, &b_Reco_mu_trk_nhitstrack);
-   fChain->SetBranchAddress("Reco_mu_trk_nhitsDT", Reco_mu_trk_nhitsDT, &b_Reco_mu_trk_nhitsDT);
-   fChain->SetBranchAddress("Reco_mu_trk_nhitsCSC", Reco_mu_trk_nhitsCSC, &b_Reco_mu_trk_nhitsCSC);
+   // fChain->SetBranchAddress("Reco_mu_trk_nhitsDT", Reco_mu_trk_nhitsDT, &b_Reco_mu_trk_nhitsDT);
+   // fChain->SetBranchAddress("Reco_mu_trk_nhitsCSC", Reco_mu_trk_nhitsCSC, &b_Reco_mu_trk_nhitsCSC);
+   fChain->SetBranchAddress("Reco_mu_trk_PIDmask", Reco_mu_trk_PIDmask, &b_Reco_mu_trk_PIDmask);
    fChain->SetBranchAddress("Reco_mu_trk_caloComp", Reco_mu_trk_caloComp, &b_Reco_mu_trk_caloComp);
    fChain->SetBranchAddress("Reco_mu_trk_segmComp", Reco_mu_trk_segmComp, &b_Reco_mu_trk_segmComp);
    fChain->SetBranchAddress("Reco_mu_trk_iso", Reco_mu_trk_iso, &b_Reco_mu_trk_iso);
@@ -481,7 +484,7 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_cal_d0err", Reco_mu_cal_d0err, &b_Reco_mu_cal_d0err);
    fChain->SetBranchAddress("Reco_mu_cal_dz", Reco_mu_cal_dz, &b_Reco_mu_cal_dz);
    fChain->SetBranchAddress("Reco_mu_cal_dzerr", Reco_mu_cal_dzerr, &b_Reco_mu_cal_dzerr);
-   fChain->SetBranchAddress("Reco_mu_cal_chi2", Reco_mu_cal_chi2, &b_Reco_mu_cal_chi2);
+   fChain->SetBranchAddress("Reco_mu_cal_normChi2", Reco_mu_cal_normChi2, &b_Reco_mu_cal_normChi2);
    fChain->SetBranchAddress("Reco_mu_cal_nhitstrack", Reco_mu_cal_nhitstrack, &b_Reco_mu_cal_nhitstrack);
    fChain->SetBranchAddress("Reco_mu_cal_caloComp", Reco_mu_cal_caloComp, &b_Reco_mu_cal_caloComp);
    fChain->SetBranchAddress("Reco_mu_cal_charge", Reco_mu_cal_charge, &b_Reco_mu_cal_charge);
