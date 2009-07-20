@@ -80,9 +80,11 @@ int main(int argc, char* argv[]) {
   //add the parameters to save/retrieve
   RooArgSet paramlist;
 
-  //CONSIDER THE GG CASE
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  //CONSIDER THE GT CASE
+  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT && JpsiPt > 15. && JpsiPt < 2000.");
   GGdata->setWeightVar(MCweight);
+
+  cout << "Number of events to fit  = " << GGdata->numEntries(kTRUE) << endl; 
 
   //JPSI MASS PARAMETRIZATION
 
@@ -214,6 +216,9 @@ int main(int argc, char* argv[]) {
 
   RooFitResult* fitRes = totPDF.fitTo(*GGdata,Extended(1),Save(1),Minos(0));
 
+  Double_t Bfrac = NSigNP.getVal()/(NSigNP.getVal() + NSigPR.getVal());
+  cout << "B frac = " << Bfrac << " +/- " << Bfrac/NSigNP.getVal() << endl;
+
   RooArgSet results(fitRes->floatParsFinal());
   RooArgSet conresults(fitRes->constPars());
   results.add(conresults);
@@ -247,28 +252,6 @@ int main(int argc, char* argv[]) {
   c2.cd();c2.SetLogy(1);
   c2.cd();GGtframe->Draw();
   c2.SaveAs("2DGTtimefit.gif");
-
-
-  /*
-
-  //GT
-  RooDataSet *GTdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
-  GTdata->setWeightVar(MCweight);
-
-  totPDF.fitTo(*GTdata,Extended(1),Save(1),Minos(0));
-
-  RooPlot *GTmframe = JpsiMass.frame();
-  GTmframe->SetTitle("Mass fit for glb-trk muons");
-  GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
-  totPDF.plotOn(GTmframe);
-  totPDF.plotOn(GTmframe,Components(RooArgSet(GGsideFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
-  totPDF.plotOn(GTmframe,Components(GGsideFunct),DrawOption("F"),FillColor(kRed));
-  GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
-
-  TCanvas c2;
-  c2.cd();GTmframe->Draw();
-  c2.SaveAs("GTmassfit.gif");
-  */
 
   return 1;
 }

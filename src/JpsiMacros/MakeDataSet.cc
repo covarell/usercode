@@ -48,13 +48,16 @@ void MakeDataSet::Loop() {
   const float JpsiMassMax = 3.5;
   const float JpsiCtMin = -1.0;
   const float JpsiCtMax = 5.0;
+  const float JpsiPtMin = 1.;
+  const float JpsiPtMax = 100.;
 
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
   RooRealVar* MCweight = new RooRealVar("MCweight","Monte Carlo Weight",0.,5.);
+
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi Pt",JpsiPtMin,JpsiPtMax,"GeV/c");
 
   //categories for reconstruction
   RooCategory JpsiType("JpsiType","Category of muons");
@@ -72,7 +75,7 @@ void MakeDataSet::Loop() {
 
   float weight = 0.;
 
-  RooDataSet* data = new RooDataSet("data","Prompt sample",RooArgList(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
+  RooDataSet* data = new RooDataSet("data","Prompt sample",RooArgList(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType,*JpsiPt));
 
   for (int jentry=0; jentry< nentries; jentry++) {
     
@@ -123,19 +126,21 @@ void MakeDataSet::Loop() {
 	TLorentzVector *theQQ4mom = (TLorentzVector*)Reco_QQ_4mom->At(iqq);
 	float theMass = theQQ4mom->M();
         float theCtau = Reco_QQ_ctau[iqq]*10.;
+	float thePt = theQQ4mom->Pt();
 
-        if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
+        if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax && thePt > JpsiPtMin && thePt < JpsiPtMax) {
 
 	  passedCandidates++;
 
 	  JpsiMass->setVal(theMass);
 	  Jpsict->setVal(Reco_QQ_ctau[iqq]*10.);
 	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
+	  JpsiPt->setVal(thePt);
 
 	  MCType.setIndex(MCcat,kTRUE);
 	  MCweight->setVal(weight);
 
-	  data->add(RooArgSet(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
+	  data->add(RooArgSet(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType,*JpsiPt));
 
 	}
       }
