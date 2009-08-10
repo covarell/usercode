@@ -76,10 +76,10 @@ int main(int argc, char* argv[]) {
   RooRealVar GGcoefside("c_GG_side","GG linear coefficient of bkg PDF",0.,-999.,999.);
   RooPolynomial GGsideFunct("GGsideFunc","GGsideFunc",JpsiMass,GGcoefside);
 
-  RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,2.8,3.2);
+  RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,3.05,3.15);
   RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.,1.);
 
-  RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.0,2.8,3.2);
+  RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.1,3.05,3.15);
   RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.04,0.,1.);
 
   RooGaussian signalG1("signalG1","Signal PDF 1",JpsiMass,meanSig1,sigmaSig1);
@@ -109,10 +109,10 @@ int main(int argc, char* argv[]) {
   c1.SaveAs("GGmassfit.gif");
 
   //GT
-  RooDataSet *GTdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  RooDataSet *GTdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
   GTdata->setWeightVar(MCweight);
 
-  totPDF.fitTo(*GTdata,Extended(1),Save(1),Minos(0));
+  totPDF.fitTo(*GTdata,Extended(1),Save(1),Minos(1));
 
   RooPlot *GTmframe = JpsiMass.frame();
   GTmframe->SetTitle("Mass fit for glb-trk muons");
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c2;
   c2.cd();GTmframe->Draw();
-  c2.SaveAs("GTmassfit.gif");
+  c2.SaveAs("GCmassfit.gif");
 
 
   return 1;

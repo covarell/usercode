@@ -78,6 +78,9 @@ MassFit:  $(INCLUDEDIR)fitBfrac.cxx
 2DFit:    $(INCLUDEDIR)fit2D.cxx
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
+2DFitSim: $(INCLUDEDIR)fit2D_sim.cxx
+	$(CXX) $(CXXFLAGS) -o Fit2DSim $(OUTLIB)/*.o $(GLIBS) $ $<
+
 SmearFit: $(INCLUDEDIR)fitSmearFactor.cxx
 	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
 

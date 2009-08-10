@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
   RooArgSet paramlist;
 
   //CONSIDER THE GT CASE
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT && JpsiPt > 15. && JpsiPt < 2000.");
+  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
   GGdata->setWeightVar(MCweight);
 
   cout << "Number of events to fit  = " << GGdata->numEntries(kTRUE) << endl; 
@@ -96,19 +96,19 @@ int main(int argc, char* argv[]) {
 
   //signal is the same for prompt and non-prompt
   RooRealVar meanMassSig1("meanMassSig1","Mean of the signal gaussian 1",3.1,2.8,3.2);
-  RooRealVar sigmaMassSig1("sigmaMassSig1","#sigma of the signal gaussian 1",0.02,0.,0.5);
+  RooRealVar sigmaMassSig1("sigmaMassSig1","#sigma of the signal gaussian 1",0.02,0.,0.9);
 
   paramlist.add(meanMassSig1);
   paramlist.add(sigmaMassSig1);
 
   RooRealVar meanMassSig2("meanMassSig2","Mean of the signal gaussian 2",3.0,2.8,3.2);
-  RooRealVar sigmaMassSig2("sigmaMassSig2","#sigma of the signal gaussian 2",0.04,0.,0.5);
+  RooRealVar sigmaMassSig2("sigmaMassSig2","#sigma of the signal gaussian 2",0.04,0.,0.9);
 
   paramlist.add(meanMassSig2);
   paramlist.add(sigmaMassSig2);
 
   RooGaussian signalMassG1("signalMassG1","Signal PDF 1",JpsiMass,meanMassSig1,sigmaMassSig1);
-  RooGaussian signalMassG2("signalMassG2","Signal PDF 2",JpsiMass,meanMassSig2,sigmaMassSig2);
+  RooGaussian signalMassG2("signalMassG2","Signal PDF 2",JpsiMass,meanMassSig1,sigmaMassSig2);
 
   RooRealVar coeffGauss("coeffGauss","Relative norm of the two signal gaussians",0.36,0.,1.);
 
@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) {
 
   RooAddPdf totPDF("totPDF","Total PDF",RooArgList(totsigPR,totsigNP,totBKG),RooArgList(NSigPR,NSigNP,NBkg));
 
-  paramlist.readFromFile("fit2dpars_GT.txt");
+  paramlist.readFromFile("fit2dpars_GC.txt");
 
   RooFitResult* fitRes = totPDF.fitTo(*GGdata,Extended(1),Save(1),Minos(0));
 
@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
   RooArgSet results(fitRes->floatParsFinal());
   RooArgSet conresults(fitRes->constPars());
   results.add(conresults);
-  results.writeToFile("fit2d_results_GT.txt");
+  results.writeToFile("fit2d_results_GC.txt");
 
   RooPlot *GGmframe = JpsiMass.frame();
   GGmframe->SetTitle("2D fit for glb-glb muons (mass projection)");
@@ -236,7 +236,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();GGmframe->Draw();
-  c1.SaveAs("2DGTmassfit.gif");
+  c1.SaveAs("2DGCmassfit.gif");
 
   RooPlot *GGtframe = Jpsict.frame();
   GGtframe->SetTitle("2D fit for glb-glb muons (c #tau projection)");
@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
   TCanvas c2;
   c2.cd();c2.SetLogy(1);
   c2.cd();GGtframe->Draw();
-  c2.SaveAs("2DGTtimefit.gif");
+  c2.SaveAs("2DGCtimefit.gif");
 
   return 1;
 }
