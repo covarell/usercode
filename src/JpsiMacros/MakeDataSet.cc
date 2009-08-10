@@ -33,6 +33,9 @@ MakeDataSet::~MakeDataSet(){ }
 
 void MakeDataSet::Loop() {
 
+  // to be defined as parameter in JPsiFitApp !!!
+  bool onlyTheBest = true;
+
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
   
@@ -48,16 +51,13 @@ void MakeDataSet::Loop() {
   const float JpsiMassMax = 3.5;
   const float JpsiCtMin = -1.0;
   const float JpsiCtMax = 5.0;
-  const float JpsiPtMin = 1.;
-  const float JpsiPtMax = 100.;
 
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
   RooRealVar* MCweight = new RooRealVar("MCweight","Monte Carlo Weight",0.,5.);
-
-  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi Pt",JpsiPtMin,JpsiPtMax,"GeV/c");
 
   //categories for reconstruction
   RooCategory JpsiType("JpsiType","Category of muons");
@@ -75,7 +75,7 @@ void MakeDataSet::Loop() {
 
   float weight = 0.;
 
-  RooDataSet* data = new RooDataSet("data","Prompt sample",RooArgList(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType,*JpsiPt));
+  RooDataSet* data = new RooDataSet("data","Prompt sample",RooArgList(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
 
   for (int jentry=0; jentry< nentries; jentry++) {
     
@@ -105,9 +105,9 @@ void MakeDataSet::Loop() {
 
     //set the MC weight for the different categories
     if(MCcat == 0) weight = 0.862;
-    else if(MCcat == 1) weight = 0.1745;
+    else if(MCcat == 1) weight = 0.1745*2;   // take into account b+bbar!!!
     else if(MCcat == 2) weight = 2.2831;
-
+  
     //exclude real Jpsi in background MC
     if(MCcat == 2){
       bool aRealJpsiEvent = false;
@@ -117,30 +117,85 @@ void MakeDataSet::Loop() {
       if (aRealJpsiEvent) continue;
     }
 
+    int theMCMatchedGlbMu1 = -1;
+    int theMCMatchedGlbMu2 = -1;
+    int theMCMatchedTrkMu = -1;
+    int theMCMatchedCalMu = -1;
+    unsigned int nGlobMuMatched = 0;
+
+    //
+    // Find MC matched muons (all QQ categories)
+    //
+    for (int imugen=0; imugen<Mc_mu_size; imugen++) {
+      // cout << "Mc_mu_size = " << Mc_mu_size << endl;
+      if (Mc_mumoth_id[imugen] == 443) {
+        TLorentzVector *theMcMumom = (TLorentzVector*)Mc_mu_4mom->At(imugen);
+        for (int imugl=0; imugl<Reco_mu_glb_size; imugl++) {
+          // cout << "Reco_mu_glb_size = " << Reco_mu_glb_size << endl;
+          TLorentzVector *theGlMumom = (TLorentzVector*)Reco_mu_glb_4mom->At(imugl);
+          if (deltaR(theMcMumom,theGlMumom) < 0.03) {
+            if (nGlobMuMatched == 0) {
+	      theMCMatchedGlbMu1 = imugl;
+              nGlobMuMatched++;
+	    } else {
+	      theMCMatchedGlbMu2 = imugl;
+	      break;
+	    }
+	  }
+	}
+        for (int imutr=0; imutr<Reco_mu_trk_size; imutr++) {
+          // cout << "Reco_mu_trk_size = " << Reco_mu_trk_size << endl;
+          TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(imutr);
+          if (deltaR(theMcMumom,theTrMumom) < 0.03) {
+	    theMCMatchedTrkMu = imutr;      break;
+	  }
+	}
+         for (int imuca=0; imuca<Reco_mu_cal_size; imuca++) {
+	   // cout << "Reco_mu_cal_size = " << Reco_mu_cal_size << endl;
+          TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(imuca);
+          if (deltaR(theMcMumom,theCaMumom) < 0.03) {
+	    theMCMatchedCalMu = imuca;       break;
+	  }
+	}
+      }      
+    }
+
+    // Find the best candidate (if needed)
+    int myBest = 0;
+    if (onlyTheBest) myBest = theBestQQ();
+
     for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
 
       if (Reco_QQ_sign[iqq] != 0) continue;
 
       if(Reco_QQ_type[iqq] == 2 || Reco_QQ_type[iqq] > 3) continue;
 
+      if (onlyTheBest && iqq != myBest) continue;
+
 	TLorentzVector *theQQ4mom = (TLorentzVector*)Reco_QQ_4mom->At(iqq);
 	float theMass = theQQ4mom->M();
         float theCtau = Reco_QQ_ctau[iqq]*10.;
-	float thePt = theQQ4mom->Pt();
 
-        if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax && thePt > JpsiPtMin && thePt < JpsiPtMax) {
+        if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
 
 	  passedCandidates++;
 
 	  JpsiMass->setVal(theMass);
 	  Jpsict->setVal(Reco_QQ_ctau[iqq]*10.);
 	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
-	  JpsiPt->setVal(thePt);
+
+          // Now, AFTER setting the weight, change to consider MC truth!
+	  if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("inclBtoJpsiMuMu")) {
+	    bool isMatchedGlbGlb = (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) || (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1);
+            bool isMatchedGlbTrk = (Reco_QQ_mulpt[iqq] == theMCMatchedTrkMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) );
+	    bool isMatchedGlbCal = (Reco_QQ_mulpt[iqq] == theMCMatchedCalMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ); 
+	    if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
+	  }
 
 	  MCType.setIndex(MCcat,kTRUE);
 	  MCweight->setVal(weight);
 
-	  data->add(RooArgSet(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType,*JpsiPt));
+	  data->add(RooArgSet(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
 
 	}
       }
@@ -184,9 +239,9 @@ void MakeDataSet::Loop() {
   data->plotOn(framect3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
   framect3->Draw(); 
 
-  c1.SaveAs("firstTest.eps");
+  c1.SaveAs("bestCands.gif");
 
-  TFile fOut("Out_DataSet.root", "RECREATE");
+  TFile fOut("DataSet_bestCands.root", "RECREATE");
   fOut.cd();
   data->Write();
   fOut.Close();
@@ -196,5 +251,75 @@ void MakeDataSet::Loop() {
   cout << "number of passed candidates = " << passedCandidates << endl;
 
 } // end of program
-			       
-			       
+		
+
+	       
+int MakeDataSet::theBestQQ() {
+    
+  int theBest = -1;
+  float thehighestPt = -1.;
+ 
+  for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0) return iqq;
+  }
+
+  for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 1 ) {
+      
+      int theTM = Reco_QQ_mulpt[iqq];
+      if (theTM >= Reco_mu_trk_size) {
+	// cout << "Non deve succedere! tmIndex = " << theTM+1 << " tmSize = " << Reco_mu_trk_size << endl;
+	continue;
+      }
+
+      if ( Reco_mu_trk_nhitstrack[theTM] > 10 && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) ) {
+	
+        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(theTM);
+        if (theTrMumom->Perp() > thehighestPt) {
+	  thehighestPt = theTrMumom->Perp();
+          theBest = iqq;
+	}
+      }
+    }    
+  }
+  
+  if (theBest >= 0) return theBest;
+
+  for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 3 ) {
+      
+      int theCM = Reco_QQ_mulpt[iqq];
+      if (theCM >= Reco_mu_cal_size) {
+	// cout << "Non deve succedere! cmIndex = " << theCM+1 << " cmSize = " << Reco_mu_cal_size << endl;
+	continue;
+      }
+
+      if ( Reco_mu_cal_nhitstrack[theCM] > 12 && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
+	
+        TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(theCM);
+        if (theCaMumom->Perp() > thehighestPt) {
+	  thehighestPt = theCaMumom->Perp();
+          theBest = iqq;
+	}
+      }
+    }    
+  }
+  
+  return theBest;
+} 			       
+
+double MakeDataSet::PhiInRange(const double& phi) const {
+      double phiout = phi;
+
+      if( phiout > 2*M_PI || phiout < -2*M_PI) {
+            phiout = fmod( phiout, 2*M_PI);
+      }
+      if (phiout <= -M_PI) phiout += 2*M_PI;
+      else if (phiout >  M_PI) phiout -= 2*M_PI;
+
+      return phiout;
+}
+
+double MakeDataSet::deltaR(const TLorentzVector* t, const TLorentzVector* u) const {
+      return sqrt(pow(t->Eta()-u->Eta(),2) +pow(PhiInRange(t->Phi()-u->Phi()),2));
+}

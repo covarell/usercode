@@ -16,6 +16,9 @@ public:
   MakeDataSet(TTree *tree=0);
   virtual ~MakeDataSet();
   void Loop();
+  int theBestQQ();
+  double PhiInRange(const double& phi) const;
+  double deltaR(const TLorentzVector* t, const TLorentzVector* u) const;
 
 private:
   
