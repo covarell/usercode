@@ -70,47 +70,70 @@ int main(int argc, char* argv[]) {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
-  //GG
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
-  GGdata->setWeightVar(MCweight);
-  RooDataSet *GGdataTr = (RooDataSet*)GGdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  GGdataTr->setWeightVar(MCweight);
+  // Fit functions and parameters
 
-  RooRealVar GGcoefside("c_GG_side","GG linear coefficient of bkg PDF",0.,-9.,9.);
-  RooPolynomial GGsideFunct("GGsideFunc","GGsideFunc",JpsiMass,GGcoefside); 
-  RooRealVar GTcoefexp("c_GT_side","GT exponential coefficient of bkg PDF",-5.,-9.,0.);
-  RooExponential GTexpFunct("GTexpFunc","GTexpFunc",JpsiMass,GTcoefexp); 
+  // BKG: first and second order polynomials
+  RooRealVar coefPol1("coefPol1","linear coefficient of bkg PDF",0.,-9.,9.);
+  RooRealVar coefPol2("coefPol2","quadratic coefficient of bkg PDF",0.,-1.,1.);
+  RooPolynomial GGPolFunct("GGPolFunc","GGPolFunc",JpsiMass,coefPol1);
+  RooPolynomial GCPolFunct("GCPolFunc","GCPolFunc",JpsiMass,RooArgList(coefPol1,coefPol2));
+ 
+  // BKG : exponential
+  RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.);
+  RooExponential GTexpFunct("GTexpFunc","GTexpFunc",JpsiMass,coefExp); 
 
+  // SIGNAL: 2-Gaussians
   RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,3.05,3.15);
   RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.,0.5);
 
   RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.1,3.05,3.15);
   RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.04,0.,0.5);
 
+  // Different mean
   RooGaussian signalG1("signalG1","Signal PDF 1",JpsiMass,meanSig1,sigmaSig1);
   RooGaussian signalG2("signalG2","Signal PDF 2",JpsiMass,meanSig2,sigmaSig2);
+  // Same mean
   RooGaussian signalG2OneMean("signalG2OneMean","Signal PDF 2",JpsiMass,meanSig1,sigmaSig2);
 
   RooRealVar coeffGauss("coeffGauss","Relative norm of the two signal gaussians",0.42,0.,1.);
 
+  // Different mean
   RooAddPdf sigPDF("sigPDF","Total signal pdf",signalG1,signalG2,coeffGauss);
+  // Same mean
   RooAddPdf sigPDFOneMean("sigPDFOneMean","Total signal pdf",signalG1,signalG2OneMean,coeffGauss);
 
   RooRealVar NSig("NSig","Number of signal events",5000.,10.,10000000.);
   RooRealVar NBkg("NBkg","Number of background events",1300.,10.,10000000.);
 
-  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(sigPDF,GGsideFunct),RooArgList(NSig,NBkg));
-  RooAddPdf totPDFOneMean("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,GGsideFunct),RooArgList(NSig,NBkg));
-  RooAddPdf totPDFExp("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,GTexpFunct),RooArgList(NSig,NBkg));
+  // Total PDF
+  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(sigPDF,GGPolFunct),RooArgList(NSig,NBkg));
+  // Total PDF (exponential background)
+  RooAddPdf totPDFExp("totPDFexp","Total pdf",RooArgList(sigPDF,GTexpFunct),RooArgList(NSig,NBkg));
+  // Total PDF (signal Gaussians with one mean)
+  RooAddPdf totPDFOneMean("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,GGPolFunct),RooArgList(NSig,NBkg));
+  // Total PDF (signal Gaussians with one mean and exponential background)
+  RooAddPdf totPDFExpOneMean("totPDFexpOneMean","Total pdf",RooArgList(sigPDFOneMean,GTexpFunct),RooArgList(NSig,NBkg));
+  // Total PDF (signal Gaussians with one mean and quadratic background)
+  RooAddPdf totPDF2Pol("totPDF2Pol","Total pdf",RooArgList(sigPDFOneMean,GCPolFunct),RooArgList(NSig,NBkg));
+
+  //GG
+  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
+  GGdata->setWeightVar(MCweight);
+  RooDataSet *GGdataTr = (RooDataSet*)GGdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
+  GGdataTr->setWeightVar(MCweight);
 
   totPDF.fitTo(*GGdata,Extended(1),Save(1));
+  // totPDFExp.fitTo(*GGdata,Extended(1),Save(1));
 
   RooPlot *GGmframe = JpsiMass.frame();
   GGmframe->SetTitle("Mass fit for glb-glb muons");
   GGdata->plotOn(GGmframe,DataError(RooAbsData::SumW2));
   totPDF.plotOn(GGmframe);
-  totPDF.plotOn(GGmframe,Components(RooArgSet(GGsideFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
-  totPDF.plotOn(GGmframe,Components(GGsideFunct),DrawOption("F"),FillColor(kRed));
+  totPDF.plotOn(GGmframe,Components(RooArgSet(GGPolFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
+  totPDF.plotOn(GGmframe,Components(GGPolFunct),DrawOption("F"),FillColor(kRed));
+  // totPDFExp.plotOn(GGmframe);
+  // totPDFExp.plotOn(GGmframe,Components(RooArgSet(GTexpFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
+  // totPDFExp.plotOn(GGmframe,Components(GTexpFunct),DrawOption("F"),FillColor(kRed));
   GGdata->plotOn(GGmframe,DataError(RooAbsData::SumW2));
   double NSigGG = NSig.getVal();   double errSigGG = NSig.getError();
 
@@ -124,14 +147,14 @@ int main(int argc, char* argv[]) {
   RooDataSet *GTdataTr = (RooDataSet*)GTdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GTdataTr->setWeightVar(MCweight);
 
-  totPDFExp.fitTo(*GTdata,Extended(1),Save(1)/* ,Minos(1)*/);
+  totPDFExpOneMean.fitTo(*GTdata,Extended(1),Save(1)/* ,Minos(1)*/);
 
   RooPlot *GTmframe = JpsiMass.frame();
   GTmframe->SetTitle("Mass fit for glb-trk muons");
   GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
-  totPDFExp.plotOn(GTmframe);
-  totPDFExp.plotOn(GTmframe,Components(RooArgSet(GTexpFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
-  totPDFExp.plotOn(GTmframe,Components(GTexpFunct),DrawOption("F"),FillColor(kRed));
+  totPDFExpOneMean.plotOn(GTmframe);
+  totPDFExpOneMean.plotOn(GTmframe,Components(RooArgSet(GTexpFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
+  totPDFExpOneMean.plotOn(GTmframe,Components(GTexpFunct),DrawOption("F"),FillColor(kRed));
   GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
   double NSigGT = NSig.getVal();   double errSigGT = NSig.getError();
 
@@ -153,8 +176,8 @@ int main(int argc, char* argv[]) {
   GCmframe->SetTitle("Mass fit for glb-trk muons");
   GCdata->plotOn(GCmframe,DataError(RooAbsData::SumW2));
   totPDFOneMean.plotOn(GCmframe);
-  totPDFOneMean.plotOn(GCmframe,Components(RooArgSet(GGsideFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
-  totPDFOneMean.plotOn(GCmframe,Components(GGsideFunct),DrawOption("F"),FillColor(kRed));
+  totPDFOneMean.plotOn(GCmframe,Components(RooArgSet(GGPolFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
+  totPDFOneMean.plotOn(GCmframe,Components(GGPolFunct),DrawOption("F"),FillColor(kRed));
   GCdata->plotOn(GCmframe,DataError(RooAbsData::SumW2));
   double NSigGC = NSig.getVal();   double errSigGC = NSig.getError();
 

@@ -72,25 +72,28 @@ JPsiApp.clean:
 JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
-MassFit:  $(INCLUDEDIR)fitBfrac.cxx
-	$(CXX) $(CXXFLAGS) -o FitJpsiMass $(OUTLIB)/*.o $(GLIBS) $ $<
+FitMass:  $(INCLUDEDIR)fitMass.cxx
+	$(CXX) $(CXXFLAGS) -o FitMass $(OUTLIB)/*.o $(GLIBS) $ $<
 
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
-2DFit:    $(INCLUDEDIR)fit2D.cxx
+Fit2D:    $(INCLUDEDIR)fit2D.cxx
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
-2DFitSim: $(INCLUDEDIR)fit2D_sim.cxx
+Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
+	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
+
+Fit2DSim: $(INCLUDEDIR)fit2D_sim.cxx
 	$(CXX) $(CXXFLAGS) -o Fit2DSim $(OUTLIB)/*.o $(GLIBS) $ $<
 
-SmearFit: $(INCLUDEDIR)fitSmearFactor.cxx
+FitSmearFactor: $(INCLUDEDIR)fitSmearFactor.cxx
 	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
 
-sidebands:  $(INCLUDEDIR)fitSidebands.cxx
-	$(CXX) $(CXXFLAGS) -o Fitsidebands $(OUTLIB)/*.o $(GLIBS) $ $<
+FitSidebands:  $(INCLUDEDIR)fitSidebands.cxx
+	$(CXX) $(CXXFLAGS) -o FitSidebands $(OUTLIB)/*.o $(GLIBS) $ $<
 
-lifebkg:  $(INCLUDEDIR)fitLifetime.cxx
+FitLifetime:  $(INCLUDEDIR)fitLifetime.cxx
 	$(CXX) $(CXXFLAGS) -o FitLifetime $(OUTLIB)/*.o $(GLIBS) $ $<
 
 JPsiFitApp.clean:
