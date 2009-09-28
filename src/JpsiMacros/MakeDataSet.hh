@@ -21,6 +21,10 @@ public:
   double deltaR(const TLorentzVector* t, const TLorentzVector* u) const;
 
 private:
+
+  int MIN_nhits_trk;
+  float MAX_normchi2_trk;
+  float MAX_normchi2_glb;
   
 };
 #endif

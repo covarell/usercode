@@ -36,6 +36,10 @@ void MakeDataSet::Loop() {
   // to be defined as parameter in JPsiFitApp !!!
   bool onlyTheBest = true;
 
+  MIN_nhits_trk = 12;
+  MAX_normchi2_trk = 1.9;
+  MAX_normchi2_glb = 10;
+
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
   
@@ -260,7 +264,8 @@ int MakeDataSet::theBestQQ() {
   float thehighestPt = -1.;
  
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
-    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0) return iqq;
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
+	Reco_mu_glb_nhitstrack[iqq] > MIN_nhits_trk && Reco_mu_glb_normChi2[iqq] < MAX_normchi2_glb) return iqq;
   }
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
@@ -272,7 +277,8 @@ int MakeDataSet::theBestQQ() {
 	continue;
       }
 
-      if ( Reco_mu_trk_nhitstrack[theTM] > 10 && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) ) {
+      if ( Reco_mu_trk_nhitstrack[theTM] > MIN_nhits_trk && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   Reco_mu_trk_normChi2[theTM] < MAX_normchi2_trk) {
 	
         TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(theTM);
         if (theTrMumom->Perp() > thehighestPt) {
@@ -294,7 +300,7 @@ int MakeDataSet::theBestQQ() {
 	continue;
       }
 
-      if ( Reco_mu_cal_nhitstrack[theCM] > 12 && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
+      if ( Reco_mu_cal_nhitstrack[theCM] > MIN_nhits_trk && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
 	
         TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(theCM);
         if (theCaMumom->Perp() > thehighestPt) {
