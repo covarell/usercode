@@ -1,5 +1,6 @@
 // C++ includes
 #include <iostream>
+#include <string>
 #include <stdio.h>
 
 // ROOT includes
@@ -22,22 +23,45 @@ using namespace RooFit;
 
 int main(int argc, char* argv[]) {
 
+  /// LIMITS ///
+
+  const float JpsiMassMin = 2.6;
+  const float JpsiMassMax = 3.5;
+  const float JpsiCtMin = -1.0;
+  const float JpsiCtMax = 5.0;
+
   gROOT->SetStyle("Plain");
 
   char *filename;
+  char *prange;
+  char *etarange;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
-
+    
     switch(pchar[0]){
-
+      
     case '-':{
-
+      
       switch(pchar[1]){
-      case 'f':
+	
+      case 'f':{
         filename = argv[i+1];
         cout << "File name for fitted data is " << filename << endl;
         break;
+      }
+      
+      case 'p':{
+	prange = argv[i+1];
+	cout << "Range for pT is " << prange << " GeV/c" << endl;
+        break;
+      }
+       
+      case 'e':{
+        etarange = argv[i+1];
+        cout << "Range for |eta| is " << etarange << endl;
+        break;
+      }
       }
     }
     }
@@ -46,16 +70,30 @@ int main(int argc, char* argv[]) {
   TFile fIn(filename);
   fIn.cd();
   RooDataSet *data = (RooDataSet*)fIn.Get("data");
+  
+  float pmin, pmax; 
+  float etamin, etamax;
+  
+  if (sscanf(prange, "%f-%f", &pmin, &pmax) == 0) {
+    cout << "pT range not valid!" << endl;
+    return 0;
+  }
 
-  const float JpsiMassMin = 2.6;
-  const float JpsiMassMax = 3.5;
-  const float JpsiCtMin = -1.0;
-  const float JpsiCtMax = 5.0;
+  if (sscanf(etarange, "%f-%f", &etamin, &etamax) == 0) {
+    cout << "eta range not valid!" << endl;
+    return 0;
+  }
+
+  char reducestr[200];
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
 
   RooRealVar JpsiMass("JpsiMass","#mu^{+}#mu^{-} mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
   JpsiMass.setRange("left",2.6,2.9);
   JpsiMass.setRange("right",3.3,3.5);
 
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,200.,"GeV/c");
+  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
   RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,5.);
@@ -117,7 +155,7 @@ int main(int argc, char* argv[]) {
   RooAddPdf totPDF2Pol("totPDF2Pol","Total pdf",RooArgList(sigPDFOneMean,GCPolFunct),RooArgList(NSig,NBkg));
 
   //GG
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
+  RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   GGdata->setWeightVar(MCweight);
   RooDataSet *GGdataTr = (RooDataSet*)GGdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GGdataTr->setWeightVar(MCweight);
@@ -139,10 +177,11 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();GGmframe->Draw();
-  c1.SaveAs("GGmassfit.gif");
+  sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange,etarange);
+  c1.SaveAs(reducestr);
 
   //GT
-  RooDataSet *GTdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
   GTdata->setWeightVar(MCweight);
   RooDataSet *GTdataTr = (RooDataSet*)GTdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GTdataTr->setWeightVar(MCweight);
@@ -160,17 +199,18 @@ int main(int argc, char* argv[]) {
 
   TCanvas c2;
   c2.cd();GTmframe->Draw();
-  c2.SaveAs("GTmassfit.gif");
+  sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange,etarange);
+  c2.SaveAs(reducestr);
 
   //GC
-  RooDataSet *GCdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
+  /* RooDataSet *GCdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
   GCdata->setWeightVar(MCweight);
   RooDataSet *GCdataTr = (RooDataSet*)GCdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GCdataTr->setWeightVar(MCweight);
   
   meanSig1.setVal(3.1);
   meanSig1.setConstant(true);
-  totPDFOneMean.fitTo(*GCdata,Extended(1),Save(1)/* ,Minos(0)*/);
+  totPDFOneMean.fitTo(*GCdata,Extended(1),Save(1),Minos(0));
 
   RooPlot *GCmframe = JpsiMass.frame();
   GCmframe->SetTitle("Mass fit for glb-trk muons");
@@ -183,14 +223,14 @@ int main(int argc, char* argv[]) {
 
   TCanvas c3;
   c3.cd();GCmframe->Draw();
-  c3.SaveAs("GCmassfit.gif");
+  c3.SaveAs("GCmassfit.gif"); */
 
   cout << endl << "GG J/psi yields:" << endl;
   cout << "True MC : " << GGdataTr->numEntries(true) << " Fit : " << NSigGG << " +/- " << errSigGG << endl;
   cout << "GT J/psi yields:" << endl;
   cout << "True MC : " << GTdataTr->numEntries(true) << " Fit : " << NSigGT << " +/- " << errSigGT << endl;
-  cout << "GC J/psi yields:" << endl;
-  cout << "True MC : " << GCdataTr->numEntries(true) << " Fit : " << NSigGC << " +/- " << errSigGC << endl;
+  // cout << "GC J/psi yields:" << endl;
+  // cout << "True MC : " << GCdataTr->numEntries(true) << " Fit : " << NSigGC << " +/- " << errSigGC << endl;
 
   return 1;
 }

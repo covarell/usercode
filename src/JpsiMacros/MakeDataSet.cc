@@ -33,13 +33,21 @@ MakeDataSet::~MakeDataSet(){ }
 
 void MakeDataSet::Loop() {
 
+  /// SELECTION CUTS ///
+ 
   // to be defined as parameter in JPsiFitApp !!!
   bool onlyTheBest = true;
 
   MIN_nhits_trk = 12;
-  MAX_normchi2_trk = 1.9;
-  MAX_normchi2_glb = 10;
+  MAX_normchi2_trk = 5.0;
+  MAX_normchi2_glb = 20.0;
 
+  // mass-lifetime limits
+  const float JpsiMassMin = 2.6;
+  const float JpsiMassMax = 3.5;
+  const float JpsiCtMin = -1.0;
+  const float JpsiCtMax = 5.0;
+  
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
   
@@ -50,15 +58,10 @@ void MakeDataSet::Loop() {
   int totalEvents = 0;
   int passedCandidates = 0;
 
-  // mass-lifetime limits
-  const float JpsiMassMin = 2.6;
-  const float JpsiMassMax = 3.5;
-  const float JpsiCtMin = -1.0;
-  const float JpsiCtMax = 5.0;
-
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,200.,"GeV/c");
+  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
   RooRealVar* MCweight = new RooRealVar("MCweight","Monte Carlo Weight",0.,5.);
@@ -79,7 +82,7 @@ void MakeDataSet::Loop() {
 
   float weight = 0.;
 
-  RooDataSet* data = new RooDataSet("data","Prompt sample",RooArgList(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
+  RooDataSet* data = new RooDataSet("data","A sample",RooArgList(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,JpsiType,MCType));
 
   for (int jentry=0; jentry< nentries; jentry++) {
     
@@ -184,8 +187,10 @@ void MakeDataSet::Loop() {
 
 	  passedCandidates++;
 
+	  JpsiPt->setVal(theQQ4mom->Perp()); 
+          JpsiEta->setVal(theQQ4mom->Eta()); 
 	  JpsiMass->setVal(theMass);
-	  Jpsict->setVal(Reco_QQ_ctau[iqq]*10.);
+	  Jpsict->setVal(theCtau);
 	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
 
           // Now, AFTER setting the weight, change to consider MC truth!
@@ -199,7 +204,7 @@ void MakeDataSet::Loop() {
 	  MCType.setIndex(MCcat,kTRUE);
 	  MCweight->setVal(weight);
 
-	  data->add(RooArgSet(*JpsiMass,*Jpsict,*MCweight,JpsiType,MCType));
+	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,JpsiType,MCType));
 
 	}
       }
@@ -244,12 +249,12 @@ void MakeDataSet::Loop() {
   framect3->Draw(); 
 
   c1.SaveAs("bestCands.gif");
-
-  TFile fOut("DataSet_bestCands.root", "RECREATE");
+ 
+  TFile fOut("DataSet.root", "RECREATE");
   fOut.cd();
   data->Write();
   fOut.Close();
-
+   
   // summary
   cout << "total number of events = " << totalEvents << endl;
   cout << "number of passed candidates = " << passedCandidates << endl;
