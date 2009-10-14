@@ -22,6 +22,9 @@ static const unsigned int MAXCHIC = 3000;
 static const unsigned int MAXPRIVTX = 30;
 static const unsigned int MAXTRIG = 10;
 
+static const bool isAOD = true;
+static const bool isOctX = true;
+
 class JPsiTreeBase {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -108,9 +111,12 @@ public :
    Double_t        Reco_QQ_s[MAXQQ];   //[Reco_QQ_size]
    Char_t          Reco_QQ_VtxIsVal[MAXQQ];   //[Reco_QQ_size]
    TClonesArray    *Reco_QQ_Vtx;
-   Double_t        Reco_QQ_VxE[MAXQQ];   //[Reco_QQ_size]
-   Double_t        Reco_QQ_VyE[MAXQQ];   //[Reco_QQ_size]
-   Double_t        Reco_QQ_VzE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VxxE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VyyE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VzzE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VyxE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VzxE[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_VzyE[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_lxy[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_lxyErr[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_normChi2[MAXQQ];   //[Reco_QQ_size]
@@ -125,14 +131,20 @@ public :
    Double_t        Reco_BeamSpot_x;
    Double_t        Reco_BeamSpot_y;
    Double_t        Reco_BeamSpot_z;
-   Double_t        Reco_BeamSpot_xE;
-   Double_t        Reco_BeamSpot_yE;
-   Double_t        Reco_BeamSpot_zE;
+   Double_t        Reco_BeamSpot_xxE;
+   Double_t        Reco_BeamSpot_yyE;
+   Double_t        Reco_BeamSpot_zzE;
+   Double_t        Reco_BeamSpot_yxE;
+   Double_t        Reco_BeamSpot_zyE;
+   Double_t        Reco_BeamSpot_zxE;
    Int_t           Reco_PriVtx_size;
    TClonesArray    *Reco_PriVtx_3vec;
-   Double_t        Reco_PriVtx_xE[MAXPRIVTX];   //[Reco_PriVtx_size]
-   Double_t        Reco_PriVtx_yE[MAXPRIVTX];   //[Reco_PriVtx_size]
-   Double_t        Reco_PriVtx_zE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_xxE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_yyE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_zzE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_yxE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_zyE[MAXPRIVTX];   //[Reco_PriVtx_size]
+   Double_t        Reco_PriVtx_zxE[MAXPRIVTX];   //[Reco_PriVtx_size]
    Int_t           Reco_PriVtx_trkSize[MAXPRIVTX];   //[Reco_PriVtx_size]
    Double_t        Reco_PriVtx_chi2[MAXPRIVTX];   //[Reco_PriVtx_size]
    Double_t        Reco_PriVtx_ndof[MAXPRIVTX];   //[Reco_PriVtx_size]
@@ -161,12 +173,12 @@ public :
    Int_t           HLT1Mu11_L3_size;
    TClonesArray    *HLT1Mu11_L3_4mom;
    Int_t           HLT1Mu11_L3_id[MAXTRIG];   //[HLT1Mu11_L3_size]
-   Int_t           HLTI2Mu3_L3_size;
-   TClonesArray    *HLTI2Mu3_L3_4mom;
-   Int_t           HLTI2Mu3_L3_id[MAXTRIG];   //[HLTI2Mu3_L3_size]
-   Int_t           HLTNoI2Mu3_L3_size;
-   TClonesArray    *HLTNoI2Mu3_L3_4mom;
-   Int_t           HLTNoI2Mu3_L3_id[MAXTRIG];   //[HLTNoI2Mu3_L3_size]
+   Int_t           HLT2IsoMu3_L3_size;
+   TClonesArray    *HLT2IsoMu3_L3_4mom;
+   Int_t           HLT2IsoMu3_L3_id[MAXTRIG];   //[HLT2IsoMu3_L3_size]
+   Int_t           HLT2Mu3_L3_size;
+   TClonesArray    *HLT2Mu3_L3_4mom;
+   Int_t           HLT2Mu3_L3_id[MAXTRIG];   //[HLT2Mu3_L3_size]
    Int_t           HLTJpsi2Mu_L3_size;
    TClonesArray    *HLTJpsi2Mu_L3_4mom;
    Int_t           HLTJpsi2Mu_L3_id[MAXTRIG];   //[HLTJpsi2Mu_L3_size]
@@ -255,9 +267,12 @@ public :
    TBranch        *b_Reco_QQ_s;   //!
    TBranch        *b_Reco_QQ_VtxIsVal;   //!
    TBranch        *b_Reco_QQ_Vtx;   //!
-   TBranch        *b_Reco_QQ_VxE;   //!
-   TBranch        *b_Reco_QQ_VyE;   //!
-   TBranch        *b_Reco_QQ_VzE;   //!
+   TBranch        *b_Reco_QQ_VxxE;   //!
+   TBranch        *b_Reco_QQ_VyyE;   //!
+   TBranch        *b_Reco_QQ_VzzE;   //!
+   TBranch        *b_Reco_QQ_VyxE;   //!
+   TBranch        *b_Reco_QQ_VzxE;   //!
+   TBranch        *b_Reco_QQ_VzyE;   //!
    TBranch        *b_Reco_QQ_lxy;   //!
    TBranch        *b_Reco_QQ_lxyErr;   //!
    TBranch        *b_Reco_QQ_normChi2;   //!
@@ -272,14 +287,20 @@ public :
    TBranch        *b_Reco_BeamSpot_x;   //!
    TBranch        *b_Reco_BeamSpot_y;   //!
    TBranch        *b_Reco_BeamSpot_z;   //!
-   TBranch        *b_Reco_BeamSpot_xE;   //!
-   TBranch        *b_Reco_BeamSpot_yE;   //!
-   TBranch        *b_Reco_BeamSpot_zE;   //!
+   TBranch        *b_Reco_BeamSpot_xxE;   //!
+   TBranch        *b_Reco_BeamSpot_yyE;   //!
+   TBranch        *b_Reco_BeamSpot_zzE;   //!
+   TBranch        *b_Reco_BeamSpot_yxE;   //!
+   TBranch        *b_Reco_BeamSpot_zyE;   //!
+   TBranch        *b_Reco_BeamSpot_zxE;   //!
    TBranch        *b_Reco_PriVtx_size;   //!
    TBranch        *b_Reco_PriVtx_3vec;   //!
-   TBranch        *b_Reco_PriVtx_xE;   //!
-   TBranch        *b_Reco_PriVtx_yE;   //!
-   TBranch        *b_Reco_PriVtx_zE;   //!
+   TBranch        *b_Reco_PriVtx_xxE;   //!
+   TBranch        *b_Reco_PriVtx_yyE;   //!
+   TBranch        *b_Reco_PriVtx_zzE;   //!
+   TBranch        *b_Reco_PriVtx_yxE;   //!
+   TBranch        *b_Reco_PriVtx_zyE;   //!
+   TBranch        *b_Reco_PriVtx_zxE;   //!
    TBranch        *b_Reco_PriVtx_trkSize;   //!
    TBranch        *b_Reco_PriVtx_chi2;   //!
    TBranch        *b_Reco_PriVtx_ndof;   //!
@@ -308,12 +329,12 @@ public :
    TBranch        *b_HLT1Mu11_L3_size;   //!
    TBranch        *b_HLT1Mu11_L3_4mom;   //!
    TBranch        *b_HLT1Mu11_L3_id;   //!
-   TBranch        *b_HLTI2Mu3_L3_size;   //!
-   TBranch        *b_HLTI2Mu3_L3_4mom;   //!
-   TBranch        *b_HLTI2Mu3_L3_id;   //!
-   TBranch        *b_HLTNoI2Mu3_L3_size;   //!
-   TBranch        *b_HLTNoI2Mu3_L3_4mom;   //!
-   TBranch        *b_HLTNoI2Mu3_L3_id;   //!
+   TBranch        *b_HLT2IsoMu3_L3_size;   //!
+   TBranch        *b_HLT2IsoMu3_L3_4mom;   //!
+   TBranch        *b_HLT2IsoMu3_L3_id;   //!
+   TBranch        *b_HLT2Mu3_L3_size;   //!
+   TBranch        *b_HLT2Mu3_L3_4mom;   //!
+   TBranch        *b_HLT2Mu3_L3_id;   //!
    TBranch        *b_HLTJpsi2Mu_L3_size;   //!
    TBranch        *b_HLTJpsi2Mu_L3_4mom;   //!
    TBranch        *b_HLTJpsi2Mu_L3_id;   //!
@@ -410,8 +431,8 @@ void JPsiTreeBase::Init(TTree *tree)
    HLT1Mu5_L3_4mom = 0;
    HLT1Mu9_L3_4mom = 0;
    HLT1Mu11_L3_4mom = 0;
-   HLTI2Mu3_L3_4mom = 0;
-   HLTNoI2Mu3_L3_4mom = 0;
+   HLT2IsoMu3_L3_4mom = 0;
+   HLT2Mu3_L3_4mom = 0;
    HLTJpsi2Mu_L3_4mom = 0;
    HLTUpsilon2Mu_L3_4mom = 0;
    // Set branch addresses and branch pointers
@@ -449,8 +470,10 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_glb_dzerr", Reco_mu_glb_dzerr, &b_Reco_mu_glb_dzerr);
    fChain->SetBranchAddress("Reco_mu_glb_normChi2", Reco_mu_glb_normChi2, &b_Reco_mu_glb_normChi2);
    fChain->SetBranchAddress("Reco_mu_glb_nhitstrack", Reco_mu_glb_nhitstrack, &b_Reco_mu_glb_nhitstrack);
-   fChain->SetBranchAddress("Reco_mu_glb_nhitsDT", Reco_mu_glb_nhitsDT, &b_Reco_mu_glb_nhitsDT);
-   fChain->SetBranchAddress("Reco_mu_glb_nhitsCSC", Reco_mu_glb_nhitsCSC, &b_Reco_mu_glb_nhitsCSC);
+   if (!isAOD) {
+     fChain->SetBranchAddress("Reco_mu_glb_nhitsDT", Reco_mu_glb_nhitsDT, &b_Reco_mu_glb_nhitsDT);
+     fChain->SetBranchAddress("Reco_mu_glb_nhitsCSC", Reco_mu_glb_nhitsCSC, &b_Reco_mu_glb_nhitsCSC);
+   }
    fChain->SetBranchAddress("Reco_mu_glb_caloComp", Reco_mu_glb_caloComp, &b_Reco_mu_glb_caloComp);
    fChain->SetBranchAddress("Reco_mu_glb_segmComp", Reco_mu_glb_segmComp, &b_Reco_mu_glb_segmComp);
    fChain->SetBranchAddress("Reco_mu_glb_iso", Reco_mu_glb_iso, &b_Reco_mu_glb_iso);
@@ -474,20 +497,22 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_trk_segmComp", Reco_mu_trk_segmComp, &b_Reco_mu_trk_segmComp);
    fChain->SetBranchAddress("Reco_mu_trk_iso", Reco_mu_trk_iso, &b_Reco_mu_trk_iso);
    fChain->SetBranchAddress("Reco_mu_trk_charge", Reco_mu_trk_charge, &b_Reco_mu_trk_charge);
-   fChain->SetBranchAddress("Reco_mu_cal_size", &Reco_mu_cal_size, &b_Reco_mu_cal_size);
-   fChain->SetBranchAddress("Reco_mu_cal_4mom", &Reco_mu_cal_4mom, &b_Reco_mu_cal_4mom);
-   fChain->SetBranchAddress("Reco_mu_cal_3vec", &Reco_mu_cal_3vec, &b_Reco_mu_cal_3vec);
-   fChain->SetBranchAddress("Reco_mu_cal_phiErr", Reco_mu_cal_phiErr, &b_Reco_mu_cal_phiErr);
-   fChain->SetBranchAddress("Reco_mu_cal_etaErr", Reco_mu_cal_etaErr, &b_Reco_mu_cal_etaErr);
-   fChain->SetBranchAddress("Reco_mu_cal_ptErr", Reco_mu_cal_ptErr, &b_Reco_mu_cal_ptErr);
-   fChain->SetBranchAddress("Reco_mu_cal_d0", Reco_mu_cal_d0, &b_Reco_mu_cal_d0);
-   fChain->SetBranchAddress("Reco_mu_cal_d0err", Reco_mu_cal_d0err, &b_Reco_mu_cal_d0err);
-   fChain->SetBranchAddress("Reco_mu_cal_dz", Reco_mu_cal_dz, &b_Reco_mu_cal_dz);
-   fChain->SetBranchAddress("Reco_mu_cal_dzerr", Reco_mu_cal_dzerr, &b_Reco_mu_cal_dzerr);
-   fChain->SetBranchAddress("Reco_mu_cal_normChi2", Reco_mu_cal_normChi2, &b_Reco_mu_cal_normChi2);
-   fChain->SetBranchAddress("Reco_mu_cal_nhitstrack", Reco_mu_cal_nhitstrack, &b_Reco_mu_cal_nhitstrack);
-   fChain->SetBranchAddress("Reco_mu_cal_caloComp", Reco_mu_cal_caloComp, &b_Reco_mu_cal_caloComp);
-   fChain->SetBranchAddress("Reco_mu_cal_charge", Reco_mu_cal_charge, &b_Reco_mu_cal_charge);
+   if (!isOctX) {
+     fChain->SetBranchAddress("Reco_mu_cal_size", &Reco_mu_cal_size, &b_Reco_mu_cal_size);
+     fChain->SetBranchAddress("Reco_mu_cal_4mom", &Reco_mu_cal_4mom, &b_Reco_mu_cal_4mom);
+     fChain->SetBranchAddress("Reco_mu_cal_3vec", &Reco_mu_cal_3vec, &b_Reco_mu_cal_3vec);
+     fChain->SetBranchAddress("Reco_mu_cal_phiErr", Reco_mu_cal_phiErr, &b_Reco_mu_cal_phiErr);
+     fChain->SetBranchAddress("Reco_mu_cal_etaErr", Reco_mu_cal_etaErr, &b_Reco_mu_cal_etaErr);
+     fChain->SetBranchAddress("Reco_mu_cal_ptErr", Reco_mu_cal_ptErr, &b_Reco_mu_cal_ptErr);
+     fChain->SetBranchAddress("Reco_mu_cal_d0", Reco_mu_cal_d0, &b_Reco_mu_cal_d0);
+     fChain->SetBranchAddress("Reco_mu_cal_d0err", Reco_mu_cal_d0err, &b_Reco_mu_cal_d0err);
+     fChain->SetBranchAddress("Reco_mu_cal_dz", Reco_mu_cal_dz, &b_Reco_mu_cal_dz);
+     fChain->SetBranchAddress("Reco_mu_cal_dzerr", Reco_mu_cal_dzerr, &b_Reco_mu_cal_dzerr);
+     fChain->SetBranchAddress("Reco_mu_cal_normChi2", Reco_mu_cal_normChi2, &b_Reco_mu_cal_normChi2);
+     fChain->SetBranchAddress("Reco_mu_cal_nhitstrack", Reco_mu_cal_nhitstrack, &b_Reco_mu_cal_nhitstrack);
+     fChain->SetBranchAddress("Reco_mu_cal_caloComp", Reco_mu_cal_caloComp, &b_Reco_mu_cal_caloComp);
+     fChain->SetBranchAddress("Reco_mu_cal_charge", Reco_mu_cal_charge, &b_Reco_mu_cal_charge);
+   }
    fChain->SetBranchAddress("Reco_QQ_size", &Reco_QQ_size, &b_Reco_QQ_size);
    fChain->SetBranchAddress("Reco_QQ_type", Reco_QQ_type, &b_Reco_QQ_type);
    fChain->SetBranchAddress("Reco_QQ_4mom", &Reco_QQ_4mom, &b_Reco_QQ_4mom);
@@ -500,31 +525,42 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_QQ_s", Reco_QQ_s, &b_Reco_QQ_s);
    fChain->SetBranchAddress("Reco_QQ_VtxIsVal", Reco_QQ_VtxIsVal, &b_Reco_QQ_VtxIsVal);
    fChain->SetBranchAddress("Reco_QQ_Vtx", &Reco_QQ_Vtx, &b_Reco_QQ_Vtx);
-   fChain->SetBranchAddress("Reco_QQ_VxE", Reco_QQ_VxE, &b_Reco_QQ_VxE);
-   fChain->SetBranchAddress("Reco_QQ_VyE", Reco_QQ_VyE, &b_Reco_QQ_VyE);
-   fChain->SetBranchAddress("Reco_QQ_VzE", Reco_QQ_VzE, &b_Reco_QQ_VzE);
+   fChain->SetBranchAddress("Reco_QQ_VxxE", Reco_QQ_VxxE, &b_Reco_QQ_VxxE);
+   fChain->SetBranchAddress("Reco_QQ_VyyE", Reco_QQ_VyyE, &b_Reco_QQ_VyyE);
+   fChain->SetBranchAddress("Reco_QQ_VzzE", Reco_QQ_VzzE, &b_Reco_QQ_VzzE);
+   fChain->SetBranchAddress("Reco_QQ_VyxE", Reco_QQ_VyxE, &b_Reco_QQ_VyxE);
+   fChain->SetBranchAddress("Reco_QQ_VzxE", Reco_QQ_VzxE, &b_Reco_QQ_VzxE);
+   fChain->SetBranchAddress("Reco_QQ_VzyE", Reco_QQ_VzyE, &b_Reco_QQ_VzyE);
    fChain->SetBranchAddress("Reco_QQ_lxy", Reco_QQ_lxy, &b_Reco_QQ_lxy);
    fChain->SetBranchAddress("Reco_QQ_lxyErr", Reco_QQ_lxyErr, &b_Reco_QQ_lxyErr);
    fChain->SetBranchAddress("Reco_QQ_normChi2", Reco_QQ_normChi2, &b_Reco_QQ_normChi2);
    fChain->SetBranchAddress("Reco_QQ_cosAlpha", Reco_QQ_cosAlpha, &b_Reco_QQ_cosAlpha);
    fChain->SetBranchAddress("Reco_QQ_ctau", Reco_QQ_ctau, &b_Reco_QQ_ctau);
    fChain->SetBranchAddress("Reco_QQ_sign", Reco_QQ_sign, &b_Reco_QQ_sign);
-   fChain->SetBranchAddress("Reco_Chic_size", &Reco_Chic_size, &b_Reco_Chic_size);
-   fChain->SetBranchAddress("Reco_Chic_4mom", &Reco_Chic_4mom, &b_Reco_Chic_4mom);
-   fChain->SetBranchAddress("Reco_Chic_OniaDaug", Reco_Chic_OniaDaug, &b_Reco_Chic_OniaDaug);
-   fChain->SetBranchAddress("Reco_Chic_GammaDaug", Reco_Chic_GammaDaug, &b_Reco_Chic_GammaDaug);
-   fChain->SetBranchAddress("Reco_Chic_DeltaM", Reco_Chic_DeltaM, &b_Reco_Chic_DeltaM);
+   if (!isOctX) {
+     fChain->SetBranchAddress("Reco_Chic_size", &Reco_Chic_size, &b_Reco_Chic_size);
+     fChain->SetBranchAddress("Reco_Chic_4mom", &Reco_Chic_4mom, &b_Reco_Chic_4mom);
+     fChain->SetBranchAddress("Reco_Chic_OniaDaug", Reco_Chic_OniaDaug, &b_Reco_Chic_OniaDaug);
+     fChain->SetBranchAddress("Reco_Chic_GammaDaug", Reco_Chic_GammaDaug, &b_Reco_Chic_GammaDaug);
+     fChain->SetBranchAddress("Reco_Chic_DeltaM", Reco_Chic_DeltaM, &b_Reco_Chic_DeltaM);
+   }
    fChain->SetBranchAddress("Reco_BeamSpot_x", &Reco_BeamSpot_x, &b_Reco_BeamSpot_x);
    fChain->SetBranchAddress("Reco_BeamSpot_y", &Reco_BeamSpot_y, &b_Reco_BeamSpot_y);
    fChain->SetBranchAddress("Reco_BeamSpot_z", &Reco_BeamSpot_z, &b_Reco_BeamSpot_z);
-   fChain->SetBranchAddress("Reco_BeamSpot_xE", &Reco_BeamSpot_xE, &b_Reco_BeamSpot_xE);
-   fChain->SetBranchAddress("Reco_BeamSpot_yE", &Reco_BeamSpot_yE, &b_Reco_BeamSpot_yE);
-   fChain->SetBranchAddress("Reco_BeamSpot_zE", &Reco_BeamSpot_zE, &b_Reco_BeamSpot_zE);
+   fChain->SetBranchAddress("Reco_BeamSpot_xxE", &Reco_BeamSpot_xxE, &b_Reco_BeamSpot_xxE);
+   fChain->SetBranchAddress("Reco_BeamSpot_yyE", &Reco_BeamSpot_yyE, &b_Reco_BeamSpot_yyE);
+   fChain->SetBranchAddress("Reco_BeamSpot_zzE", &Reco_BeamSpot_zzE, &b_Reco_BeamSpot_zzE);
+   fChain->SetBranchAddress("Reco_BeamSpot_yxE", &Reco_BeamSpot_yxE, &b_Reco_BeamSpot_yxE);
+   fChain->SetBranchAddress("Reco_BeamSpot_zyE", &Reco_BeamSpot_zyE, &b_Reco_BeamSpot_zyE);
+   fChain->SetBranchAddress("Reco_BeamSpot_zxE", &Reco_BeamSpot_zxE, &b_Reco_BeamSpot_zxE);
    fChain->SetBranchAddress("Reco_PriVtx_size", &Reco_PriVtx_size, &b_Reco_PriVtx_size);
    fChain->SetBranchAddress("Reco_PriVtx_3vec", &Reco_PriVtx_3vec, &b_Reco_PriVtx_3vec);
-   fChain->SetBranchAddress("Reco_PriVtx_xE", Reco_PriVtx_xE, &b_Reco_PriVtx_xE);
-   fChain->SetBranchAddress("Reco_PriVtx_yE", Reco_PriVtx_yE, &b_Reco_PriVtx_yE);
-   fChain->SetBranchAddress("Reco_PriVtx_zE", Reco_PriVtx_zE, &b_Reco_PriVtx_zE);
+   fChain->SetBranchAddress("Reco_PriVtx_xxE", Reco_PriVtx_xxE, &b_Reco_PriVtx_xxE);
+   fChain->SetBranchAddress("Reco_PriVtx_yyE", Reco_PriVtx_yyE, &b_Reco_PriVtx_yyE);
+   fChain->SetBranchAddress("Reco_PriVtx_zzE", Reco_PriVtx_zzE, &b_Reco_PriVtx_zzE);
+   fChain->SetBranchAddress("Reco_PriVtx_yxE", Reco_PriVtx_yxE, &b_Reco_PriVtx_yxE);
+   fChain->SetBranchAddress("Reco_PriVtx_zyE", Reco_PriVtx_zyE, &b_Reco_PriVtx_zyE);
+   fChain->SetBranchAddress("Reco_PriVtx_zxE", Reco_PriVtx_zxE, &b_Reco_PriVtx_zxE);
    fChain->SetBranchAddress("Reco_PriVtx_trkSize", Reco_PriVtx_trkSize, &b_Reco_PriVtx_trkSize);
    fChain->SetBranchAddress("Reco_PriVtx_chi2", Reco_PriVtx_chi2, &b_Reco_PriVtx_chi2);
    fChain->SetBranchAddress("Reco_PriVtx_ndof", Reco_PriVtx_ndof, &b_Reco_PriVtx_ndof);
@@ -553,12 +589,12 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("HLT1Mu11_L3_size", &HLT1Mu11_L3_size, &b_HLT1Mu11_L3_size);
    fChain->SetBranchAddress("HLT1Mu11_L3_4mom", &HLT1Mu11_L3_4mom, &b_HLT1Mu11_L3_4mom);
    fChain->SetBranchAddress("HLT1Mu11_L3_id", HLT1Mu11_L3_id, &b_HLT1Mu11_L3_id);
-   fChain->SetBranchAddress("HLTI2Mu3_L3_size", &HLTI2Mu3_L3_size, &b_HLTI2Mu3_L3_size);
-   fChain->SetBranchAddress("HLTI2Mu3_L3_4mom", &HLTI2Mu3_L3_4mom, &b_HLTI2Mu3_L3_4mom);
-   fChain->SetBranchAddress("HLTI2Mu3_L3_id", HLTI2Mu3_L3_id, &b_HLTI2Mu3_L3_id);
-   fChain->SetBranchAddress("HLTNoI2Mu3_L3_size", &HLTNoI2Mu3_L3_size, &b_HLTNoI2Mu3_L3_size);
-   fChain->SetBranchAddress("HLTNoI2Mu3_L3_4mom", &HLTNoI2Mu3_L3_4mom, &b_HLTNoI2Mu3_L3_4mom);
-   fChain->SetBranchAddress("HLTNoI2Mu3_L3_id", HLTNoI2Mu3_L3_id, &b_HLTNoI2Mu3_L3_id);
+   fChain->SetBranchAddress("HLT2IsoMu3_L3_size", &HLT2IsoMu3_L3_size, &b_HLT2IsoMu3_L3_size);
+   fChain->SetBranchAddress("HLT2IsoMu3_L3_4mom", &HLT2IsoMu3_L3_4mom, &b_HLT2IsoMu3_L3_4mom);
+   fChain->SetBranchAddress("HLT2IsoMu3_L3_id", HLT2IsoMu3_L3_id, &b_HLT2IsoMu3_L3_id);
+   fChain->SetBranchAddress("HLT2Mu3_L3_size", &HLT2Mu3_L3_size, &b_HLT2Mu3_L3_size);
+   fChain->SetBranchAddress("HLT2Mu3_L3_4mom", &HLT2Mu3_L3_4mom, &b_HLT2Mu3_L3_4mom);
+   fChain->SetBranchAddress("HLT2Mu3_L3_id", HLT2Mu3_L3_id, &b_HLT2Mu3_L3_id);
    fChain->SetBranchAddress("HLTJpsi2Mu_L3_size", &HLTJpsi2Mu_L3_size, &b_HLTJpsi2Mu_L3_size);
    fChain->SetBranchAddress("HLTJpsi2Mu_L3_4mom", &HLTJpsi2Mu_L3_4mom, &b_HLTJpsi2Mu_L3_4mom);
    fChain->SetBranchAddress("HLTJpsi2Mu_L3_id", HLTJpsi2Mu_L3_id, &b_HLTJpsi2Mu_L3_id);

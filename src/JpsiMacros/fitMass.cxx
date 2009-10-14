@@ -17,6 +17,7 @@
 #include "RooPolynomial.h"
 #include "RooExponential.h"
 #include "RooGaussian.h"
+#include "RooCBShape.h"
 #include "RooAddPdf.h"
 
 using namespace RooFit;
@@ -35,6 +36,7 @@ int main(int argc, char* argv[]) {
   char *filename;
   char *prange;
   char *etarange;
+  bool sidebandPrefit = false;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -60,6 +62,11 @@ int main(int argc, char* argv[]) {
       case 'e':{
         etarange = argv[i+1];
         cout << "Range for |eta| is " << etarange << endl;
+        break;
+      }
+      case 's':{
+        sidebandPrefit = true;
+        cout << "Sideband pre-fitting activated" << endl;
         break;
       }
       }
@@ -89,14 +96,15 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
 
   RooRealVar JpsiMass("JpsiMass","#mu^{+}#mu^{-} mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  JpsiMass.setRange("left",2.6,2.9);
-  JpsiMass.setRange("right",3.3,3.5);
+  JpsiMass.setRange("all",JpsiMassMin,JpsiMassMax);
+  JpsiMass.setRange("left",JpsiMassMin,2.9);
+  JpsiMass.setRange("right",3.3,JpsiMassMax);
 
   RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,200.,"GeV/c");
   RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
-  RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,5.);
+  RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,25.);
 
   RooCategory JpsiType("JpsiType","Category of muons");
   JpsiType.defineType("GG",0);
@@ -111,21 +119,30 @@ int main(int argc, char* argv[]) {
   // Fit functions and parameters
 
   // BKG: first and second order polynomials
-  RooRealVar coefPol1("coefPol1","linear coefficient of bkg PDF",0.,-9.,9.);
+  RooRealVar coefPol1("coefPol1","linear coefficient of bkg PDF",-0.5,-15000.,15000.);
   RooRealVar coefPol2("coefPol2","quadratic coefficient of bkg PDF",0.,-1.,1.);
-  RooPolynomial GGPolFunct("GGPolFunc","GGPolFunc",JpsiMass,coefPol1);
-  RooPolynomial GCPolFunct("GCPolFunc","GCPolFunc",JpsiMass,RooArgList(coefPol1,coefPol2));
- 
+  RooRealVar CcoefPol1("CcoefPol1","linear coefficient of bkg PDF",-0.5,-15000.,15000.);
+  RooRealVar CcoefPol2("CcoefPol2","quadratic coefficient of bkg PDF",0.,-1.,1.);
+  RooPolynomial PolFunct1("PolFunct","PolFunct1",JpsiMass,coefPol1);
+  RooPolynomial PolFunct2("PolFunct2","PolFunct2",JpsiMass,RooArgList(coefPol1,coefPol2));
+  RooPolynomial CPolFunct1("CPolFunct","CPolFunct1",JpsiMass,CcoefPol1);
+  RooPolynomial CPolFunct2("CPolFunct2","CPolFunct2",JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
+  
+  coefPol2.setVal(0.0); 
+  coefPol2.setConstant(kTRUE); 
+  CcoefPol2.setVal(0.0); 
+  CcoefPol2.setConstant(kTRUE); 
+
   // BKG : exponential
   RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.);
-  RooExponential GTexpFunct("GTexpFunc","GTexpFunc",JpsiMass,coefExp); 
+  RooExponential expFunct("expFunct","expFunct",JpsiMass,coefExp); 
 
   // SIGNAL: 2-Gaussians
   RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,3.05,3.15);
-  RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.,0.5);
+  RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.,0.2);
 
   RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.1,3.05,3.15);
-  RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.04,0.,0.5);
+  RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.03,0.,0.2);
 
   // Different mean
   RooGaussian signalG1("signalG1","Signal PDF 1",JpsiMass,meanSig1,sigmaSig1);
@@ -140,45 +157,82 @@ int main(int argc, char* argv[]) {
   // Same mean
   RooAddPdf sigPDFOneMean("sigPDFOneMean","Total signal pdf",signalG1,signalG2OneMean,coeffGauss);
 
-  RooRealVar NSig("NSig","Number of signal events",5000.,10.,10000000.);
-  RooRealVar NBkg("NBkg","Number of background events",1300.,10.,10000000.);
+  // SIGNAL: Crystal Ball shape
+  RooRealVar alpha("alpha","#alpha of CB",0.96,0.,5.);
+  RooRealVar enne("enne","n of CB",3.,0.,8.);
 
-  // Total PDF
-  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(sigPDF,GGPolFunct),RooArgList(NSig,NBkg));
+  RooRealVar NSig("NSig","Number of signal events",5000.,10.,10000000.);
+  RooRealVar NBkg("NBkg","Number of background events",2000.,10.,10000000.);
+
+  RooCBShape sigCB("sigCB","Signal CB PDF",JpsiMass,meanSig1,sigmaSig1,alpha,enne);
+
+  RooAddPdf sigCBGauss("sigCBGauss","Signal CB+Gauss PDF",sigCB,signalG2,coeffGauss);
+
+  // Total PDF 
+  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(sigPDF,CPolFunct2),RooArgList(NSig,NBkg));
   // Total PDF (exponential background)
-  RooAddPdf totPDFExp("totPDFexp","Total pdf",RooArgList(sigPDF,GTexpFunct),RooArgList(NSig,NBkg));
+  RooAddPdf totPDFExp("totPDFexp","Total pdf",RooArgList(sigPDF,expFunct),RooArgList(NSig,NBkg));
   // Total PDF (signal Gaussians with one mean)
-  RooAddPdf totPDFOneMean("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,GGPolFunct),RooArgList(NSig,NBkg));
+  RooAddPdf totPDFOneMean("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,CPolFunct2),RooArgList(NSig,NBkg));
   // Total PDF (signal Gaussians with one mean and exponential background)
-  RooAddPdf totPDFExpOneMean("totPDFexpOneMean","Total pdf",RooArgList(sigPDFOneMean,GTexpFunct),RooArgList(NSig,NBkg));
+  RooAddPdf totPDFExpOneMean("totPDFexpOneMean","Total pdf",RooArgList(sigPDFOneMean,expFunct),RooArgList(NSig,NBkg));
   // Total PDF (signal Gaussians with one mean and quadratic background)
-  RooAddPdf totPDF2Pol("totPDF2Pol","Total pdf",RooArgList(sigPDFOneMean,GCPolFunct),RooArgList(NSig,NBkg));
+  RooAddPdf totPDF2Pol("totPDF2Pol","Total pdf",RooArgList(sigPDFOneMean,CPolFunct2),RooArgList(NSig,NBkg));
+  // Total PDF (signal CB)
+  RooAddPdf totPDFCB("totPDFCB","Total pdf",RooArgList(sigCB,CPolFunct2),RooArgList(NSig,NBkg));
+  // Total PDF (signal CB and exponential background)
+  RooAddPdf totPDFExpCB("totPDFExpCB","Total pdf",RooArgList(sigCB,expFunct),RooArgList(NSig,NBkg));
+  // Total PDF (signal CB+Gauss)
+  RooAddPdf totPDFCBGauss("totPDFCBGauss","Total pdf",RooArgList(sigCBGauss,CPolFunct2),RooArgList(NSig,NBkg));
+  // Total PDF (signal CB+Gauss and exponential background)
+  RooAddPdf totPDFExpCBGauss("totPDFExpCBGauss","Total pdf",RooArgList(sigCBGauss,expFunct),RooArgList(NSig,NBkg));
 
   //GG
+  // fix some parameters 
+  // alpha.setConstant(kTRUE); 
+  // enne.setConstant(kTRUE); 
+
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   GGdata->setWeightVar(MCweight);
   RooDataSet *GGdataTr = (RooDataSet*)GGdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GGdataTr->setWeightVar(MCweight);
 
-  totPDF.fitTo(*GGdata,Extended(1),Save(1));
+  if (sidebandPrefit) {
+    PolFunct2.fitTo(*GGdata,Range("left,right"));
+    CcoefPol1.setVal(coefPol1.getVal());
+    CcoefPol1.setConstant(kTRUE);
+    // float theCurrentVal = coefPol1.getVal();
+    // coefPol1.setRange(theCurrentVal-0.01,theCurrentVal+0.01);
+  }
+
+  totPDFCBGauss.fitTo(*GGdata,Extended(1),Save(1),Minos(0));
   // totPDFExp.fitTo(*GGdata,Extended(1),Save(1));
 
   RooPlot *GGmframe = JpsiMass.frame();
-  GGmframe->SetTitle("Mass fit for glb-glb muons");
+  sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange,etarange);
+  GGmframe->SetTitle(reducestr);
   GGdata->plotOn(GGmframe,DataError(RooAbsData::SumW2));
-  totPDF.plotOn(GGmframe);
-  totPDF.plotOn(GGmframe,Components(RooArgSet(GGPolFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
-  totPDF.plotOn(GGmframe,Components(GGPolFunct),DrawOption("F"),FillColor(kRed));
-  // totPDFExp.plotOn(GGmframe);
-  // totPDFExp.plotOn(GGmframe,Components(RooArgSet(GTexpFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
-  // totPDFExp.plotOn(GGmframe,Components(GTexpFunct),DrawOption("F"),FillColor(kRed));
+  // PolFunct2.plotOn(GGmframe,Range("left,right"));
+  totPDFCBGauss.plotOn(GGmframe,Range("all",kTRUE));
+  totPDFCBGauss.plotOn(GGmframe,Components(RooArgSet(CPolFunct2,sigCBGauss)),DrawOption("F"),FillColor(kGreen));
+  totPDFCBGauss.plotOn(GGmframe,Components(CPolFunct2),DrawOption("F"),FillColor(kRed));
+  // totPDFCBGaussExp.plotOn(GGmframe);
+  // totPDFCBGaussExp.plotOn(GGmframe,Components(RooArgSet(expFunct,sigPDF)),DrawOption("F"),FillColor(kGreen));
+  // totPDFCBGaussExp.plotOn(GGmframe,Components(expFunct),DrawOption("F"),FillColor(kRed));
   GGdata->plotOn(GGmframe,DataError(RooAbsData::SumW2));
   double NSigGG = NSig.getVal();   double errSigGG = NSig.getError();
+  double resolGG = (coeffGauss.getVal()*coeffGauss.getVal()*sigmaSig1.getVal() + (1-coeffGauss.getVal())*(1-coeffGauss.getVal())*sigmaSig2.getVal()) / (coeffGauss.getVal()*coeffGauss.getVal() + (1-coeffGauss.getVal())*(1-coeffGauss.getVal())); 
 
   TCanvas c1;
   c1.cd();GGmframe->Draw();
   sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange,etarange);
   c1.SaveAs(reducestr);
+
+  // fix some parameters 
+  alpha.setConstant(kTRUE); 
+  enne.setConstant(kTRUE); 
+  // CcoefPol1.setVal(-1.0);
+  // CcoefPol2.setConstant(kFALSE);
 
   //GT
   RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
@@ -186,21 +240,37 @@ int main(int argc, char* argv[]) {
   RooDataSet *GTdataTr = (RooDataSet*)GTdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   GTdataTr->setWeightVar(MCweight);
 
-  totPDFExpOneMean.fitTo(*GTdata,Extended(1),Save(1)/* ,Minos(1)*/);
+  if (sidebandPrefit) {
+    // coefPol1.setRange(-15000.,15000.);
+    CcoefPol1.setConstant(kFALSE);
+    PolFunct2.fitTo(*GTdata,Range("left,right"));
+    CcoefPol1.setVal(coefPol1.getVal());
+    CcoefPol1.setConstant(kTRUE);
+    // float theCurrentVal = coefPol1.getVal();
+    // coefPol1.setRange(theCurrentVal-0.01,theCurrentVal+0.01);
+  }
+
+  totPDFCBGauss.fitTo(*GTdata,Extended(1),Save(1),Minos(0));
+  // totPDFExpCBGauss.fitTo(*GTdata,Extended(1),Save(1),Minos(0));
 
   RooPlot *GTmframe = JpsiMass.frame();
-  GTmframe->SetTitle("Mass fit for glb-trk muons");
+  sprintf(reducestr,"Mass fit for glb-trk muons p_{T} = %s GeV,  #eta = %s",prange,etarange);
+  GTmframe->SetTitle(reducestr);
   GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
-  totPDFExpOneMean.plotOn(GTmframe);
-  totPDFExpOneMean.plotOn(GTmframe,Components(RooArgSet(GTexpFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
-  totPDFExpOneMean.plotOn(GTmframe,Components(GTexpFunct),DrawOption("F"),FillColor(kRed));
+  totPDFCBGauss.plotOn(GTmframe,Range("all",kTRUE));
+  totPDFCBGauss.plotOn(GTmframe,Components(RooArgSet(CPolFunct2,sigCBGauss)),DrawOption("F"),FillColor(kGreen));
+  totPDFCBGauss.plotOn(GTmframe,Components(CPolFunct2),DrawOption("F"),FillColor(kRed)); 
+  /* totPDFExpCBGauss.plotOn(GTmframe,Range("all",kTRUE));
+  totPDFExpCBGauss.plotOn(GTmframe,Components(RooArgSet(expFunct,sigCBGauss)),DrawOption("F"),FillColor(kGreen));
+  totPDFExpCBGauss.plotOn(GTmframe,Components(expFunct),DrawOption("F"),FillColor(kRed)); */
   GTdata->plotOn(GTmframe,DataError(RooAbsData::SumW2));
   double NSigGT = NSig.getVal();   double errSigGT = NSig.getError();
+  double resolGT = (coeffGauss.getVal()*coeffGauss.getVal()*sigmaSig1.getVal() + (1-coeffGauss.getVal())*(1-coeffGauss.getVal())*sigmaSig2.getVal()) / (coeffGauss.getVal()*coeffGauss.getVal() + (1-coeffGauss.getVal())*(1-coeffGauss.getVal()));
 
   TCanvas c2;
   c2.cd();GTmframe->Draw();
   sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange,etarange);
-  c2.SaveAs(reducestr);
+  c2.SaveAs(reducestr); 
 
   //GC
   /* RooDataSet *GCdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
@@ -210,14 +280,14 @@ int main(int argc, char* argv[]) {
   
   meanSig1.setVal(3.1);
   meanSig1.setConstant(true);
-  totPDFOneMean.fitTo(*GCdata,Extended(1),Save(1),Minos(0));
+  totPDFCBGauss.fitTo(*GCdata,Extended(1),Save(1),Minos(0));
 
   RooPlot *GCmframe = JpsiMass.frame();
   GCmframe->SetTitle("Mass fit for glb-trk muons");
   GCdata->plotOn(GCmframe,DataError(RooAbsData::SumW2));
-  totPDFOneMean.plotOn(GCmframe);
-  totPDFOneMean.plotOn(GCmframe,Components(RooArgSet(GGPolFunct,sigPDFOneMean)),DrawOption("F"),FillColor(kGreen));
-  totPDFOneMean.plotOn(GCmframe,Components(GGPolFunct),DrawOption("F"),FillColor(kRed));
+  totPDFCBGauss.plotOn(GCmframe);
+  totPDFCBGauss.plotOn(GCmframe,Components(RooArgSet(PolFunct2,sigPDFCBGauss)),DrawOption("F"),FillColor(kGreen));
+  totPDFCBGauss.plotOn(GCmframe,Components(PolFunct2),DrawOption("F"),FillColor(kRed));
   GCdata->plotOn(GCmframe,DataError(RooAbsData::SumW2));
   double NSigGC = NSig.getVal();   double errSigGC = NSig.getError();
 
@@ -225,10 +295,11 @@ int main(int argc, char* argv[]) {
   c3.cd();GCmframe->Draw();
   c3.SaveAs("GCmassfit.gif"); */
 
-  cout << endl << "GG J/psi yields:" << endl;
-  cout << "True MC : " << GGdataTr->numEntries(true) << " Fit : " << NSigGG << " +/- " << errSigGG << endl;
-  cout << "GT J/psi yields:" << endl;
-  cout << "True MC : " << GTdataTr->numEntries(true) << " Fit : " << NSigGT << " +/- " << errSigGT << endl;
+  cout << endl << "pT = " << prange << " GeV; |eta| = " << etarange << endl;
+  cout << endl << "GG J/psi yields:                 GT J/psi yields:" << endl;
+  cout << "True MC : " << GGdataTr->numEntries(true) << "                   True MC : " << GTdataTr->numEntries(true) << endl;
+  cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << endl;
+  cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV" << endl; 
   // cout << "GC J/psi yields:" << endl;
   // cout << "True MC : " << GCdataTr->numEntries(true) << " Fit : " << NSigGC << " +/- " << errSigGC << endl;
 

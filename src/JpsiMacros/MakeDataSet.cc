@@ -48,6 +48,8 @@ void MakeDataSet::Loop() {
   const float JpsiCtMin = -1.0;
   const float JpsiCtMax = 5.0;
   
+  ///////////////////////
+
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
   
@@ -60,7 +62,7 @@ void MakeDataSet::Loop() {
 
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,200.,"GeV/c");
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
   RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
 
@@ -106,14 +108,28 @@ void MakeDataSet::Loop() {
     //estrablish which kind of MC this is
     MCcat = -999;
     TString filestring(fChain->GetCurrentFile()->GetName());
-    if(filestring.Contains("promptJpsiMuMu")) MCcat = 0;
+
+    if (filestring.Contains("prompt")) {
+       MCcat = 0;
+       weight = 0.1089;
+    } else if (filestring.Contains("inclB")) {
+       MCcat = 1;
+       weight = 0.1226;
+    } else if (filestring.Contains("ppMu_ntpl")) {
+       MCcat = 2;
+       weight = 12.76;
+    } else if (filestring.Contains("ppMuMu")) {
+       MCcat = 2;
+       weight = 1.108;
+    }
+    /* if(filestring.Contains("promptJpsiMuMu")) MCcat = 0;
     else if(filestring.Contains("inclBtoJpsiMuMu")) MCcat = 1;
     else if(filestring.Contains("InclusiveppToMu")) MCcat = 2;
 
     //set the MC weight for the different categories
     if(MCcat == 0) weight = 0.862;
     else if(MCcat == 1) weight = 0.1745*2;   // take into account b+bbar!!!
-    else if(MCcat == 2) weight = 2.2831;
+    else if(MCcat == 2) weight = 2.2831; */
   
     //exclude real Jpsi in background MC
     if(MCcat == 2){
@@ -194,7 +210,7 @@ void MakeDataSet::Loop() {
 	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
 
           // Now, AFTER setting the weight, change to consider MC truth!
-	  if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("inclBtoJpsiMuMu")) {
+	  if (filestring.Contains("prompt") || filestring.Contains("inclB")) {
 	    bool isMatchedGlbGlb = (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) || (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1);
             bool isMatchedGlbTrk = (Reco_QQ_mulpt[iqq] == theMCMatchedTrkMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) );
 	    bool isMatchedGlbCal = (Reco_QQ_mulpt[iqq] == theMCMatchedCalMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ); 
@@ -212,43 +228,105 @@ void MakeDataSet::Loop() {
 
   data->setWeightVar(*MCweight);
 
-  TCanvas c1("c1","c1",10,10,600,1000);
-  c1.Divide(2,3);
+  TCanvas c1("c1","c1",10,10,600,600);
+  c1.Divide(2,2);
 
   c1.cd(1);
   RooPlot* frameMass = JpsiMass->frame();
-  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"));
+  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   frameMass->Draw();
 
   c1.cd(3);
   RooPlot* frameMass2 = JpsiMass->frame();
-  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"));
+  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
   frameMass2->Draw();
 
-  c1.cd(5);
+  /* c1.cd(5);
   RooPlot* frameMass3 = JpsiMass->frame(); 
   data->plotOn(frameMass3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
-  frameMass3->Draw();
+  frameMass3->Draw(); */
 
   c1.cd(2);
   gPad->SetLogy(1);
   RooPlot* framect = Jpsict->frame();
-  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"));
+  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   framect->Draw();
 
   c1.cd(4);
   gPad->SetLogy(1);
   RooPlot* framect2 = Jpsict->frame();
-  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"));
+  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
   framect2->Draw();
 
-  c1.cd(6);
+  /* c1.cd(6);
   gPad->SetLogy(1);
   RooPlot* framect3 = Jpsict->frame();
   data->plotOn(framect3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
-  framect3->Draw(); 
+  framect3->Draw(); */
 
   c1.SaveAs("bestCands.gif");
+
+  TCanvas c2("c2","c2",10,10,600,600);
+  c2.Divide(2,2);
+
+  c2.cd(1);
+  RooPlot* frameEta = JpsiEta->frame();
+  data->plotOn(frameEta,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  frameEta->Draw();
+
+  c2.cd(3);
+  RooPlot* frameEta2 = JpsiEta->frame();
+  data->plotOn(frameEta2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameEta2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  frameEta2->Draw();
+
+  /* c2.cd(5);
+  RooPlot* frameMass3 = JpsiMass->frame(); 
+  data->plotOn(frameMass3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
+  frameMass3->Draw(); */
+
+  c2.cd(2);
+  gPad->SetLogy(1);
+  RooPlot* framePt = JpsiPt->frame();
+  data->plotOn(framePt,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  framePt->Draw();
+
+  c2.cd(4);
+  gPad->SetLogy(1);
+  RooPlot* framePt2 = JpsiPt->frame();
+  data->plotOn(framePt2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framePt2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  framePt2->Draw();
+
+  /* c2.cd(6);
+  gPad->SetLogy(1);
+  RooPlot* framect3 = Jpsict->frame();
+  data->plotOn(framect3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
+  framect3->Draw(); */
+
+  c2.SaveAs("bestCands2.gif");
  
   TFile fOut("DataSet.root", "RECREATE");
   fOut.cd();

@@ -130,6 +130,7 @@ void finalJPsiAnalysis::Loop() {
     for (int imutr=0; imutr<Reco_mu_trk_size; imutr++) {
       //cout << "imutr = " << imutr << " TrkSize = " << Reco_mu_trk_size << endl;
       TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(imutr);
+      if (((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5) > 0.5 || (Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8) > 0.5) && (Reco_mu_trk_PIDmask[imutr] & (int)pow(2,1))/(int)pow(2,1) < 0.5 ) cout << "Bellan tonto" << endl;
       if (theMCMatchedTrkMu == imutr) {
 	hMcRightAllMuIso->Fill(Reco_mu_trk_iso[imutr]);
 	hMcRightTrkMuPt->Fill(theTrMumom->Perp());
