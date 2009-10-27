@@ -20,6 +20,10 @@ public:
 
 private:
 
+  int MIN_nhits_trk;
+  float MAX_normchi2_trk;
+  float MAX_normchi2_glb;
+
   void bookHistos();
   void drawPlots();
   void saveHistos();
@@ -69,6 +73,15 @@ private:
   TH1F *hMcRecoTrkMuDeltaR;  
   TH1F *hMcRecoCalMuDeltaR;  
 
+  TH1F *hMcRightGlbMunPixHits; 
+  TH1F *hMcWrongGlbMunPixHits; 
+  TH1F *hMcRightGlbMud0;       
+  TH1F *hMcWrongGlbMud0;       
+  TH1F *hMcRightGlbMudz;       
+  TH1F *hMcWrongGlbMudz;       
+  TH1F *hMcRightGlbMuFirstLayer;
+  TH1F *hMcWrongGlbMuFirstLayer;
+
   TH1F *hMcRightTrkMuPt;
   TH1F *hMcWrongTrkMuPt;
   TH1F *hMcRightTrkBit4;
@@ -83,6 +96,10 @@ private:
   TH1F *hMcWrongTrkMuChi2; 
   TH1F *hMcRightTrkMuNhits;
   TH1F *hMcWrongTrkMuNhits;
+  TH1F *hMcRightTrkMud0;       
+  TH1F *hMcWrongTrkMud0;       
+  TH1F *hMcRightTrkMudz;       
+  TH1F *hMcWrongTrkMudz;
 
   TH1F *hMcRightCalMuChi2; 
   TH1F *hMcWrongCalMuChi2; 

@@ -25,6 +25,9 @@ private:
   int MIN_nhits_trk;
   float MAX_normchi2_trk;
   float MAX_normchi2_glb;
+  int MIN_nhits_pixel;
+  float MAX_d0_trk;
+  float MAX_dz_trk;
   
 };
 #endif

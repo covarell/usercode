@@ -26,6 +26,10 @@ finalJPsiAnalysis::~finalJPsiAnalysis(){ }
 
 void finalJPsiAnalysis::Loop() {
 
+  MIN_nhits_trk = 12;
+  MAX_normchi2_trk = 5.0;
+  MAX_normchi2_glb = 20.0;
+
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
   
@@ -107,7 +111,29 @@ void finalJPsiAnalysis::Loop() {
     // if (aRealJpsiEvent) continue;
     
     //
-    // MC matched calo
+    // MC matched global mu (before cuts)
+    //
+    /* for (int imugl=0; imugl<Reco_mu_glb_size; imugl++) {
+      TLorentzVector *theGlMumom = (TLorentzVector*)Reco_mu_glb_4mom->At(imugl);
+      if (theMCMatchedGlbMu1 == imugl || theMCMatchedGlbMu2 == imugl) {
+        hMcRightAllMuIso->Fill(Reco_mu_glb_iso[imugl]);
+	hMcRightGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+        hMcRightGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+        hMcRightGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+        if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+	  hMcRightGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+      } else {
+        hMcWrongGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+        hMcWrongGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+        hMcWrongGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+        if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+	  hMcWrongGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+
+      }
+    }
+
+    //
+    // MC matched calo mu (before cuts)
     //
     for (int imuca=0; imuca<Reco_mu_cal_size; imuca++) {
       TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(imuca);
@@ -125,17 +151,18 @@ void finalJPsiAnalysis::Loop() {
     }
 
     //
-    // MC matched tracker
+    // MC matched tracker mu (before cuts)
     //
     for (int imutr=0; imutr<Reco_mu_trk_size; imutr++) {
       //cout << "imutr = " << imutr << " TrkSize = " << Reco_mu_trk_size << endl;
       TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(imutr);
-      if (((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5) > 0.5 || (Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8) > 0.5) && (Reco_mu_trk_PIDmask[imutr] & (int)pow(2,1))/(int)pow(2,1) < 0.5 ) cout << "Bellan tonto" << endl;
       if (theMCMatchedTrkMu == imutr) {
 	hMcRightAllMuIso->Fill(Reco_mu_trk_iso[imutr]);
 	hMcRightTrkMuPt->Fill(theTrMumom->Perp());
         hMcRightTrkMuNhits->Fill(Reco_mu_trk_nhitstrack[imutr]);
         hMcRightTrkMuChi2->Fill(Reco_mu_trk_normChi2[imutr]);
+        hMcRightTrkMud0->Fill(Reco_mu_trk_d0[imutr]);
+        hMcRightTrkMudz->Fill(Reco_mu_trk_dz[imutr]);
 	hMcRightTrkBit4->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,4))/(int)pow(2,4));
 	hMcRightTrkBit5->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5));
 	hMcRightTrkBit8->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8));
@@ -144,6 +171,8 @@ void finalJPsiAnalysis::Loop() {
 	hMcWrongTrkMuPt->Fill(theTrMumom->Perp());
 	hMcWrongTrkMuNhits->Fill(Reco_mu_trk_nhitstrack[imutr]);
         hMcWrongTrkMuChi2->Fill(Reco_mu_trk_normChi2[imutr]);
+	hMcWrongTrkMud0->Fill(Reco_mu_trk_d0[imutr]);
+        hMcWrongTrkMudz->Fill(Reco_mu_trk_dz[imutr]);
 	hMcWrongTrkBit4->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,4))/(int)pow(2,4));
 	hMcWrongTrkBit5->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5));
 	hMcWrongTrkBit8->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8));  
@@ -151,15 +180,7 @@ void finalJPsiAnalysis::Loop() {
       }
     }
     
-      //
-    // MC matched global
-    //
-    for (int imugl=0; imugl<Reco_mu_glb_size; imugl++) {
-      //cout << "imugl = " << imugl << " GlbSize = " << Reco_mu_glb_size << endl;
-      if (theMCMatchedGlbMu1 == imugl || theMCMatchedGlbMu2 == imugl) {
-	hMcRightAllMuIso->Fill(Reco_mu_glb_iso[imugl]);
-      }
-    }
+   */
 
     int bestQQ = theBestQQ();
 
@@ -170,16 +191,70 @@ void finalJPsiAnalysis::Loop() {
 	if (HLTBits_accept[0]) {
 	  if (Reco_QQ_type[iqq] == 0) {
 	    QQMass2Glob_passmu3->Fill(theMass);
-            if (iqq == bestQQ) QQMass2Glob_best->Fill(theMass);
+            if (iqq == bestQQ) {
+	      QQMass2Glob_best->Fill(theMass);
+              int imugl = Reco_QQ_muhpt[iqq];
+	      if (imugl == theMCMatchedGlbMu1 || imugl == theMCMatchedGlbMu2) {
+		hMcRightGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+		hMcRightGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+		hMcRightGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+		if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+		  hMcRightGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+	      } else {
+		hMcWrongGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+		hMcWrongGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+		hMcWrongGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+		if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+		  hMcWrongGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+	      }
+              imugl = Reco_QQ_mulpt[iqq];
+	      if (Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) {
+		hMcRightGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+		hMcRightGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+		hMcRightGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+		if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+		  hMcRightGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+	      } else {
+		hMcWrongGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
+		hMcWrongGlbMud0->Fill(Reco_mu_glb_d0[imugl]);
+		hMcWrongGlbMudz->Fill(Reco_mu_glb_dz[imugl]);
+		if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
+		  hMcWrongGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
+	      }
+	    }
 	  }
 	  if (Reco_QQ_type[iqq] == 1) {
 	    QQMass1Glob1Trk_passmu3->Fill(theMass);
-            if (iqq == bestQQ) QQMass1Glob1Trk_best->Fill(theMass);
+            if (iqq == bestQQ) {
+	      QQMass1Glob1Trk_best->Fill(theMass);
+              int imutr = Reco_QQ_mulpt[iqq];
+	      TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(imutr);
+              if (theMCMatchedTrkMu == imutr) {
+		hMcRightTrkMuPt->Fill(theTrMumom->Perp());
+		hMcRightTrkMuNhits->Fill(Reco_mu_trk_nhitstrack[imutr]);
+		hMcRightTrkMuChi2->Fill(Reco_mu_trk_normChi2[imutr]);
+		hMcRightTrkMud0->Fill(Reco_mu_trk_d0[imutr]);
+		hMcRightTrkMudz->Fill(Reco_mu_trk_dz[imutr]);
+		hMcRightTrkBit4->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,4))/(int)pow(2,4));
+		hMcRightTrkBit5->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5));
+		hMcRightTrkBit8->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8));
+		hMcRightTrkBit9->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,9))/(int)pow(2,9));
+	      } else {
+		hMcWrongTrkMuPt->Fill(theTrMumom->Perp());
+		hMcWrongTrkMuNhits->Fill(Reco_mu_trk_nhitstrack[imutr]);
+		hMcWrongTrkMuChi2->Fill(Reco_mu_trk_normChi2[imutr]);
+		hMcWrongTrkMud0->Fill(Reco_mu_trk_d0[imutr]);
+		hMcWrongTrkMudz->Fill(Reco_mu_trk_dz[imutr]);
+		hMcWrongTrkBit4->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,4))/(int)pow(2,4));
+		hMcWrongTrkBit5->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,5))/(int)pow(2,5));
+		hMcWrongTrkBit8->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,8))/(int)pow(2,8));  
+		hMcWrongTrkBit9->Fill((Reco_mu_trk_PIDmask[imutr] & (int)pow(2,9))/(int)pow(2,9));
+	      } 
+	    }
 	  }
 	  if (Reco_QQ_type[iqq] == 3) {
 	    QQMass1Glob1Cal_passmu3->Fill(theMass);
 	    if (iqq == bestQQ) QQMass1Glob1Cal_best->Fill(theMass);
-            // To be changed 
             if (Reco_QQ_mulpt[iqq] == theMCMatchedCalMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ) {
 	      //
 	      hMcRightCalGlobMuMass->Fill(theMass);
@@ -303,6 +378,16 @@ void finalJPsiAnalysis::bookHistos() {
   hMcRecoTrkMuDeltaR                  = new TH1F("hMcRecoTrkMuDeltaR",  "MC-reco matching #Delta R (tracker muons)", 100, 0.,0.5);
   hMcRecoCalMuDeltaR                  = new TH1F("hMcRecoCalMuDeltaR",  "MC-reco matching #Delta R (calo muons)", 100, 0.,0.5);
 
+  // mc-truth matching
+  hMcRightGlbMunPixHits            = new TH1F("hMcRightGlbMunPixHits",  "number of pixel hits - MC matched (global muons)", 8, -0.5, 7.5);
+  hMcWrongGlbMunPixHits            = new TH1F("hMcWrongGlbMunPixHits",  "number of pixel hits - MC unmatched (global muons)", 8, -0.5, 7.5);
+  hMcRightGlbMud0            = new TH1F("hMcRightGlbMud0",  "d0 - MC matched (global muons)", 100, 0., 30.);
+  hMcWrongGlbMud0            = new TH1F("hMcWrongGlbMud0",  "d0 - MC unmatched (global muons)", 100, 0., 30.);
+  hMcRightGlbMudz            = new TH1F("hMcRightGlbMudz",  "dz - MC matched (global muons)", 100, 0., 50.);
+  hMcWrongGlbMudz            = new TH1F("hMcWrongGlbMudz",  "dz - MC unmatched (global muons)", 100, 0., 50.);
+  hMcRightGlbMuFirstLayer             = new TH1F("hMcRightGlbMuFirstLayer",  "first pixel layer hit - MC matched (global muons)", 4, -0.5, 3.5);
+  hMcWrongGlbMuFirstLayer             = new TH1F("hMcWrongGlbMuFirstLayer",  "first pixel layer hit - MC unmatched (global muons)", 4, -0.5, 3.5);
+ 
   // mc truth matching - trk
   hMcRightTrkMuPt                      = new TH1F("hMcRightTrkMuPt",  "pT  - MC matched (tracker muons)", 50, 0.,5.0);
   hMcWrongTrkMuPt                      = new TH1F("hMcWrongTrkMuPt",  "pT - MC unmatched (tracker muons)", 50, 0.,5.0);
@@ -318,6 +403,10 @@ void finalJPsiAnalysis::bookHistos() {
   hMcWrongTrkBit8              = new TH1F("hMcWrongTrkBit8",  "StationOptimizedLowPtLoose bit - MC unmatched (tracker muons)", 4, -1.5,2.5);
   hMcRightTrkBit9              = new TH1F("hMcRightTrkBit9",  "StationOptimizedLowPtTight bit - MC matched (tracker muons)", 4, -1.5,2.5);
   hMcWrongTrkBit9              = new TH1F("hMcWrongTrkBit9",  "StationOptimizedLowPtTight bit - MC unmatched (tracker muons)", 4, -1.5,2.5);
+  hMcRightTrkMud0            = new TH1F("hMcRightTrkMud0",  "d0 - MC matched (global muons)", 100, 0., 30.);
+  hMcWrongTrkMud0            = new TH1F("hMcWrongTrkMud0",  "d0 - MC unmatched (global muons)", 100, 0., 30.);
+  hMcRightTrkMudz            = new TH1F("hMcRightTrkMudz",  "dz - MC matched (global muons)", 100, 0., 50.);
+  hMcWrongTrkMudz            = new TH1F("hMcWrongTrkMudz",  "dz - MC unmatched (global muons)", 100, 0., 50.);
 
   // mc truth matching - calo
   hMcRightCalMuPt                      = new TH1F("hMcRightCalMuPt",  "pT  - MC matched (calo muons)", 50, 0.,5.0);
@@ -393,16 +482,24 @@ void finalJPsiAnalysis::saveHistos() {
   QQMass1Glob1Cal_pass2mu3ups  -> Write(); 
   hMcRecoGlobMuDeltaR       -> Write();   
   hMcRecoTrkMuDeltaR        -> Write();   
-  hMcRecoCalMuDeltaR        -> Write(); 
-  hMcRightTrkMuPt  -> Write();
-  hMcWrongTrkMuPt  -> Write();
-  hMcRightTrkBit4  -> Write();
-  hMcWrongTrkBit4  -> Write();
-  hMcRightTrkBit5  -> Write();
-  hMcWrongTrkBit5  -> Write();
-  hMcRightTrkBit8  -> Write();
-  hMcWrongTrkBit8  -> Write();
-  hMcRightTrkBit9  -> Write();
+  hMcRecoCalMuDeltaR        -> Write();
+  hMcRightGlbMunPixHits   -> Write(); 
+  hMcWrongGlbMunPixHits   -> Write(); 
+  hMcRightGlbMud0         -> Write(); 
+  hMcWrongGlbMud0         -> Write(); 
+  hMcRightGlbMudz         -> Write(); 
+  hMcWrongGlbMudz         -> Write(); 
+  hMcRightGlbMuFirstLayer -> Write(); 
+  hMcWrongGlbMuFirstLayer -> Write(); 
+  hMcRightTrkMuPt   -> Write(); 
+  hMcWrongTrkMuPt   -> Write(); 
+  hMcRightTrkBit4   -> Write(); 
+  hMcWrongTrkBit4   -> Write(); 
+  hMcRightTrkBit5   -> Write(); 
+  hMcWrongTrkBit5   -> Write(); 
+  hMcRightTrkBit8   -> Write(); 
+  hMcWrongTrkBit8   -> Write(); 
+  hMcRightTrkBit9   -> Write(); 
   hMcWrongTrkBit9    -> Write();
   hMcRightTrkMuChi2  -> Write();   
   hMcWrongTrkMuChi2  -> Write(); 
@@ -412,6 +509,10 @@ void finalJPsiAnalysis::saveHistos() {
   hMcWrongCalMuChi2  -> Write(); 
   hMcRightCalMuNhits -> Write(); 
   hMcWrongCalMuNhits -> Write(); 
+  hMcRightTrkMud0         -> Write(); 
+  hMcWrongTrkMud0         -> Write(); 
+  hMcRightTrkMudz         -> Write(); 
+  hMcWrongTrkMudz         -> Write(); 
   hMcRightCalMuCaloComp     -> Write();   
   hMcWrongCalMuCaloComp     -> Write(); 
   hMcRightCalMuPt           -> Write(); 
@@ -452,7 +553,8 @@ int finalJPsiAnalysis::theBestQQ() {
   float thehighestPt = -1.;
  
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
-    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0) return iqq;
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
+	Reco_mu_glb_nhitstrack[iqq] > MIN_nhits_trk && Reco_mu_glb_normChi2[iqq] < MAX_normchi2_glb) return iqq;
   }
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
@@ -464,7 +566,8 @@ int finalJPsiAnalysis::theBestQQ() {
 	continue;
       }
 
-      if ( Reco_mu_trk_nhitstrack[theTM] > 10 && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) ) {
+      if ( Reco_mu_trk_nhitstrack[theTM] > MIN_nhits_trk && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   Reco_mu_trk_normChi2[theTM] < MAX_normchi2_trk) {
 	
         TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(theTM);
         if (theTrMumom->Perp() > thehighestPt) {
@@ -486,7 +589,7 @@ int finalJPsiAnalysis::theBestQQ() {
 	continue;
       }
 
-      if ( Reco_mu_cal_nhitstrack[theCM] > 12 && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
+      if ( Reco_mu_cal_nhitstrack[theCM] > MIN_nhits_trk && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
 	
         TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(theCM);
         if (theCaMumom->Perp() > thehighestPt) {

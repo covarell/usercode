@@ -41,6 +41,9 @@ void MakeDataSet::Loop() {
   MIN_nhits_trk = 12;
   MAX_normchi2_trk = 5.0;
   MAX_normchi2_glb = 20.0;
+  MIN_nhits_pixel = 2;
+  MAX_d0_trk = 10.0;
+  MAX_dz_trk = 25.0;
 
   // mass-lifetime limits
   const float JpsiMassMin = 2.6;
@@ -109,18 +112,22 @@ void MakeDataSet::Loop() {
     MCcat = -999;
     TString filestring(fChain->GetCurrentFile()->GetName());
 
-    if (filestring.Contains("prompt")) {
+    if (filestring.Contains("promptJpsiMuMu")) {
        MCcat = 0;
-       weight = 0.1089;
-    } else if (filestring.Contains("inclB")) {
+       // weight = 0.1089;
+       weight = 0.0973;
+    } else if (filestring.Contains("BJpsiMuMu")) {
        MCcat = 1;
-       weight = 0.1226;
-    } else if (filestring.Contains("ppMu_ntpl")) {
+       // weight = 0.1226;
+       weight = 0.0314;
+    } else if (filestring.Contains("ppMuX")) {
        MCcat = 2;
-       weight = 12.76;
+       // weight = 12.76;
+       weight = 8.179;
     } else if (filestring.Contains("ppMuMu")) {
        MCcat = 2;
-       weight = 1.108;
+       // weight = 1.108;
+       weight = 0.892;
     }
     /* if(filestring.Contains("promptJpsiMuMu")) MCcat = 0;
     else if(filestring.Contains("inclBtoJpsiMuMu")) MCcat = 1;
@@ -210,7 +217,7 @@ void MakeDataSet::Loop() {
 	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
 
           // Now, AFTER setting the weight, change to consider MC truth!
-	  if (filestring.Contains("prompt") || filestring.Contains("inclB")) {
+	  if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("BJpsiMuMu")) {
 	    bool isMatchedGlbGlb = (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) || (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1);
             bool isMatchedGlbTrk = (Reco_QQ_mulpt[iqq] == theMCMatchedTrkMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) );
 	    bool isMatchedGlbCal = (Reco_QQ_mulpt[iqq] == theMCMatchedCalMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ); 
@@ -228,16 +235,18 @@ void MakeDataSet::Loop() {
 
   data->setWeightVar(*MCweight);
 
-  TCanvas c1("c1","c1",10,10,600,600);
-  c1.Divide(2,2);
+  // TCanvas c1("c1","c1",10,10,600,600);
+  TCanvas c1("c1","c1",10,10,1000,500);
+  // c1.Divide(2,2);
+  c1.Divide(2,1);
 
-  c1.cd(1);
+  /* c1.cd(1);
   RooPlot* frameMass = JpsiMass->frame();
   data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
   data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
   data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
-  frameMass->Draw();
+  frameMass->Draw(); 
 
   c1.cd(3);
   RooPlot* frameMass2 = JpsiMass->frame();
@@ -245,14 +254,15 @@ void MakeDataSet::Loop() {
   data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
   data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
   data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
-  frameMass2->Draw();
+  frameMass2->Draw(); */
 
   /* c1.cd(5);
   RooPlot* frameMass3 = JpsiMass->frame(); 
   data->plotOn(frameMass3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
   frameMass3->Draw(); */
 
-  c1.cd(2);
+  c1.cd(1);
+  // c1.cd(2);
   gPad->SetLogy(1);
   RooPlot* framect = Jpsict->frame();
   data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
@@ -261,7 +271,8 @@ void MakeDataSet::Loop() {
   data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   framect->Draw();
 
-  c1.cd(4);
+  c1.cd(2);
+  // c1.cd(4);
   gPad->SetLogy(1);
   RooPlot* framect2 = Jpsict->frame();
   data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
@@ -276,7 +287,8 @@ void MakeDataSet::Loop() {
   data->plotOn(framect3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
   framect3->Draw(); */
 
-  c1.SaveAs("bestCands.gif");
+  // c1.SaveAs("bestCands.gif");
+  c1.SaveAs("lifeTimes.gif");
 
   TCanvas c2("c2","c2",10,10,600,600);
   c2.Divide(2,2);
@@ -347,23 +359,44 @@ int MakeDataSet::theBestQQ() {
   float thehighestPt = -1.;
  
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+    int thehptMu = Reco_QQ_muhpt[iqq];
+    int thelptMu = Reco_QQ_mulpt[iqq];
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
-	Reco_mu_glb_nhitstrack[iqq] > MIN_nhits_trk && Reco_mu_glb_normChi2[iqq] < MAX_normchi2_glb) return iqq;
+	Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb && 
+        (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
+        fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
+        fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
+	Reco_mu_glb_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	Reco_mu_glb_normChi2[thelptMu] < MAX_normchi2_glb &&
+        (Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel && 
+        fabs(Reco_mu_glb_d0[thelptMu]) < MAX_d0_trk && 
+        fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk) return iqq;
   }
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 1 ) {
       
-      int theTM = Reco_QQ_mulpt[iqq];
-      if (theTM >= Reco_mu_trk_size) {
+      int thehptMu = Reco_QQ_muhpt[iqq];
+      int thelptMu = Reco_QQ_mulpt[iqq];
+      if (thelptMu >= Reco_mu_trk_size) {
 	// cout << "Non deve succedere! tmIndex = " << theTM+1 << " tmSize = " << Reco_mu_trk_size << endl;
 	continue;
       }
 
-      if ( Reco_mu_trk_nhitstrack[theTM] > MIN_nhits_trk && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
-	   Reco_mu_trk_normChi2[theTM] < MAX_normchi2_trk) {
+      if ( Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb &&
+           (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
+	   fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
+	   Reco_mu_trk_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   Reco_mu_trk_normChi2[thelptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thelptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thelptMu]) < MAX_dz_trk) {
 	
-        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(theTM);
+        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(thelptMu);
         if (theTrMumom->Perp() > thehighestPt) {
 	  thehighestPt = theTrMumom->Perp();
           theBest = iqq;
@@ -375,17 +408,23 @@ int MakeDataSet::theBestQQ() {
   if (theBest >= 0) return theBest;
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 3 ) {
-      
-      int theCM = Reco_QQ_mulpt[iqq];
-      if (theCM >= Reco_mu_cal_size) {
-	// cout << "Non deve succedere! cmIndex = " << theCM+1 << " cmSize = " << Reco_mu_cal_size << endl;
+
+      int thehptMu = Reco_QQ_muhpt[iqq];
+      int thelptMu = Reco_QQ_mulpt[iqq];
+      if (thelptMu >= Reco_mu_cal_size) {
+	// cout << "Non deve succedere! cmIndex = " << thelptMu+1 << " cmSize = " << Reco_mu_cal_size << endl;
 	continue;
       }
 
-      if ( Reco_mu_cal_nhitstrack[theCM] > MIN_nhits_trk && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
+      if ( Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb &&
+	   Reco_mu_cal_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   Reco_mu_cal_normChi2[thelptMu] < 3.0 && 
+	   Reco_mu_cal_caloComp[thelptMu] > 0.89) {
 	
-        TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(theCM);
+        TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(thelptMu);
         if (theCaMumom->Perp() > thehighestPt) {
 	  thehighestPt = theCaMumom->Perp();
           theBest = iqq;
