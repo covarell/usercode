@@ -19,6 +19,8 @@ public:
   int theBestQQ();
   double PhiInRange(const double& phi) const;
   double deltaR(const TLorentzVector* t, const TLorentzVector* u) const;
+  float findEff(TH2F* effhist, float pt, float eta, bool approx) const;
+  float findEffErr(TH2F* effhist, float pt, float eta, bool approx) const;
 
 private:
 
@@ -28,6 +30,7 @@ private:
   int MIN_nhits_pixel;
   float MAX_d0_trk;
   float MAX_dz_trk;
+  float MIN_vtxprob_jpsi;
   
 };
 #endif

@@ -81,7 +81,11 @@ private:
   TH1F *hMcWrongGlbMudz;       
   TH1F *hMcRightGlbMuFirstLayer;
   TH1F *hMcWrongGlbMuFirstLayer;
+  TH1F *hMcRightGlbTrkMuVtxProb;  
+  TH1F *hMcWrongGlbTrkMuVtxProb;
 
+  TH1F *hMcRightGlbGlbMuVtxProb;
+  TH1F *hMcWrongGlbGlbMuVtxProb;
   TH1F *hMcRightTrkMuPt;
   TH1F *hMcWrongTrkMuPt;
   TH1F *hMcRightTrkBit4;

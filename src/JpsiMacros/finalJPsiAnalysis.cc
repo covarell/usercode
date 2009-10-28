@@ -193,6 +193,13 @@ void finalJPsiAnalysis::Loop() {
 	    QQMass2Glob_passmu3->Fill(theMass);
             if (iqq == bestQQ) {
 	      QQMass2Glob_best->Fill(theMass);
+
+              if ( (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1) || (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) ) {
+                hMcRightGlbGlbMuVtxProb->Fill(Reco_QQ_probChi2[iqq]);  
+	      } else {
+                hMcWrongGlbGlbMuVtxProb->Fill(Reco_QQ_probChi2[iqq]);
+	      }
+
               int imugl = Reco_QQ_muhpt[iqq];
 	      if (imugl == theMCMatchedGlbMu1 || imugl == theMCMatchedGlbMu2) {
 		hMcRightGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
@@ -207,6 +214,7 @@ void finalJPsiAnalysis::Loop() {
 		if (Reco_mu_glb_nhitsPix1HitBE[imugl] > 0) 
 		  hMcWrongGlbMuFirstLayer->Fill(Reco_mu_glb_nhitsPix1Hit[imugl]);
 	      }
+
               imugl = Reco_QQ_mulpt[iqq];
 	      if (Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) {
 		hMcRightGlbMunPixHits->Fill(Reco_mu_glb_nhitsPixB[imugl] + Reco_mu_glb_nhitsPixE[imugl]);
@@ -223,10 +231,18 @@ void finalJPsiAnalysis::Loop() {
 	      }
 	    }
 	  }
+
 	  if (Reco_QQ_type[iqq] == 1) {
 	    QQMass1Glob1Trk_passmu3->Fill(theMass);
             if (iqq == bestQQ) {
 	      QQMass1Glob1Trk_best->Fill(theMass);
+
+              if ( Reco_QQ_mulpt[iqq] == theMCMatchedTrkMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ) {
+                hMcRightGlbTrkMuVtxProb->Fill(Reco_QQ_probChi2[iqq]);  
+	      } else {
+                hMcWrongGlbTrkMuVtxProb->Fill(Reco_QQ_probChi2[iqq]);
+	      }
+ 
               int imutr = Reco_QQ_mulpt[iqq];
 	      TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(imutr);
               if (theMCMatchedTrkMu == imutr) {
@@ -387,6 +403,8 @@ void finalJPsiAnalysis::bookHistos() {
   hMcWrongGlbMudz            = new TH1F("hMcWrongGlbMudz",  "dz - MC unmatched (global muons)", 100, 0., 50.);
   hMcRightGlbMuFirstLayer             = new TH1F("hMcRightGlbMuFirstLayer",  "first pixel layer hit - MC matched (global muons)", 4, -0.5, 3.5);
   hMcWrongGlbMuFirstLayer             = new TH1F("hMcWrongGlbMuFirstLayer",  "first pixel layer hit - MC unmatched (global muons)", 4, -0.5, 3.5);
+  hMcRightGlbGlbMuVtxProb                  = new TH1F("hMcRightGlbGlbMuVtxProb",  "Vertex probability - MC matched (global+global muons)", 1000, 0.0,1.0);
+  hMcWrongGlbGlbMuVtxProb                  = new TH1F("hMcWrongGlbGlbMuVtxProb",  "Vertex probability - MC unmatched (global+global muons)", 1000, 0.0,1.0);
  
   // mc truth matching - trk
   hMcRightTrkMuPt                      = new TH1F("hMcRightTrkMuPt",  "pT  - MC matched (tracker muons)", 50, 0.,5.0);
@@ -407,6 +425,8 @@ void finalJPsiAnalysis::bookHistos() {
   hMcWrongTrkMud0            = new TH1F("hMcWrongTrkMud0",  "d0 - MC unmatched (global muons)", 100, 0., 30.);
   hMcRightTrkMudz            = new TH1F("hMcRightTrkMudz",  "dz - MC matched (global muons)", 100, 0., 50.);
   hMcWrongTrkMudz            = new TH1F("hMcWrongTrkMudz",  "dz - MC unmatched (global muons)", 100, 0., 50.);
+  hMcRightGlbTrkMuVtxProb                  = new TH1F("hMcRightGlbTrkMuVtxProb",  "Vertex probability - MC matched (global+tracker muons)", 1000, 0.0,1.0);
+  hMcWrongGlbTrkMuVtxProb                   = new TH1F("hMcWrongGlbTrkMuVtxProb",  "Vertex probability - MC unmatched (global+tracker muons)", 1000, 0.0,1.0);
 
   // mc truth matching - calo
   hMcRightCalMuPt                      = new TH1F("hMcRightCalMuPt",  "pT  - MC matched (calo muons)", 50, 0.,5.0);
@@ -490,7 +510,11 @@ void finalJPsiAnalysis::saveHistos() {
   hMcRightGlbMudz         -> Write(); 
   hMcWrongGlbMudz         -> Write(); 
   hMcRightGlbMuFirstLayer -> Write(); 
-  hMcWrongGlbMuFirstLayer -> Write(); 
+  hMcWrongGlbMuFirstLayer -> Write();
+  hMcRightGlbTrkMuVtxProb -> Write();   
+  hMcWrongGlbTrkMuVtxProb -> Write(); 
+  hMcRightGlbGlbMuVtxProb -> Write(); 
+  hMcWrongGlbGlbMuVtxProb -> Write(); 
   hMcRightTrkMuPt   -> Write(); 
   hMcWrongTrkMuPt   -> Write(); 
   hMcRightTrkBit4   -> Write(); 

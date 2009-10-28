@@ -21,8 +21,9 @@ static const unsigned int MAXQQ = 3000;
 static const unsigned int MAXCHIC = 3000;
 static const unsigned int MAXPRIVTX = 30;
 static const unsigned int MAXTRIG = 10;
+static const unsigned int MAXTRACK = 600;
 
-static const bool isAOD = true;
+static const bool isAOD = false;
 static const bool isOctX = true;
 
 class JPsiTreeBase {
@@ -47,6 +48,21 @@ public :
    TClonesArray    *Mc_mu_3vec;
    Int_t           Mc_mu_id[MAXMCMU];   //[Mc_mu_size]
    Int_t           Mc_mumoth_id[MAXMCMU];   //[Mc_mu_size]
+   Int_t           Reco_track_size;
+   TClonesArray    *Reco_track_4mom;
+   TClonesArray    *Reco_track_3vec;
+   TClonesArray    *Reco_track_CovM;
+   Double_t        Reco_track_phiErr[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_etaErr[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_ptErr[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_d0[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_d0err[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_dz[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_dzerr[MAXTRACK];   //[Reco_track_size]
+   Int_t           Reco_track_charge[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_chi2[MAXTRACK];   //[Reco_track_size]
+   Double_t        Reco_track_ndof[MAXTRACK];   //[Reco_track_size]
+   Int_t           Reco_track_nhits[MAXTRACK];   //[Reco_track_size]
    Int_t           Reco_mu_glb_size;
    TClonesArray    *Reco_mu_glb_4mom;
    TClonesArray    *Reco_mu_glb_track4mom;
@@ -60,6 +76,11 @@ public :
    Double_t        Reco_mu_glb_dzerr[MAXMU];   //[Reco_mu_glb_size]
    Double_t        Reco_mu_glb_normChi2[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitstrack[MAXMU];   //[Reco_mu_glb_size]
+   Int_t           Reco_mu_glb_nhitsStrip[MAXMU];   //[Reco_mu_glb_size]
+   Int_t           Reco_mu_glb_nhitsPixB[MAXMU];   //[Reco_mu_glb_size]
+   Int_t           Reco_mu_glb_nhitsPixE[MAXMU];   //[Reco_mu_glb_size]
+   Int_t           Reco_mu_glb_nhitsPix1Hit[MAXMU];   //[Reco_mu_glb_size]
+   Int_t           Reco_mu_glb_nhitsPix1HitBE[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitsDT[MAXMU];   //[Reco_mu_glb_size]
    Int_t           Reco_mu_glb_nhitsCSC[MAXMU];   //[Reco_mu_glb_size]
    Double_t        Reco_mu_glb_caloComp[MAXMU];   //[Reco_mu_glb_size]
@@ -80,6 +101,11 @@ public :
    Int_t           Reco_mu_trk_nhitstrack[MAXMU];   //[Reco_mu_trk_size]
    // Int_t           Reco_mu_trk_nhitsDT[MAXMU];   //[Reco_mu_trk_size]
    // Int_t           Reco_mu_trk_nhitsCSC[MAXMU];   //[Reco_mu_trk_size]
+   Int_t           Reco_mu_trk_nhitsStrip[MAXMU];  // Vectors of strip/pixel hits
+   Int_t           Reco_mu_trk_nhitsPixB[MAXMU];
+   Int_t           Reco_mu_trk_nhitsPixE[MAXMU];
+   Int_t           Reco_mu_trk_nhitsPix1Hit[MAXMU];
+   Int_t           Reco_mu_trk_nhitsPix1HitBE[MAXMU];
    Int_t           Reco_mu_trk_PIDmask[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_caloComp[MAXMU];   //[Reco_mu_trk_size]
    Double_t        Reco_mu_trk_segmComp[MAXMU];   //[Reco_mu_trk_size]
@@ -120,6 +146,7 @@ public :
    Double_t        Reco_QQ_lxy[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_lxyErr[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_normChi2[MAXQQ];   //[Reco_QQ_size]
+   Double_t        Reco_QQ_probChi2[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_cosAlpha[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_ctau[MAXQQ];   //[Reco_QQ_size]
    Int_t           Reco_QQ_sign[MAXQQ];   //[Reco_QQ_size]
@@ -203,6 +230,21 @@ public :
    TBranch        *b_Mc_mu_3vec;   //!
    TBranch        *b_Mc_mu_id;   //!
    TBranch        *b_Mc_mumoth_id;   //!
+   TBranch        *b_Reco_track_size;   //!
+   TBranch        *b_Reco_track_4mom;   //!
+   TBranch        *b_Reco_track_3vec;   //!
+   TBranch        *b_Reco_track_CovM;   //!
+   TBranch        *b_Reco_track_phiErr;   //!
+   TBranch        *b_Reco_track_etaErr;   //!
+   TBranch        *b_Reco_track_ptErr;   //!
+   TBranch        *b_Reco_track_d0;   //!
+   TBranch        *b_Reco_track_d0err;   //!
+   TBranch        *b_Reco_track_dz;   //!
+   TBranch        *b_Reco_track_dzerr;   //!
+   TBranch        *b_Reco_track_charge;   //!
+   TBranch        *b_Reco_track_chi2;   //!
+   TBranch        *b_Reco_track_ndof;   //!
+   TBranch        *b_Reco_track_nhits;   //!
    TBranch        *b_Reco_mu_glb_size;   //!
    TBranch        *b_Reco_mu_glb_4mom;   //!
    TBranch        *b_Reco_mu_glb_track4mom;   //!
@@ -216,6 +258,11 @@ public :
    TBranch        *b_Reco_mu_glb_dzerr;   //!
    TBranch        *b_Reco_mu_glb_normChi2;   //!
    TBranch        *b_Reco_mu_glb_nhitstrack;   //!
+   TBranch        *b_Reco_mu_glb_nhitsStrip;   //!
+   TBranch        *b_Reco_mu_glb_nhitsPixB;   //!
+   TBranch        *b_Reco_mu_glb_nhitsPixE;   //!
+   TBranch        *b_Reco_mu_glb_nhitsPix1Hit;   //!
+   TBranch        *b_Reco_mu_glb_nhitsPix1HitBE;   //!
    TBranch        *b_Reco_mu_glb_nhitsDT;   //!
    TBranch        *b_Reco_mu_glb_nhitsCSC;   //!
    TBranch        *b_Reco_mu_glb_caloComp;   //!
@@ -236,6 +283,11 @@ public :
    TBranch        *b_Reco_mu_trk_nhitstrack;   //!
    // TBranch        *b_Reco_mu_trk_nhitsDT;   //!
    // TBranch        *b_Reco_mu_trk_nhitsCSC;   //!
+   TBranch        *b_Reco_mu_trk_nhitsStrip;   //!
+   TBranch        *b_Reco_mu_trk_nhitsPixB;   //!
+   TBranch        *b_Reco_mu_trk_nhitsPixE;   //!
+   TBranch        *b_Reco_mu_trk_nhitsPix1Hit;   //!
+   TBranch        *b_Reco_mu_trk_nhitsPix1HitBE;   //!
    TBranch        *b_Reco_mu_trk_PIDmask;   //!
    TBranch        *b_Reco_mu_trk_caloComp;   //!
    TBranch        *b_Reco_mu_trk_segmComp;   //!
@@ -276,6 +328,7 @@ public :
    TBranch        *b_Reco_QQ_lxy;   //!
    TBranch        *b_Reco_QQ_lxyErr;   //!
    TBranch        *b_Reco_QQ_normChi2;   //!
+   TBranch        *b_Reco_QQ_probChi2;   //!
    TBranch        *b_Reco_QQ_cosAlpha;   //!
    TBranch        *b_Reco_QQ_ctau;   //!
    TBranch        *b_Reco_QQ_sign;   //!
@@ -415,6 +468,9 @@ void JPsiTreeBase::Init(TTree *tree)
    Mc_QQmoth_3vec = 0;
    Mc_mu_4mom = 0;
    Mc_mu_3vec = 0;
+   Reco_track_4mom = 0;
+   Reco_track_3vec = 0;
+   Reco_track_CovM = 0;
    Reco_mu_glb_4mom = 0;
    Reco_mu_glb_track4mom = 0;
    Reco_mu_glb_3vec = 0;
@@ -457,6 +513,23 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Mc_mu_3vec", &Mc_mu_3vec, &b_Mc_mu_3vec);
    fChain->SetBranchAddress("Mc_mu_id", Mc_mu_id, &b_Mc_mu_id);
    fChain->SetBranchAddress("Mc_mumoth_id", Mc_mumoth_id, &b_Mc_mumoth_id);
+   if (!isAOD) {
+     fChain->SetBranchAddress("Reco_track_size", &Reco_track_size, &b_Reco_track_size);
+     fChain->SetBranchAddress("Reco_track_4mom", &Reco_track_4mom, &b_Reco_track_4mom);
+     fChain->SetBranchAddress("Reco_track_3vec", &Reco_track_3vec, &b_Reco_track_3vec);
+     fChain->SetBranchAddress("Reco_track_CovM", &Reco_track_CovM, &b_Reco_track_CovM);
+     fChain->SetBranchAddress("Reco_track_phiErr", Reco_track_phiErr, &b_Reco_track_phiErr);
+     fChain->SetBranchAddress("Reco_track_etaErr", Reco_track_etaErr, &b_Reco_track_etaErr);
+     fChain->SetBranchAddress("Reco_track_ptErr", Reco_track_ptErr, &b_Reco_track_ptErr);
+     fChain->SetBranchAddress("Reco_track_d0", Reco_track_d0, &b_Reco_track_d0);
+     fChain->SetBranchAddress("Reco_track_d0err", Reco_track_d0err, &b_Reco_track_d0err);
+     fChain->SetBranchAddress("Reco_track_dz", Reco_track_dz, &b_Reco_track_dz);
+     fChain->SetBranchAddress("Reco_track_dzerr", Reco_track_dzerr, &b_Reco_track_dzerr);
+     fChain->SetBranchAddress("Reco_track_charge", Reco_track_charge, &b_Reco_track_charge);
+     fChain->SetBranchAddress("Reco_track_chi2", Reco_track_chi2, &b_Reco_track_chi2);
+     fChain->SetBranchAddress("Reco_track_ndof", Reco_track_ndof, &b_Reco_track_ndof);
+     fChain->SetBranchAddress("Reco_track_nhits", Reco_track_nhits, &b_Reco_track_nhits);
+   }
    fChain->SetBranchAddress("Reco_mu_glb_size", &Reco_mu_glb_size, &b_Reco_mu_glb_size);
    fChain->SetBranchAddress("Reco_mu_glb_4mom", &Reco_mu_glb_4mom, &b_Reco_mu_glb_4mom);
    fChain->SetBranchAddress("Reco_mu_glb_track4mom", &Reco_mu_glb_track4mom, &b_Reco_mu_glb_track4mom);
@@ -470,10 +543,13 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_glb_dzerr", Reco_mu_glb_dzerr, &b_Reco_mu_glb_dzerr);
    fChain->SetBranchAddress("Reco_mu_glb_normChi2", Reco_mu_glb_normChi2, &b_Reco_mu_glb_normChi2);
    fChain->SetBranchAddress("Reco_mu_glb_nhitstrack", Reco_mu_glb_nhitstrack, &b_Reco_mu_glb_nhitstrack);
-   if (!isAOD) {
-     fChain->SetBranchAddress("Reco_mu_glb_nhitsDT", Reco_mu_glb_nhitsDT, &b_Reco_mu_glb_nhitsDT);
-     fChain->SetBranchAddress("Reco_mu_glb_nhitsCSC", Reco_mu_glb_nhitsCSC, &b_Reco_mu_glb_nhitsCSC);
-   }
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsStrip", Reco_mu_glb_nhitsStrip, &b_Reco_mu_glb_nhitsStrip);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsPixB", Reco_mu_glb_nhitsPixB, &b_Reco_mu_glb_nhitsPixB);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsPixE", Reco_mu_glb_nhitsPixE, &b_Reco_mu_glb_nhitsPixE);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsPix1Hit", Reco_mu_glb_nhitsPix1Hit, &b_Reco_mu_glb_nhitsPix1Hit);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsPix1HitBE", Reco_mu_glb_nhitsPix1HitBE, &b_Reco_mu_glb_nhitsPix1HitBE);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsDT", Reco_mu_glb_nhitsDT, &b_Reco_mu_glb_nhitsDT);
+   fChain->SetBranchAddress("Reco_mu_glb_nhitsCSC", Reco_mu_glb_nhitsCSC, &b_Reco_mu_glb_nhitsCSC);
    fChain->SetBranchAddress("Reco_mu_glb_caloComp", Reco_mu_glb_caloComp, &b_Reco_mu_glb_caloComp);
    fChain->SetBranchAddress("Reco_mu_glb_segmComp", Reco_mu_glb_segmComp, &b_Reco_mu_glb_segmComp);
    fChain->SetBranchAddress("Reco_mu_glb_iso", Reco_mu_glb_iso, &b_Reco_mu_glb_iso);
@@ -492,6 +568,11 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_mu_trk_nhitstrack", Reco_mu_trk_nhitstrack, &b_Reco_mu_trk_nhitstrack);
    // fChain->SetBranchAddress("Reco_mu_trk_nhitsDT", Reco_mu_trk_nhitsDT, &b_Reco_mu_trk_nhitsDT);
    // fChain->SetBranchAddress("Reco_mu_trk_nhitsCSC", Reco_mu_trk_nhitsCSC, &b_Reco_mu_trk_nhitsCSC);
+   fChain->SetBranchAddress("Reco_mu_trk_nhitsStrip", Reco_mu_trk_nhitsStrip, &b_Reco_mu_trk_nhitsStrip);
+   fChain->SetBranchAddress("Reco_mu_trk_nhitsPixB", Reco_mu_trk_nhitsPixB, &b_Reco_mu_trk_nhitsPixB);
+   fChain->SetBranchAddress("Reco_mu_trk_nhitsPixE", Reco_mu_trk_nhitsPixE, &b_Reco_mu_trk_nhitsPixE);
+   fChain->SetBranchAddress("Reco_mu_trk_nhitsPix1Hit", Reco_mu_trk_nhitsPix1Hit, &b_Reco_mu_trk_nhitsPix1Hit);
+   fChain->SetBranchAddress("Reco_mu_trk_nhitsPix1HitBE", Reco_mu_trk_nhitsPix1HitBE, &b_Reco_mu_trk_nhitsPix1HitBE);
    fChain->SetBranchAddress("Reco_mu_trk_PIDmask", Reco_mu_trk_PIDmask, &b_Reco_mu_trk_PIDmask);
    fChain->SetBranchAddress("Reco_mu_trk_caloComp", Reco_mu_trk_caloComp, &b_Reco_mu_trk_caloComp);
    fChain->SetBranchAddress("Reco_mu_trk_segmComp", Reco_mu_trk_segmComp, &b_Reco_mu_trk_segmComp);
@@ -534,6 +615,7 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_QQ_lxy", Reco_QQ_lxy, &b_Reco_QQ_lxy);
    fChain->SetBranchAddress("Reco_QQ_lxyErr", Reco_QQ_lxyErr, &b_Reco_QQ_lxyErr);
    fChain->SetBranchAddress("Reco_QQ_normChi2", Reco_QQ_normChi2, &b_Reco_QQ_normChi2);
+   fChain->SetBranchAddress("Reco_QQ_probChi2", Reco_QQ_probChi2, &b_Reco_QQ_probChi2);
    fChain->SetBranchAddress("Reco_QQ_cosAlpha", Reco_QQ_cosAlpha, &b_Reco_QQ_cosAlpha);
    fChain->SetBranchAddress("Reco_QQ_ctau", Reco_QQ_ctau, &b_Reco_QQ_ctau);
    fChain->SetBranchAddress("Reco_QQ_sign", Reco_QQ_sign, &b_Reco_QQ_sign);

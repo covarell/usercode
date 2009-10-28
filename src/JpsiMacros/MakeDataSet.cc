@@ -35,15 +35,17 @@ void MakeDataSet::Loop() {
 
   /// SELECTION CUTS ///
  
-  // to be defined as parameter in JPsiFitApp !!!
+  // to be defined as parameters in JPsiFitApp...
   bool onlyTheBest = true;
+  bool efficiencyStore = true;
 
   MIN_nhits_trk = 12;
   MAX_normchi2_trk = 5.0;
   MAX_normchi2_glb = 20.0;
   MIN_nhits_pixel = 2;
-  MAX_d0_trk = 10.0;
-  MAX_dz_trk = 25.0;
+  MAX_d0_trk = 5.0;
+  MAX_dz_trk = 20.0;
+  MIN_vtxprob_jpsi = 0.001;
 
   // mass-lifetime limits
   const float JpsiMassMin = 2.6;
@@ -54,8 +56,8 @@ void MakeDataSet::Loop() {
   ///////////////////////
 
   if (fChain == 0) return;  
-  int nentries = (int)fChain->GetEntries();
-  
+  int nentries = (int)fChain->GetEntries(); 
+
   // loop over events
   cout << "Number of entries = " << nentries << endl;
 
@@ -63,11 +65,37 @@ void MakeDataSet::Loop() {
   int totalEvents = 0;
   int passedCandidates = 0;
 
+  TH2F *heffTrk;
+  TH2F *heffMuGlb;
+  TH2F *heffMuTrk;
+  TH2F *heffMuHLT;
+
+  // Tag'n'probe stuff
+  if (efficiencyStore) {
+
+    TFile *feffTrk = TFile::Open("TnPfiles/fit_result_TkFromSta.root");
+    TFile *feffMuGlb = TFile::Open("TnPfiles/fit_result_MuFromTkJPsiGlb.root");
+    TFile *feffMuTrk = TFile::Open("TnPfiles/fit_result_MuFromTkJPsiTkM.root");
+    TFile *feffMuHLT = TFile::Open("TnPfiles/fit_result_HltFromJPsiGlb.root");
+    
+    heffTrk = (TH2F*)feffTrk->Get("fit_eff_pt_eta");
+    heffTrk->SetName("heffTrk");
+    heffMuGlb = (TH2F*)feffMuGlb->Get("fit_eff_pt_eta");
+    heffMuGlb->SetName("heffmuGlb");
+    heffMuTrk = (TH2F*)feffMuTrk->Get("fit_eff_pt_eta");
+    heffMuTrk->SetName("heffmuTrk");
+    heffMuHLT = (TH2F*)feffMuHLT->Get("fit_eff_pt_eta");
+    heffMuHLT->SetName("heffmuHLT");
+
+  }
+
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
   RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
   RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
+  RooRealVar* TNPeff = new RooRealVar("TNPeff","Tag and probe efficiency",0.,1.);
+  RooRealVar* TNPefferr = new RooRealVar("TNPefferr","Tag and probe efficiency uncertainty",0.,1.);
 
   RooRealVar* MCweight = new RooRealVar("MCweight","Monte Carlo Weight",0.,5.);
 
@@ -86,8 +114,10 @@ void MakeDataSet::Loop() {
   int MCcat = -999;
 
   float weight = 0.;
+  float tnpeff = 0.;
+  float tnpefferr = 0.;
 
-  RooDataSet* data = new RooDataSet("data","A sample",RooArgList(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,JpsiType,MCType));
+  RooDataSet* data = new RooDataSet("data","A sample",RooArgList(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
 
   for (int jentry=0; jentry< nentries; jentry++) {
     
@@ -209,6 +239,8 @@ void MakeDataSet::Loop() {
         if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
 
 	  passedCandidates++;
+          int theLoPtMu = Reco_QQ_mulpt[iqq];
+          int theHiPtMu = Reco_QQ_muhpt[iqq];
 
 	  JpsiPt->setVal(theQQ4mom->Perp()); 
           JpsiEta->setVal(theQQ4mom->Eta()); 
@@ -218,16 +250,67 @@ void MakeDataSet::Loop() {
 
           // Now, AFTER setting the weight, change to consider MC truth!
 	  if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("BJpsiMuMu")) {
-	    bool isMatchedGlbGlb = (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu2) || (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2 && Reco_QQ_mulpt[iqq] == theMCMatchedGlbMu1);
-            bool isMatchedGlbTrk = (Reco_QQ_mulpt[iqq] == theMCMatchedTrkMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) );
-	    bool isMatchedGlbCal = (Reco_QQ_mulpt[iqq] == theMCMatchedCalMu && (Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu1 || Reco_QQ_muhpt[iqq] == theMCMatchedGlbMu2) ); 
+	    bool isMatchedGlbGlb = (theHiPtMu == theMCMatchedGlbMu1 && theLoPtMu == theMCMatchedGlbMu2) || (theHiPtMu == theMCMatchedGlbMu2 && theLoPtMu == theMCMatchedGlbMu1);
+            bool isMatchedGlbTrk = (theLoPtMu == theMCMatchedTrkMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) );
+	    bool isMatchedGlbCal = (theLoPtMu == theMCMatchedCalMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) ); 
 	    if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
 	  }
 
+          // if efficiencyStore, store efficiencies from TagNProbe
+          if (efficiencyStore) {
+            TLorentzVector *theHpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theHiPtMu);
+            TLorentzVector *theLpt4mom;
+	    if (Reco_QQ_type[iqq] == 0) 
+	      theLpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theLoPtMu);
+	    else 
+	      theLpt4mom = (TLorentzVector*)Reco_mu_trk_4mom->At(theLoPtMu);
+	    
+	    float effTrk1 = findEff(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+            float effTrk2 = findEff(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+            // cout << "efftrk 2 " << effTrk2 << endl; 
+            float effMu1 = findEff(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+            float effMu2;
+            float effHLT1 = findEff(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+
+            float efferrTrk1 = findEffErr(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+            float efferrTrk2 = findEffErr(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true); 
+            float efferrMu1 = findEffErr(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+            float efferrMu2;
+            float efferrHLT1 = findEffErr(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	    
+
+            if (Reco_QQ_type[iqq] == 0) {
+	      effMu2 = findEff(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+              // cout << "effmu 2 " << effMu2 << endl; 
+              efferrMu2 = findEffErr(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+              float effHLT2 = findEff(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+              float efferrHLT2 = findEffErr(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	      // GLOBAL - GLOBAL : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
+	      // eff_(GlobalMu from Track)^2 * 
+	      // (2eff_(HLT from GlobalMu) - eff_(HLT from GlobalMu)^2)
+	      tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * (effHLT1 + effHLT2 - effHLT1*effHLT2);
+              float uglyNumber = (pow((1-effHLT1)*efferrHLT2,2) + pow((1-effHLT2)*efferrHLT1,2))/pow(effHLT1 + effHLT2 - effHLT1*effHLT2,2);
+	      tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + uglyNumber);
+	    } else {
+              effMu2 = findEff(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+              // cout << "effmu 2 (tracker) " << effMu2 << endl; 
+              efferrMu2 = findEffErr(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	      // GLOBAL - TRACKER : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
+	      // eff_(GlobalMu from Track) * eff_(TrackerMu from Track) *
+	      // eff_(HLT from GlobalMu)^2
+              tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * effHLT1;
+	      tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + pow(efferrHLT1/effHLT1,2));
+	    }
+	  }
+
 	  MCType.setIndex(MCcat,kTRUE);
+          TNPeff->setVal(tnpeff);
+          cout << " EFF : " << tnpeff << endl;
+          TNPefferr->setVal(tnpefferr);
+          cout << " ERR : " << tnpefferr << endl << endl;
 	  MCweight->setVal(weight);
 
-	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,JpsiType,MCType));
+	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
 
 	}
       }
@@ -362,6 +445,7 @@ int MakeDataSet::theBestQQ() {
     int thehptMu = Reco_QQ_muhpt[iqq];
     int thelptMu = Reco_QQ_mulpt[iqq];
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
+        Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi && 
 	Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
 	Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb && 
         (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
@@ -385,13 +469,15 @@ int MakeDataSet::theBestQQ() {
 	continue;
       }
 
-      if ( Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+      if ( Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi &&
+	   Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
 	   Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb &&
            (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
 	   fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
 	   fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
 	   Reco_mu_trk_nhitstrack[thelptMu] > MIN_nhits_trk && 
 	   ((Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+           (Reco_mu_trk_nhitsPixB[thelptMu] + Reco_mu_trk_nhitsPixE[thelptMu]) > MIN_nhits_pixel &&
 	   Reco_mu_trk_normChi2[thelptMu] < MAX_normchi2_trk &&
 	   fabs(Reco_mu_trk_d0[thelptMu]) < MAX_d0_trk && 
 	   fabs(Reco_mu_trk_dz[thelptMu]) < MAX_dz_trk) {
@@ -450,4 +536,45 @@ double MakeDataSet::PhiInRange(const double& phi) const {
 
 double MakeDataSet::deltaR(const TLorentzVector* t, const TLorentzVector* u) const {
       return sqrt(pow(t->Eta()-u->Eta(),2) +pow(PhiInRange(t->Phi()-u->Phi()),2));
+}
+
+float MakeDataSet::findEff(TH2F* effhist, float pt, float eta, bool approx) const {
+
+  if (effhist->GetBinContent( effhist->FindBin(pt,eta) ) >  0.0001) {
+    return effhist->GetBinContent( effhist->FindBin(pt,eta) );
+  } else {
+    if (approx) {
+      // try close-by bins
+      int binp;       int bineta;        int dummy;
+      effhist->GetBinXYZ(effhist->FindBin(pt,eta),binp,bineta,dummy);
+      // cout << pt << " " << eta << " " << binp  << " " << bineta << " " << dummy << endl;
+      int newbinp = binp - 1;
+      if (effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) ) > 0.0001)
+	return effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) );
+      newbinp = binp + 1;
+      if (effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) ) > 0.0001)
+	return effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) );
+    } 
+  }
+  return 1.;
+}
+
+float MakeDataSet::findEffErr(TH2F* effhist, float pt, float eta, bool approx) const {
+
+  if (effhist->GetBinContent( effhist->FindBin(pt,eta) ) >  0.0001) {
+    return effhist->GetBinError( effhist->FindBin(pt,eta) );
+  } else {
+    if (approx) {
+      // try close-by bins
+      int binp;       int bineta;        int dummy;
+      effhist->GetBinXYZ(effhist->FindBin(pt,eta),binp,bineta,dummy);
+      int newbinp = binp - 1;
+      if (effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) ) > 0.0001)
+	return effhist->GetBinError( effhist->GetBin(newbinp,bineta,dummy) );
+      newbinp = binp + 1;
+      if (effhist->GetBinContent( effhist->GetBin(newbinp,bineta,dummy) ) > 0.0001)
+	return effhist->GetBinError( effhist->GetBin(newbinp,bineta,dummy) );
+    } 
+  }
+  return 0.;
 }
