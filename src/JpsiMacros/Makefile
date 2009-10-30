@@ -75,6 +75,9 @@ JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(OUTLIB)/*.o $(GLIBS) $ $<
 
+FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassSimul $(OUTLIB)/*.o $(GLIBS) $ $<
+
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 

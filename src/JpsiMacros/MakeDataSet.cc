@@ -119,13 +119,21 @@ void MakeDataSet::Loop() {
     JpsiType.defineType(catname,i+1);
   }
 
+  RooCategory JpsiEtaType("JpsiEtaType","Category of eta");
+  JpsiEtaType.defineType("1",1);
+  JpsiEtaType.defineType("2",2);
+
   int MCcat = -999;
 
   float weight = 0.;
   float tnpeff = 0.;
   float tnpefferr = 0.;
 
-  RooDataSet* data = new RooDataSet("data","A sample",RooArgList(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
+  RooArgList varlist(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType);
+  varlist.add(JpsiPtType);
+  varlist.add(JpsiEtaType);
+
+  RooDataSet* data = new RooDataSet("data","A sample",varlist);
 
   for (int jentry=0; jentry< nentries; jentry++) {
     
@@ -151,30 +159,30 @@ void MakeDataSet::Loop() {
     TString filestring(fChain->GetCurrentFile()->GetName());
 
     if (filestring.Contains("promptJpsiMuMu")) {
-       MCcat = 0;
-       // weight = 0.1089;
-       weight = 0.09176;
+      MCcat = 0;
+      // weight = 0.1089;
+      weight = 0.09176;
     } else if (filestring.Contains("BJpsiMuMu")) {
-       MCcat = 1;
-       // weight = 0.1226;
-       weight = 0.0309;
+      MCcat = 1;
+      // weight = 0.1226;
+      weight = 0.0309;
     } else if (filestring.Contains("ppMuX")) {
-       MCcat = 2;
-       // weight = 12.76;
-       weight = 8.180;
+      MCcat = 2;
+      // weight = 12.76;
+      weight = 8.180;
     } else if (filestring.Contains("ppMuMu")) {
-       MCcat = 2;
-       // weight = 1.108;
-       weight = 0.892;
+      MCcat = 2;
+      // weight = 1.108;
+      weight = 0.892;
     }
     /* if(filestring.Contains("promptJpsiMuMu")) MCcat = 0;
-    else if(filestring.Contains("inclBtoJpsiMuMu")) MCcat = 1;
-    else if(filestring.Contains("InclusiveppToMu")) MCcat = 2;
+       else if(filestring.Contains("inclBtoJpsiMuMu")) MCcat = 1;
+       else if(filestring.Contains("InclusiveppToMu")) MCcat = 2;
 
-    //set the MC weight for the different categories
-    if(MCcat == 0) weight = 0.862;
-    else if(MCcat == 1) weight = 0.1745*2;   // take into account b+bbar!!!
-    else if(MCcat == 2) weight = 2.2831; */
+       //set the MC weight for the different categories
+       if(MCcat == 0) weight = 0.862;
+       else if(MCcat == 1) weight = 0.1745*2;   // take into account b+bbar!!!
+       else if(MCcat == 2) weight = 2.2831; */
   
     //exclude real Jpsi in background MC
     if(MCcat == 2){
@@ -218,8 +226,8 @@ void MakeDataSet::Loop() {
 	    theMCMatchedTrkMu = imutr;      break;
 	  }
 	}
-         for (int imuca=0; imuca<Reco_mu_cal_size; imuca++) {
-	   // cout << "Reco_mu_cal_size = " << Reco_mu_cal_size << endl;
+	for (int imuca=0; imuca<Reco_mu_cal_size; imuca++) {
+	  // cout << "Reco_mu_cal_size = " << Reco_mu_cal_size << endl;
           TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(imuca);
           if (deltaR(theMcMumom,theCaMumom) < 0.03) {
 	    theMCMatchedCalMu = imuca;       break;
@@ -241,91 +249,98 @@ void MakeDataSet::Loop() {
 
       if (onlyTheBest && iqq != myBest) continue;
 
-	TLorentzVector *theQQ4mom = (TLorentzVector*)Reco_QQ_4mom->At(iqq);
-	float theMass = theQQ4mom->M();
-        float theCtau = Reco_QQ_ctau[iqq]*10.;
+      TLorentzVector *theQQ4mom = (TLorentzVector*)Reco_QQ_4mom->At(iqq);
+      float theMass = theQQ4mom->M();
+      float theCtau = Reco_QQ_ctau[iqq]*10.;
 
-        if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
+      if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
 
-	  passedCandidates++;
-          int theLoPtMu = Reco_QQ_mulpt[iqq];  
-          int theHiPtMu = Reco_QQ_muhpt[iqq];
+	passedCandidates++;
+	int theLoPtMu = Reco_QQ_mulpt[iqq];  
+	int theHiPtMu = Reco_QQ_muhpt[iqq];
 
-	  JpsiPt->setVal(theQQ4mom->Perp()); 
-          JpsiEta->setVal(theQQ4mom->Eta()); 
-	  JpsiMass->setVal(theMass);
-	  Jpsict->setVal(theCtau);
-	  JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
+	JpsiPt->setVal(theQQ4mom->Perp()); 
+	JpsiEta->setVal(theQQ4mom->Eta()); 
+	JpsiMass->setVal(theMass);
+	Jpsict->setVal(theCtau);
+	JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
 
-          // Now, AFTER setting the weight, change to consider MC truth!
-	  if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("BJpsiMuMu")) {
-	    bool isMatchedGlbGlb = (theHiPtMu == theMCMatchedGlbMu1 && theLoPtMu == theMCMatchedGlbMu2) || (theHiPtMu == theMCMatchedGlbMu2 && theLoPtMu == theMCMatchedGlbMu1);
-            bool isMatchedGlbTrk = (theLoPtMu == theMCMatchedTrkMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) );
-	    bool isMatchedGlbCal = (theLoPtMu == theMCMatchedCalMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) ); 
-	    if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
-	  }
+	// Now, AFTER setting the weight, change to consider MC truth!
+	if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("BJpsiMuMu")) {
+	  bool isMatchedGlbGlb = (theHiPtMu == theMCMatchedGlbMu1 && theLoPtMu == theMCMatchedGlbMu2) || (theHiPtMu == theMCMatchedGlbMu2 && theLoPtMu == theMCMatchedGlbMu1);
+	  bool isMatchedGlbTrk = (theLoPtMu == theMCMatchedTrkMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) );
+	  bool isMatchedGlbCal = (theLoPtMu == theMCMatchedCalMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) ); 
+	  if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
+	}
 
-          // if efficiencyStore, store efficiencies from TagNProbe
-          if (efficiencyStore) {
-            TLorentzVector *theHpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theHiPtMu);
-            TLorentzVector *theLpt4mom;
-	    if (Reco_QQ_type[iqq] == 0) 
-	      theLpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theLoPtMu);
-	    else { 
-	      theLpt4mom = (TLorentzVector*)Reco_mu_trk_4mom->At(theLoPtMu);
-	    }    
+	// if efficiencyStore, store efficiencies from TagNProbe
+	if (efficiencyStore) {
+	  TLorentzVector *theHpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theHiPtMu);
+	  TLorentzVector *theLpt4mom;
+	  if (Reco_QQ_type[iqq] == 0) 
+	    theLpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theLoPtMu);
+	  else { 
+	    theLpt4mom = (TLorentzVector*)Reco_mu_trk_4mom->At(theLoPtMu);
+	  }    
 
-	    float effTrk1 = findEff(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
-            float effTrk2 = findEff(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-            // cout << "efftrk 2 " << effTrk2 << endl; 
-            float effMu1 = findEff(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
-            float effMu2;
-            float effHLT1 = findEff(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float effTrk1 = findEff(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float effTrk2 = findEff(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	  // cout << "efftrk 2 " << effTrk2 << endl; 
+	  float effMu1 = findEff(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float effMu2;
+	  float effHLT1 = findEff(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
 
-            float efferrTrk1 = findEffErr(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
-            float efferrTrk2 = findEffErr(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true); 
-            float efferrMu1 = findEffErr(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
-            float efferrMu2;
-            float efferrHLT1 = findEffErr(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float efferrTrk1 = findEffErr(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float efferrTrk2 = findEffErr(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true); 
+	  float efferrMu1 = findEffErr(heffMuGlb, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
+	  float efferrMu2;
+	  float efferrHLT1 = findEffErr(heffMuHLT, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
 	    
 
-            if (Reco_QQ_type[iqq] == 0) {
-	      effMu2 = findEff(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-              // cout << "effmu 2 " << effMu2 << endl; 
-              efferrMu2 = findEffErr(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-              float effHLT2 = findEff(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-              float efferrHLT2 = findEffErr(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-	      // GLOBAL - GLOBAL : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
-	      // eff_(GlobalMu from Track)^2 * 
-	      // (2eff_(HLT from GlobalMu) - eff_(HLT from GlobalMu)^2)
-	      tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * (effHLT1 + effHLT2 - effHLT1*effHLT2);
-              float uglyNumber = (pow((1-effHLT1)*efferrHLT2,2) + pow((1-effHLT2)*efferrHLT1,2))/pow(effHLT1 + effHLT2 - effHLT1*effHLT2,2);
-	      tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + uglyNumber);
-	    } else {
-              effMu2 = findEff(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-              // cout << "effmu 2 (tracker) " << effMu2 << endl; 
-              efferrMu2 = findEffErr(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
-	      // GLOBAL - TRACKER : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
-	      // eff_(GlobalMu from Track) * eff_(TrackerMu from Track) *
-	      // eff_(HLT from GlobalMu)^2
-              tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * effHLT1;
-	      tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + pow(efferrHLT1/effHLT1,2));
-	    }
+	  if (Reco_QQ_type[iqq] == 0) {
+	    effMu2 = findEff(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    // cout << "effmu 2 " << effMu2 << endl; 
+	    efferrMu2 = findEffErr(heffMuGlb, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    float effHLT2 = findEff(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    float efferrHLT2 = findEffErr(heffMuHLT, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    // GLOBAL - GLOBAL : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
+	    // eff_(GlobalMu from Track)^2 * 
+	    // (2eff_(HLT from GlobalMu) - eff_(HLT from GlobalMu)^2)
+	    tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * (effHLT1 + effHLT2 - effHLT1*effHLT2);
+	    float uglyNumber = (pow((1-effHLT1)*efferrHLT2,2) + pow((1-effHLT2)*efferrHLT1,2))/pow(effHLT1 + effHLT2 - effHLT1*effHLT2,2);
+	    tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + uglyNumber);
+	  } else {
+	    effMu2 = findEff(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    // cout << "effmu 2 (tracker) " << effMu2 << endl; 
+	    efferrMu2 = findEffErr(heffMuTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
+	    // GLOBAL - TRACKER : eff_Jpsi ~ eff_(Track from Standalone)^2 * 
+	    // eff_(GlobalMu from Track) * eff_(TrackerMu from Track) *
+	    // eff_(HLT from GlobalMu)^2
+	    tnpeff = effTrk1 * effTrk2 * effMu1 * effMu2 * effHLT1;
+	    tnpefferr = tnpeff * sqrt(pow(efferrTrk1/effTrk1,2) + pow(efferrTrk2/effTrk2,2) + pow(efferrMu1/effMu1,2) + pow(efferrMu2/effMu2,2) + pow(efferrHLT1/effHLT1,2));
 	  }
-
-	  MCType.setIndex(MCcat,kTRUE);
-          TNPeff->setVal(tnpeff);
-          // cout << " EFF : " << tnpeff << endl;
-          TNPefferr->setVal(tnpefferr);
-          // cout << " ERR : " << tnpefferr << endl << endl;
-	  MCweight->setVal(weight);
-
-	  JpsiPtType.setIndex(get_Jpsi_pt_type(theQQ4mom->Perp()),kTRUE);
-
-	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
-
 	}
+
+	MCType.setIndex(MCcat,kTRUE);
+	TNPeff->setVal(tnpeff);
+	// cout << " EFF : " << tnpeff << endl;
+	TNPefferr->setVal(tnpefferr);
+	// cout << " ERR : " << tnpefferr << endl << endl;
+	MCweight->setVal(weight);
+
+	JpsiPtType.setIndex(get_Jpsi_pt_type(theQQ4mom->Perp()),kTRUE);
+
+	if(fabs(theQQ4mom->Eta()) < 1.2) JpsiEtaType.setIndex(1,kTRUE);
+	else if(fabs(theQQ4mom->Eta()) > 1.2) JpsiEtaType.setIndex(2,kTRUE);
+
+	RooArgSet varlist_tmp(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType);
+	varlist_tmp.add(JpsiPtType);
+	varlist_tmp.add(JpsiEtaType);
+
+	data->add(varlist_tmp);
+
       }
+    }
   }
 
   data->setWeightVar(*MCweight);

@@ -325,8 +325,6 @@ int main(int argc, char* argv[]) {
   double NSigGT, errSigGT,resolGT;
   printResults(ws,NSigGT,errSigGT,resolGT);
 
-  cout << "prova1 " << endl;
-
   RooDataSet *GGdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG && (MCType == MCType::PR || MCType == MCType::NP)");
 
   RooDataSet *GTdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT && (MCType == MCType::PR || MCType == MCType::NP)");
