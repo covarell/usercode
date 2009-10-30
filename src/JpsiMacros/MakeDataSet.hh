@@ -9,6 +9,7 @@
 #include <TVector3.h>
 #include "JPsiTreeBase.h"
 
+#include <vector>
 
 class MakeDataSet : public JPsiTreeBase{
 public:
@@ -21,7 +22,7 @@ public:
   double deltaR(const TLorentzVector* t, const TLorentzVector* u) const;
   float findEff(TH2F* effhist, float pt, float eta, bool approx) const;
   float findEffErr(TH2F* effhist, float pt, float eta, bool approx) const;
-  int get_Jpsi_pt_type(const double jpsi4mom);
+  int get_Jpsi_var_type(const double jpsi4mom, vector<double> min, vector<double> max);
 
 private:
 

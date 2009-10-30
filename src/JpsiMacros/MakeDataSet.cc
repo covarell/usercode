@@ -113,15 +113,56 @@ void MakeDataSet::Loop() {
 
   RooCategory JpsiPtType("JpsiPtType","Category of pT");
 
-  for(int i=0;i<11;i++){
+  //read from file the pt bins
+  vector<double> ptmin;
+  vector<double> ptmax;
+
+  ifstream fpt;
+  fpt.open("ptranges.txt");
+  if (!fpt){
+    cout << "Error opening file " << endl;
+    assert(0);
+  }
+
+  Double_t min = 0., max = 0.;
+  //Read in the cache file and store back to array
+  while(!fpt.eof()){
+    fpt >> min >> max;
+    ptmin.push_back(min);
+    ptmax.push_back(max);
+  }
+
+  for(int i=0;i<ptmin.size();i++){
     char catname[100];
     sprintf(catname,"&d",i+1);
-    JpsiType.defineType(catname,i+1);
+    JpsiPtType.defineType(catname,i+1);
   }
 
   RooCategory JpsiEtaType("JpsiEtaType","Category of eta");
-  JpsiEtaType.defineType("1",1);
-  JpsiEtaType.defineType("2",2);
+
+  //read from file the pt bins
+  vector<double> etamin;
+  vector<double> etamax;
+
+  ifstream feta;
+  feta.open("etaranges.txt");
+  if (!feta){
+    cout << "Error opening file " << endl;
+    assert(0);
+  }
+
+  //Read in the cache file and store back to array
+  while(!feta.eof()){
+    feta>> min >> max;
+    etamin.push_back(min);
+    etamax.push_back(max);
+  }
+
+  for(int i=0;i<etamin.size();i++){
+    char catname[100];
+    sprintf(catname,"&d",i+1);
+    JpsiEtaType.defineType(catname,i+1);
+  }
 
   int MCcat = -999;
 
@@ -328,10 +369,8 @@ void MakeDataSet::Loop() {
 	// cout << " ERR : " << tnpefferr << endl << endl;
 	MCweight->setVal(weight);
 
-	JpsiPtType.setIndex(get_Jpsi_pt_type(theQQ4mom->Perp()),kTRUE);
-
-	if(fabs(theQQ4mom->Eta()) < 1.2) JpsiEtaType.setIndex(1,kTRUE);
-	else if(fabs(theQQ4mom->Eta()) > 1.2) JpsiEtaType.setIndex(2,kTRUE);
+	JpsiPtType.setIndex(get_Jpsi_var_type(theQQ4mom->Perp(),ptmin,ptmax),kTRUE);
+	JpsiEtaType.setIndex(get_Jpsi_var_type(theQQ4mom->Perp(),etamin,etamax),kTRUE);
 
 	RooArgSet varlist_tmp(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType);
 	varlist_tmp.add(JpsiPtType);
@@ -461,20 +500,11 @@ void MakeDataSet::Loop() {
 
 } // end of program
 		
-int MakeDataSet::get_Jpsi_pt_type(const double jpsi4mom) {
 
-  if(jpsi4mom < 5.) return 1;
-  else if(jpsi4mom > 5. && jpsi4mom < 6.) return 2;
-  else if(jpsi4mom > 6. && jpsi4mom < 7.) return 3;
-  else if(jpsi4mom > 7. && jpsi4mom < 8.) return 4;
-  else if(jpsi4mom > 9. && jpsi4mom < 9.) return 5;
-  else if(jpsi4mom > 9. && jpsi4mom < 11.) return 6;
-  else if(jpsi4mom > 11. && jpsi4mom < 14.) return 7;
-  else if(jpsi4mom > 14. && jpsi4mom < 18.) return 8;
-  else if(jpsi4mom > 18. && jpsi4mom < 25.) return 9;
-  else if(jpsi4mom > 25. && jpsi4mom < 35.) return 10;
-  else if(jpsi4mom > 35.) return 11;
-  else (assert(0));
+int MakeDataSet::get_Jpsi_var_type(const double jpsivar, vector<double> vectmin, vector<double> vectmax) {
+
+  for(int i=0;i<vectmin.size();i++)
+    if(jpsivar > vectmin[i] && jpsivar < vectmax[i]) return i+1;
 
   return -999;
 }
