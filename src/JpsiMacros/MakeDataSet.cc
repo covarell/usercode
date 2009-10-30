@@ -111,6 +111,14 @@ void MakeDataSet::Loop() {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
+  RooCategory JpsiPtType("JpsiPtType","Category of pT");
+
+  for(int i=0;i<11;i++){
+    char catname[100];
+    sprintf(catname,"&d",i+1);
+    JpsiType.defineType(catname,i+1);
+  }
+
   int MCcat = -999;
 
   float weight = 0.;
@@ -312,6 +320,8 @@ void MakeDataSet::Loop() {
           // cout << " ERR : " << tnpefferr << endl << endl;
 	  MCweight->setVal(weight);
 
+	  JpsiPtType.setIndex(get_Jpsi_pt_type(theQQ4mom->Perp()),kTRUE);
+
 	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
 
 	}
@@ -436,7 +446,23 @@ void MakeDataSet::Loop() {
 
 } // end of program
 		
+int MakeDataSet::get_Jpsi_pt_type(const double jpsi4mom) {
 
+  if(jpsi4mom < 5.) return 1;
+  else if(jpsi4mom > 5. && jpsi4mom < 6.) return 2;
+  else if(jpsi4mom > 6. && jpsi4mom < 7.) return 3;
+  else if(jpsi4mom > 7. && jpsi4mom < 8.) return 4;
+  else if(jpsi4mom > 9. && jpsi4mom < 9.) return 5;
+  else if(jpsi4mom > 9. && jpsi4mom < 11.) return 6;
+  else if(jpsi4mom > 11. && jpsi4mom < 14.) return 7;
+  else if(jpsi4mom > 14. && jpsi4mom < 18.) return 8;
+  else if(jpsi4mom > 18. && jpsi4mom < 25.) return 9;
+  else if(jpsi4mom > 25. && jpsi4mom < 35.) return 10;
+  else if(jpsi4mom > 35.) return 11;
+  else (assert(0));
+
+  return -999;
+}
 	       
 int MakeDataSet::theBestQQ() {
     

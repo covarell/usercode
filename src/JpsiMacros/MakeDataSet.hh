@@ -21,6 +21,7 @@ public:
   double deltaR(const TLorentzVector* t, const TLorentzVector* u) const;
   float findEff(TH2F* effhist, float pt, float eta, bool approx) const;
   float findEffErr(TH2F* effhist, float pt, float eta, bool approx) const;
+  int get_Jpsi_pt_type(const double jpsi4mom);
 
 private:
 
