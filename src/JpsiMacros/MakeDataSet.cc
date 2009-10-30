@@ -145,15 +145,15 @@ void MakeDataSet::Loop() {
     if (filestring.Contains("promptJpsiMuMu")) {
        MCcat = 0;
        // weight = 0.1089;
-       weight = 0.0973;
+       weight = 0.09176;
     } else if (filestring.Contains("BJpsiMuMu")) {
        MCcat = 1;
        // weight = 0.1226;
-       weight = 0.0314;
+       weight = 0.0309;
     } else if (filestring.Contains("ppMuX")) {
        MCcat = 2;
        // weight = 12.76;
-       weight = 8.179;
+       weight = 8.180;
     } else if (filestring.Contains("ppMuMu")) {
        MCcat = 2;
        // weight = 1.108;
@@ -228,7 +228,8 @@ void MakeDataSet::Loop() {
 
       if (Reco_QQ_sign[iqq] != 0) continue;
 
-      if(Reco_QQ_type[iqq] == 2 || Reco_QQ_type[iqq] > 3) continue;
+      // if(Reco_QQ_type[iqq] == 2 || Reco_QQ_type[iqq] > 3) continue;
+      if(Reco_QQ_type[iqq] > 1) continue;
 
       if (onlyTheBest && iqq != myBest) continue;
 
@@ -239,7 +240,7 @@ void MakeDataSet::Loop() {
         if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
 
 	  passedCandidates++;
-          int theLoPtMu = Reco_QQ_mulpt[iqq];
+          int theLoPtMu = Reco_QQ_mulpt[iqq];  
           int theHiPtMu = Reco_QQ_muhpt[iqq];
 
 	  JpsiPt->setVal(theQQ4mom->Perp()); 
@@ -262,9 +263,10 @@ void MakeDataSet::Loop() {
             TLorentzVector *theLpt4mom;
 	    if (Reco_QQ_type[iqq] == 0) 
 	      theLpt4mom = (TLorentzVector*)Reco_mu_glb_4mom->At(theLoPtMu);
-	    else 
+	    else { 
 	      theLpt4mom = (TLorentzVector*)Reco_mu_trk_4mom->At(theLoPtMu);
-	    
+	    }    
+
 	    float effTrk1 = findEff(heffTrk, theHpt4mom->Pt(), theHpt4mom->Eta(), true);
             float effTrk2 = findEff(heffTrk, theLpt4mom->Pt(), theLpt4mom->Eta(), true);
             // cout << "efftrk 2 " << effTrk2 << endl; 
@@ -305,9 +307,9 @@ void MakeDataSet::Loop() {
 
 	  MCType.setIndex(MCcat,kTRUE);
           TNPeff->setVal(tnpeff);
-          cout << " EFF : " << tnpeff << endl;
+          // cout << " EFF : " << tnpeff << endl;
           TNPefferr->setVal(tnpefferr);
-          cout << " ERR : " << tnpefferr << endl << endl;
+          // cout << " ERR : " << tnpefferr << endl << endl;
 	  MCweight->setVal(weight);
 
 	  data->add(RooArgSet(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType));
@@ -442,32 +444,31 @@ int MakeDataSet::theBestQQ() {
   float thehighestPt = -1.;
  
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
-    int thehptMu = Reco_QQ_muhpt[iqq];
-    int thelptMu = Reco_QQ_mulpt[iqq];
-    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
-        Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi && 
-	Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
-	Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb && 
-        (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
-        fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
-        fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
-	Reco_mu_glb_nhitstrack[thelptMu] > MIN_nhits_trk && 
-	Reco_mu_glb_normChi2[thelptMu] < MAX_normchi2_glb &&
-        (Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel && 
-        fabs(Reco_mu_glb_d0[thelptMu]) < MAX_d0_trk && 
-        fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk) return iqq;
+
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 ) {
+
+      int thehptMu = Reco_QQ_muhpt[iqq];   if (thehptMu >= Reco_mu_glb_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];   if (thelptMu >= Reco_mu_glb_size) continue;
+      if (Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi && 
+	  Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	  Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb && 
+	  (Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel && 
+	  fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
+	  fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
+	  Reco_mu_glb_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	  Reco_mu_glb_normChi2[thelptMu] < MAX_normchi2_glb &&
+	  (Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel && 
+	  fabs(Reco_mu_glb_d0[thelptMu]) < MAX_d0_trk && 
+	  fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk) return iqq;
+    }
   }
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
 
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 1 ) {
       
-      int thehptMu = Reco_QQ_muhpt[iqq];
-      int thelptMu = Reco_QQ_mulpt[iqq];
-      if (thelptMu >= Reco_mu_trk_size) {
-	// cout << "Non deve succedere! tmIndex = " << theTM+1 << " tmSize = " << Reco_mu_trk_size << endl;
-	continue;
-      }
+      int thehptMu = Reco_QQ_muhpt[iqq];  if (thehptMu >= Reco_mu_glb_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];  if (thelptMu >= Reco_mu_trk_size) continue;
 
       if ( Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi &&
 	   Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
