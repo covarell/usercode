@@ -8,7 +8,6 @@
 #include <TLorentzVector.h>
 #include <TVector3.h>
 #include "JPsiTreeBase.h"
-
 #include <vector>
 
 class MakeDataSet : public JPsiTreeBase{
@@ -33,7 +32,21 @@ private:
   float MAX_d0_trk;
   float MAX_dz_trk;
   float MIN_vtxprob_jpsi;
-  
+
+  TH1F* gammaFactor_GGnonprompt;
+  TH1F* gammaFactor_GTnonprompt;
+  TH1F* hMcPR_GGMass;               
+  TH1F* hMcPR_GTMass;               
+  TH1F* hMcNP_GGMass;               
+  TH1F* hMcNP_GTMass;               
+  TH1F* hMcBK_GGMass;               
+  TH1F* hMcBK_GTMass;               
+  TH1F* hMcPR_GGLife;               
+  TH1F* hMcPR_GTLife;               
+  TH1F* hMcNP_GGLife;               
+  TH1F* hMcNP_GTLife;               
+  TH1F* hMcBK_GGLife;               
+  TH1F* hMcBK_GTLife;               
 };
 #endif
 
