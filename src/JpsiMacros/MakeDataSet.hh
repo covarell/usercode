@@ -46,7 +46,16 @@ private:
   TH1F* hMcNP_GGLife;               
   TH1F* hMcNP_GTLife;               
   TH1F* hMcBK_GGLife;               
-  TH1F* hMcBK_GTLife;               
+  TH1F* hMcBK_GTLife; 
+
+  TH2F *heffTrk;
+  TH2F *heffMuGlb;
+  TH2F *heffMuTrk;
+  TH2F *heffMuHLT;
+
+  bool onlyTheBest;
+  bool efficiencyStore;
+              
 };
 #endif
 
