@@ -329,61 +329,61 @@ void MakeDataSet::Loop() {
 	if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
       }
       
-      // Fill histos
-      switch(Reco_QQ_type[iqq]){
-	
-      case 0:{
-      
-	switch(MCcat){
-	  
-	case 0 :{
-	  hMcPR_GGMass->Fill(theMass,weight);
-	  hMcPR_GGLife->Fill(theCtau,weight);
-	  break;
-	}	    
-	case 1 :{
-	  hMcNP_GGMass->Fill(theMass,weight);
-	  hMcNP_GGLife->Fill(theCtau,weight);
-	  gammaFactor_GGnonprompt->Fill(corrFact,weight);
-	  break;
-	} 
-	case 2 :{
-	  hMcBK_GGMass->Fill(theMass,weight);
-	  hMcBK_GGLife->Fill(theCtau,weight);
-	  break;
-	}
-	}
-	
-      case 1 :{
-	
-	switch(MCcat){
-	  
-	case 0 :{
-	  hMcPR_GTMass->Fill(theMass,weight);
-	  hMcPR_GTLife->Fill(theCtau,weight);
-	  break;
-	}	    
-	case 1 :{
-	  hMcNP_GTMass->Fill(theMass,weight);
-	  hMcNP_GTLife->Fill(theCtau,weight);
-	  gammaFactor_GTnonprompt->Fill(corrFact,weight);
-	  break;
-	} 
-	case 2 :{
-	  hMcBK_GTMass->Fill(theMass,weight);
-	  hMcBK_GTLife->Fill(theCtau,weight);
-	  break;
-	}
-	}
-      }
-      }
-      }
-      
-      // Fill RooDataSet
       if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
 	
 	passedCandidates++;
 	
+        // Fill histos
+	switch(Reco_QQ_type[iqq]){
+	  
+	case 0:{
+	  
+	  switch(MCcat){
+	  
+	  case 0 :{
+	    hMcPR_GGMass->Fill(theMass,weight);
+	    hMcPR_GGLife->Fill(theCtau,weight);
+	    break;
+	  }	    
+	  case 1 :{
+	    hMcNP_GGMass->Fill(theMass,weight);
+	    hMcNP_GGLife->Fill(theCtau,weight);
+	    gammaFactor_GGnonprompt->Fill(corrFact,weight);
+	    break;
+	  } 
+	  case 2 :{
+	    hMcBK_GGMass->Fill(theMass,weight);
+	    hMcBK_GGLife->Fill(theCtau,weight);
+	    break;
+	  }
+	  }
+	
+	case 1 :{
+	  
+	  switch(MCcat){
+	    
+	  case 0 :{
+	    hMcPR_GTMass->Fill(theMass,weight);
+	    hMcPR_GTLife->Fill(theCtau,weight);
+	    break;
+	  }	    
+	  case 1 :{
+	    hMcNP_GTMass->Fill(theMass,weight);
+	    hMcNP_GTLife->Fill(theCtau,weight);
+	    gammaFactor_GTnonprompt->Fill(corrFact,weight);
+	    break;
+	  } 
+	  case 2 :{
+	    hMcBK_GTMass->Fill(theMass,weight);
+	    hMcBK_GTLife->Fill(theCtau,weight);
+	    break;
+	  }
+	  }
+	}
+	}
+	}
+	
+        // Fill RooDataSet
 	JpsiPt->setVal(theQQ4mom->Perp()); 
 	JpsiEta->setVal(theQQ4mom->Eta()); 
 	JpsiMass->setVal(theMass);
@@ -483,8 +483,8 @@ void MakeDataSet::Loop() {
   data->plotOn(frameMass3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
   frameMass3->Draw(); */
 
-  c1.cd(1);
-  // c1.cd(2);
+  // c1.cd(1);
+  c1.cd(2);
   gPad->SetLogy(1);
   RooPlot* framect = Jpsict->frame();
   data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
@@ -493,8 +493,8 @@ void MakeDataSet::Loop() {
   data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   framect->Draw();
 
-  c1.cd(2);
-  // c1.cd(4);
+  // c1.cd(2);
+  c1.cd(4);
   gPad->SetLogy(1);
   RooPlot* framect2 = Jpsict->frame();
   data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
