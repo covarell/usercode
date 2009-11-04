@@ -62,18 +62,18 @@ MakeDataSet::MakeDataSet(TTree *tree)
 
   gammaFactor_GGnonprompt         = new TH1F("gammaFactorGG_nonprompt",  "MC correction for non-prompt decays", 100, 0.,3.);
   gammaFactor_GTnonprompt         = new TH1F("gammaFactorGT_nonprompt",  "MC correction for non-prompt decays", 100, 0.,3.);
-  hMcPR_GGMass                  = new TH1F("hMcPR_GGMass",  "Inv. mass prompt - MC matched (global+global muons)", 110, 2.6,3.7);
-  hMcPR_GTMass                  = new TH1F("hMcPR_GTMass",  "Inv. mass prompt - MC matched (global+tracker muons)", 110, 2.6,3.7);
-  hMcNP_GGMass                  = new TH1F("hMcNP_GGMass",  "Inv. mass non-prompt - MC matched (global+global muons)", 110, 2.6,3.7);
-  hMcNP_GTMass                  = new TH1F("hMcNP_GTMass",  "Inv. mass non-prompt - MC matched (global+tracker muons)", 110, 2.6,3.7);
-  hMcBK_GGMass                  = new TH1F("hMcBK_GGMass",  "Inv. mass background (global+global muons)", 110, 2.6,3.7);
-  hMcBK_GTMass                  = new TH1F("hMcBK_GTMass",  "Inv. mass background (global+tracker muons)", 110, 2.6,3.7);
-  hMcPR_GGLife                  = new TH1F("hMcPR_GGLife",  "c #tau prompt - MC matched (global+global muons)", 80, -1.0, 3.0);
-  hMcPR_GTLife                  = new TH1F("hMcPR_GTLife",  "c #tau prompt - MC matched (global+tracker muons)", 80, -1.0, 3.0);
-  hMcNP_GGLife                  = new TH1F("hMcNP_GGLife",  "c #tau non-prompt - MC matched (global+global muons)", 80, -1.0, 3.0);
-  hMcNP_GTLife                  = new TH1F("hMcNP_GTLife",  "c #tau non-prompt - MC matched (global+tracker muons)", 80, -1.0, 3.0);
-  hMcBK_GGLife                  = new TH1F("hMcBK_GGLife",  "c #tau background (global+global muons)", 80, -1.0, 3.0);
-  hMcBK_GTLife                  = new TH1F("hMcBK_GTLife",  "c #tau background (global+tracker muons)", 80, -1.0, 3.0);
+  hMcPR_GGMass                  = new TH1F("hMcPR_GGMass",  "Inv. mass prompt - MC matched (global+global muons)", 100, 2.6,3.6);
+  hMcPR_GTMass                  = new TH1F("hMcPR_GTMass",  "Inv. mass prompt - MC matched (global+tracker muons)", 100, 2.6,3.6);
+  hMcNP_GGMass                  = new TH1F("hMcNP_GGMass",  "Inv. mass non-prompt - MC matched (global+global muons)", 100, 2.6,3.6);
+  hMcNP_GTMass                  = new TH1F("hMcNP_GTMass",  "Inv. mass non-prompt - MC matched (global+tracker muons)", 100, 2.6,3.6);
+  hMcBK_GGMass                  = new TH1F("hMcBK_GGMass",  "Inv. mass background (global+global muons)", 100, 2.6,3.6);
+  hMcBK_GTMass                  = new TH1F("hMcBK_GTMass",  "Inv. mass background (global+tracker muons)", 100, 2.6,3.6);
+  hMcPR_GGLife                  = new TH1F("hMcPR_GGLife",  "c #tau prompt - MC matched (global+global muons)", 90, -1.0, 3.5);
+  hMcPR_GTLife                  = new TH1F("hMcPR_GTLife",  "c #tau prompt - MC matched (global+tracker muons)", 90, -1.0, 3.5);
+  hMcNP_GGLife                  = new TH1F("hMcNP_GGLife",  "c #tau non-prompt - MC matched (global+global muons)", 90, -1.0, 3.5);
+  hMcNP_GTLife                  = new TH1F("hMcNP_GTLife",  "c #tau non-prompt - MC matched (global+tracker muons)", 90, -1.0, 3.5);
+  hMcBK_GGLife                  = new TH1F("hMcBK_GGLife",  "c #tau background (global+global muons)", 90, -1.0, 3.5);
+  hMcBK_GTLife                  = new TH1F("hMcBK_GTLife",  "c #tau background (global+tracker muons)", 90, -1.0, 3.5);
   
 }
 
@@ -83,9 +83,13 @@ void MakeDataSet::Loop() {
 
   // mass-lifetime limits
   const float JpsiMassMin = 2.6;
-  const float JpsiMassMax = 3.5;
+  const float JpsiMassMax = 3.6;
   const float JpsiCtMin = -1.0;
   const float JpsiCtMax = 3.5;
+  float JpsiPtMin = 0.0;           // SET BY 
+  float JpsiPtMax = 0.0;           // DEFINITION
+  float JpsiEtaMin = 0.0;          // OF BIN
+  float JpsiEtaMax = 0.0;          // LIMITS NOW
   
   // B-meson/baryon masses
   const float JpsiNomMass = 3.09688;
@@ -106,10 +110,67 @@ void MakeDataSet::Loop() {
   int totalEvents = 0;
   int passedCandidates = 0;
 
+  // PT category
+  RooCategory JpsiPtType("JpsiPtType","Category of pT");
+
+  //read from file the pt bins
+  vector<double> ptmin;
+  vector<double> ptmax;
+
+  ifstream fpt;
+  fpt.open("ptranges.txt");
+  if (!fpt) { cout << "Error opening file ptranges.txt" << endl; assert(0);  }
+
+  Double_t min = 0., max = 0.;  
+  //Read in the cache file and store back to array
+  while(!fpt.eof()){
+    fpt >> min >> max;
+    ptmin.push_back(min);
+    ptmax.push_back(max);
+  }
+
+  JpsiPtMin = ptmin[0];  cout << "Pt min = " << JpsiPtMin << endl;
+  JpsiPtMax = ptmax[ptmax.size()-2];  cout << "Pt max = " << JpsiPtMax << endl;
+
+  for(int i=0;i<ptmin.size()-1;i++){
+    char catname[100];
+    sprintf(catname,"P%d",i+1);
+    JpsiPtType.defineType(catname,i+1); 
+    cout << "Pt bin " << i+1 << ": Min = " << ptmin[i] << " Max = " << ptmax[i] << endl;   
+  }
+
+  // eta category
+  RooCategory JpsiEtaType("JpsiEtaType","Category of eta");
+
+  //read from file the pt bins
+  vector<double> etamin;
+  vector<double> etamax;
+
+  ifstream feta;
+  feta.open("etaranges.txt");
+  if (!feta){ cout << "Error opening file etaranges.txt" << endl; assert(0); }
+
+  //Read in the cache file and store back to array
+  while(!feta.eof()){
+    feta >> min >> max;
+    etamin.push_back(min);
+    etamax.push_back(max);    
+  }
+
+  JpsiEtaMin = etamin[0];   cout << "Eta min = " << JpsiEtaMin << endl;
+  JpsiEtaMax = etamax[etamax.size()-2];   cout << "Eta max = " << JpsiEtaMax << endl;
+
+  for(int i=0;i<etamin.size()-1;i++){
+    char catname[100];
+    sprintf(catname,"E%d",i+1);
+    JpsiEtaType.defineType(catname,i+1);
+    cout << "Eta bin " << i+1 << ": Min = " << etamin[i] << " Max = " << etamax[i] << endl;
+  }
+
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",0.,60.,"GeV/c");
-  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-2.7,2.7);
+  RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",JpsiPtMin,JpsiPtMax,"GeV/c");
+  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",JpsiEtaMin,JpsiEtaMax);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
   RooRealVar* JpsictTrue = new RooRealVar("JpsictTrue","J/psi ctau true",JpsiCtMin,JpsiCtMax,"mm");
   RooRealVar* TNPeff = new RooRealVar("TNPeff","Tag and probe efficiency",0.,1.);
@@ -129,57 +190,6 @@ void MakeDataSet::Loop() {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
-  // PT category
-  RooCategory JpsiPtType("JpsiPtType","Category of pT");
-
-  //read from file the pt bins
-  vector<double> ptmin;
-  vector<double> ptmax;
-
-  ifstream fpt;
-  fpt.open("ptranges.txt");
-  if (!fpt) { cout << "Error opening file ptranges.txt" << endl; assert(0);  }
-
-  Double_t min = 0., max = 0.;
-  //Read in the cache file and store back to array
-  while(!fpt.eof()){
-    fpt >> min >> max;
-    ptmin.push_back(min);
-    ptmax.push_back(max);
-    cout << "Min " << min << " Max " << max << endl;
-  }
-
-  for(int i=0;i<ptmin.size()-1;i++){
-    char catname[100];
-    sprintf(catname,"P%d",i+1);
-    JpsiPtType.defineType(catname,i+1); 
-  }
-
-  // eta category
-  RooCategory JpsiEtaType("JpsiEtaType","Category of eta");
-
-  //read from file the pt bins
-  vector<double> etamin;
-  vector<double> etamax;
-
-  ifstream feta;
-  feta.open("etaranges.txt");
-  if (!feta){ cout << "Error opening file etaranges.txt" << endl; assert(0); }
-
-  //Read in the cache file and store back to array
-  while(!feta.eof()){
-    feta >> min >> max;
-    etamin.push_back(min);
-    etamax.push_back(max);
-    cout << "Min " << min << " Max " << max << endl;
-  }
-
-  for(int i=0;i<etamin.size()-1;i++){
-    char catname[100];
-    sprintf(catname,"E%d",i+1);
-    JpsiEtaType.defineType(catname,i+1);
-  }
-
   int MCcat = -999;
 
   float weight = 0.;
@@ -187,6 +197,7 @@ void MakeDataSet::Loop() {
   float tnpefferr = 0.;
 
   RooArgList varlist(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType);
+  varlist.add(*JpsictTrue);
   varlist.add(JpsiPtType);
   varlist.add(JpsiEtaType);
 
@@ -329,7 +340,7 @@ void MakeDataSet::Loop() {
 	if (!isMatchedGlbGlb && !isMatchedGlbTrk && !isMatchedGlbCal) MCcat = 2;
       }
       
-      if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax) {
+      if (theMass > JpsiMassMin && theMass < JpsiMassMax && theCtau > JpsiCtMin && theCtau < JpsiCtMax && theQQ4mom->Perp() > JpsiPtMin && theQQ4mom->Perp() < JpsiPtMax && fabs(theQQ4mom->Eta()) > JpsiEtaMin && fabs(theQQ4mom->Eta()) < JpsiEtaMax) {
 	
 	passedCandidates++;
 	
@@ -357,6 +368,8 @@ void MakeDataSet::Loop() {
 	    break;
 	  }
 	  }
+	  break;
+	}
 	
 	case 1 :{
 	  
@@ -379,7 +392,7 @@ void MakeDataSet::Loop() {
 	    break;
 	  }
 	  }
-	}
+	  break;
 	}
 	}
 	
@@ -446,6 +459,7 @@ void MakeDataSet::Loop() {
 	
 	// Fill RooDataSet
 	RooArgSet varlist_tmp(*JpsiMass,*Jpsict,*JpsiPt,*JpsiEta,*MCweight,*TNPeff,*TNPefferr,JpsiType,MCType);
+        varlist_tmp.add(*JpsictTrue);
 	varlist_tmp.add(JpsiPtType);
 	varlist_tmp.add(JpsiEtaType);
 	  
@@ -464,49 +478,49 @@ void MakeDataSet::Loop() {
 
   c1.cd(1);
   RooPlot* frameMass = JpsiMass->frame();
-  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   frameMass->Draw(); 
 
   c1.cd(3);
   RooPlot* frameMass2 = JpsiMass->frame();
-  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
-  data->plotOn(frameMass2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(frameMass2,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
   frameMass2->Draw(); 
 
   /* c1.cd(5);
   RooPlot* frameMass3 = JpsiMass->frame(); 
-  data->plotOn(frameMass3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
+  data->plotOn(frameMass3,Binning(100),RooFit::Cut("JpsiType==JpsiType::GC"));
   frameMass3->Draw(); */
 
   // c1.cd(1);
   c1.cd(2);
   gPad->SetLogy(1);
   RooPlot* framect = Jpsict->frame();
-  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
-  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
-  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
-  data->plotOn(framect,Binning(50),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(90),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(90),RooFit::Cut("JpsiType==JpsiType::GG && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(90),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framect,Binning(90),RooFit::Cut("JpsiType==JpsiType::GG"),DataError(RooAbsData::SumW2));
   framect->Draw();
 
   // c1.cd(2);
   c1.cd(4);
   gPad->SetLogy(1);
   RooPlot* framect2 = Jpsict->frame();
-  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
-  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
-  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
-  data->plotOn(framect2,Binning(50),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(90),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(90),RooFit::Cut("JpsiType==JpsiType::GT && (MCType==MCType::NP || MCType==MCType::BK)"),LineColor(2),MarkerColor(2),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(90),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),LineColor(4),MarkerColor(4),DataError(RooAbsData::SumW2));
+  data->plotOn(framect2,Binning(90),RooFit::Cut("JpsiType==JpsiType::GT"),DataError(RooAbsData::SumW2));
   framect2->Draw();
 
   /* c1.cd(6);
   gPad->SetLogy(1);
   RooPlot* framect3 = Jpsict->frame();
-  data->plotOn(framect3,Binning(50),RooFit::Cut("JpsiType==JpsiType::GC"));
+  data->plotOn(framect3,Binning(90),RooFit::Cut("JpsiType==JpsiType::GC"));
   framect3->Draw(); */
 
   c1.SaveAs("bestCands.gif");
@@ -588,6 +602,18 @@ void MakeDataSet::Loop() {
   // summary
   cout << "total number of events = " << totalEvents << endl;
   cout << "number of passed candidates = " << passedCandidates << endl;
+  RooDataSet *reddataPR = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::PR");
+  cout << "Weighted global+global (PROMPT) = " << reddataPR->numEntries(kTRUE) << endl;
+  RooDataSet *reddataNP = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::NP");
+  cout << "Weighted global+global (NON-PROMPT) = " << reddataNP->numEntries(kTRUE) << endl;
+  RooDataSet *reddataBK = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::BK");
+  cout << "Weighted global+global (BACKGROUND) = " << reddataBK->numEntries(kTRUE) << endl;
+  RooDataSet *reddata2PR = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::PR");
+  cout << "Weighted global+tracker (PROMPT) = " << reddata2PR->numEntries(kTRUE) << endl;
+  RooDataSet *reddata2NP = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::NP");
+  cout << "Weighted global+tracker (NON-PROMPT) = " << reddata2NP->numEntries(kTRUE) << endl;
+  RooDataSet *reddata2BK = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::BK");
+  cout << "Weighted global+tracker (BACKGROUND) = " << reddata2BK->numEntries(kTRUE) << endl;
 
 } // end of program
 		

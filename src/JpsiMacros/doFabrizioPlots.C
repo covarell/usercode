@@ -162,10 +162,6 @@ void doFabrizioPlots() {
    leg->Draw("same");
 
    c2->SaveAs("jpsilifeMC.pdf");
-
-   
-   
-
 }
 
 
