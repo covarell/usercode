@@ -63,6 +63,9 @@ $(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
 $(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeDataSet.o $<
 
+$(OUTLIB)myRooFit.o: $(INCLUDEDIR)/myRooFit/RooHistPdfConv.cxx
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR)/myRooFit -o $(OUTLIB)myRooFit.o $<
+
 JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
@@ -75,13 +78,10 @@ JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(OUTLIB)/*.o $(GLIBS) $ $<
 
-FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
-	$(CXX) $(CXXFLAGS) -o FitMassSimul $(OUTLIB)/*.o $(GLIBS) $ $<
-
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
-Fit2D:    $(INCLUDEDIR)fit2D.cxx
+Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)myRooFit.o
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
 Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
