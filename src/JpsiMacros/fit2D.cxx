@@ -28,6 +28,8 @@
 #include "RooCBShape.h"
 #include "RooExponential.h"
 
+#include "myRooFit/RooHistPdfConv.h"
+
 using namespace RooFit;
 
 //list of parameters to save
@@ -108,8 +110,8 @@ void defineCTResol(RooWorkspace *ws){
 
   RooRealVar *Jpsict = ws->var("Jpsict");
 
-  RooRealVar meanResSigW("meanResSigW","Mean of the resolution wide gaussian",0.01,-1.,1.);
-  RooRealVar sigmaResSigW("sigmaResSigW","#sigma of the resolution wide gaussian",0.3,0.001,5.);
+  RooRealVar meanResSigW("meanResSigW","Mean of the resolution wide gaussian",0.003,-1.,1.);
+  RooRealVar sigmaResSigW("sigmaResSigW","#sigma of the resolution wide gaussian",0.05,0.001,5.);
   RooRealVar scaleK("scaleK","Scale factor of the resolution gaussian",1.,0.,10.);
   RooConstVar one("one","one",1.);
   //params.add(meanResSigW);
@@ -118,15 +120,15 @@ void defineCTResol(RooWorkspace *ws){
 
   scaleK.setConstant(kTRUE);
 
-  RooRealVar meanResSigN("meanResSigN","Mean of the resolution narrow gaussian",0.01,-1.,1.);
-  RooRealVar sigmaResSigN("sigmaResSigN","#sigma of the resolution narrow gaussian",0.1,0.001,5.);
+  RooRealVar meanResSigN("meanResSigN","Mean of the resolution narrow gaussian",-0.17,-1.,1.);
+  RooRealVar sigmaResSigN("sigmaResSigN","#sigma of the resolution narrow gaussian",0.02,0.001,5.);
   //params.add(meanResSigN);
   //params.add(sigmaResSigN);
 
   RooGaussModel resGW("resGW","Wide Gaussian resolution function",*Jpsict,meanResSigW,sigmaResSigW,one,scaleK);
   RooGaussModel resGN("resGN","Narrow Gaussian resolution function",*Jpsict,meanResSigN,sigmaResSigN,one,scaleK);
 
-  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.5,0.,1.);
+  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.93,0.,1.);
   //params.add(fracRes);
 
   RooAddModel resol("resol","resol",RooArgList(resGW,resGN),RooArgList(fracRes));
@@ -140,9 +142,9 @@ void defineCTBackground(RooWorkspace *ws){
 
   RooRealVar *Jpsict = ws->var("Jpsict");
 
-  RooRealVar lambdap("lambdap","tau of the positive background tail",0.1,0.05,5.);
-  RooRealVar lambdam("lambdam","tau of the negative background tail",0.1,0.05,5.);
-  RooRealVar lambdasym("lambdasym","tau of the symmetric background tail",0.1,0.05,5.);
+  RooRealVar lambdap("lambdap","tau of the positive background tail",0.4,0.,5.);
+  RooRealVar lambdam("lambdam","tau of the negative background tail",3.88,0.,5.);
+  RooRealVar lambdasym("lambdasym","tau of the symmetric background tail",0.16,0.,10.);
   //params.add(lambdap);
   //params.add(lambdam);
   //params.add(lambdasym);
@@ -155,18 +157,18 @@ void defineCTBackground(RooWorkspace *ws){
 
   //now, we could just compose the background together
   //but since we are not idiots, we compose them partially for stability
-  RooRealVar fpm("fpm","Fraction of pos/neg tails",0.5,0.,1.);
+  RooRealVar fpm("fpm","Fraction of pos/neg tails",0.92,0.,1.);
   //params.add(fpm);
 
   RooAddPdf bkgPart1("bkgPart1","Sum of pos/neg backgrounds",bkg2,bkg3,fpm);
 
-  RooRealVar fLiving("fLiving","Fraction of sym/asym living backgrounds",0.5,0.,1.);
+  RooRealVar fLiving("fLiving","Fraction of sym/asym living backgrounds",0.99,0.,1.);
   //params.add(fLiving);
 
   //FIXME
   RooAddPdf bkgPart2("bkgPart2","Sum of living backgrounds",bkgPart1,bkg4,fLiving);
 
-  RooRealVar fbkgTot("fbkgTot","Fraction of delta living background",0.5,0.,1.);
+  RooRealVar fbkgTot("fbkgTot","Fraction of delta living background",0.17,0.,1.);
   //params.add(fbkgTot);
 
   RooAddPdf bkgctauTOT("bkgctauTOT","Sum of all backgrounds",*(ws->pdf("resol")),bkgPart2,fbkgTot);
@@ -398,16 +400,16 @@ int main(int argc, char* argv[]) {
 
   setRanges(ws);
 
-  ws->var("JpsiMass")->setBins(20);
-  ws->var("Jpsict")->setBins(20);
+  ws->var("JpsiMass")->setBins(25);
+  ws->var("Jpsict")->setBins(25);
 
   //CONSIDER THE CASE
-  RooDataSet *reddata1;
+  RooDataSet *reddata;
 
-  if(isGG) reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
-  else reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  if(isGG) reddata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
+  else reddata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
 
-  RooDataHist *reddata = new RooDataHist("reddata","reddata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict")),*(ws->cat("MCType"))),*reddata1);
+  //RooDataHist *reddata = new RooDataHist("reddata","reddata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict")),*(ws->cat("MCType"))),*reddata1);
 
   cout << "Number of events to fit  = " << reddata->numEntries(kTRUE) << endl; 
 
@@ -461,9 +463,10 @@ int main(int argc, char* argv[]) {
   if(prefitBackground){
     cout << "Prefitting background on " << reddataBK->numEntries(kTRUE) << " MC events " << endl;
     ws->pdf("bkgctauTOT")->fitTo(*reddataBK/*,NumCPU(4)*/);
+    //ws->pdf("resol")->fitTo(*reddataBK/*,NumCPU(4)*/);
   }
 
-  ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(1)/*,NumCPU(4)*/);
+  ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(4));
 
   ws->saveSnapshot("fit2dpart_GG.root",ws->components(),kFALSE);
 

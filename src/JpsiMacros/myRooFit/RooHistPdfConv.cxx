@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx 24286 2008-06-16 15:47:04Z wouter $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.1 2009/11/05 16:38:57 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -31,23 +31,23 @@
 #include "RooMath.h"
 #include "RooRealConstant.h"
 #include "RooRandom.h"
+#include "RooRealVar.h"
 
-ClassImp(RooHistPdfConv) 
-;
-
+ClassImp(RooHistPdfConv);
 
 
 //_____________________________________________________________________________
-RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& xIn, 
+RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& _xIn, 
 			     RooAbsReal& _mean, RooAbsReal& _sigma, 
 			     RooDataHist& datahist) :
-  RooResolutionModel(name,title,xIn), 
+  RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
+  xIn("xIn","xIn",this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
-  msf("msf","Mean Scale Factor",this,(RooRealVar&)RooRealConstant::value(1)),
-  ssf("ssf","Sigma Scale Factor",this,(RooRealVar&)RooRealConstant::value(1))
+  msf("msf","Mean Scale Factor",this,(RooAbsReal&)RooRealConstant::value(1)),
+  ssf("ssf","Sigma Scale Factor",this,(RooAbsReal&)RooRealConstant::value(1))
 {  
   _histpdf = new RooDataHist(datahist);
   _variableName = xIn.GetName();
@@ -56,12 +56,13 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& 
 
 
 //_____________________________________________________________________________
-RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& xIn, 
+RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& _xIn, 
 			     RooAbsReal& _mean, RooAbsReal& _sigma, 
 			     RooAbsReal& _msSF, RooDataHist& datahist) : 
-  RooResolutionModel(name,title,xIn), 
+  RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
+  xIn("xIn","xIn",this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
   msf("msf","Mean Scale Factor",this,_msSF),
@@ -74,13 +75,14 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& 
 
 
 //_____________________________________________________________________________
-RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& xIn, 
+RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& _xIn, 
 			     RooAbsReal& _mean, RooAbsReal& _sigma, 
 			     RooAbsReal& _meanSF, RooAbsReal& _sigmaSF,
                              RooDataHist& datahist ) : 
-  RooResolutionModel(name,title,xIn), 
+  RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
+  xIn("xIn","xIn",this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
   msf("msf","Mean Scale Factor",this,_meanSF),
@@ -93,9 +95,10 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooRealVar& 
 
 //_____________________________________________________________________________
 RooHistPdfConv::RooHistPdfConv(const RooHistPdfConv& other, const char* name) : 
-  RooResolutionModel(other,name),
+  RooAbsPdf(other,name),
   _flatSFInt(other._flatSFInt),
   _asympInt(other._asympInt),
+  xIn("xIn",this,other.xIn),
   mean("mean",this,other.mean),
   sigma("sigma",this,other.sigma),
   msf("msf",this,other.msf),
@@ -130,22 +133,19 @@ Double_t RooHistPdfConv::evaluate() const
     Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
     Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName);
-    Double_t c = (xprime->getVal() - halfBinSize - x + (mean*msf)) / (root2*sigma*ssf);
-    Double_t d = (xprime->getVal() + halfBinSize - x + (mean*msf)) / (root2*sigma*ssf);
+
+    Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
+    Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
     result += 0.5*weight*(RooMath::erfc(c)-RooMath::erfc(d));
   }
 
   return result ;
 }
 
-Int_t RooHistPdfConv::basisCode(const char* name) const {
-  return 0;
-}
-
 //_____________________________________________________________________________
 Int_t RooHistPdfConv::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const 
 {
-  if (matchArgs(allVars,analVars,convVar())) return 1 ;
+  if (matchArgs(allVars,analVars,xIn)) return 1 ;
   return 0 ;
 }
 
@@ -246,7 +246,7 @@ Double_t RooHistPdfConv::evalCerfInt(Double_t sign, Double_t tau, Double_t umin,
 //_____________________________________________________________________________
 Int_t RooHistPdfConv::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t /*staticInitOK*/) const
 {
-  if (matchArgs(directVars,generateVars,x)) return 1 ;  
+  if (matchArgs(directVars,generateVars,xIn)) return 1 ;  
   return 0 ;
 }
 
@@ -257,10 +257,10 @@ void RooHistPdfConv::generateEvent(Int_t code)
 {
   assert(code==1) ;
   Double_t xgen ;
-  while(1) {    
+  while(1) {
     xgen = RooRandom::randomGenerator()->Gaus((mean*msf),(sigma*ssf));
-    if (xgen<x.max() && xgen>x.min()) {
-      x = xgen ;
+    if (xgen < xIn.max() && xgen > xIn.min()) {
+      xIn = xgen ;
       return ;
     }
   }

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- *    File: $Id: RooHistPdfConv.h,v 1.21 2007/05/11 09:13:07 verkerke Exp $
+ *    File: $Id: RooHistPdfConv.h,v 1.1 2009/11/05 16:38:57 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -13,33 +13,35 @@
  * with or without modification, are permitted according to the terms        *
  * listed in LICENSE (http://roofit.sourceforge.net/license.txt)             *
  *****************************************************************************/
-#ifndef ROO_MYGAUSS_MODEL
-#define ROO_MYGAUSS_MODEL
+#ifndef ROO_HISTPDFCONV
+#define ROO_HISTPDFCONV
 
-#include "RooResolutionModel.h"
+#include "RooAbsPdf.h"
 #include "RooRealProxy.h"
 #include "RooDataHist.h"
 #include "RooComplex.h"
 #include "RooMath.h"
 
-class RooHistPdfConv : public RooResolutionModel {
+class RooHistPdfConv : public RooAbsPdf {
 public:
 
   // enum RooGaussBasis { histBasis=1 };
 
   // Constructors, assignment etc
   inline RooHistPdfConv() { }
-  RooHistPdfConv(const char *name, const char *title, RooRealVar& x, 
+  RooHistPdfConv(const char *name, const char *title, RooAbsReal& x, 
 		RooAbsReal& mean, RooAbsReal& sigma, RooDataHist& datahist) ; 
-  RooHistPdfConv(const char *name, const char *title, RooRealVar& x, 
+
+  RooHistPdfConv(const char *name, const char *title, RooAbsReal& x, 
 		RooAbsReal& mean, RooAbsReal& sigma, RooAbsReal& msSF, RooDataHist& datahist ) ; 
-  RooHistPdfConv(const char *name, const char *title, RooRealVar& x, 
+
+  RooHistPdfConv(const char *name, const char *title, RooAbsReal& x, 
 		RooAbsReal& mean, RooAbsReal& sigma, RooAbsReal& meanSF, RooAbsReal& sigmaSF, RooDataHist& datahist) ; 
+
   RooHistPdfConv(const RooHistPdfConv& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new RooHistPdfConv(*this,newname) ; }
   virtual ~RooHistPdfConv();
   
-  virtual Int_t basisCode(const char* name) const ;
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName) const ;
 
@@ -88,6 +90,7 @@ protected:
 
   Bool_t _asympInt ;  // added FMV,07/24/03
   
+  RooRealProxy xIn ;
   RooRealProxy mean ;
   RooRealProxy sigma ;
   RooRealProxy msf ;

@@ -81,8 +81,8 @@ FitMass:  $(INCLUDEDIR)fitMass.cxx
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
-Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)myRooFit.o
-	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
+Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)myRooFit.o  
+	$(CXX) $(CXXFLAGS) -o Fit2D -L$(OUTLIB)/*.so $(GLIBS) $ $<
 
 Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
 	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
