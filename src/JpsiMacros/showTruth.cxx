@@ -6,6 +6,7 @@
 #include <TROOT.h>
 #include <TFile.h>
 #include <TCanvas.h>
+#include <TH1F.h>
 
 #include "RooFit.h"
 #include "RooGlobalFunc.h"
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
   gROOT->SetStyle("Plain");
 
   char *filename;
+  Int_t nevents = 0;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -47,17 +49,13 @@ int main(int argc, char* argv[]) {
   RooDataSet *data = (RooDataSet*)fIn.Get("data");
 
   const float JpsiMassMin = 2.6;
-  const float JpsiMassMax = 3.5;
+  const float JpsiMassMax = 3.6;
   const float JpsiCtMin = -1.0;
-  const float JpsiCtMax = 5.0;
+  const float JpsiCtMax = 3.5;
 
-  RooRealVar JpsiMass("JpsiMass","#mu^{+}#mu^{-} mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
-  JpsiMass.setRange("left",2.6,2.9);
-  JpsiMass.setRange("right",3.3,3.5);
+  RooRealVar JpsictRes("JpsictRes","J/psi ctau resolution",-2.0,2.0,"mm");
 
-  RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
-
-  RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,5.);
+  RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,50.);
 
   RooCategory JpsiType("JpsiType","Category of muons");
   JpsiType.defineType("GG",0);
@@ -69,56 +67,85 @@ int main(int argc, char* argv[]) {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
+  RooDataSet *OKdata = (RooDataSet*)data->reduce("JpsictTrue > -10.0");
+  const RooArgSet* thisRow = OKdata->get();
+
+  RooDataSet* dataRes = new RooDataSet("dataRes","Resolution",
+                                        RooArgList(JpsictRes));
+
+
+  for (Int_t iSamp = 0; iSamp < OKdata->numEntries(); iSamp++)
+    {
+      if (nevents%100 == 0) cout << " >>> Processing event : " << nevents <<endl;
+      nevents++;
+      thisRow = OKdata->get(iSamp);
+
+      RooRealVar* Jpsict = (RooRealVar*)thisRow->find("Jpsict");
+      RooRealVar* JpsictTrue = (RooRealVar*)thisRow->find("JpsictTrue");
+
+      float Jpsires = Jpsict->getVal() - JpsictTrue->getVal();
+      JpsictRes.setVal(Jpsires);
+
+      dataRes->add(RooArgSet(JpsictRes));
+
+    }
+  
+  OKdata->merge(dataRes);
+  cout << " Merging OK " <<endl;
+
   //GG
-  RooDataSet *GGdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
-  GGdata->setWeightVar(MCweight);
-  RooDataSet *GGdataTr = (RooDataSet*)GGdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  GGdataTr->setWeightVar(MCweight);
-  RooDataSet *GGdataFa = (RooDataSet*)GGdata->reduce("MCType == MCType::BK");
-  GGdataFa->setWeightVar(MCweight);
-
-  RooPlot *GGmframe = JpsiMass.frame();
-  GGmframe->SetTitle("Mass for glb-glb muons");
-  GGdataTr->plotOn(GGmframe,DataError(RooAbsData::SumW2));
-  GGdataFa->plotOn(GGmframe,DataError(RooAbsData::SumW2),LineColor(kRed),MarkerColor(kRed));
-
   TCanvas c1;
-  c1.cd();GGmframe->Draw();
-  c1.SaveAs("GGmass.gif");
+  c1.Divide(2,2);
+
+  c1.cd(1);
+  gPad->SetLogy(1);
+  RooPlot* frameGGPR = JpsictRes.frame();
+  frameGGPR->SetTitle("c #tau resolution - MC prompt");
+  OKdata->plotOn(frameGGPR,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::PR"),DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2));
+  frameGGPR->Draw();
+
+  c1.cd(2);
+  gPad->SetLogy(1);
+  RooPlot* frameGGNP = JpsictRes.frame();
+  frameGGNP->SetTitle("c #tau resolution - MC non-prompt");
+  OKdata->plotOn(frameGGNP,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::NP"),DataError(RooAbsData::SumW2),LineColor(4),MarkerColor(4));
+  frameGGNP->Draw();
+
+  c1.cd(3);
+  gPad->SetLogy(1);
+  RooPlot* frameGGBK = JpsictRes.frame();
+  frameGGBK->SetTitle("c #tau resolution - MC background");
+  OKdata->plotOn(frameGGBK,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::BK"),DataError(RooAbsData::SumW2));
+  frameGGBK->Draw();
+
+  c1.SaveAs("GGctres.eps");
 
   //GT
-  RooDataSet *GTdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
-  GTdata->setWeightVar(MCweight);
-  RooDataSet *GTdataTr = (RooDataSet*)GTdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  GTdataTr->setWeightVar(MCweight);
-  RooDataSet *GTdataFa = (RooDataSet*)GTdata->reduce("MCType == MCType::BK");
-  GTdataFa->setWeightVar(MCweight);
-
-  RooPlot *GTmframe = JpsiMass.frame();
-  GTmframe->SetTitle("Mass for glb-trk muons");
-  GTdataTr->plotOn(GTmframe,DataError(RooAbsData::SumW2));
-  GTdataFa->plotOn(GTmframe,DataError(RooAbsData::SumW2),LineColor(kRed),MarkerColor(kRed));
-
   TCanvas c2;
-  c2.cd();GTmframe->Draw();
-  c2.SaveAs("GTmass.gif");
+  c2.Divide(2,2);
 
-  //GC
-  RooDataSet *GCdata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GC");
-  GCdata->setWeightVar(MCweight);
-  RooDataSet *GCdataTr = (RooDataSet*)GCdata->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  GCdataTr->setWeightVar(MCweight);
-  RooDataSet *GCdataFa = (RooDataSet*)GCdata->reduce("MCType == MCType::BK");
-  GCdataFa->setWeightVar(MCweight);
+  c2.cd(1);
+  gPad->SetLogy(1);
+  RooPlot* frameGTPR = JpsictRes.frame();
+  frameGTPR->SetTitle("c #tau resolution - MC prompt");
+  OKdata->plotOn(frameGTPR,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::PR"),DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2));
+  frameGTPR->Draw();
 
-  RooPlot *GCmframe = JpsiMass.frame();
-  GCmframe->SetTitle("Mass for glb-calo muons");
-  GCdataTr->plotOn(GCmframe,DataError(RooAbsData::SumW2));
-  GCdataFa->plotOn(GCmframe,DataError(RooAbsData::SumW2),LineColor(kRed),MarkerColor(kRed));
+  c2.cd(2);
+  gPad->SetLogy(1);
+  RooPlot* frameGTNP = JpsictRes.frame();
+  frameGTNP->SetTitle("c #tau resolution - MC non-prompt");
+  OKdata->plotOn(frameGTNP,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::NP"),DataError(RooAbsData::SumW2),LineColor(4),MarkerColor(4));
+  frameGTNP->Draw();
 
-  TCanvas c3;
-  c3.cd();GCmframe->Draw();
-  c3.SaveAs("GCmass.gif");
+  c2.cd(3);
+  gPad->SetLogy(1);
+  RooPlot* frameGTBK = JpsictRes.frame();
+  frameGTBK->SetTitle("c #tau resolution - MC background");
+  OKdata->plotOn(frameGTBK,Binning(100),RooFit::Cut("JpsiType==JpsiType::GT && MCType==MCType::BK"),DataError(RooAbsData::SumW2));
+  frameGTBK->Draw();
+
+  c2.SaveAs("GTctres.eps");
 
   return 1;
 }

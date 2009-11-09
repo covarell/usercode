@@ -247,8 +247,10 @@ void MakeDataSet::Loop() {
       if (aRealJpsiEvent) continue;
     }
     // Calculate correction factor/true lifetime for non-prompt
-    float corrFact = -0.09;
+    float corrFact = 1.0;
     float trueLife = -999.;
+    bool hasABMother = false;
+
     for (int iQQgen=0; iQQgen<Mc_QQ_size; iQQgen++) {
 
       TVector3 *theMcQQvtx = (TVector3*)Mc_QQ_3vec->At(iQQgen);
@@ -259,14 +261,22 @@ void MakeDataSet::Loop() {
       TLorentzVector *theMcQQmom = (TLorentzVector*)Mc_QQ_4mom->At(iQQgen);
       TLorentzVector *theMcBmom = (TLorentzVector*)Mc_QQmoth_4mom->At(iQQgen);
 
-      if (abs(Mc_QQmoth_id[iQQgen]) == 511) 
+      if (abs(Mc_QQmoth_id[iQQgen]) == 511) {
 	corrFact = (BpNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 521)
-	corrFact = (B0NomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());						
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 531)
+	hasABMother = true;
+      }
+      else if (abs(Mc_QQmoth_id[iQQgen]) == 521) {
+	corrFact = (B0NomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
+      	hasABMother = true;
+      }					
+      else if (abs(Mc_QQmoth_id[iQQgen]) == 531) {
 	corrFact = (BsNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 5122)
+	hasABMother = true;
+      }
+      else if (abs(Mc_QQmoth_id[iQQgen]) == 5122) {
 	corrFact = (LbNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
+	hasABMother = true;
+      }
       trueLife = theDiff.Perp()/corrFact;
     }
 
@@ -359,7 +369,7 @@ void MakeDataSet::Loop() {
 	  case 1 :{
 	    hMcNP_GGMass->Fill(theMass,weight);
 	    hMcNP_GGLife->Fill(theCtau,weight);
-	    gammaFactor_GGnonprompt->Fill(corrFact,weight);
+	    if (hasABMother) gammaFactor_GGnonprompt->Fill(corrFact,weight);
 	    break;
 	  } 
 	  case 2 :{
@@ -383,7 +393,7 @@ void MakeDataSet::Loop() {
 	  case 1 :{
 	    hMcNP_GTMass->Fill(theMass,weight);
 	    hMcNP_GTLife->Fill(theCtau,weight);
-	    gammaFactor_GTnonprompt->Fill(corrFact,weight);
+	    if (hasABMother) gammaFactor_GTnonprompt->Fill(corrFact,weight);
 	    break;
 	  } 
 	  case 2 :{

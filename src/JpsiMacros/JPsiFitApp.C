@@ -1,5 +1,7 @@
 // C++ includes
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <stdio.h>
 
 // ROOT includes
@@ -7,7 +9,6 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
-
 #include "MakeDataSet.cc"
 
 int main(int argc, char* argv[]) {
@@ -17,14 +18,26 @@ int main(int argc, char* argv[]) {
     std::cout << "missing argument: insert inputFile with list of root files" << std::endl; 
     return 1;
   }
+  strcpy(inputFileName,argv[1]);
+  
+  TChain *theChain = new TChain("T1");
+  char Buffer[500];
+  char MyRootFile[2000];
+  std::cout << "input: " << inputFileName << std::endl;
+  ifstream *inputFile = new ifstream(inputFileName);
 
- TChain *theChain=new TChain("T1");
-
-  //char* output=argv[1];
-  for(int i=1;i<argc;i++) {
-    theChain->Add(argv[i]);
-    //printf("Processing:%s\n",argv[i]);
+  int nfiles=1;
+  while( !(inputFile->eof()) ){
+    inputFile->getline(Buffer,500);
+    if (!strstr(Buffer,"#") && !(strspn(Buffer," ") == strlen(Buffer))) { 
+      sscanf(Buffer,"%s",MyRootFile);
+      theChain->Add(MyRootFile);
+      std::cout << "chaining " << MyRootFile << std::endl;
+      nfiles++;
+    }
   }
+  inputFile->close();
+  delete inputFile;
 
   MakeDataSet jpsiStudy(theChain);
   jpsiStudy.Loop();
