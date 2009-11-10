@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- *    File: $Id: RooHistPdfConv.h,v 1.2 2009/11/06 11:28:32 pellicci Exp $
+ *    File: $Id: RooHistPdfConv.h,v 1.1 2009/11/10 10:46:33 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -47,51 +47,15 @@ public:
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName) const ;
 
+  Double_t cerfIndefiniteInt(Double_t xi) const;
+
   Int_t getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK=kTRUE) const;
   void generateEvent(Int_t code);
-
-  void advertiseFlatScaleFactorIntegral(Bool_t flag) { _flatSFInt = flag ; }
-
-  void advertiseAymptoticIntegral(Bool_t flag) { _asympInt = flag ; }  // added FMV,07/24/03
 
 protected:
 
   virtual Double_t evaluate() const ;
-  RooComplex evalCerfApprox(Double_t swt, Double_t u, Double_t c) const ;
 
-  // Calculate exp(-u^2) cwerf(swt*c + i(u+c)), taking care of numerical instabilities
-  inline RooComplex evalCerf(Double_t swt, Double_t u, Double_t c) const {
-    RooComplex z(swt*c,u+c);
-    return (z.im()>-4.0) ? RooMath::FastComplexErrFunc(z)*exp(-u*u) : evalCerfApprox(swt,u,c) ;
-  }
-    
-  // Calculate Re(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-  inline Double_t evalCerfRe(Double_t swt, Double_t u, Double_t c) const {
-    RooComplex z(swt*c,u+c);
-    return (z.im()>-4.0) ? RooMath::FastComplexErrFuncRe(z)*exp(-u*u) : evalCerfApprox(swt,u,c).re() ;
-  }
-  
-  // Calculate Im(exp(-u^2) cwerf(swt*c + i(u+c))), taking care of numerical instabilities
-  inline Double_t evalCerfIm(Double_t swt, Double_t u, Double_t c) const {
-    RooComplex z(swt*c,u+c);
-    return (z.im()>-4.0) ? RooMath::FastComplexErrFuncIm(z)*exp(-u*u) : evalCerfApprox(swt,u,c).im() ;
-  }
-
-  // Calculate Re(exp(-u^2) cwerf(i(u+c)))
-  // added FMV, 08/17/03
-  inline Double_t evalCerfRe(Double_t u, Double_t c) const {
-    return exp(u*2*c+c*c) * RooMath::erfc(u+c);
-  }
-
-  // Calculate common normalization factors 
-  // added FMV,07/24/03
-  RooComplex evalCerfInt(Double_t sign, Double_t wt, Double_t tau, Double_t umin, Double_t umax, Double_t c) const ;
-  Double_t evalCerfInt(Double_t sign, Double_t tau, Double_t umin, Double_t umax, Double_t c) const ;
-
-  Bool_t _flatSFInt ;
-
-  Bool_t _asympInt ;  // added FMV,07/24/03
-  
   RooRealProxy xIn ;
   RooRealProxy mean ;
   RooRealProxy sigma ;
