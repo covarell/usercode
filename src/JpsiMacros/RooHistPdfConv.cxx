@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.1 2009/11/05 16:38:57 covarell Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.2 2009/11/06 11:28:32 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -33,7 +33,7 @@
 #include "RooRandom.h"
 #include "RooRealVar.h"
 
-ClassImp(RooHistPdfConv);
+//ClassImp(RooHistPdfConv);
 
 
 //_____________________________________________________________________________
@@ -43,14 +43,14 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
-  xIn("xIn","xIn",this,_xIn),
+  xIn(_xIn.GetName(),_xIn.GetTitle(),this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
   msf("msf","Mean Scale Factor",this,(RooAbsReal&)RooRealConstant::value(1)),
   ssf("ssf","Sigma Scale Factor",this,(RooAbsReal&)RooRealConstant::value(1))
 {  
   _histpdf = new RooDataHist(datahist);
-  _variableName = xIn.GetName();
+  _variableName = "JpsictTrue";
 }
 
 
@@ -62,14 +62,14 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
-  xIn("xIn","xIn",this,_xIn),
+  xIn(_xIn.GetName(),_xIn.GetTitle(),this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
   msf("msf","Mean Scale Factor",this,_msSF),
   ssf("ssf","Sigma Scale Factor",this,_msSF)
 {
   _histpdf = new RooDataHist(datahist);
-  _variableName = xIn.GetName();
+  _variableName = "JpsictTrue";
 }
 
 
@@ -82,14 +82,14 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   RooAbsPdf(name,title), 
   _flatSFInt(kFALSE),
   _asympInt(kFALSE),
-  xIn("xIn","xIn",this,_xIn),
+  xIn(_xIn.GetName(),_xIn.GetTitle(),this,_xIn),
   mean("mean","Mean",this,_mean),
   sigma("sigma","Width",this,_sigma),
   msf("msf","Mean Scale Factor",this,_meanSF),
   ssf("ssf","Sigma Scale Factor",this,_sigmaSF)
 {   
   _histpdf = new RooDataHist(datahist); 
-  _variableName = xIn.GetName();
+  _variableName = "JpsictTrue";
 }   
 
 
@@ -98,21 +98,14 @@ RooHistPdfConv::RooHistPdfConv(const RooHistPdfConv& other, const char* name) :
   RooAbsPdf(other,name),
   _flatSFInt(other._flatSFInt),
   _asympInt(other._asympInt),
-  xIn("xIn",this,other.xIn),
+  xIn(other.xIn.GetName(),this,other.xIn),
   mean("mean",this,other.mean),
   sigma("sigma",this,other.sigma),
   msf("msf",this,other.msf),
   ssf("ssf",this,other.ssf)
 {
   _histpdf = other._histpdf;
-}
-
-
-
-//_____________________________________________________________________________
-RooHistPdfConv::~RooHistPdfConv()
-{
-  // Destructor
+  _variableName = other._variableName;
 }
 
 
@@ -132,7 +125,7 @@ Double_t RooHistPdfConv::evaluate() const
     aRow = _histpdf->get(i);
     Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
     Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
-    xprime = (RooRealVar*)aRow->find(_variableName);
+    xprime = (RooRealVar*)aRow->find(_variableName.c_str());
 
     Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
     Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);

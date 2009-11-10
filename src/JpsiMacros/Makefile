@@ -1,5 +1,4 @@
 ROOTCFLAGS    = $(shell root-config --cflags)
-ROOTLIBS      = $(shell root-config --libs)
 ROOTGLIBS     = $(shell root-config --glibs)
 
 CXX           = g++
@@ -36,41 +35,33 @@ endif
 
 endif
 
-NGLIBS         = $(ROOTGLIBS) 
-NGLIBS        += -lMinuit -lRooFit
-gGLIBS          = $(filter-out -lNew, $(NGLIBS))
-
 CXXFLAGS      += $(ROOTCFLAGS)
-LIBS           = $(ROOTLIBS) 
 
 NGLIBS         = $(ROOTGLIBS) 
 NGLIBS        += -lMinuit -lRooFit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
 INCLUDEDIR       = ./
-CXX	         += -I$(INCLUDEDIR) -I.
+CXX	         += -I$(INCLUDEDIR)
 OUTLIB	         = ../lib/
 
 .SUFFIXES: .cc,.C,.hh,.h
 .PREFIXES: ../lib/
 
 $(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAnalysis.cc 
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)JPsiTreeBase.o $<
+	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)JPsiTreeBase.o $<
 
 $(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)finalJPsiAnalysis.o $<
+	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)finalJPsiAnalysis.o $<
 
 $(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)MakeDataSet.o $<
+	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)MakeDataSet.o $<
 
-$(OUTLIB)myRooFit.o: $(INCLUDEDIR)/myRooFit/RooHistPdfConv.cxx
-	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR)/myRooFit -o $(OUTLIB)myRooFit.o $<
+$(OUTLIB)RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
+	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)/libRooHistPdfConv.o $<
 
 JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
-
-JPsiApp.clean:
-	rm -f JPsiApp
 
 JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
@@ -78,11 +69,14 @@ JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(OUTLIB)/*.o $(GLIBS) $ $<
 
+FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassSim $(OUTLIB)/*.o $(GLIBS) $ $<
+
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
-Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)myRooFit.o  
-	$(CXX) $(CXXFLAGS) -o Fit2D -L$(OUTLIB)/*.so $(GLIBS) $ $<
+Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)RooHistPdfConv.o  
+	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
 Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
 	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
@@ -99,11 +93,9 @@ FitSidebands:  $(INCLUDEDIR)fitSidebands.cxx
 FitLifetime:  $(INCLUDEDIR)fitLifetime.cxx
 	$(CXX) $(CXXFLAGS) -o FitLifetime $(OUTLIB)/*.o $(GLIBS) $ $<
 
-JPsiFitApp.clean:
-	rm -f JPsiFitApp
-
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
+	rm -f $(OUTLIB)*.so
 	rm -f JPsiApp JPsiFitApp
 
-all:  JPsiApp JPsiFitApp
+all:  JPsiApp JPsiFitApp Fit2D FitMass ShowTruth FitMassSim

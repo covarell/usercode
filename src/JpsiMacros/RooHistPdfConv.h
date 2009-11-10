@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- *    File: $Id: RooHistPdfConv.h,v 1.1 2009/11/05 16:38:57 covarell Exp $
+ *    File: $Id: RooHistPdfConv.h,v 1.2 2009/11/06 11:28:32 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -16,6 +16,8 @@
 #ifndef ROO_HISTPDFCONV
 #define ROO_HISTPDFCONV
 
+#include <string>
+
 #include "RooAbsPdf.h"
 #include "RooRealProxy.h"
 #include "RooDataHist.h"
@@ -28,7 +30,7 @@ public:
   // enum RooGaussBasis { histBasis=1 };
 
   // Constructors, assignment etc
-  inline RooHistPdfConv() { }
+  RooHistPdfConv() { }
   RooHistPdfConv(const char *name, const char *title, RooAbsReal& x, 
 		RooAbsReal& mean, RooAbsReal& sigma, RooDataHist& datahist) ; 
 
@@ -40,7 +42,7 @@ public:
 
   RooHistPdfConv(const RooHistPdfConv& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new RooHistPdfConv(*this,newname) ; }
-  virtual ~RooHistPdfConv();
+  inline virtual ~RooHistPdfConv() {}
   
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName) const ;
@@ -97,9 +99,9 @@ protected:
   RooRealProxy ssf ;
 
   RooDataHist* _histpdf;
-  const char* _variableName;
+  string _variableName;
 
-  ClassDef(RooHistPdfConv,1) // Gaussian Resolution Model
+  //ClassDef(RooHistPdfConv,1) // Gaussian Resolution Model
 };
 
 #endif

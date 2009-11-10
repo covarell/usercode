@@ -28,7 +28,7 @@
 #include "RooCBShape.h"
 #include "RooExponential.h"
 
-#include "myRooFit/RooHistPdfConv.h"
+#include "RooHistPdfConv.h"
 
 using namespace RooFit;
 
@@ -178,14 +178,12 @@ void defineCTBackground(RooWorkspace *ws){
   return;
 }
 
-void defineCTSignal(RooWorkspace *ws){
-
-  RooRealVar *Jpsict = ws->var("Jpsict");
+void defineCTSignal(RooWorkspace *ws, RooDataHist *reducedNP){
 
   //signal prompt, same as zero lifetime background
 
   //signal non-prompt
-  RooRealVar taueff("taueff","Effective tau of the B meson",0.348,0.05,1.);
+  //RooRealVar taueff("taueff","Effective tau of the B meson",0.348,0.05,1.);
   //params.add(taueff);
 
   //RooGExpModel physsigNP("physsigNP","Gauss + exp model",Jpsict,sigmaMC,taueff);
@@ -194,7 +192,14 @@ void defineCTSignal(RooWorkspace *ws){
   //Jpsict.setBinning(FFTbin,"cache");
   //RooFFTConvPdf sigNP("sigNP","Non-prompt signal",Jpsict,physsigNP,resol);
 
-  RooDecay sigNP("sigNP","Non-prompt signal",*Jpsict,taueff,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
+  //RooDecay sigNP("sigNP","Non-prompt signal",*Jpsict,taueff,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
+
+  //get subdatasets. Some of them are useful. Some, however, not
+
+  RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
+  RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
+
+  RooAddPdf sigNP("sigNP","Non-prompt signal",sigNPW,sigNPN,*(ws->var("fracRes")));
 
   ws->import(sigNP);
 
@@ -413,6 +418,13 @@ int main(int argc, char* argv[]) {
 
   cout << "Number of events to fit  = " << reddata->numEntries(kTRUE) << endl; 
 
+  //get subdatasets. Some of them are useful. Some, however, not
+  RooDataSet *reddataPR = (RooDataSet*) reddata->reduce("MCType == MCType::PR");
+  RooDataSet *reddataNP = (RooDataSet*) reddata->reduce("MCType == MCType::NP");
+  RooDataSet *reddataBK = (RooDataSet*) reddata->reduce("MCType == MCType::BK");
+
+  RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsictTrue"))),*reddataNP); 
+
   //JPSI MASS PARAMETRIZATION
 
   //background
@@ -430,7 +442,7 @@ int main(int argc, char* argv[]) {
   defineCTBackground(ws);
 
   //signal
-  defineCTSignal(ws);
+  defineCTSignal(ws,redMCNP);
 
   //putting all together
   RooProdPdf totsigPR("totsigPR","Total prompt signal",RooArgList(*(ws->pdf("sigCBGauss")),*(ws->pdf("resol"))));
@@ -449,10 +461,6 @@ int main(int argc, char* argv[]) {
   ws->import(totPDF);
 
   ws->loadSnapshot("fit2dpars_GG.root");
-
-  RooDataSet *reddataPR = (RooDataSet*) reddata->reduce("MCType == MCType::PR");
-  RooDataSet *reddataNP = (RooDataSet*) reddata->reduce("MCType == MCType::NP");
-  RooDataSet *reddataBK = (RooDataSet*) reddata->reduce("MCType == MCType::BK");
 
   if(prefitSignalMass){
     ws->pdf("sigCBGauss")->fitTo(*reddataPR,NumCPU(4),Minos(1));
