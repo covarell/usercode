@@ -277,7 +277,7 @@ void MakeDataSet::Loop() {
 	corrFact = (LbNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
 	hasABMother = true;
       }
-      trueLife = theDiff.Perp()/corrFact;
+      trueLife = theDiff.Perp()*10./corrFact;
     }
 
     int theMCMatchedGlbMu1 = -1;
