@@ -21,8 +21,6 @@
 #include "RooAbsPdf.h"
 #include "RooRealProxy.h"
 #include "RooDataHist.h"
-#include "RooComplex.h"
-#include "RooMath.h"
 
 class RooHistPdfConv : public RooAbsPdf {
 public:
@@ -47,7 +45,7 @@ public:
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName) const ;
 
-  Double_t cerfIndefiniteInt(Double_t xi) const;
+  Double_t cerfInt(Double_t xi) const;
 
   Int_t getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK=kTRUE) const;
   void generateEvent(Int_t code);
@@ -69,12 +67,3 @@ protected:
 };
 
 #endif
-
-
-
-
-
-
-
-
-

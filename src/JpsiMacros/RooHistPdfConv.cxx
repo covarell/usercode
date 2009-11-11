@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.1 2009/11/10 10:46:33 pellicci Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.2 2009/11/10 13:10:42 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -23,12 +23,11 @@
 // END_HTML
 //
 
-#include "RooFit.h"
+#include "TMath.h"
 
-#include "Riostream.h"
+#include "RooFit.h"
 #include "Riostream.h"
 #include "RooHistPdfConv.h"
-#include "RooMath.h"
 #include "RooRealConstant.h"
 #include "RooRandom.h"
 #include "RooRealVar.h"
@@ -121,10 +120,10 @@ Double_t RooHistPdfConv::evaluate() const
 
     Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
     Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
-    result += 0.5*weight*(RooMath::erfc(c)-RooMath::erfc(d));
+    result += 0.5*weight*(TMath::Erfc(c)-TMath::Erfc(d));
   }
 
-  return result ;
+  return fabs(result);
 }
 
 //_____________________________________________________________________________
@@ -149,19 +148,27 @@ Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) c
     Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
 
-    result += 0.5*weight*(cerfIndefiniteInt(xprime->getVal() - halfBinSize) - cerfIndefiniteInt(xprime->getVal() + halfBinSize) );
+    result += 0.5*weight*(cerfInt(xprime->getVal() - halfBinSize) - cerfInt(xprime->getVal() + halfBinSize) );
   }
 
   return result;
 }
 
-Double_t RooHistPdfConv::cerfIndefiniteInt(Double_t xi) const
+Double_t RooHistPdfConv::cerfInt(Double_t xi) const
 {
   static const Double_t root2(sqrt(2.));
-  const Double_t a = -1./(root2*sigma*ssf);
-  const Double_t b = xi + mean*ssf;
+  static const Double_t pi2(sqrt(acos(-1.)));
 
-  return -b/a*RooMath::erf(b+a*xIn) + xIn*RooMath::erfc(b+a*xIn) - (exp(-b*b-2*a*b*xIn-a*a*xIn*xIn));
+  const Double_t xmin = xIn.min();
+  const Double_t xmax = xIn.max();
+
+  const Double_t a = -1./(root2*sigma*ssf);
+  const Double_t b = (xi + mean*ssf)/(root2*sigma*ssf);
+
+  const Double_t maxInt = -b/a*TMath::Erf(b+a*xmax) + xmax*TMath::Erfc(b+a*xmax) - exp(-b*b-2*a*b*xmax-a*a*xmax*xmax)/(pi2*a);
+  const Double_t minInt = -b/a*TMath::Erf(b+a*xmin) + xmin*TMath::Erfc(b+a*xmin) - exp(-b*b-2*a*b*xmin-a*a*xmin*xmin)/(pi2*a);
+
+  return maxInt - minInt;
 }
 
 

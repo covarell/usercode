@@ -32,9 +32,6 @@
 
 using namespace RooFit;
 
-//list of parameters to save
-//RooArgSet params;
-
 void defineMassSignal(RooWorkspace *ws){
 
   RooRealVar *JpsiMass = ws->var("JpsiMass");
@@ -42,13 +39,9 @@ void defineMassSignal(RooWorkspace *ws){
   // SIGNAL: 2-Gaussians
   RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.09,3.05,3.15);
   RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.03,0.,0.2);
-  //params.add(meanSig1);
-  //params.add(sigmaSig1);
 
   RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.09,3.05,3.15);
   RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.05,0.,0.2);
-  //params.add(meanSig2);
-  //params.add(sigmaSig2);
 
   // Different mean
   RooGaussian signalG1("signalG1","Signal PDF 1",*JpsiMass,meanSig1,sigmaSig1);
@@ -58,7 +51,6 @@ void defineMassSignal(RooWorkspace *ws){
   RooGaussian signalG2OneMean("signalG2OneMean","Signal PDF 2",*JpsiMass,meanSig1,sigmaSig2);
 
   RooRealVar coeffGauss("coeffGauss","Relative norm of the two signal gaussians",0.8,0.,1.);
-  //params.add(coeffGauss);
 
   // Different mean
   RooAddPdf sigPDF("sigPDF","Total signal pdf",signalG1,signalG2,coeffGauss);
@@ -68,8 +60,6 @@ void defineMassSignal(RooWorkspace *ws){
   // SIGNAL: Crystal Ball shape
   RooRealVar alpha("alpha","#alpha of CB",2.2,0.,5.);
   RooRealVar enne("enne","n of CB",0.33,0.,8.);
-  //params.add(alpha);
-  //params.add(enne);
 
   RooCBShape sigCB("sigCB","Signal CB PDF",*JpsiMass,meanSig1,sigmaSig1,alpha,enne);
 
@@ -87,8 +77,6 @@ void defineMassBackground(RooWorkspace *ws){
   // BKG: first and second order polynomials
   RooRealVar CcoefPol1("CcoefPol1","linear coefficient of bkg PDF",-0.05,-1500.,1500.);
   RooRealVar CcoefPol2("CcoefPol2","quadratic coefficient of bkg PDF",0.1,-1.,1.);
-  //params.add(CcoefPol1);
-  //params.add(CcoefPol2);
 
   RooPolynomial CPolFunct1("CPolFunct","CPolFunct1",*JpsiMass,CcoefPol1);
   RooPolynomial CPolFunct2("CPolFunct2","CPolFunct2",*JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
@@ -99,7 +87,6 @@ void defineMassBackground(RooWorkspace *ws){
   // BKG : exponential
   RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.);
   RooExponential expFunct("expFunct","expFunct",*JpsiMass,coefExp); 
-  //params.add(coefExp);
 
   ws->import(RooArgSet(CPolFunct1,CPolFunct2,expFunct));
 
@@ -114,24 +101,19 @@ void defineCTResol(RooWorkspace *ws){
   RooRealVar sigmaResSigW("sigmaResSigW","#sigma of the resolution wide gaussian",0.05,0.001,5.);
   RooRealVar scaleK("scaleK","Scale factor of the resolution gaussian",1.,0.,10.);
   RooConstVar one("one","one",1.);
-  //params.add(meanResSigW);
-  //params.add(sigmaResSigW);
-  //params.add(scaleK);
 
   scaleK.setConstant(kTRUE);
 
   RooRealVar meanResSigN("meanResSigN","Mean of the resolution narrow gaussian",-0.17,-1.,1.);
-  RooRealVar sigmaResSigN("sigmaResSigN","#sigma of the resolution narrow gaussian",0.02,0.001,5.);
-  //params.add(meanResSigN);
-  //params.add(sigmaResSigN);
+  RooRealVar sigmaResSigN("sigmaResSigN","#sigma of the resolution narrow gaussian",0.05,0.001,5.);
 
   RooGaussModel resGW("resGW","Wide Gaussian resolution function",*Jpsict,meanResSigW,sigmaResSigW,one,scaleK);
   RooGaussModel resGN("resGN","Narrow Gaussian resolution function",*Jpsict,meanResSigN,sigmaResSigN,one,scaleK);
 
-  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.93,0.,1.);
-  //params.add(fracRes);
+  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.5,0.,1.);
 
-  RooAddModel resol("resol","resol",RooArgList(resGW,resGN),RooArgList(fracRes));
+  //RooAddModel resol("resol","resol",RooArgList(resGW,resGN),RooArgList(fracRes));
+  RooGaussModel resol("resol","Wide Gaussian resolution function",*Jpsict,meanResSigW,sigmaResSigW,one,scaleK);
 
   ws->import(resol);
 
@@ -142,34 +124,26 @@ void defineCTBackground(RooWorkspace *ws){
 
   RooRealVar *Jpsict = ws->var("Jpsict");
 
-  RooRealVar lambdap("lambdap","tau of the positive background tail",0.4,0.,5.);
-  RooRealVar lambdam("lambdam","tau of the negative background tail",3.88,0.,5.);
-  RooRealVar lambdasym("lambdasym","tau of the symmetric background tail",0.16,0.,10.);
-  //params.add(lambdap);
-  //params.add(lambdam);
-  //params.add(lambdasym);
+  RooRealVar lambdap("lambdap","tau of the positive background tail",1.4,0.,5.);
+  RooRealVar lambdam("lambdam","tau of the negative background tail",1.88,0.,5.);
+  RooRealVar lambdasym("lambdasym","tau of the symmetric background tail",1.16,0.,10.);
 
   //bkg1 is the resolution function
-
   RooDecay bkg2("bkg2","One sided positive background",*Jpsict,lambdap,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
   RooDecay bkg3("bkg3","One sided negative background",*Jpsict,lambdam,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::Flipped);
   RooDecay bkg4("bkg4","Symmetric background",*Jpsict,lambdasym,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::DoubleSided);
 
   //now, we could just compose the background together
   //but since we are not idiots, we compose them partially for stability
-  RooRealVar fpm("fpm","Fraction of pos/neg tails",0.92,0.,1.);
-  //params.add(fpm);
+  RooRealVar fpm("fpm","Fraction of pos/neg tails",0.5,0.,1.);
 
   RooAddPdf bkgPart1("bkgPart1","Sum of pos/neg backgrounds",bkg2,bkg3,fpm);
 
-  RooRealVar fLiving("fLiving","Fraction of sym/asym living backgrounds",0.99,0.,1.);
-  //params.add(fLiving);
+  RooRealVar fLiving("fLiving","Fraction of sym/asym living backgrounds",0.5,0.,1.);
 
-  //FIXME
   RooAddPdf bkgPart2("bkgPart2","Sum of living backgrounds",bkgPart1,bkg4,fLiving);
 
-  RooRealVar fbkgTot("fbkgTot","Fraction of delta living background",0.17,0.,1.);
-  //params.add(fbkgTot);
+  RooRealVar fbkgTot("fbkgTot","Fraction of delta living background",0.5,0.,1.);
 
   RooAddPdf bkgctauTOT("bkgctauTOT","Sum of all backgrounds",*(ws->pdf("resol")),bkgPart2,fbkgTot);
 
@@ -187,19 +161,13 @@ void defineCTSignal(RooWorkspace *ws, RooDataHist *reducedNP){
   //params.add(taueff);
 
   //RooGExpModel physsigNP("physsigNP","Gauss + exp model",Jpsict,sigmaMC,taueff);
-
-  //RooUniformBinning FFTbin(Jpsict.getMin(),Jpsict.getMax(),1000,"cache");
-  //Jpsict.setBinning(FFTbin,"cache");
-  //RooFFTConvPdf sigNP("sigNP","Non-prompt signal",Jpsict,physsigNP,resol);
-
   //RooDecay sigNP("sigNP","Non-prompt signal",*Jpsict,taueff,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
 
-  //get subdatasets. Some of them are useful. Some, however, not
+  //RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
+  //RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
 
-  RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
-  RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
-
-  RooAddPdf sigNP("sigNP","Non-prompt signal",sigNPW,sigNPN,*(ws->var("fracRes")));
+  //RooAddPdf sigNP("sigNP","Non-prompt signal",sigNPW,sigNPN,*(ws->var("fracRes")));
+  RooHistPdfConv sigNP("sigNP","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
 
   ws->import(sigNP);
 
@@ -210,8 +178,6 @@ void setRanges(RooWorkspace *ws){
 
   const float JpsiMassMin = 2.6;
   const float JpsiMassMax = 3.5;
-  //const float JpsiCtMin = -1.0;
-  //const float JpsiCtMax = 5.0;
 
   ws->var("JpsiMass")->setRange("all",JpsiMassMin,JpsiMassMax);
   ws->var("JpsiMass")->setRange("left",JpsiMassMin,2.9);
@@ -358,6 +324,7 @@ int main(int argc, char* argv[]) {
   char *filename;
   bool isGG;
   bool prefitSignalMass = false;
+  bool prefitSignalCTau = false;
   bool prefitBackground = false;
 
   for(Int_t i=1;i<argc;i++){
@@ -384,6 +351,11 @@ int main(int argc, char* argv[]) {
 	cout << "The signal mass distribution will be prefitted on MC" << endl;
 	break;
 
+      case 'c':
+	prefitSignalCTau = true;
+	cout << "The signal ctau distribution will be prefitted on MC, values will be fixed in the background prefit (if any)" << endl;
+	break;
+
       case 'b':
 	prefitBackground = true;
 	cout << "The background ct distribution will be prefitted on MC (but not fixed!!!)" << endl;
@@ -405,16 +377,16 @@ int main(int argc, char* argv[]) {
 
   setRanges(ws);
 
-  ws->var("JpsiMass")->setBins(25);
-  ws->var("Jpsict")->setBins(25);
+  ws->var("JpsiMass")->setBins(35);
+  ws->var("Jpsict")->setBins(45);
 
   //CONSIDER THE CASE
-  RooDataSet *reddata;
+  RooDataSet *reddata1;
 
-  if(isGG) reddata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
-  else reddata = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  if(isGG) reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
+  else reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
 
-  //RooDataHist *reddata = new RooDataHist("reddata","reddata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict")),*(ws->cat("MCType"))),*reddata1);
+  RooDataHist *reddata = new RooDataHist("reddata","reddata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict")),*(ws->cat("MCType"))),*reddata1);
 
   cout << "Number of events to fit  = " << reddata->numEntries(kTRUE) << endl; 
 
@@ -452,9 +424,6 @@ int main(int argc, char* argv[]) {
   RooRealVar NSigPR("NSigPR","Number of prompt signal events",4000.,10.,1000000.);
   RooRealVar NSigNP("NSigNP","Number of non-prompt signal events",900.,10.,1000000.);
   RooRealVar NBkg("NBkg","Number of background events",1400.,10.,1000000.);
-  //params.add(NSigPR);
-  //params.add(NSigNP);
-  //params.add(NBkg);
 
   RooAddPdf totPDF("totPDF","Total PDF",RooArgList(totsigPR,totsigNP,totBKG),RooArgList(NSigPR,NSigNP,NBkg));
 
@@ -463,18 +432,38 @@ int main(int argc, char* argv[]) {
   ws->loadSnapshot("fit2dpars_GG.root");
 
   if(prefitSignalMass){
-    ws->pdf("sigCBGauss")->fitTo(*reddataPR,NumCPU(4),Minos(1));
+    ws->pdf("sigCBGauss")->fitTo(*reddataPR/*,NumCPU(4)*/);
     ws->var("enne")->setConstant(kTRUE);
     ws->var("alpha")->setConstant(kTRUE);
   }
 
-  if(prefitBackground){
-    cout << "Prefitting background on " << reddataBK->numEntries(kTRUE) << " MC events " << endl;
-    ws->pdf("bkgctauTOT")->fitTo(*reddataBK/*,NumCPU(4)*/);
-    //ws->pdf("resol")->fitTo(*reddataBK/*,NumCPU(4)*/);
+
+  if(prefitSignalCTau){
+    ws->pdf("resol")->fitTo(*reddataPR/*,NumCPU(4)*/);
   }
 
-  ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(4));
+  if(prefitBackground){
+    cout << "Prefitting background on " << reddataBK->numEntries(kTRUE) << " MC events " << endl;
+
+    if(prefitSignalCTau){
+      //ws->var("meanResSigN")->setConstant(kTRUE);
+      ws->var("meanResSigW")->setConstant(kTRUE);
+      //ws->var("sigmaResSigN")->setConstant(kTRUE);
+      ws->var("sigmaResSigW")->setConstant(kTRUE);
+    }
+
+    ws->pdf("bkgctauTOT")->fitTo(*reddataBK/*,NumCPU(4)*/);
+
+    if(prefitSignalCTau){
+      //ws->var("meanResSigN")->setConstant(kFALSE);
+      ws->var("meanResSigW")->setConstant(kFALSE);
+      //ws->var("sigmaResSigN")->setConstant(kFALSE);
+      ws->var("sigmaResSigW")->setConstant(kFALSE);
+    }
+
+  }
+
+  ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0)/*,NumCPU(4)*/);
 
   ws->saveSnapshot("fit2dpart_GG.root",ws->components(),kFALSE);
 
