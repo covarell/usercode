@@ -246,38 +246,33 @@ void MakeDataSet::Loop() {
       }
       if (aRealJpsiEvent) continue;
     }
+
     // Calculate correction factor/true lifetime for non-prompt
     float corrFact = 1.0;
-    float trueLife = -999.;
-    bool hasABMother = false;
+    float trueLife = 0.0;
 
     for (int iQQgen=0; iQQgen<Mc_QQ_size; iQQgen++) {
 
       TVector3 *theMcQQvtx = (TVector3*)Mc_QQ_3vec->At(iQQgen);
       TVector3 *theMcBvtx = (TVector3*)Mc_QQmoth_3vec->At(iQQgen);
 
-      TVector3 theDiff = &theMcQQvtx - &theMcBvtx;
-      
       TLorentzVector *theMcQQmom = (TLorentzVector*)Mc_QQ_4mom->At(iQQgen);
       TLorentzVector *theMcBmom = (TLorentzVector*)Mc_QQmoth_4mom->At(iQQgen);
 
-      if (abs(Mc_QQmoth_id[iQQgen]) == 511) {
-	corrFact = (BpNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-	hasABMother = true;
+      if (MCcat != 1 || fabs(theMcQQvtx->X()-theMcBvtx->X()) > 0.00001) { 
+	trueLife = sqrt(pow(theMcQQvtx->X()-theMcBvtx->X(),2) + pow(theMcQQvtx->Y()-theMcBvtx->Y(),2))*10.*JpsiNomMass/theMcQQmom->Perp();
+	
+	if (abs(Mc_QQmoth_id[iQQgen]) == 511) 
+	  corrFact = (BpNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
+	else if (abs(Mc_QQmoth_id[iQQgen]) == 521) 
+	  corrFact = (B0NomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());					
+	else if (abs(Mc_QQmoth_id[iQQgen]) == 531) 
+	  corrFact = (BsNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
+	else if (abs(Mc_QQmoth_id[iQQgen]) == 5122) 
+	  corrFact = (LbNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
+      } else {
+	trueLife = 999.;
       }
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 521) {
-	corrFact = (B0NomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-      	hasABMother = true;
-      }					
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 531) {
-	corrFact = (BsNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-	hasABMother = true;
-      }
-      else if (abs(Mc_QQmoth_id[iQQgen]) == 5122) {
-	corrFact = (LbNomMass*theMcQQmom->Perp())/(JpsiNomMass*theMcBmom->Perp());
-	hasABMother = true;
-      }
-      trueLife = theDiff.Perp()*10./corrFact;
     }
 
     int theMCMatchedGlbMu1 = -1;
@@ -323,7 +318,7 @@ void MakeDataSet::Loop() {
       }      
     }
 
-    // Find the best candidate (if needed)
+     // Find the best candidate (if needed)
     int myBest = 0;
     if (onlyTheBest) myBest = theBestQQ();
 
@@ -342,7 +337,7 @@ void MakeDataSet::Loop() {
       int theLoPtMu = Reco_QQ_mulpt[iqq];  
       int theHiPtMu = Reco_QQ_muhpt[iqq];
       
-        // Now, AFTER setting the weight, change to consider MC truth!
+      // Now, AFTER setting the weight, change to consider MC truth!
       if (filestring.Contains("promptJpsiMuMu") || filestring.Contains("BJpsiMuMu")) {
 	bool isMatchedGlbGlb = (theHiPtMu == theMCMatchedGlbMu1 && theLoPtMu == theMCMatchedGlbMu2) || (theHiPtMu == theMCMatchedGlbMu2 && theLoPtMu == theMCMatchedGlbMu1);
 	bool isMatchedGlbTrk = (theLoPtMu == theMCMatchedTrkMu && (theHiPtMu == theMCMatchedGlbMu1 || theHiPtMu == theMCMatchedGlbMu2) );
@@ -364,12 +359,13 @@ void MakeDataSet::Loop() {
 	  case 0 :{
 	    hMcPR_GGMass->Fill(theMass,weight);
 	    hMcPR_GGLife->Fill(theCtau,weight);
+            // gammaFactor_GGnonprompt->Fill(theCtau-trueLife);
 	    break;
 	  }	    
 	  case 1 :{
 	    hMcNP_GGMass->Fill(theMass,weight);
 	    hMcNP_GGLife->Fill(theCtau,weight);
-	    if (hasABMother) gammaFactor_GGnonprompt->Fill(corrFact,weight);
+	    gammaFactor_GGnonprompt->Fill(corrFact,weight);
 	    break;
 	  } 
 	  case 2 :{
@@ -388,12 +384,13 @@ void MakeDataSet::Loop() {
 	  case 0 :{
 	    hMcPR_GTMass->Fill(theMass,weight);
 	    hMcPR_GTLife->Fill(theCtau,weight);
+            // gammaFactor_GTnonprompt->Fill(theCtau-trueLife);
 	    break;
 	  }	    
 	  case 1 :{
 	    hMcNP_GTMass->Fill(theMass,weight);
 	    hMcNP_GTLife->Fill(theCtau,weight);
-	    if (hasABMother) gammaFactor_GTnonprompt->Fill(corrFact,weight);
+	    gammaFactor_GTnonprompt->Fill(corrFact,weight);
 	    break;
 	  } 
 	  case 2 :{
@@ -411,6 +408,7 @@ void MakeDataSet::Loop() {
 	JpsiEta->setVal(theQQ4mom->Eta()); 
 	JpsiMass->setVal(theMass);
 	Jpsict->setVal(theCtau);
+        // cout << "life = " << theCtau << " trueLife = " << trueLife << endl;
 	JpsictTrue->setVal(trueLife);
 	JpsiType.setIndex(Reco_QQ_type[iqq],kTRUE);
 	MCType.setIndex(MCcat,kTRUE); 
@@ -650,7 +648,8 @@ int MakeDataSet::theBestQQ() {
 	  Reco_mu_glb_normChi2[thelptMu] < MAX_normchi2_glb &&
 	  (((Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel) || ((Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel-1 && Reco_mu_glb_nhitsPix1Hit[thelptMu] == 1)) &&
 	  fabs(Reco_mu_glb_d0[thelptMu]) < MAX_d0_trk && 
-	  fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk) {
+	  fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk
+	  ) {
 	return iqq;
       }
     }
