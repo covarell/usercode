@@ -59,6 +59,9 @@ int main(int argc, char* argv[]) {
   RooRealVar* JpsictTrue = new RooRealVar("JpsictTrue","J/psi ctau true",JpsiCtMin,JpsiCtMax,"mm");
 
   RooRealVar JpsictRes("JpsictRes","J/psi ctau resolution",-1.0,1.0,"mm");
+  JpsictRes.setBins(300);
+  JpsictRes.setRange("fitRange",-0.4,0.4);
+  JpsictRes.setRange("drawRange",-0.7,0.7);
 
   RooRealVar MCweight("MCweight","Monte Carlo Weight",0.,50.);
 
@@ -72,7 +75,7 @@ int main(int argc, char* argv[]) {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
-  RooDataSet *OKdata = (RooDataSet*)data->reduce(RooArgSet(*Jpsict,*JpsictTrue,JpsiType,MCType),"JpsictTrue > -10.0");
+  RooDataSet *OKdata = (RooDataSet*)data->reduce(RooArgSet(*Jpsict,*JpsictTrue,JpsiType,MCType),"abs(JpsictTrue) < 3.4999");
   const RooArgSet* thisRow = OKdata->get();
 
   RooDataSet* dataRes = new RooDataSet("dataRes","Resolution",
@@ -108,44 +111,49 @@ int main(int argc, char* argv[]) {
   RooRealVar meanResSigN("meanResSigN","Mean of the resolution narrow gaussian",-0.17,-1.,1.);
   RooRealVar sigmaResSigN("sigmaResSigN","#sigma of the resolution narrow gaussian",0.02,0.001,5.);
 
-  RooGaussModel resGW("resGW","Wide Gaussian resolution function",*Jpsict,meanResSigW,sigmaResSigW,one,scaleK);
-  RooGaussModel resGN("resGN","Narrow Gaussian resolution function",*Jpsict,meanResSigN,sigmaResSigN,one,scaleK);
+  RooRealVar meanResSigO("meanResSigO","Mean of the resolution outlier gaussian",-0.17,-1.,1.);
+  RooRealVar sigmaResSigO("sigmaResSigO","#sigma of the resolution outlier gaussian",0.5,0.1,5.);
 
-  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.93,0.,1.);
+  RooGaussModel resGW("resGW","Wide Gaussian resolution function",JpsictRes,meanResSigW,sigmaResSigW,one,scaleK);
+  RooGaussModel resGN("resGN","Narrow Gaussian resolution function",JpsictRes,meanResSigN,sigmaResSigN,one,scaleK);
+  RooGaussModel resGO("resGO","Outlier Gaussian resolution function",JpsictRes,meanResSigO,sigmaResSigO,one,scaleK);
+
+  RooRealVar fracRes("fracRes","Fraction of narrow/wider gaussians",0.13,0.,1.);
+  RooRealVar fracRes2("fracRes2","Fraction of narrow/outlier gaussians",0.01,0.,1.);
   //params.add(fracRes);
 
-  RooAddModel resol("resol","resol",RooArgList(resGW,resGN),RooArgList(fracRes));
-
-  RooDataSet *mydata;
+  RooAddModel resol("resol","resol",RooArgList(resGW,resGN,resGO),RooArgList(fracRes,fracRes2));
   
   //GG
   TCanvas c1;
   c1.Divide(2,2);
 
-  mydata = (RooDataSet*)OKdata->reduce("JpsiType==JpsiType::GG && MCType==MCType::PR");
-  RooDataHist histPRGG("histPRGG","GG prompt binned dataset",RooArgSet(JpsictRes),*mydata,1.0);
-  resol.fitTo(histPRGG);
+  RooDataSet *mydataPRGG = (RooDataSet*)OKdata->reduce("JpsiType==JpsiType::GG && MCType==MCType::PR");
+  RooDataHist histPRGG("histPRGG","GG prompt binned dataset",RooArgSet(JpsictRes),*mydataPRGG,1.0);
+  resol.fitTo(histPRGG,Range("fitrange"));
 
   c1.cd(1);
-  gPad->SetLogy(1);
+  // gPad->SetLogy(1);
   RooPlot* frameGGPR = JpsictRes.frame();
   frameGGPR->SetTitle("c #tau resolution - MC prompt");
-  OKdata->plotOn(frameGGPR,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::PR"),DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2));
-  resol.plotOn(frameGGPR);
-  resol.plotOn(frameGGPR,Components(resGW),LineStyle(kDashed),LineColor(2));
+  // OKdata->plotOn(frameGGPR,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::PR"),DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2));
+  histPRGG.plotOn(frameGGPR,DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2),Range("drawrange")); 
+  resol.plotOn(frameGGPR,Range("fitrange"));
+  resol.plotOn(frameGGPR,Components(resGW),LineStyle(kDashed),LineColor(4),Range("fitrange"));
   frameGGPR->Draw();
 
-  mydata = (RooDataSet*)OKdata->reduce("JpsiType==JpsiType::GG && MCType==MCType::NP");
-  RooDataHist histNPGG("histNPGG","GG non-prompt binned dataset",RooArgSet(JpsictRes),*mydata,1.0);
-  resol.fitTo(histNPGG);
+  RooDataSet *mydataNPGG = (RooDataSet*)OKdata->reduce("JpsiType==JpsiType::GG && MCType==MCType::NP");
+  RooDataHist histNPGG("histNPGG","GG non-prompt binned dataset",RooArgSet(JpsictRes),*mydataNPGG,1.0);
+  resol.fitTo(histNPGG,Range("fitrange"));
 
   c1.cd(2);
-  gPad->SetLogy(1);
+  // gPad->SetLogy(1);
   RooPlot* frameGGNP = JpsictRes.frame();
   frameGGNP->SetTitle("c #tau resolution - MC non-prompt");
-  OKdata->plotOn(frameGGNP,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::NP"),DataError(RooAbsData::SumW2),LineColor(4),MarkerColor(4));
-  resol.plotOn(frameGGNP);
-  resol.plotOn(frameGGNP,Components(resGW),LineStyle(kDashed),LineColor(2));
+  // OKdata->plotOn(frameGGNP,Binning(100),RooFit::Cut("JpsiType==JpsiType::GG && MCType==MCType::NP"),DataError(RooAbsData::SumW2),LineColor(4),MarkerColor(4));
+  histNPGG.plotOn(frameGGNP,DataError(RooAbsData::SumW2),LineColor(2),MarkerColor(2),Range("drawrange"));
+  resol.plotOn(frameGGNP,Range("fitrange"));
+  resol.plotOn(frameGGNP,Components(resGW),LineStyle(kDashed),LineColor(4),Range("fitrange"));
   frameGGNP->Draw();
 
   c1.cd(3);
