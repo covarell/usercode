@@ -31,8 +31,7 @@ void defineBackground(RooWorkspace *ws){
   RooRealVar CcoefPol1("CcoefPol1","linear coefficient of bkg PDF",-0.05,-1500.,1500.);
   RooRealVar CcoefPol2("CcoefPol2","quadratic coefficient of bkg PDF",0.1,-1.,1.);
 
-  RooPolynomial CPolFunct1("CPolFunct","CPolFunct1",*JpsiMass,CcoefPol1);
-  RooPolynomial CPolFunct2("CPolFunct2","CPolFunct2",*JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
+  RooPolynomial CPolFunct("CPolFunct","CPolFunct",*JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
   
   CcoefPol2.setVal(0.0); 
   CcoefPol2.setConstant(kTRUE); 
@@ -41,7 +40,7 @@ void defineBackground(RooWorkspace *ws){
   RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.);
   RooExponential expFunct("expFunct","expFunct",*JpsiMass,coefExp); 
 
-  ws->import(RooArgSet(CPolFunct1,CPolFunct2,expFunct));
+  ws->import(RooArgSet(CPolFunct,expFunct));
 
   return;
 }
@@ -71,8 +70,8 @@ void defineSignal(RooWorkspace *ws){
   RooAddPdf sigPDFOneMean("sigPDFOneMean","Total signal pdf",signalG1,signalG2OneMean,coeffGauss);
 
   // SIGNAL: Crystal Ball shape
-  RooRealVar alpha("alpha","#alpha of CB",0.96,0.,5.);
-  RooRealVar enne("enne","n of CB",3.,0.,8.);
+  RooRealVar alpha("alpha","#alpha of CB",0.96,0.,8.);
+  RooRealVar enne("enne","n of CB",3.,0.,10.);
 
   RooCBShape sigCB("sigCB","Signal CB PDF",*JpsiMass,meanSig1,sigmaSig1,alpha,enne);
 
@@ -300,7 +299,7 @@ int main(int argc, char* argv[]) {
   }
 
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
-  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2));
+  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(4));
 
   drawResults(ws,true,prange,etarange);
 
@@ -308,8 +307,8 @@ int main(int argc, char* argv[]) {
   printResults(ws,NSigGG,errSigGG,resolGG);
 
   // fix some parameters 
-  ws->var("alpha")->setConstant(kTRUE); 
-  ws->var("enne")->setConstant(kTRUE); 
+  //ws->var("alpha")->setConstant(kTRUE); 
+  //ws->var("enne")->setConstant(kTRUE); 
 
   //GT
   if (sidebandPrefit) prefitSideband(ws,false);
