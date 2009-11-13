@@ -170,7 +170,7 @@ void MakeDataSet::Loop() {
   // RooFit stuff
   RooRealVar* JpsiMass = new RooRealVar("JpsiMass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
   RooRealVar* JpsiPt = new RooRealVar("JpsiPt","J/psi pt",JpsiPtMin,JpsiPtMax,"GeV/c");
-  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",JpsiEtaMin,JpsiEtaMax);
+  RooRealVar* JpsiEta = new RooRealVar("JpsiEta","J/psi eta",-JpsiEtaMax,JpsiEtaMax);
   RooRealVar* Jpsict = new RooRealVar("Jpsict","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
   RooRealVar* JpsictTrue = new RooRealVar("JpsictTrue","J/psi ctau true",JpsiCtMin,JpsiCtMax,"mm");
   RooRealVar* TNPeff = new RooRealVar("TNPeff","Tag and probe efficiency",0.,1.);

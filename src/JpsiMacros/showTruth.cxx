@@ -20,12 +20,24 @@
 
 using namespace RooFit;
 
+void getrange(string &varRange, float *varmin, float *varmax){
+ if (sscanf(varRange.c_str(), "%f-%f", varmin, varmax) == 0) {
+    cout << varRange.c_str() << " not valid!" << endl;
+    assert(0);
+  }
+
+ return;
+}
+
+
 int main(int argc, char* argv[]) {
 
   gROOT->SetStyle("Plain");
 
   char *filename;
   Int_t nevents = 0;
+  string prange;
+  string etarange;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -35,10 +47,23 @@ int main(int argc, char* argv[]) {
     case '-':{
 
       switch(pchar[1]){
-      case 'f':
+      case 'f':{
         filename = argv[i+1];
         cout << "File name for fitted data is " << filename << endl;
         break;
+      }
+ 
+      case 'p':{
+	prange = argv[i+1];
+	cout << "Range for pT is " << prange << " GeV/c" << endl;
+        break;
+      }
+       
+      case 'e':{
+        etarange = argv[i+1];
+        cout << "Range for |eta| is " << etarange << endl;
+        break;
+      }
       }
     }
     }
@@ -73,7 +98,16 @@ int main(int argc, char* argv[]) {
   MCType.defineType("NP",1);
   MCType.defineType("BK",2);
 
-  RooDataSet *OKdata = (RooDataSet*)data->reduce(RooArgSet(*Jpsict,*JpsictTrue,JpsiType,MCType),"abs(JpsictTrue) < 3.4999");
+  float pmin, pmax; 
+  float etamin, etamax;
+
+  getrange(prange,&pmin,&pmax);
+  getrange(etarange,&etamin,&etamax);
+
+  char reducestr[200];
+  sprintf(reducestr,"abs(JpsictTrue) < 3.4999 && JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+
+  RooDataSet *OKdata = (RooDataSet*)data->reduce(RooArgSet(*Jpsict,*JpsictTrue,JpsiType,MCType),reducestr);
   const RooArgSet* thisRow = OKdata->get();
 
   RooDataSet* dataRes = new RooDataSet("dataRes","Resolution",
@@ -215,3 +249,4 @@ int main(int argc, char* argv[]) {
 
   return 1;
 }
+
