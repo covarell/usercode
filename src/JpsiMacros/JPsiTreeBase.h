@@ -24,7 +24,7 @@ static const unsigned int MAXTRIG = 10;
 static const unsigned int MAXTRACK = 600;
 
 static const bool isAOD = false;
-static const bool isOctX = true;
+static const bool isOctX = false;
 
 class JPsiTreeBase {
 public :
@@ -150,6 +150,7 @@ public :
    Double_t        Reco_QQ_cosAlpha[MAXQQ];   //[Reco_QQ_size]
    Double_t        Reco_QQ_ctau[MAXQQ];   //[Reco_QQ_size]
    Int_t           Reco_QQ_sign[MAXQQ];   //[Reco_QQ_size]
+   Int_t           Reco_gamma_size;
    Int_t           Reco_Chic_size;
    TClonesArray    *Reco_Chic_4mom;
    Int_t           Reco_Chic_OniaDaug[MAXCHIC];   //[Reco_Chic_size]
@@ -332,6 +333,7 @@ public :
    TBranch        *b_Reco_QQ_cosAlpha;   //!
    TBranch        *b_Reco_QQ_ctau;   //!
    TBranch        *b_Reco_QQ_sign;   //!
+   TBranch        *b_Reco_gamma_size;   //!    
    TBranch        *b_Reco_Chic_size;   //!
    TBranch        *b_Reco_Chic_4mom;   //!
    TBranch        *b_Reco_Chic_OniaDaug;   //!
@@ -620,6 +622,7 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("Reco_QQ_ctau", Reco_QQ_ctau, &b_Reco_QQ_ctau);
    fChain->SetBranchAddress("Reco_QQ_sign", Reco_QQ_sign, &b_Reco_QQ_sign);
    if (!isOctX) {
+     fChain->SetBranchAddress("Reco_gamma_size", &Reco_gamma_size, &b_Reco_gamma_size); 
      fChain->SetBranchAddress("Reco_Chic_size", &Reco_Chic_size, &b_Reco_Chic_size);
      fChain->SetBranchAddress("Reco_Chic_4mom", &Reco_Chic_4mom, &b_Reco_Chic_4mom);
      fChain->SetBranchAddress("Reco_Chic_OniaDaug", Reco_Chic_OniaDaug, &b_Reco_Chic_OniaDaug);

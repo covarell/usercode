@@ -33,8 +33,13 @@ private:
 
   // histos
   TH1F *QQMass2Glob_passmu3;
+  TH1F *QQMass2Trk_passmu3;
   TH1F *QQMass1Glob1Trk_passmu3;
   TH1F *QQMass1Glob1Cal_passmu3;
+  TH1F *QQPt2Glob_passmu3;  
+  TH1F *QQPt2Trk_passmu3;  
+  TH1F *QQPt1Glob1Trk_passmu3;
+  TH1F *QQPt1Glob1Cal_passmu3;
   TH1F *QQMass2Glob_best;
   TH1F *QQMass1Glob1Trk_best;
   TH1F *QQMass1Glob1Cal_best;
@@ -83,9 +88,15 @@ private:
   TH1F *hMcWrongGlbMuFirstLayer;
   TH1F *hMcRightGlbTrkMuVtxProb;  
   TH1F *hMcWrongGlbTrkMuVtxProb;
+  TH1F *hMcRightGlbTrkMuMass;              
+  TH1F *hMcWrongGlbTrkMuMass;
+  TH1F *hMcRightTrkTrkMuMass;              
+  TH1F *hMcWrongTrkTrkMuMass;
 
   TH1F *hMcRightGlbGlbMuVtxProb;
   TH1F *hMcWrongGlbGlbMuVtxProb;
+  TH1F *hMcRightGlbGlbMuMass;
+  TH1F *hMcWrongGlbGlbMuMass;
   TH1F *hMcRightTrkMuPt;
   TH1F *hMcWrongTrkMuPt;
   TH1F *hMcRightTrkBit4;
@@ -125,6 +136,18 @@ private:
   TH1F *hMcWrongCalGlobMucosAlpha;
       
   TH1F *hMcRightAllMuIso;
+
+  TH1F *passingHLTMu3; 
+  TH1F *trackSize;     
+  TH1F *gammaSize;    
+  TH1F *genQQSize;
+  TH1F *genQQPt;   
+  TH1F *globalMuonSize;
+  TH1F *globalMuonPt;  
+  TH1F *trackerMuonSize;
+  TH1F *trackerMuonPt; 
+  TH1F *caloMuonSize;  
+  TH1F *caloMuonPt;    
 
 };
 #endif
