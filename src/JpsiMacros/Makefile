@@ -43,10 +43,10 @@ GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
 INCLUDEDIR       = ./
 CXX	         += -I$(INCLUDEDIR)
-OUTLIB	         = ../lib/
+OUTLIB	         = ../../../../../lib/
 
 .SUFFIXES: .cc,.C,.hh,.h
-.PREFIXES: ../lib/
+.PREFIXES: ../../../../../lib/
 
 $(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAnalysis.cc 
 	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)JPsiTreeBase.o $<

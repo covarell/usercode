@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) {
   }
 
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
-  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(4));
+  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2));
 
   drawResults(ws,true,prange,etarange);
 
@@ -314,7 +314,7 @@ int main(int argc, char* argv[]) {
   if (sidebandPrefit) prefitSideband(ws,false);
 
   RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
-  ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(1),NumCPU(2));
+  ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2));
 
   drawResults(ws,false,prange,etarange);
 

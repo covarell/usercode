@@ -26,9 +26,15 @@ finalJPsiAnalysis::~finalJPsiAnalysis(){ }
 
 void finalJPsiAnalysis::Loop() {
 
+  /// SELECTION CUTS ///
+ 
   MIN_nhits_trk = 12;
   MAX_normchi2_trk = 5.0;
   MAX_normchi2_glb = 20.0;
+  MIN_nhits_pixel = 2;
+  MAX_d0_trk = 5.0;
+  MAX_dz_trk = 20.0;
+  MIN_vtxprob_jpsi = 0.001;
 
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
@@ -312,6 +318,9 @@ void finalJPsiAnalysis::Loop() {
 	  } else {
 	    hMcWrongTrkTrkMuMass->Fill(theMass);
 	  }
+          if (iqq == bestQQ) {
+	    QQMass2Trk_best->Fill(theMass);
+	  }
 	}
 	if (Reco_QQ_type[iqq] == 3) {
 	  QQMass1Glob1Cal_passmu3->Fill(theMass);
@@ -400,23 +409,24 @@ void finalJPsiAnalysis::Loop() {
 void finalJPsiAnalysis::bookHistos() {
 
   // trigger passed 
-  QQMass2Glob_passmu3              = new TH1F("QQMass2Glob_passmu3",  "Invariant mass (2 global muons)", 20, 0.2 ,4.);
-  QQMass2Trk_passmu3               = new TH1F("QQMass2Trk_passmu3",  "Invariant mass (2 tracker muons)", 20, 0.2 ,4.);
-  QQMass1Glob1Trk_passmu3          = new TH1F("QQMass1Glob1Trk_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 20, 0.2, 4.);
-  QQMass1Glob1Cal_passmu3          = new TH1F("QQMass1Glob1Cal_passmu3",  "Invariant mass (1 global + 1 calo muon)", 20, 0.2 ,4.);
-  QQPt2Glob_passmu3                = new TH1F("QQPt2Glob_passmu3",  "Pt (2 global muons)", 10, 0.,20.);
-  QQPt2Trk_passmu3                 = new TH1F("QQPt2Trk_passmu3",  "Pt (2 tracker muons)", 10, 0.,20.);
-  QQPt1Glob1Trk_passmu3            = new TH1F("QQPt1Glob1Trk_passmu3",  "Pt (1 global + 1 tracker muon)", 10, 0.,20.);
-  QQPt1Glob1Cal_passmu3            = new TH1F("QQPt1Glob1Cal_passmu3",  "Pt (1 global + 1 calo muon)", 10, 0.,20.); 
-  QQMass2Glob_best              = new TH1F("QQMass2Glob_best",  "Invariant mass (2 global muons)", 100, 2.,4.);
-  QQMass1Glob1Trk_best          = new TH1F("QQMass1Glob1Trk_best",  "Invariant mass (1 global + 1 tracker muon)", 100, 2.,4.);
-  QQMass1Glob1Cal_best          = new TH1F("QQMass1Glob1Cal_best",  "Invariant mass (1 global + 1 calo muon)", 100, 2.,4.);
-  QQMass2GlobPT6_passmu3              = new TH1F("QQMass2GlobPT6_passmu3",  "Invariant mass (2 global muons)", 100, 0.,15.);
-  QQMass1Glob1TrkPT6_passmu3          = new TH1F("QQMass1Glob1TrkPT6_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 100, 0.,15.);
-  QQMass1Glob1CalPT6_passmu3          = new TH1F("QQMass1Glob1CalPT6_passmu3",  "Invariant mass (1 global + 1 calo muon)", 100, 0.,15.);
-  WSMass2Glob_passmu3              = new TH1F("WSMass2Glob_passmu3",  "Invariant mass (2 global muons)", 100, 0.,15.);
-  WSMass1Glob1Trk_passmu3          = new TH1F("WSMass1Glob1Trk_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 100, 0.,15.);
-  WSMass1Glob1Cal_passmu3          = new TH1F("WSMass1Glob1Cal_passmu3",  "Invariant mass (1 global + 1 calo muon)", 100, 0.,15.);
+  QQMass2Glob_passmu3              = new TH1F("QQMass2Glob_passmu3",  "Invariant mass (2 global muons)", 20, 2. ,4.);
+  QQMass2Trk_passmu3               = new TH1F("QQMass2Trk_passmu3",  "Invariant mass (2 tracker muons)", 20, 2. ,4.);
+  QQMass1Glob1Trk_passmu3          = new TH1F("QQMass1Glob1Trk_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 20, 2., 4.);
+  QQMass1Glob1Cal_passmu3          = new TH1F("QQMass1Glob1Cal_passmu3",  "Invariant mass (1 global + 1 calo muon)", 20, 2. ,4.);
+  QQPt2Glob_passmu3                = new TH1F("QQPt2Glob_passmu3",  "Pt (2 global muons)", 20, 0.,20.);
+  QQPt2Trk_passmu3                 = new TH1F("QQPt2Trk_passmu3",  "Pt (2 tracker muons)", 20, 0.,20.);
+  QQPt1Glob1Trk_passmu3            = new TH1F("QQPt1Glob1Trk_passmu3",  "Pt (1 global + 1 tracker muon)", 20, 0.,20.);
+  QQPt1Glob1Cal_passmu3            = new TH1F("QQPt1Glob1Cal_passmu3",  "Pt (1 global + 1 calo muon)", 20, 0.,20.); 
+  QQMass2Glob_best              = new TH1F("QQMass2Glob_best",  "Invariant mass (2 global muons)", 20, 2.,4.);
+  QQMass2Trk_best              = new TH1F("QQMass2Trk_best",  "Invariant mass (2 tracker muons)", 20, 2.,4.);
+  QQMass1Glob1Trk_best          = new TH1F("QQMass1Glob1Trk_best",  "Invariant mass (1 global + 1 tracker muon)", 20, 2.,4.);
+  QQMass1Glob1Cal_best          = new TH1F("QQMass1Glob1Cal_best",  "Invariant mass (1 global + 1 calo muon)", 20, 2.,4.);
+  QQMass2GlobPT6_passmu3              = new TH1F("QQMass2GlobPT6_passmu3",  "Invariant mass (2 global muons)", 20, 2.,4.);
+  QQMass1Glob1TrkPT6_passmu3          = new TH1F("QQMass1Glob1TrkPT6_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 20, 2.,4.);
+  QQMass1Glob1CalPT6_passmu3          = new TH1F("QQMass1Glob1CalPT6_passmu3",  "Invariant mass (1 global + 1 calo muon)", 20, 2.,4.);
+  WSMass2Glob_passmu3              = new TH1F("WSMass2Glob_passmu3",  "Invariant mass (2 global muons)", 20, 2.,4.);
+  WSMass1Glob1Trk_passmu3          = new TH1F("WSMass1Glob1Trk_passmu3",  "Invariant mass (1 global + 1 tracker muon)", 20, 2.,4.);
+  WSMass1Glob1Cal_passmu3          = new TH1F("WSMass1Glob1Cal_passmu3",  "Invariant mass (1 global + 1 calo muon)", 20, 2.,4.);
   QQMass2Glob_passmu5              = new TH1F("QQMass2Glob_passmu5",  "Invariant mass (2 global muons)", 100, 0.,15.);
   QQMass1Glob1Trk_passmu5          = new TH1F("QQMass1Glob1Trk_passmu5",  "Invariant mass (1 global + 1 tracker muon)", 100, 0.,15.);
   QQMass1Glob1Cal_passmu5          = new TH1F("QQMass1Glob1Cal_passmu5",  "Invariant mass (1 global + 1 calo muon)", 100, 0.,15.); 
@@ -499,7 +509,7 @@ void finalJPsiAnalysis::bookHistos() {
   hMcRightCalGlobMuDeltaR                  = new TH1F("hMcRightCalGlobMuDeltaR",  " DeltaR - MC matched (calo+global muons)", 80, 0.,5.0);
   hMcWrongCalGlobMuDeltaR                  = new TH1F("hMcWrongCalGlobMuDeltaR",  " DeltaR - MC unmatched (calo+global muons)", 80, 0.,5.0);
   hMcRightCalGlobMuMass                  = new TH1F("hMcRightCalGlobMuMass",  "Inv. mass - MC matched (calo+global muons)", 20, 2.0,4.0);
-  hMcWrongCalGlobMuMass                  = new TH1F("hMcWrongCalGlobMuMass",  "Inv. Mass - MC unmatched (calo+global muons)", 20, 2.0,4.2);
+  hMcWrongCalGlobMuMass                  = new TH1F("hMcWrongCalGlobMuMass",  "Inv. Mass - MC unmatched (calo+global muons)", 20, 2.0,4.0);
   hMcRightCalGlobMuVtxChi2                  = new TH1F("hMcRightCalGlobMuVtxChi2",  "Vertex norm. #chi^{2} - MC matched (calo+global muons)", 80, 0.0,10.0);
   hMcWrongCalGlobMuVtxChi2                  = new TH1F("hMcWrongCalGlobMuVtxChi2",  "Vertex norm. #chi^{2} - MC unmatched (calo+global muons)", 80, 0.0,10.0);
   hMcRightCalGlobMuS                  = new TH1F("hMcRightCalGlobMuS",  "Significance of muon IPs - MC matched (calo+global muons)", 80, 0.0,100.0);
@@ -544,7 +554,8 @@ void finalJPsiAnalysis::saveHistos() {
   QQPt2Trk_passmu3           -> Write();
   QQPt1Glob1Trk_passmu3      -> Write(); 
   QQPt1Glob1Cal_passmu3      -> Write(); 
-  QQMass2Glob_best           -> Write();        
+  QQMass2Glob_best           -> Write();
+  QQMass2Trk_best           -> Write();
   QQMass1Glob1Trk_best       -> Write(); 
   QQMass1Glob1Cal_best       -> Write();
   QQMass2GlobPT6_passmu3        -> Write();        
@@ -667,27 +678,53 @@ double finalJPsiAnalysis::deltaR(const TLorentzVector* t, const TLorentzVector* 
 
 int finalJPsiAnalysis::theBestQQ() {
     
-  int theBest = -1;
+ int theBest = -1;
   float thehighestPt = -1.;
  
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
-    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 &&
-	Reco_mu_glb_nhitstrack[iqq] > MIN_nhits_trk && Reco_mu_glb_normChi2[iqq] < MAX_normchi2_glb) return iqq;
+
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 0 ) {
+
+      int thehptMu = Reco_QQ_muhpt[iqq];   if (thehptMu >= Reco_mu_glb_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];   if (thelptMu >= Reco_mu_glb_size) continue;
+      if (Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi && 
+	  Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	  Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb && 
+	  (((Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel) || ((Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel-1 && Reco_mu_glb_nhitsPix1Hit[thehptMu] == 1)) && 
+	  fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
+	  fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
+	  Reco_mu_glb_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	  Reco_mu_glb_normChi2[thelptMu] < MAX_normchi2_glb &&
+	  (((Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel) || ((Reco_mu_glb_nhitsPixB[thelptMu] + Reco_mu_glb_nhitsPixE[thelptMu]) > MIN_nhits_pixel-1 && Reco_mu_glb_nhitsPix1Hit[thelptMu] == 1)) &&
+	  fabs(Reco_mu_glb_d0[thelptMu]) < MAX_d0_trk && 
+	  fabs(Reco_mu_glb_dz[thelptMu]) < MAX_dz_trk
+	  ) {
+	return iqq;
+      }
+    }
   }
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 1 ) {
       
-      int theTM = Reco_QQ_mulpt[iqq];
-      if (theTM >= Reco_mu_trk_size) {
-	// cout << "Non deve succedere! tmIndex = " << theTM+1 << " tmSize = " << Reco_mu_trk_size << endl;
-	continue;
-      }
+      int thehptMu = Reco_QQ_muhpt[iqq];  if (thehptMu >= Reco_mu_glb_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];  if (thelptMu >= Reco_mu_trk_size) continue;
 
-      if ( Reco_mu_trk_nhitstrack[theTM] > MIN_nhits_trk && ((Reco_mu_trk_PIDmask[theTM] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[theTM] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
-	   Reco_mu_trk_normChi2[theTM] < MAX_normchi2_trk) {
+      if ( Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi &&
+	   Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb &&
+	   (((Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel) || ((Reco_mu_glb_nhitsPixB[thehptMu] + Reco_mu_glb_nhitsPixE[thehptMu]) > MIN_nhits_pixel-1 && Reco_mu_glb_nhitsPix1Hit[thehptMu] == 1)) &&
+	   fabs(Reco_mu_glb_d0[thehptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_glb_dz[thehptMu]) < MAX_dz_trk && 
+	   Reco_mu_trk_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   (Reco_mu_trk_nhitsPixB[thelptMu] + Reco_mu_trk_nhitsPixE[thelptMu]) > MIN_nhits_pixel &&
+	   Reco_mu_trk_normChi2[thelptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thelptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thelptMu]) < MAX_dz_trk) {
 	
-        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(theTM);
+        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(thelptMu);
         if (theTrMumom->Perp() > thehighestPt) {
 	  thehighestPt = theTrMumom->Perp();
           theBest = iqq;
@@ -699,17 +736,55 @@ int finalJPsiAnalysis::theBestQQ() {
   if (theBest >= 0) return theBest;
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
-    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 3 ) {
+
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 2 ) {
       
-      int theCM = Reco_QQ_mulpt[iqq];
-      if (theCM >= Reco_mu_cal_size) {
-	// cout << "Non deve succedere! cmIndex = " << theCM+1 << " cmSize = " << Reco_mu_cal_size << endl;
+      int thehptMu = Reco_QQ_muhpt[iqq];  if (thehptMu >= Reco_mu_trk_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];  if (thelptMu >= Reco_mu_trk_size) continue;
+
+      if ( Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi &&
+	   Reco_mu_trk_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thehptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thehptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   (Reco_mu_trk_nhitsPixB[thehptMu] + Reco_mu_trk_nhitsPixE[thehptMu]) > MIN_nhits_pixel &&
+	   Reco_mu_trk_normChi2[thehptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thehptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thehptMu]) < MAX_dz_trk &&
+	   Reco_mu_trk_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   (Reco_mu_trk_nhitsPixB[thelptMu] + Reco_mu_trk_nhitsPixE[thelptMu]) > MIN_nhits_pixel &&
+	   Reco_mu_trk_normChi2[thelptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thelptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thelptMu]) < MAX_dz_trk) {
+	
+        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(thehptMu);
+        if (theTrMumom->Perp() > thehighestPt) {
+	  thehighestPt = theTrMumom->Perp();
+          theBest = iqq;
+	}
+      }
+    }    
+  }
+  
+  if (theBest >= 0) return theBest;
+
+  for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 3 ) {
+
+      int thehptMu = Reco_QQ_muhpt[iqq];
+      int thelptMu = Reco_QQ_mulpt[iqq];
+      if (thelptMu >= Reco_mu_cal_size) {
+	// cout << "Non deve succedere! cmIndex = " << thelptMu+1 << " cmSize = " << Reco_mu_cal_size << endl;
 	continue;
       }
 
-      if ( Reco_mu_cal_nhitstrack[theCM] > MIN_nhits_trk && Reco_mu_cal_normChi2[theCM] < 3.0 && Reco_mu_cal_caloComp[theCM] > 0.89) {
+      if ( Reco_mu_glb_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   Reco_mu_glb_normChi2[thehptMu] < MAX_normchi2_glb &&
+	   Reco_mu_cal_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   Reco_mu_cal_normChi2[thelptMu] < 3.0 && 
+	   Reco_mu_cal_caloComp[thelptMu] > 0.89) {
 	
-        TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(theCM);
+        TLorentzVector *theCaMumom = (TLorentzVector*)Reco_mu_cal_4mom->At(thelptMu);
         if (theCaMumom->Perp() > thehighestPt) {
 	  thehighestPt = theCaMumom->Perp();
           theBest = iqq;

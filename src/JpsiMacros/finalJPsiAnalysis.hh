@@ -23,6 +23,10 @@ private:
   int MIN_nhits_trk;
   float MAX_normchi2_trk;
   float MAX_normchi2_glb;
+  int MIN_nhits_pixel;
+  float MAX_d0_trk;
+  float MAX_dz_trk;
+  float MIN_vtxprob_jpsi;
 
   void bookHistos();
   void drawPlots();
@@ -42,6 +46,7 @@ private:
   TH1F *QQPt1Glob1Cal_passmu3;
   TH1F *QQMass2Glob_best;
   TH1F *QQMass1Glob1Trk_best;
+  TH1F *QQMass2Trk_best;
   TH1F *QQMass1Glob1Cal_best;
   TH1F *QQMass2GlobPT6_passmu3;
   TH1F *QQMass1Glob1TrkPT6_passmu3;

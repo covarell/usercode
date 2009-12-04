@@ -688,6 +688,38 @@ int MakeDataSet::theBestQQ() {
 
   for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
 
+    if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 2 ) {
+      
+      int thehptMu = Reco_QQ_muhpt[iqq];  if (thehptMu >= Reco_mu_trk_size) continue;
+      int thelptMu = Reco_QQ_mulpt[iqq];  if (thelptMu >= Reco_mu_trk_size) continue;
+
+      if ( Reco_QQ_probChi2[iqq] > MIN_vtxprob_jpsi &&
+	   Reco_mu_trk_nhitstrack[thehptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thehptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thehptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   (Reco_mu_trk_nhitsPixB[thehptMu] + Reco_mu_trk_nhitsPixE[thehptMu]) > MIN_nhits_pixel &&
+	   Reco_mu_trk_normChi2[thehptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thehptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thehptMu]) < MAX_dz_trk &&
+	   Reco_mu_trk_nhitstrack[thelptMu] > MIN_nhits_trk && 
+	   ((Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,5))/(int)pow(2,5) > 0 || (Reco_mu_trk_PIDmask[thelptMu] & (int)pow(2,8))/(int)pow(2,8) > 0) &&
+	   (Reco_mu_trk_nhitsPixB[thelptMu] + Reco_mu_trk_nhitsPixE[thelptMu]) > MIN_nhits_pixel &&
+	   Reco_mu_trk_normChi2[thelptMu] < MAX_normchi2_trk &&
+	   fabs(Reco_mu_trk_d0[thelptMu]) < MAX_d0_trk && 
+	   fabs(Reco_mu_trk_dz[thelptMu]) < MAX_dz_trk) {
+	
+        TLorentzVector *theTrMumom = (TLorentzVector*)Reco_mu_trk_4mom->At(thehptMu);
+        if (theTrMumom->Perp() > thehighestPt) {
+	  thehighestPt = theTrMumom->Perp();
+          theBest = iqq;
+	}
+      }
+    }    
+  }
+  
+  if (theBest >= 0) return theBest;
+
+  for (int iqq=0; iqq<Reco_QQ_size; iqq++) {
+
     if (Reco_QQ_sign[iqq] == 0 && Reco_QQ_type[iqq] == 3 ) {
 
       int thehptMu = Reco_QQ_muhpt[iqq];
