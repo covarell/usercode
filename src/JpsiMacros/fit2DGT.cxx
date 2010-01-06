@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
   GTdataPr->setWeightVar(MCweight);
   GTdataNp->setWeightVar(MCweight); 
 
-  cout << "Number of events to fit  = " << GTdata->numEntries(kTRUE) << endl; 
+  cout << "Number of events to fit  = " << GTdata->sumEntries() << endl; 
 
   //JPSI MASS PARAMETRIZATION
 
@@ -263,8 +263,8 @@ int main(int argc, char* argv[]) {
   c2.SaveAs("2DGTtimefit.gif");
 
   cout << endl << "GT J/psi yields:" << endl;
-  cout << "PROMPT :     True MC : " << GTdataPr->numEntries(true) << " Fit : " << NSigPR.getVal() << " +/- " << NSigPR.getError() << endl;
-  cout << "NON-PROMPT : True MC : " << GTdataNp->numEntries(true) << " Fit : " << NSigNP.getVal() << " +/- " << NSigNP.getError() << endl;
+  cout << "PROMPT :     True MC : " << GTdataPr->sumEntries() << " Fit : " << NSigPR.getVal() << " +/- " << NSigPR.getError() << endl;
+  cout << "NON-PROMPT : True MC : " << GTdataNp->sumEntries() << " Fit : " << NSigNP.getVal() << " +/- " << NSigNP.getError() << endl;
 
   return 1;
 }

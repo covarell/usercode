@@ -473,8 +473,8 @@ int main(int argc, char* argv[]) {
   drawResults(ws,isGG);
 
   cout << endl << "GG J/psi yields:" << endl;
-  cout << "PROMPT :     True MC : " << reddataPR->numEntries(true) << " Fit : " << ws->var("NSigPR")->getVal() << " +/- " << ws->var("NSigPR")->getError() << endl;
-  cout << "NON-PROMPT : True MC : " << reddataNP->numEntries(true) << " Fit : " << ws->var("NSigNP")->getVal() << " +/- " << ws->var("NSigNP")->getError() << endl;
+  cout << "PROMPT :     True MC : " << reddataPR->sumEntries() << " Fit : " << ws->var("NSigPR")->getVal() << " +/- " << ws->var("NSigPR")->getError() << endl;
+  cout << "NON-PROMPT : True MC : " << reddataNP->sumEntries() << " Fit : " << ws->var("NSigNP")->getVal() << " +/- " << ws->var("NSigNP")->getError() << endl;
 
   return 1;
 }

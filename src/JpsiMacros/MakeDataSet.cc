@@ -44,10 +44,10 @@ MakeDataSet::MakeDataSet(TTree *tree)
   // Tag'n'probe stuff
   if (efficiencyStore) {
 
-    TFile *feffTrk = TFile::Open("TnPfiles/fit_result_TkFromSta.root");
-    TFile *feffMuGlb = TFile::Open("TnPfiles/fit_result_MuFromTkJPsiGlb.root");
-    TFile *feffMuTrk = TFile::Open("TnPfiles/fit_result_MuFromTkJPsiTkM.root");
-    TFile *feffMuHLT = TFile::Open("TnPfiles/fit_result_HltFromJPsiGlb.root");
+    TFile *feffTrk = TFile::Open("~/scratch0/quarkonia/CMSSW_3_1_5/root/UserCode/Covarell/src/JpsiMacros/TnPfiles/fit_result_TkFromSta.root");
+    TFile *feffMuGlb = TFile::Open("~/scratch0/quarkonia/CMSSW_3_1_5/root/UserCode/Covarell/src/JpsiMacros/TnPfiles/fit_result_MuFromTkJPsiGlb.root");
+    TFile *feffMuTrk = TFile::Open("~/scratch0/quarkonia/CMSSW_3_1_5/root/UserCode/Covarell/src/JpsiMacros/TnPfiles/fit_result_MuFromTkJPsiTkM.root");
+    TFile *feffMuHLT = TFile::Open("~/scratch0/quarkonia/CMSSW_3_1_5/root/UserCode/Covarell/src/JpsiMacros/TnPfiles/fit_result_HltFromJPsiGlb.root");
     
     heffTrk = (TH2F*)feffTrk->Get("fit_eff_pt_eta");
     heffTrk->SetName("heffTrk");
@@ -214,7 +214,7 @@ void MakeDataSet::Loop() {
     totalEvents++;
 
     // TRIGGER CUTS 
-    if (!HLTBits_accept[0]) continue;    // SingleMu3
+    // if (!HLTBits_accept[0]) continue;    // SingleMu3
 
     //estrablish which kind of MC this is
     MCcat = -999;
@@ -611,17 +611,17 @@ void MakeDataSet::Loop() {
   cout << "total number of events = " << totalEvents << endl;
   cout << "number of passed candidates = " << passedCandidates << endl;
   RooDataSet *reddataPR = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::PR");
-  cout << "Weighted global+global (PROMPT) = " << reddataPR->numEntries(kTRUE) << endl;
+  cout << "Weighted global+global (PROMPT) = " << reddataPR->sumEntries() << endl;
   RooDataSet *reddataNP = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::NP");
-  cout << "Weighted global+global (NON-PROMPT) = " << reddataNP->numEntries(kTRUE) << endl;
+  cout << "Weighted global+global (NON-PROMPT) = " << reddataNP->sumEntries() << endl;
   RooDataSet *reddataBK = (RooDataSet*)data->reduce("JpsiType==JpsiType::GG && MCType==MCType::BK");
-  cout << "Weighted global+global (BACKGROUND) = " << reddataBK->numEntries(kTRUE) << endl;
+  cout << "Weighted global+global (BACKGROUND) = " << reddataBK->sumEntries() << endl;
   RooDataSet *reddata2PR = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::PR");
-  cout << "Weighted global+tracker (PROMPT) = " << reddata2PR->numEntries(kTRUE) << endl;
+  cout << "Weighted global+tracker (PROMPT) = " << reddata2PR->sumEntries() << endl;
   RooDataSet *reddata2NP = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::NP");
-  cout << "Weighted global+tracker (NON-PROMPT) = " << reddata2NP->numEntries(kTRUE) << endl;
+  cout << "Weighted global+tracker (NON-PROMPT) = " << reddata2NP->sumEntries() << endl;
   RooDataSet *reddata2BK = (RooDataSet*)data->reduce("JpsiType==JpsiType::GT && MCType==MCType::BK");
-  cout << "Weighted global+tracker (BACKGROUND) = " << reddata2BK->numEntries(kTRUE) << endl;
+  cout << "Weighted global+tracker (BACKGROUND) = " << reddata2BK->sumEntries() << endl;
 
 } // end of program
 		

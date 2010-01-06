@@ -323,7 +323,7 @@ int main(int argc, char* argv[]) {
 
   cout << endl << "pT = " << prange << " GeV; |eta| = " << etarange << endl;
   cout << endl << "GG J/psi yields:                 GT J/psi yields:" << endl;
-  cout << "True MC : " << GGdataTr->numEntries(true) << "                   True MC : " << GTdataTr->numEntries(true) << endl;
+  cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << endl;
   cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << endl;
   cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV" << endl; 
 

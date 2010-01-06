@@ -272,15 +272,15 @@ void printResults(RooWorkspace *ws, bool isGG){
 
       cout << "Fit for bin (" << i << "," << j << "): " << Nsig << " +/- " << errSig << endl;
       reddata2 = (RooDataSet*)data->reduce(RooArgList(*JpsiPtType),cutstring.c_str()); 
-      cout << "True MC for bin (" << i << "," << j << "): " << reddata2->numEntries(kTRUE) << endl;
+      cout << "True MC for bin (" << i << "," << j << "): " << reddata2->sumEntries() << endl;
       // cout << "Resolution : " << resol*1000. << " MeV" << endl;
       
       if (j == 1) {
-	ycenters1[i-1] = Nsig - reddata2->numEntries(kTRUE);
+	ycenters1[i-1] = Nsig - reddata2->sumEntries();
         yerrors1[i-1] = errSig;
       }
       if (j == 2) {
-	ycenters2[i-1] = Nsig - reddata2->numEntries(kTRUE);
+	ycenters2[i-1] = Nsig - reddata2->sumEntries();
         yerrors2[i-1] = errSig;
       }
     }
