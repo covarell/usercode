@@ -23,91 +23,78 @@
 
 using namespace RooFit;
 
-void defineBackground(RooWorkspace *ws){
+//Convention: when necessary, use the following convention
+// 0 Global-Global
+// 1 Global-Tracker
+// 2 Tracker-Tracker
 
-  RooRealVar *JpsiMass = ws->var("JpsiMass");
+void defineBackground(RooWorkspace *ws)
+{
+  //Second order polynomial, the 2nd coefficient is by default set to zero
+  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
-  // BKG: first and second order polynomials
-  RooRealVar CcoefPol1("CcoefPol1","linear coefficient of bkg PDF",-0.05,-1500.,1500.);
-  RooRealVar CcoefPol2("CcoefPol2","quadratic coefficient of bkg PDF",0.1,-1.,1.);
-
-  RooPolynomial CPolFunct("CPolFunct","CPolFunct",*JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
-  
-  CcoefPol2.setVal(0.0); 
-  CcoefPol2.setConstant(kTRUE); 
-
-  // BKG : exponential
-  RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.);
-  RooExponential expFunct("expFunct","expFunct",*JpsiMass,coefExp); 
-
-  ws->import(RooArgSet(CPolFunct,expFunct));
+  //Exponential
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-5.,-9.,0.1])");
 
   return;
 }
 
-void defineSignal(RooWorkspace *ws){
+void defineSignal(RooWorkspace *ws)
+{
+  //SIGNAL FUNCTION CANDIDATES:
 
-  RooRealVar *JpsiMass = ws->var("JpsiMass");
+  //Normal Gaussians
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.,0.2])");
 
-  // SIGNAL: 2-Gaussians
-  RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,3.05,3.15);
-  RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.,0.2);
+  //Gaussian with same mean as signalG1
+  ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
-  RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.1,3.05,3.15);
-  RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.03,0.,0.2);
+  //Crystall Ball
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.96,0.,8.],enne[3.,0.,10.])");
 
-  // Different mean
-  RooGaussian signalG1("signalG1","Signal PDF 1",*JpsiMass,meanSig1,sigmaSig1);
-  RooGaussian signalG2("signalG2","Signal PDF 2",*JpsiMass,meanSig2,sigmaSig2);
-  // Same mean
-  RooGaussian signalG2OneMean("signalG2OneMean","Signal PDF 2",*JpsiMass,meanSig1,sigmaSig2);
+  //SUM OF SIGNAL FUNCTIONS
 
-  RooRealVar coeffGauss("coeffGauss","Relative norm of the two signal gaussians",0.42,0.,1.);
+  //Sum of Gaussians with different mean
+  ws->factory("SUM::sigPDF(coeffGauss[0.5,0.,1.]*signalG1,signalG2)");
 
-  // Different mean
-  RooAddPdf sigPDF("sigPDF","Total signal pdf",signalG1,signalG2,coeffGauss);
-  // Same mean
-  RooAddPdf sigPDFOneMean("sigPDFOneMean","Total signal pdf",signalG1,signalG2OneMean,coeffGauss);
+  //Sum of Gaussians with same mean
+  ws->factory("SUM::sigPDFOneMean(coeffGauss*signalG1,signalG2OneMean)");
 
-  // SIGNAL: Crystal Ball shape
-  RooRealVar alpha("alpha","#alpha of CB",0.96,0.,8.);
-  RooRealVar enne("enne","n of CB",3.,0.,10.);
-
-  RooCBShape sigCB("sigCB","Signal CB PDF",*JpsiMass,meanSig1,sigmaSig1,alpha,enne);
-
-  RooAddPdf sigCBGauss("sigCBGauss","Signal CB+Gauss PDF",sigCB,signalG2,coeffGauss);
-
-  ws->import(RooArgSet(sigPDF,sigPDFOneMean,sigCBGauss),RecycleConflictNodes());
+  //Sum of a Gaussian and a CrystallBall
+  ws->factory("SUM::sigCBGauss(coeffGauss*sigCB,signalG2)");
 
   return;
 }
 
-void getrange(string &varRange, float *varmin, float *varmax){
+void getrange(string &varRange, float *varmin, float *varmax)
+{
  if (sscanf(varRange.c_str(), "%f-%f", varmin, varmax) == 0) {
-    cout << "pT range not valid!" << endl;
+   cout << varRange.c_str() << ": range not valid!" << endl;
     assert(0);
   }
 
  return;
 }
 
-void prefitSideband(RooWorkspace *ws, bool isGG){
-
+void prefitSideband(RooWorkspace *ws, const int DataCat)
+{
   ws->var("coefExp")->setConstant(kFALSE);
 
   RooDataSet *tmpdata;
-  if(isGG) tmpdata = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GG");
-  else tmpdata = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GT");
+  if(DataCat == 0) tmpdata = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GG");
+  else if(DataCat == 1) tmpdata = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GT");
+  else if(DataCat == 2) tmpdata = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::TT");
 
-  ws->pdf("expFunct")->fitTo(*tmpdata,Range("left,right"));
+  ws->pdf("expFunct")->fitTo(*tmpdata,Range("left,right"),SumW2Error(kTRUE));
 
   ws->var("coefExp")->setConstant(kTRUE);
 
   return;
 }
 
-void setRanges(RooWorkspace *ws){
-
+void setRanges(RooWorkspace *ws)
+{
   const float JpsiMassMin = 2.6;
   const float JpsiMassMax = 3.5;
 
@@ -117,6 +104,7 @@ void setRanges(RooWorkspace *ws){
 
   ws->cat("JpsiType")->setRange("glbglb","GG");
   ws->cat("JpsiType")->setRange("glbtrk","GT");
+  ws->cat("JpsiType")->setRange("trktrk","TT");
 
   ws->cat("MCType")->setRange("prompt","PR");
   ws->cat("MCType")->setRange("nonprompt","NP");
@@ -125,43 +113,46 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG, const string prange, const string etarange){
-
+void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const string etarange)
+{
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
   RooAbsPdf *background = ws->pdf("expFunct");
-  RooAbsPdf *signal = ws->pdf("sigCBGauss");
 
   char reducestr[200];
 
   RooPlot *mframe = ws->var("JpsiMass")->frame();
 
-  if(isGG) sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
-  else sprintf(reducestr,"Mass fit for glb-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  else if(DataCat == 1) sprintf(reducestr,"Mass fit for glb-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  else if(DataCat == 2) sprintf(reducestr,"Mass fit for trk-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
 
   mframe->SetTitle(reducestr);
 
-  if(isGG) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+  else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
 
   totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(mframe,Components(*background),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-  if(isGG) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+  else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  if(isGG) sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
-  else sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  if(DataCat == 0) sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 1) sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 2) sprintf(reducestr,"TTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
   c1.SaveAs(reducestr);
 
   return;
 }
 
-void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol){
-
+void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol)
+{
   Nsig   = ws->var("NSig")->getVal();
   errSig = ws->var("NSig")->getError();
   const double coeffGauss = ws->var("coeffGauss")->getVal();
@@ -173,10 +164,8 @@ void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol)
   return;
 }
 
-int main(int argc, char* argv[]) {
-
-  /// LIMITS ///
-
+int main(int argc, char* argv[])
+{
   gROOT->SetStyle("Plain");
 
   char *filename;
@@ -243,8 +232,8 @@ int main(int argc, char* argv[]) {
 
   char reducestr[200];
   sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
-  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
 
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
   reddata->setWeightVar("MCweight");
 
   ws->import(*reddata);
@@ -252,80 +241,78 @@ int main(int argc, char* argv[]) {
   setRanges(ws);
 
   //DEFINE SIGNAL AND BACKGROUND
-  defineBackground(ws);
   defineSignal(ws);
-
-  RooRealVar NSig("NSig","Number of signal events",5000.,10.,10000000.);
-  RooRealVar NBkg("NBkg","Number of background events",2000.,10.,10000000.);
+  defineBackground(ws);
 
   // Total PDF (signal CB+Gauss)
-  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(*(ws->pdf("sigCBGauss")),*(ws->pdf("expFunct"))),RooArgList(NSig,NBkg));
+  ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
 
-  ws->import(totPDF);
-
-  /*
-  // Total PDF 
-  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(sigPDF,CPolFunct2),RooArgList(NSig,NBkg));
-  // Total PDF (exponential background)
-  RooAddPdf totPDFExp("totPDFexp","Total pdf",RooArgList(sigPDF,expFunct),RooArgList(NSig,NBkg));
-  // Total PDF (signal Gaussians with one mean)
-  RooAddPdf totPDFOneMean("totPDFOneMean","Total pdf",RooArgList(sigPDFOneMean,CPolFunct2),RooArgList(NSig,NBkg));
-  // Total PDF (signal Gaussians with one mean and exponential background)
-  RooAddPdf totPDFExpOneMean("totPDFexpOneMean","Total pdf",RooArgList(sigPDFOneMean,expFunct),RooArgList(NSig,NBkg));
-  // Total PDF (signal Gaussians with one mean and quadratic background)
-  RooAddPdf totPDF2Pol("totPDF2Pol","Total pdf",RooArgList(sigPDFOneMean,CPolFunct2),RooArgList(NSig,NBkg));
-  // Total PDF (signal CB)
-  RooAddPdf totPDFCB("totPDFCB","Total pdf",RooArgList(sigCB,CPolFunct2),RooArgList(NSig,NBkg));
-  // Total PDF (signal CB and exponential background)
-  RooAddPdf totPDFExpCB("totPDFExpCB","Total pdf",RooArgList(sigCB,expFunct),RooArgList(NSig,NBkg));
-  // Total PDF (signal CB+Gauss and exponential background)
-  RooAddPdf totPDFExpCBGauss("totPDFExpCBGauss","Total pdf",RooArgList(sigCBGauss,expFunct),RooArgList(NSig,NBkg));
-  */
-
-  //GG
-  // fix some parameters 
-  // alpha.setConstant(kTRUE); 
-  // enne.setConstant(kTRUE); 
+  //Make subsamples to be used later
 
   RooDataSet *GGdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG && (MCType == MCType::PR || MCType == MCType::NP)");
   RooDataSet *GTdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT && (MCType == MCType::PR || MCType == MCType::NP)");
+  RooDataSet *TTdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT && (MCType == MCType::PR || MCType == MCType::NP)");
 
-  if (sidebandPrefit) prefitSideband(ws,true);
+  RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
+  RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
+  RooDataSet *TTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT");
+
+  //GG CASE
+
+  // fix some parameters 
+  // ws->var("alpha")->setConstant(kTRUE); 
+  // ws->var("enne")->setConstant(kTRUE); 
+
+  if (sidebandPrefit) prefitSideband(ws,0);
 
   if(prefitSignalMass){
-    ws->pdf("sigCBGauss")->fitTo(*GGdataTr);
+    ws->pdf("sigCBGauss")->fitTo(*GGdataTr,SumW2Error(kTRUE));
     ws->var("enne")->setConstant(kTRUE);
     ws->var("alpha")->setConstant(kTRUE);
   }
 
-  RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
-  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2));
+  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,true,prange,etarange);
+  drawResults(ws,0,prange,etarange);
 
   double NSigGG, errSigGG,resolGG;
   printResults(ws,NSigGG,errSigGG,resolGG);
+
+  //GT case
 
   // fix some parameters 
   //ws->var("alpha")->setConstant(kTRUE); 
   //ws->var("enne")->setConstant(kTRUE); 
 
-  //GT
-  if (sidebandPrefit) prefitSideband(ws,false);
+  if (sidebandPrefit) prefitSideband(ws,1);
 
-  RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
-  ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2));
+  ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,false,prange,etarange);
+  drawResults(ws,1,prange,etarange);
 
   double NSigGT, errSigGT,resolGT;
   printResults(ws,NSigGT,errSigGT,resolGT);
 
+  //TT case
+
+  // fix some parameters 
+  //ws->var("alpha")->setConstant(kTRUE); 
+  //ws->var("enne")->setConstant(kTRUE); 
+
+  if (sidebandPrefit) prefitSideband(ws,2);
+
+  ws->pdf("totPDF")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+
+  drawResults(ws,2,prange,etarange);
+
+  double NSigTT, errSigTT,resolTT;
+  printResults(ws,NSigTT,errSigTT,resolTT);
+
   cout << endl << "pT = " << prange << " GeV; |eta| = " << etarange << endl;
-  cout << endl << "GG J/psi yields:                 GT J/psi yields:" << endl;
-  cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << endl;
-  cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << endl;
-  cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV" << endl; 
+  cout << endl << "GG J/psi yields:                 GT J/psi yields:                   TT J/psi yields:" << endl;
+  cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << "                   True MC : " << TTdataTr->sumEntries() << endl;
+  cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << "        Fit : " << NSigTT << " +/- " << errSigTT << endl;
+  cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV        Resolution : " << resolTT*1000. << " MeV" << endl; 
 
   return 1;
 }
