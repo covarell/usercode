@@ -67,6 +67,16 @@ void defineSignal(RooWorkspace *ws)
   return;
 }
 
+void getrange(string &varRange, float *varmin, float *varmax)
+{
+ if (sscanf(varRange.c_str(), "%f-%f", varmin, varmax) == 0) {
+   cout << varRange.c_str() << ": range not valid!" << endl;
+    assert(0);
+  }
+
+ return;
+}
+
 void prefitSideband(RooWorkspace *ws, const int DataCat)
 {
   ws->var("coefExp")->setConstant(kFALSE);
@@ -103,7 +113,7 @@ void setRanges(RooWorkspace *ws)
   return;
 }
 
-void drawResults(RooWorkspace *ws, const int DataCat)
+void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const string etarange)
 {
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
@@ -113,9 +123,9 @@ void drawResults(RooWorkspace *ws, const int DataCat)
 
   RooPlot *mframe = ws->var("JpsiMass")->frame();
 
-  if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons");
-  else if(DataCat == 1) sprintf(reducestr,"Mass fit for glb-trk muons");
-  else if(DataCat == 2) sprintf(reducestr,"Mass fit for trk-trk muons");
+  if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  else if(DataCat == 1) sprintf(reducestr,"Mass fit for glb-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  else if(DataCat == 2) sprintf(reducestr,"Mass fit for trk-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
 
   mframe->SetTitle(reducestr);
 
@@ -133,9 +143,9 @@ void drawResults(RooWorkspace *ws, const int DataCat)
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  if(DataCat == 0) sprintf(reducestr,"GGmassfit.gif");
-  else if(DataCat == 1) sprintf(reducestr,"GTmassfit.gif");
-  else if(DataCat == 2) sprintf(reducestr,"TTmassfit.gif");
+  if(DataCat == 0) sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 1) sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 2) sprintf(reducestr,"TTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
   c1.SaveAs(reducestr);
 
   return;
@@ -159,6 +169,8 @@ int main(int argc, char* argv[])
   gROOT->SetStyle("Plain");
 
   char *filename;
+  string prange;
+  string etarange;
   bool sidebandPrefit = false;
   bool prefitSignalMass = false;
 
@@ -177,6 +189,18 @@ int main(int argc, char* argv[])
         break;
       }
       
+      case 'p':{
+	prange = argv[i+1];
+	cout << "Range for pT is " << prange << " GeV/c" << endl;
+        break;
+      }
+       
+      case 'e':{
+        etarange = argv[i+1];
+        cout << "Range for |eta| is " << etarange << endl;
+        break;
+      }
+
       case 's':{
         sidebandPrefit = true;
         cout << "Sideband pre-fitting activated" << endl;
@@ -198,8 +222,18 @@ int main(int argc, char* argv[])
 
   TFile fIn(filename);
   fIn.cd();
+  RooDataSet *data = (RooDataSet*)fIn.Get("data");
+  
+  float pmin, pmax; 
+  float etamin, etamax;
 
-  RooDataSet *reddata = (RooDataSet*)fIn.Get("data");
+  getrange(prange,&pmin,&pmax);
+  getrange(etarange,&etamin,&etamax);
+
+  char reducestr[200];
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
   reddata->setWeightVar("MCweight");
 
   ws->import(*reddata);
@@ -239,7 +273,7 @@ int main(int argc, char* argv[])
 
   ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,0);
+  drawResults(ws,0,prange,etarange);
 
   double NSigGG, errSigGG,resolGG;
   printResults(ws,NSigGG,errSigGG,resolGG);
@@ -254,7 +288,7 @@ int main(int argc, char* argv[])
 
   ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,1);
+  drawResults(ws,1,prange,etarange);
 
   double NSigGT, errSigGT,resolGT;
   printResults(ws,NSigGT,errSigGT,resolGT);
@@ -269,11 +303,12 @@ int main(int argc, char* argv[])
 
   ws->pdf("totPDF")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,2);
+  drawResults(ws,2,prange,etarange);
 
   double NSigTT, errSigTT,resolTT;
   printResults(ws,NSigTT,errSigTT,resolTT);
 
+  cout << endl << "pT = " << prange << " GeV; |eta| = " << etarange << endl;
   cout << endl << "GG J/psi yields:                 GT J/psi yields:                   TT J/psi yields:" << endl;
   cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << "                   True MC : " << TTdataTr->sumEntries() << endl;
   cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << "        Fit : " << NSigTT << " +/- " << errSigTT << endl;
