@@ -38,15 +38,11 @@ endif
 CXXFLAGS      += $(ROOTCFLAGS)
 
 NGLIBS         = $(ROOTGLIBS) 
-# Hack here, because RooFit is removed from ROOT:
-NGLIBS        += -L/afs/cern.ch/cms/sw/slc4_ia32_gcc345/cms/cmssw/CMSSW_3_3_4/external/slc4_ia32_gcc345/lib/ -lMinuit -lRooFit
-# NGLIBS        += -lMinuit -lRooFit
+NGLIBS        += -lMinuit -lRooFit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
 INCLUDEDIR       = ./
 CXX	         += -I$(INCLUDEDIR)
-# Hack here, because RooFit is removed from ROOT:
-CXX	         += -I/afs/cern.ch/cms/sw/slc4_ia32_gcc345/lcg/roofit/5.25.02-cms/include/
 OUTLIB	         = ../../../../../lib/
 
 .SUFFIXES: .cc,.C,.hh,.h
