@@ -13,6 +13,7 @@
 #include "RooFit.h"
 #include "RooGlobalFunc.h"
 #include "RooDataSet.h"
+#include "RooDataHist.h"
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
@@ -32,76 +33,128 @@ static const Int_t nbinseta = 2;
 double ptbinlimits[nbinspt+1];
 double etabinlimits[nbinseta+1];
 
-void defineBackground(RooWorkspace *ws){
+//Convention: when necessary, use the following convention
+// 0 Global-Global
+// 1 Global-Tracker
+// 2 Tracker-Tracker
 
-  RooRealVar *JpsiMass = ws->var("JpsiMass");
-
-  // BKG: first and second order polynomials
-  RooRealVar coefPol1("coefPol1","linear coefficient of bkg PDF",-0.05,-150.,150.);
-  RooRealVar coefPol2("coefPol2","quadratic coefficient of bkg PDF",0.1,-1.,1.);
-
-  RooRealVar CcoefPol1("CcoefPol1","linear coefficient of bkg PDF",-0.05,-1500.,1500.);
-  RooRealVar CcoefPol2("CcoefPol2","quadratic coefficient of bkg PDF",0.1,-1.,1.);
-
-  RooPolynomial PolFunct1("PolFunct","PolFunct1",*JpsiMass,coefPol1);
-  RooPolynomial PolFunct2("PolFunct2","PolFunct2",*JpsiMass,RooArgList(coefPol1,coefPol2));
-
-  RooPolynomial CPolFunct1("CPolFunct","CPolFunct1",*JpsiMass,CcoefPol1);
-  RooPolynomial CPolFunct2("CPolFunct2","CPolFunct2",*JpsiMass,RooArgList(CcoefPol1,CcoefPol2));
+string nameCategory(string nameBase, int i)
+{
+  ostringstream ost;
+  ost << nameBase << i;
   
-  coefPol2.setVal(0.0); 
-  coefPol2.setConstant(kTRUE); 
-  CcoefPol2.setVal(0.0); 
-  CcoefPol2.setConstant(kTRUE); 
+  return ost.str();
+}
 
-  // BKG : exponential
-  RooRealVar coefExp("coefExp","exponential coefficient of bkg PDF",-5.,-9.,0.1);
-  RooExponential expFunct("expFunct","expFunct",*JpsiMass,coefExp); 
+string nameSplitVar(string nameBaseVar, int ip = -1, int ieta = -1)
+{
+  ostringstream ostP;
+  ostP << "P" << ip;
+  ostringstream ostEta;
+  ostEta << "E" << ieta;
 
-  ws->import(RooArgSet(PolFunct1,PolFunct2,CPolFunct1,CPolFunct2,expFunct));
+  string catstring_pt = ostP.str();
+  string catstring_eta = ostEta.str(); 
+  string result;
+
+  if (ip == -1) result = nameBaseVar + "_" + catstring_eta;
+  else if (ieta == -1) result = nameBaseVar + "_" + catstring_pt;
+  else result = nameBaseVar + "_{" + catstring_pt + ";" + catstring_eta + "}";
+  
+  return result;
+}
+
+string nameCategoryCut(int ip = -1, int ieta = -1)
+{
+  ostringstream ostP2;
+  ostP2 << "P" << ip;
+  ostringstream ostEta2;
+  ostEta2 << "E" << ieta;
+
+  string catstring_pt = ostP2.str();
+  string catstring_eta = ostEta2.str(); 
+  string result;
+
+  if (ip == -1) result = "JpsiEtaType == JpsiEtaType::" + catstring_eta;
+  else if (ieta == -1) result = "JpsiPtType == JpsiPtType::" + catstring_pt;
+  else result = "JpsiEtaType == JpsiEtaType::" + catstring_eta + " && JpsiPtType == JpsiPtType::" + catstring_pt;
+
+  return result;
+}
+
+void defineBackground(RooWorkspace *ws)
+{
+  //Second order polynomial, the 2nd coefficient is by default set to zero
+  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
+
+  //Exponential
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-5.,-9.,0.1])");
 
   return;
 }
 
-void defineSignal(RooWorkspace *ws){
+void defineSignal(RooWorkspace *ws)
+{
+  //SIGNAL FUNCTION CANDIDATES:
 
-  RooRealVar *JpsiMass = ws->var("JpsiMass");
+  //Normal Gaussians
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.,0.2])");
 
-  // SIGNAL: 2-Gaussians
-  RooRealVar meanSig1("meanSig1","Mean of the signal gaussian 1",3.1,3.05,3.15);
-  RooRealVar sigmaSig1("sigmaSig1","#sigma of the signal gaussian 1",0.02,0.001,0.2);
+  //Gaussian with same mean as signalG1
+  ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
-  RooRealVar meanSig2("meanSig2","Mean of the signal gaussian 2",3.1,3.05,3.15);
-  RooRealVar sigmaSig2("sigmaSig2","#sigma of the signal gaussian 2",0.03,0.001,0.2);
+  //Crystall Ball
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.96,0.,8.],enne[3.,0.,10.])");
 
-  // Different mean
-  RooGaussian signalG1("signalG1","Signal PDF 1",*JpsiMass,meanSig1,sigmaSig1);
-  RooGaussian signalG2("signalG2","Signal PDF 2",*JpsiMass,meanSig2,sigmaSig2);
-  // Same mean
-  RooGaussian signalG2OneMean("signalG2OneMean","Signal PDF 2",*JpsiMass,meanSig1,sigmaSig2);
+  //SUM OF SIGNAL FUNCTIONS
 
-  RooRealVar coeffGauss("coeffGauss","Relative norm of the two signal gaussians",0.42,0.,1.);
+  //Sum of Gaussians with different mean
+  ws->factory("SUM::sigPDF(coeffGauss[0.5,0.,1.]*signalG1,signalG2)");
 
-  // Different mean
-  RooAddPdf sigPDF("sigPDF","Total signal pdf",signalG1,signalG2,coeffGauss);
-  // Same mean
-  RooAddPdf sigPDFOneMean("sigPDFOneMean","Total signal pdf",signalG1,signalG2OneMean,coeffGauss);
+  //Sum of Gaussians with same mean
+  ws->factory("SUM::sigPDFOneMean(coeffGauss*signalG1,signalG2OneMean)");
 
-  // SIGNAL: Crystal Ball shape
-  RooRealVar alpha("alpha","#alpha of CB",0.96,0.,5.);
-  RooRealVar enne("enne","n of CB",3.,0.,50.);
-
-  RooCBShape sigCB("sigCB","Signal CB PDF",*JpsiMass,meanSig1,sigmaSig1,alpha,enne);
-
-  RooAddPdf sigCBGauss("sigCBGauss","Signal CB+Gauss PDF",sigCB,signalG2,coeffGauss);
-
-  ws->import(RooArgSet(sigPDF,sigPDFOneMean,sigCBGauss),RecycleConflictNodes());
+  //Sum of a Gaussian and a CrystallBall
+  ws->factory("SUM::sigCBGauss(coeffGauss*sigCB,signalG2)");
 
   return;
 }
 
-void setRanges(RooWorkspace *ws){
+void prefitSideband(RooWorkspace *ws, const int DataCat)
+{
 
+  for(int i = 1;i<=nbinspt;i++){
+    for(int j = 1;j<=nbinseta;j++){
+
+      string myName = nameSplitVar("coefExp",i,j);
+      if (ws->var(myName.c_str())) ws->var(myName.c_str())->setConstant(kFALSE);
+     
+      string halfcutstring = nameCategoryCut(i,j);
+      string cutstring;
+
+      if(DataCat == 0) cutstring = halfcutstring + " && JpsiType == JpsiType::GG";
+      else if(DataCat == 1) cutstring = halfcutstring + " && JpsiType == JpsiType::GT"; 
+      else if(DataCat == 2)  cutstring = halfcutstring + " && JpsiType == JpsiType::GG";
+
+      RooDataSet *tmpdata = (RooDataSet*)ws->data("data")->reduce(cutstring.c_str());
+
+      RooDataHist *tmpdataBin = new RooDataHist("tmpdataBin","tmpdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*tmpdata);
+      
+      cutstring = nameSplitVar("expFunct",i,j);
+      ws->pdf(cutstring.c_str())->fitTo(*tmpdata,Range("left,right"),SumW2Error(kTRUE));
+      // ws->pdf(cutstring.c_str())->fitTo(*tmpdataBin,Range("left,right"),SumW2Error(kTRUE));
+  
+      if (ws->var(myName.c_str())) ws->var(myName.c_str())->setConstant(kTRUE);
+   
+    }
+  }
+
+  return;
+}
+
+void setRanges(RooWorkspace *ws)
+{
   const float JpsiMassMin = 2.6;
   const float JpsiMassMax = 3.5;
 
@@ -111,7 +164,7 @@ void setRanges(RooWorkspace *ws){
 
   ws->cat("JpsiType")->setRange("glbglb","GG");
   ws->cat("JpsiType")->setRange("glbtrk","GT");
-  ws->cat("JpsiType")->setRange("glbglbtrk","GG,GT");
+  ws->cat("JpsiType")->setRange("trktrk","TT");
 
   ws->cat("MCType")->setRange("prompt","PR");
   ws->cat("MCType")->setRange("nonprompt","NP");
@@ -120,14 +173,11 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG){
-
+void drawResults(RooWorkspace *ws, const int DataCat)
+{
   RooDataSet *data = (RooDataSet*)ws->data("data");
-  RooAbsPdf *totalPDF = ws->pdf("TOTPDF_sim");
-  RooAbsPdf *background = ws->pdf("expFunct");
-  RooAbsPdf *signal = ws->pdf("sigCBGauss");
+  RooAbsPdf *totalPDF = ws->pdf("totPDF_sim");
   RooCategory *JpsiPtType = ws->cat("JpsiPtType");
-  RooCategory *JpsiType = ws->cat("JpsiType");
   RooCategory *JpsiEtaType = ws->cat("JpsiEtaType");
   RooRealVar *JpsiMass = ws->var("JpsiMass");
 
@@ -138,52 +188,44 @@ void drawResults(RooWorkspace *ws, const bool isGG){
 
   TCanvas c2("c2","c2",10,10,1100,1000);
   c2.Divide(3,4);
+  
+  string catstring_type;
+
+  if(DataCat == 0) catstring_type = "GG";
+  else if(DataCat == 1) catstring_type = "GT";
+  else if(DataCat == 2) catstring_type = "TT";
 
   for(int i = 1;i<=nbinspt;i++){
     for(int j = 1;j<=nbinseta;j++){
 
        // ~ empty bins here
-      if (isGG && i == 1 && j < 3) continue;
-      if (!isGG && i == 11) continue;
+      if (DataCat == 0 && i == 1 && j < 3) continue;
+      if (DataCat > 0 && i == 11) continue;
 
       RooPlot *mframe = JpsiMass->frame();
 
-      ostringstream ost;
-      ostringstream ostzwei;
-      ost << ptbinlimits[i-1] << " < pT < " << ptbinlimits[i] << " GeV, " << etabinlimits[j-1] << " < |#eta| < " << etabinlimits[j];
+      ostringstream ostTitle;
+      ostTitle << ptbinlimits[i-1] << " < pT < " << ptbinlimits[i] << " GeV, " << etabinlimits[j-1] << " < |#eta| < " << etabinlimits[j];
 
-      if(isGG) {
-	reducestr = "Mass fit GG muons: " + ost.str();
-	ostzwei << "GG";
-      } else {
-	reducestr = "Mass fit GT muons: " + ost.str();
-	ostzwei << "GT";
-      }
+      reducestr = "Mass fit " + catstring_type + " muons: " + ostTitle.str();
 
       mframe->SetTitle(reducestr.c_str());
 
       string cutstring;
+      string halfcutstring = nameCategoryCut(i,j);
 
-      ostringstream ostdrei;
-      ostdrei << "P" << i;
-      ostringstream ostvier;
-      ostvier << "E" << j;
-
-      string catstring_type = ostzwei.str();
-      string catstring_pt = ostdrei.str();
-      string catstring_eta = ostvier.str();      
-
-      cutstring = "JpsiPtType == JpsiPtType::" + catstring_pt + " && JpsiEtaType == JpsiEtaType::" + catstring_eta + " && JpsiType == JpsiType::" + catstring_type;
+      cutstring = halfcutstring + " && JpsiType == JpsiType::" + catstring_type;
 
       data->plotOn(mframe,DataError(RooAbsData::SumW2),MarkerSize(0.5),Cut(cutstring.c_str()));
+    
+      string catstring_pt = nameCategory("P",i);
+      string catstring_eta = nameCategory("E",j);
 
-      JpsiType->setLabel(catstring_type.c_str());
       JpsiPtType->setLabel(catstring_pt.c_str());
       JpsiEtaType->setLabel(catstring_eta.c_str());
 
-      string bkgname = "expFunct_{" + catstring_pt + ";" + catstring_eta + ";" + catstring_type + "}";
-
-      string totPDFname = "totPDF_{" + catstring_pt + ";" + catstring_eta + ";" + catstring_type + "}";
+      string bkgname = nameSplitVar("expFunct",i,j);
+      string totPDFname = nameSplitVar("totPDF",i,j);
 
       ws->pdf(totPDFname.c_str())->plotOn(mframe,Normalization(totalPDF->expectedEvents(RooArgSet(*JpsiMass)),RooAbsReal::NumEvent));
       ws->pdf(totPDFname.c_str())->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(totalPDF->expectedEvents(RooArgSet(*JpsiMass)),RooAbsReal::NumEvent));
@@ -197,21 +239,21 @@ void drawResults(RooWorkspace *ws, const bool isGG){
     }
   }
 
-  if(isGG) reducestr = "GGmassfit_sim.gif";
-  else reducestr = "GTmassfit_sim.gif";
+  reducestr = catstring_type + "massfit_barrel.gif";   
   c1.SaveAs(reducestr.c_str());
 
-  if(isGG) reducestr = "GGmassfit_sim2.gif";
-  else reducestr = "GTmassfit_sim2.gif";
+  reducestr = catstring_type + "massfit_endcap.gif";
   c2.SaveAs(reducestr.c_str());
 
   return;
+
 }
 
-void printResults(RooWorkspace *ws, bool isGG){
-
+void printResults(RooWorkspace *ws, const int DataCat)
+{
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooCategory *JpsiPtType = ws->cat("JpsiPtType");
+  RooCategory *JpsiEtaType = ws->cat("JpsiEtaType");
 
   TCanvas c3("c3","c3",10,10,500,600);
   TCanvas c4("c4","c4",10,10,500,600);
@@ -223,9 +265,13 @@ void printResults(RooWorkspace *ws, bool isGG){
   double ycenters2[nbinspt] = {nbinspt*0.};
   double yerrors2[nbinspt] = {nbinspt*0.};
 
-  if (isGG) cout << endl << endl << "Global-global ";
-  else cout << endl << endl << "Global-tracker ";
-  cout << "J/psi yields:" << endl;
+  string catstring_type;
+
+  if(DataCat == 0) catstring_type = "GG";
+  else if(DataCat == 1) catstring_type = "GT";
+  else if(DataCat == 2) catstring_type = "TT";
+
+  cout << endl << endl << catstring_type << " J/psi yields:" << endl;
 
   RooDataSet* reddata2; 
   string cutstring;
@@ -237,43 +283,25 @@ void printResults(RooWorkspace *ws, bool isGG){
 
     for(int j = 1;j<=nbinseta;j++){
 
-      // ~ empty bins here
-      if (isGG && i == 1 && j < 3) continue;
-      if (!isGG && i == 11) continue;
+      // ~ empty bins here, if any
+      if (DataCat == 0 && i == 1 && j < 3) continue;
+      if (DataCat > 0 && i == 11) continue;
 
-      ostringstream ostzwei;
-      if(isGG) ostzwei << "GG";
-      else ostzwei << "GT";
+      string Nsigname = nameSplitVar("NSig",i,j);
+      // string coeffGaussname = nameSplitVar("coeffGauss",i,j);
+      // string sigmaSig1name = nameSplitVar("sigmaSig1",-1,j);
+      // string sigmaSig2name = "sigmaSig2";
 
-      ostringstream ostdrei;
-      ostdrei << "P" << i;
-      ostringstream ostvier;
-      ostvier << "E" << j;
+      string halfcutstring = nameCategoryCut(i,j);
 
-      string catstring_type = ostzwei.str();
-      string catstring_pt = ostdrei.str();
-      string catstring_eta = ostvier.str();
-
-      string Nsigname = "NSig_{" + catstring_pt + ";" + catstring_eta + ";" + catstring_type + "}";
-      string coeffGaussname = "coeffGauss_{" + catstring_pt + ";" + catstring_eta + "}";
-      string sigmaSig1name = "sigmaSig1_" + catstring_eta + "";
-      string sigmaSig2name = "sigmaSig2_{" + catstring_pt + ";" + catstring_eta + "}";
-      // string sigmaSig2name = "sigmaSig2_" + catstring_eta + "";
-
-      cutstring = "(MCType == MCType::PR || MCType == MCType::NP) && JpsiPtType == JpsiPtType::" + catstring_pt + " && JpsiEtaType == JpsiEtaType::" + catstring_eta + " && JpsiType == JpsiType::" + catstring_type;
+      cutstring = "(MCType == MCType::PR || MCType == MCType::NP) && JpsiType == JpsiType::" + catstring_type + " && " + halfcutstring;
 
       const double Nsig   = ws->var(Nsigname.c_str())->getVal();
       const double errSig = ws->var(Nsigname.c_str())->getError();
-      /* const double coeffGauss = ws->var(coeffGaussname.c_str())->getVal();
-      const double sigmaSig1 = ws->var(sigmaSig1name.c_str())->getVal();
-      const double sigmaSig2 = ws->var(sigmaSig2name.c_str())->getVal();
-
-      const double resol = (coeffGauss*coeffGauss*sigmaSig1 + (1-coeffGauss)*(1-coeffGauss)*sigmaSig2) / (coeffGauss*coeffGauss + (1-coeffGauss)*(1-coeffGauss)); */
-
+     
       cout << "Fit for bin (" << i << "," << j << "): " << Nsig << " +/- " << errSig << endl;
       reddata2 = (RooDataSet*)data->reduce(RooArgList(*JpsiPtType),cutstring.c_str()); 
       cout << "True MC for bin (" << i << "," << j << "): " << reddata2->sumEntries() << endl;
-      // cout << "Resolution : " << resol*1000. << " MeV" << endl;
       
       if (j == 1) {
 	ycenters1[i-1] = Nsig - reddata2->sumEntries();
@@ -294,8 +322,7 @@ void printResults(RooWorkspace *ws, bool isGG){
   gpull1->SetMarkerColor(kRed);
   gpull1->Draw("AP");
 
-  if(isGG) cutstring = "GGpull_barrel.gif";
-  else cutstring = "GTpull_barrel.gif";
+  cutstring = catstring_type + "pull_barrel.gif";
   c3.SaveAs(cutstring.c_str());
 
   TGraphErrors *gpull2 = new TGraphErrors(nbinspt,ptbincenters,ycenters2,ptbinerrors,yerrors2);
@@ -306,20 +333,19 @@ void printResults(RooWorkspace *ws, bool isGG){
   gpull2->SetMarkerColor(kBlue);
   gpull2->Draw("AP");
 
-  if(isGG) cutstring = "GGpull_endcap.gif";
-  else cutstring = "GTpull_endcap.gif";
+  cutstring = catstring_type + "pull_endcap.gif";
   c4.SaveAs(cutstring.c_str());
 
   return;
 }
 
-int main(int argc, char* argv[]) {
-
-  /// LIMITS ///
-
+int main(int argc, char* argv[])
+{
   gROOT->SetStyle("Plain");
 
   char *filename;
+  bool sidebandPrefit = false;
+  bool prefitSignalMass = false;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -336,6 +362,18 @@ int main(int argc, char* argv[]) {
         break;
       }
       
+      case 's':{
+        sidebandPrefit = true;
+        cout << "Sideband pre-fitting activated" << endl;
+        break;
+      }
+
+      case 'c':{
+        prefitSignalMass = true;
+        cout << "Signal MC pre-fitting activated" << endl;
+        break;
+      }
+
       }
     }
     }
@@ -343,18 +381,16 @@ int main(int argc, char* argv[]) {
 
   // read back pT-eta values
  
-  ifstream fpt;
-  fpt.open("ptranges.txt");
-  if (!fpt) { cout << "Error opening file ptranges.txt" << endl; assert(0);  }
+  ifstream fpt;    fpt.open("ptranges.txt");
+  if (!fpt) { cout << "Error opening file ptranges.txt" << endl; assert(0); }
 
   Double_t min = 0., max = 0.;  
   Int_t i = 0;  
 
-  //Read in the cache file and store back to array
-  while(!fpt.eof()){
+  //Read in the file and store back to array
+  while( !fpt.eof() ){
     fpt >> min >> max;
-    ptbinlimits[i] = min;
-    i++;
+    ptbinlimits[i] = min;   i++;
   }
   ptbinlimits[i-1] = max;
 
@@ -364,11 +400,9 @@ int main(int argc, char* argv[]) {
   feta.open("etaranges.txt");
   if (!feta){ cout << "Error opening file etaranges.txt" << endl; assert(0); }
 
-  //Read in the cache file and store back to array
   while(!feta.eof()){
     feta >> min >> max;
-    etabinlimits[i] = min;
-    i++;    
+    etabinlimits[i] = min;  i++;    
   }
   etabinlimits[i-1] = max;
 
@@ -376,90 +410,129 @@ int main(int argc, char* argv[]) {
 
   TFile fIn(filename);
   fIn.cd();
-  RooDataSet *reddata1 = (RooDataSet*)fIn.Get("data");
+  RooDataSet *reddata = (RooDataSet*)fIn.Get("data");
 
-  reddata1->setWeightVar("MCweight");
+  reddata->setWeightVar("MCweight");
 
-  ws->import(*reddata1);
+  ws->import(*reddata);
 
   setRanges(ws);
 
-  ws->var("JpsiMass")->setBins(100);
+  ws->var("JpsiMass")->setBins(60);
 
-  RooDataHist *reddata = new RooDataHist("reddata","reddata",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType")),*(ws->cat("JpsiType"))),*reddata1);
-  
+  setRanges(ws);
+
   //DEFINE SIGNAL AND BACKGROUND
-  defineBackground(ws);
   defineSignal(ws);
-
-  RooRealVar NSig("NSig","Number of signal events",5000.,0.,100000.);
-  RooRealVar NBkg("NBkg","Number of background events",2000.,0.,100000.);
+  defineBackground(ws);
 
   // Total PDF (signal CB+Gauss)
-  RooAddPdf totPDF("totPDF","Total pdf",RooArgList(*(ws->pdf("sigCBGauss")),*(ws->pdf("expFunct"))),RooArgList(NSig,NBkg));
+  ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
 
-  ws->import(totPDF);
-
-  //Create the simultaneous PDF for the pt bins fit
+  //DO SIMULTANEOUS FIT
   RooSimWSTool wst(*ws);
-  // wst.build("TOTPDF_sim","totPDF",SplitParam("coefExp,coeffGauss,NSig,NBkg","JpsiPtType,JpsiEtaType")) ;
-  wst.build("TOTPDF_sim","totPDF",
-	    SplitParam("NSig,NBkg,coefExp","JpsiPtType,JpsiEtaType,JpsiType"));
-  // SplitParam("sigmaSig1,coeffGauss","JpsiPtType,JpsiEtaType") );
+  wst.build("totPDF_sim","totPDF",
+	    //  SplitParam("NSig,NBkg,coefExp,coeffGauss,sigmaSig1","JpsiPtType,JpsiEtaType"));
+	    SplitParam("NSig,NBkg,coefExp,coeffGauss,sigmaSig1","JpsiPtType,JpsiEtaType"));
+	    // SplitParam("alpha,enne","JpsiEtaType")); 
+  
+  //Make subsamples to be used later
 
-  // fix to 0 all "GC" stuff (not fitted so far)
-  for(int i = 1;i<=nbinspt;i++){
-    for(int j = 1;j<=nbinseta;j++){
+  RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
+  RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
+  RooDataSet *TTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT");
+  RooDataHist *GGdataBin = new RooDataHist("GGdataBin","GGdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdata);
+  RooDataHist *GTdataBin = new RooDataHist("GTdataBin","GTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GTdata);
+  RooDataHist *TTdataBin = new RooDataHist("TTdataBin","TTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*TTdata);
 
-      ostringstream ostdrei;
-      ostdrei << "P" << i;
-      ostringstream ostvier;
-      ostvier << "E" << j;
+  //GG CASE 
+ 
+  // fix some parameters  
+  // ws->var("alpha")->setConstant(kTRUE);  
+  // ws->var("enne")->setConstant(kTRUE);  
 
-      string catstring_pt = ostdrei.str();
-      string catstring_eta = ostvier.str(); 
+  if (sidebandPrefit) prefitSideband(ws,0); 
 
-      string Nsigname = "NSig_{" + catstring_pt + ";" + catstring_eta + ";GC}";
-      string Nbkgname = "NBkg_{" + catstring_pt + ";" + catstring_eta + ";GC}";
-      string Expname = "coefExp_{" + catstring_pt + ";" + catstring_eta + ";GC}";
-      string sigmaSig1name = "sigmaSig1_{" + catstring_pt + ";" + catstring_eta + ";GC}";
-      string coeffGaussname = "coeffGauss_{" + catstring_pt + ";" + catstring_eta + ";GC}";
-      if (ws->var(Nsigname.c_str())) {
-	ws->var(Nsigname.c_str())->setVal(1.);
-	ws->var(Nsigname.c_str())->setConstant(kTRUE);
-      }
-      if (ws->var(Nbkgname.c_str())) {
-	ws->var(Nbkgname.c_str())->setVal(1.);
-	ws->var(Nbkgname.c_str())->setConstant(kTRUE);
-      }
-      if (ws->var(Expname.c_str())) ws->var(Expname.c_str())->setConstant(kTRUE);
-      if (ws->var(sigmaSig1name.c_str())) ws->var(sigmaSig1name.c_str())->setConstant(kTRUE);
-      if (ws->var(coeffGaussname.c_str())) ws->var(coeffGaussname.c_str())->setConstant(kTRUE);
-    }
+  if(prefitSignalMass){ 
+
+    RooDataSet *GGdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG && (MCType == MCType::PR || MCType == MCType::NP)");
+
+    // RooDataSet *GGdataTr1 = (RooDataSet*)GGdataTr->reduce("JpsiEtaType == JpsiEtaType::E1");
+    // RooDataSet *GGdataTr2 = (RooDataSet*)GGdataTr->reduce("JpsiEtaType == JpsiEtaType::E2");
+ 
+    RooDataHist *GGdataTrBin = new RooDataHist("GGdataTrBin","GGdataTrBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdataTr);
+
+    // RooDataHist *GGdataTrBin1 = new RooDataHist("GGdataTrBin1","GGdataTrBin1",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdataTr1);
+
+    // RooDataHist *GGdataTrBin2 = new RooDataHist("GGdataTrBin2","GGdataTrBin2",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdataTr2);
+
+    ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin,SumW2Error(kTRUE));
+    ws->var("enne")->setConstant(kTRUE);
+    ws->var("alpha")->setConstant(kTRUE);
+
+    /* // ws->pdf("sigCBGauss")->fitTo(*GGdataTr1,SumW2Error(kTRUE)); 
+    ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin1,SumW2Error(kTRUE));
+
+    double enneVal = ws->var("enne")->getVal();
+    ws->var("enne_E1")->setVal(enneVal);
+    ws->var("enne_E1")->setConstant(kTRUE);
+
+    double alphaVal = ws->var("alpha")->getVal();
+    ws->var("alpha_E1")->setVal(alphaVal);
+    ws->var("alpha_E1")->setConstant(kTRUE);
+
+    // ws->pdf("sigCBGauss")->fitTo(*GGdataTr2,SumW2Error(kTRUE)); 
+    ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin2,SumW2Error(kTRUE));
+
+    enneVal = ws->var("enne")->getVal();
+    ws->var("enne_E2")->setVal(enneVal);
+    ws->var("enne_E2")->setConstant(kTRUE);
+
+    alphaVal = ws->var("alpha")->getVal();
+    ws->var("alpha_E2")->setVal(alphaVal);
+    ws->var("alpha_E2")->setConstant(kTRUE);*/
+  
   }
 
-  // RooDataHist *GGdata = (RooDataHist*)reddata->reduce("JpsiType == JpsiType::GG");
-  // ws->pdf("TOTPDF_sim")->fitTo(*GGdata,Extended(1),Save(1),Minos(0));
-  
-  ws->pdf("TOTPDF_sim")->fitTo(*reddata,Extended(1),Save(1),Minos(0));
-  // ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0));
- 
-  drawResults(ws,true);
+  // ws->pdf("totPDF_sim")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF_sim")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+
+  drawResults(ws,0);
+
+  printResults(ws,0);
+
+  //GT case
 
   // fix some parameters 
-  // ws->var("alpha")->setConstant(kTRUE); 
-  // ws->var("enne")->setConstant(kTRUE); 
+  /* ws->var("alpha_E1")->setConstant(kTRUE);
+  ws->var("alpha_E2")->setConstant(kTRUE);
+  ws->var("enne_E1")->setConstant(kTRUE); 
+  ws->var("enne_E2")->setConstant(kTRUE); */
 
-  //GT
+  if (sidebandPrefit) prefitSideband(ws,1);
 
-  // RooDataHist *GTdata = (RooDataHist*)reddata->reduce("JpsiType == JpsiType::GT");
-  // ws->pdf("TOTPDF_sim")->fitTo(*GTdata,Extended(1),Save(1),Minos(0));
+  // ws->pdf("totPDF_sim")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF_sim")->fitTo(*GTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,false);
+  drawResults(ws,1);
 
-  printResults(ws,true);
+  printResults(ws,1);
 
-  printResults(ws,false);
+  //TT case
+
+  // fix some parameters 
+  //ws->var("alpha")->setConstant(kTRUE); 
+  //ws->var("enne")->setConstant(kTRUE); 
+
+  /* if (sidebandPrefit) prefitSideband(ws,2);
+
+  // ws->pdf("totPDF_sim")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF_sim")->fitTo(*TTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+
+  drawResults(ws,2);
+
+  printResults(ws,2); */
 
   return 1;
 }
+
