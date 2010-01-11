@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.2 2009/11/10 13:10:42 pellicci Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.3 2009/11/11 09:27:46 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -34,6 +34,8 @@
 
 //ClassImp(RooHistPdfConv);
 
+static const Double_t root2(sqrt(2.));
+static const Double_t pi2(sqrt(acos(-1.)));
 
 //_____________________________________________________________________________
 RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& _xIn, 
@@ -104,8 +106,6 @@ RooHistPdfConv::RooHistPdfConv(const RooHistPdfConv& other, const char* name) :
 Double_t RooHistPdfConv::evaluate() const 
 {  
   // cout << "RooHistPdfConv::evaluate(" << GetName() << ")" << endl ;
-  
-  static const Double_t root2(sqrt(2.)) ; 
   const RooArgSet* aRow;
   RooRealVar* xprime;
  
@@ -114,12 +114,13 @@ Double_t RooHistPdfConv::evaluate() const
   for (Int_t i=0; i<_histpdf->numEntries(); i++) {
     
     aRow = _histpdf->get(i);
-    Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
-    Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
+
+    const Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
+    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
 
-    Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
-    Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
+    const Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
+    const Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
     result += 0.5*weight*(TMath::Erfc(c)-TMath::Erfc(d));
   }
 
@@ -144,8 +145,8 @@ Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) c
   Double_t result(0.);
   for (Int_t i=0; i<_histpdf->numEntries(); i++) {
     aRow = _histpdf->get(i);
-    Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
-    Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
+    const Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
+    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
 
     result += 0.5*weight*(cerfInt(xprime->getVal() - halfBinSize) - cerfInt(xprime->getVal() + halfBinSize) );
@@ -156,9 +157,6 @@ Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) c
 
 Double_t RooHistPdfConv::cerfInt(Double_t xi) const
 {
-  static const Double_t root2(sqrt(2.));
-  static const Double_t pi2(sqrt(acos(-1.)));
-
   const Double_t xmin = xIn.min();
   const Double_t xmax = xIn.max();
 

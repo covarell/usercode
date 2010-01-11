@@ -14,11 +14,6 @@
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
-#include "RooPolynomial.h"
-#include "RooExponential.h"
-#include "RooGaussian.h"
-#include "RooCBShape.h"
-#include "RooAddPdf.h"
 #include "RooWorkspace.h"
 
 using namespace RooFit;
@@ -107,7 +102,6 @@ void drawResults(RooWorkspace *ws, const int DataCat)
 {
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
-  RooAbsPdf *background = ws->pdf("expFunct");
 
   char reducestr[200];
 
@@ -125,7 +119,7 @@ void drawResults(RooWorkspace *ws, const int DataCat)
 
   totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components(*background),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,Components("expFunct"),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
   if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));

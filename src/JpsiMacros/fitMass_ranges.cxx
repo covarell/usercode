@@ -14,11 +14,6 @@
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
-#include "RooPolynomial.h"
-#include "RooExponential.h"
-#include "RooGaussian.h"
-#include "RooCBShape.h"
-#include "RooAddPdf.h"
 #include "RooWorkspace.h"
 
 using namespace RooFit;
