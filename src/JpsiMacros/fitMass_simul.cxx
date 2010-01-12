@@ -27,11 +27,18 @@
 
 using namespace RooFit;
 
-static const Int_t nbinspt = 11;
-static const Int_t nbinseta = 2;
+static const Int_t nbinspt = 6;
+static const Int_t nbinseta = 1;
 
 double ptbinlimits[nbinspt+1];
 double etabinlimits[nbinseta+1];
+
+double ptbincenters[nbinspt] = {nbinspt*20.};
+double ptbinerrors[nbinspt] = {nbinspt*0.};
+double ycenters1[nbinspt] = {nbinspt*-999.};
+double yerrors1[nbinspt] = {nbinspt*0.};
+double ycenters2[nbinspt] = {nbinspt*-999.};
+double yerrors2[nbinspt] = {nbinspt*0.};
 
 //Convention: when necessary, use the following convention
 // 0 Global-Global
@@ -182,12 +189,14 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   RooRealVar *JpsiMass = ws->var("JpsiMass");
 
   string reducestr;
+  int nRows = nbinspt/3;
+  int vertDim = nRows*250;  
 
-  TCanvas c1("c1","c1",10,10,1100,1000);
-  c1.Divide(3,4);
+  TCanvas c1("c1","c1",10,10,1100,vertDim);
+  c1.Divide(3,nRows);
 
-  TCanvas c2("c2","c2",10,10,1100,1000);
-  c2.Divide(3,4);
+  TCanvas c2("c2","c2",10,10,1100,vertDim);
+  c2.Divide(3,nRows);
   
   string catstring_type;
 
@@ -198,9 +207,10 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   for(int i = 1;i<=nbinspt;i++){
     for(int j = 1;j<=nbinseta;j++){
 
-       // ~ empty bins here
-      if (DataCat == 0 && i == 1 && j < 3) continue;
-      if (DataCat > 0 && i == 11) continue;
+      // ~ empty bins here
+      // if (DataCat == 0 && i == 1) continue;
+      if (DataCat == 1 && i > 3) continue;
+      if (DataCat == 2 && i > 2) continue;
 
       RooPlot *mframe = JpsiMass->frame();
 
@@ -254,16 +264,14 @@ void printResults(RooWorkspace *ws, const int DataCat)
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooCategory *JpsiPtType = ws->cat("JpsiPtType");
   RooCategory *JpsiEtaType = ws->cat("JpsiEtaType");
+  
+  TCanvas c3("c3","c3",10,10,500,400);
+  TCanvas c4("c4","c4",10,10,500,400);
 
-  TCanvas c3("c3","c3",10,10,500,600);
-  TCanvas c4("c4","c4",10,10,500,600);
-
-  double ptbincenters[nbinspt] = {nbinspt*20.};
-  double ptbinerrors[nbinspt] = {nbinspt*0.};
-  double ycenters1[nbinspt] = {nbinspt*0.};
-  double yerrors1[nbinspt] = {nbinspt*0.};
-  double ycenters2[nbinspt] = {nbinspt*0.};
-  double yerrors2[nbinspt] = {nbinspt*0.};
+  for(int i = 1;i<=nbinspt;i++){
+    ycenters1[i] = -999.;
+    ycenters2[i] = -999.;
+  }
 
   string catstring_type;
 
@@ -277,15 +285,16 @@ void printResults(RooWorkspace *ws, const int DataCat)
   string cutstring;
 
   for(int i = 1;i<=nbinspt;i++){
-
+       
     ptbincenters[i-1] = (ptbinlimits[i] + ptbinlimits[i-1])/2. ;
     ptbinerrors[i-1] = ptbinlimits[i] - ptbincenters[i-1] ;
 
     for(int j = 1;j<=nbinseta;j++){
 
       // ~ empty bins here, if any
-      if (DataCat == 0 && i == 1 && j < 3) continue;
-      if (DataCat > 0 && i == 11) continue;
+      // if (DataCat == 0 && i == 1) continue;
+      if (DataCat == 1 && i > 3) continue;
+      if (DataCat == 2 && i > 2) continue;
 
       string Nsigname = nameSplitVar("NSig",i,j);
       // string coeffGaussname = nameSplitVar("coeffGauss",i,j);
@@ -320,6 +329,8 @@ void printResults(RooWorkspace *ws, const int DataCat)
   gpull1->SetTitle("Pull of fit results - barrel");
   gpull1->SetMarkerStyle(20);
   gpull1->SetMarkerColor(kRed);
+  gpull1->SetMaximum(30.);
+  gpull1->SetMinimum(-30.);
   gpull1->Draw("AP");
 
   cutstring = catstring_type + "pull_barrel.gif";
@@ -331,6 +342,8 @@ void printResults(RooWorkspace *ws, const int DataCat)
   gpull2->SetTitle("Pull of fit results - endcap");
   gpull2->SetMarkerStyle(20);
   gpull2->SetMarkerColor(kBlue);
+  gpull2->SetMaximum(30.);
+  gpull2->SetMinimum(-30.);
   gpull2->Draw("AP");
 
   cutstring = catstring_type + "pull_endcap.gif";
@@ -392,7 +405,7 @@ int main(int argc, char* argv[])
     fpt >> min >> max;
     ptbinlimits[i] = min;   i++;
   }
-  ptbinlimits[i-1] = max;
+  ptbinlimits[nbinspt] = max;
 
   i = 0;  
 
@@ -404,7 +417,7 @@ int main(int argc, char* argv[])
     feta >> min >> max;
     etabinlimits[i] = min;  i++;    
   }
-  etabinlimits[i-1] = max;
+  etabinlimits[nbinseta] = max;
 
   RooWorkspace *ws = new RooWorkspace("ws");
 
@@ -427,13 +440,13 @@ int main(int argc, char* argv[])
   defineBackground(ws);
 
   // Total PDF (signal CB+Gauss)
-  ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+  ws->factory("SUM::totPDF(NSig[500.,1.,10000000.]*sigCBGauss,NBkg[200.,1.,10000000.]*expFunct)");
 
   //DO SIMULTANEOUS FIT
   RooSimWSTool wst(*ws);
   wst.build("totPDF_sim","totPDF",
 	    //  SplitParam("NSig,NBkg,coefExp,coeffGauss,sigmaSig1","JpsiPtType,JpsiEtaType"));
-	    SplitParam("NSig,NBkg,coefExp,coeffGauss,sigmaSig1","JpsiPtType,JpsiEtaType"));
+	    SplitParam("NSig,NBkg,coefExp,coeffGauss","JpsiPtType,JpsiEtaType"));
 	    // SplitParam("alpha,enne","JpsiEtaType")); 
   
   //Make subsamples to be used later
@@ -469,6 +482,10 @@ int main(int argc, char* argv[])
     ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin,SumW2Error(kTRUE));
     ws->var("enne")->setConstant(kTRUE);
     ws->var("alpha")->setConstant(kTRUE);
+    ws->var("meanSig1")->setConstant(kTRUE);
+    ws->var("meanSig2")->setConstant(kTRUE);
+    // ws->var("sigmaSig1")->setConstant(kTRUE);
+    // ws->var("sigmaSig2")->setConstant(kTRUE);
 
     /* // ws->pdf("sigCBGauss")->fitTo(*GGdataTr1,SumW2Error(kTRUE)); 
     ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin1,SumW2Error(kTRUE));
@@ -494,8 +511,8 @@ int main(int argc, char* argv[])
   
   }
 
-  // ws->pdf("totPDF_sim")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
-  ws->pdf("totPDF_sim")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF_sim")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF_sim")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,0);
 
@@ -504,6 +521,8 @@ int main(int argc, char* argv[])
   //GT case
 
   // fix some parameters 
+  ws->var("sigmaSig1")->setConstant(kTRUE);
+  ws->var("sigmaSig2")->setConstant(kTRUE);
   /* ws->var("alpha_E1")->setConstant(kTRUE);
   ws->var("alpha_E2")->setConstant(kTRUE);
   ws->var("enne_E1")->setConstant(kTRUE); 
@@ -511,8 +530,8 @@ int main(int argc, char* argv[])
 
   if (sidebandPrefit) prefitSideband(ws,1);
 
-  // ws->pdf("totPDF_sim")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
-  ws->pdf("totPDF_sim")->fitTo(*GTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF_sim")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF_sim")->fitTo(*GTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,1);
 
@@ -521,17 +540,17 @@ int main(int argc, char* argv[])
   //TT case
 
   // fix some parameters 
-  //ws->var("alpha")->setConstant(kTRUE); 
-  //ws->var("enne")->setConstant(kTRUE); 
+  ws->var("alpha")->setConstant(kTRUE); 
+  ws->var("enne")->setConstant(kTRUE); 
 
-  /* if (sidebandPrefit) prefitSideband(ws,2);
+  if (sidebandPrefit) prefitSideband(ws,2);
 
-  // ws->pdf("totPDF_sim")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF_sim")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   // ws->pdf("totPDF_sim")->fitTo(*TTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,2);
 
-  printResults(ws,2); */
+  printResults(ws,2);
 
   return 1;
 }
