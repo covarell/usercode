@@ -77,7 +77,7 @@ FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassRange $(GLIBS) $ $<
 
 FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
-	$(CXX) $(CXXFLAGS) -o FitMassSim $(OUTLIB)/*.o $(GLIBS) $ $<
+	$(CXX) $(CXXFLAGS) -o FitMassSim $(GLIBS) $ $<
 
 ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<

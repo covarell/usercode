@@ -11,6 +11,7 @@
 #include "RooFit.h"
 #include "RooGlobalFunc.h"
 #include "RooDataSet.h"
+#include "RooAbsPdf.h"
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
