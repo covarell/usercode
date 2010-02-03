@@ -52,23 +52,23 @@ OUTLIB	         = ../../../../../lib/
 .SUFFIXES: .cc,.C,.hh,.h
 .PREFIXES: ../../../../../lib/
 
-$(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAnalysis.cc 
-	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)JPsiTreeBase.o $<
+## $(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAnalysis.cc 
+##	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)JPsiTreeBase.o $<
 
-$(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
-	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)finalJPsiAnalysis.o $<
+## $(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
+##	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)finalJPsiAnalysis.o $<
 
-$(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
-	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)MakeDataSet.o $<
+## $(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
+##	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)MakeDataSet.o $<
 
 $(OUTLIB)RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
 	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)/libRooHistPdfConv.o $<
 
-JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
-	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
+## JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
+##	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
-JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
-	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
+## JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
+##	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(GLIBS) $ $<
@@ -85,24 +85,24 @@ ShowTruth:  $(INCLUDEDIR)showTruth.cxx
 Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)RooHistPdfConv.o  
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
-Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
-	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
+## Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
+##	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
 
-Fit2DSim: $(INCLUDEDIR)fit2D_sim.cxx
-	$(CXX) $(CXXFLAGS) -o Fit2DSim $(OUTLIB)/*.o $(GLIBS) $ $<
+## Fit2DSim: $(INCLUDEDIR)fit2D_sim.cxx
+##	$(CXX) $(CXXFLAGS) -o Fit2DSim $(OUTLIB)/*.o $(GLIBS) $ $<
 
-FitSmearFactor: $(INCLUDEDIR)fitSmearFactor.cxx
-	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
+## FitSmearFactor: $(INCLUDEDIR)fitSmearFactor.cxx
+##	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
 
-FitSidebands:  $(INCLUDEDIR)fitSidebands.cxx
-	$(CXX) $(CXXFLAGS) -o FitSidebands $(OUTLIB)/*.o $(GLIBS) $ $<
+## FitSidebands:  $(INCLUDEDIR)fitSidebands.cxx
+##	$(CXX) $(CXXFLAGS) -o FitSidebands $(OUTLIB)/*.o $(GLIBS) $ $<
 
-FitLifetime:  $(INCLUDEDIR)fitLifetime.cxx
-	$(CXX) $(CXXFLAGS) -o FitLifetime $(OUTLIB)/*.o $(GLIBS) $ $<
+FitLifetimePrompt:  $(INCLUDEDIR)fitLifetimePrompt.cxx
+	$(CXX) $(CXXFLAGS) -o FitLifetimePrompt $(GLIBS) $ $<
 
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f $(OUTLIB)*.so
-	rm -f JPsiApp JPsiFitApp
+##	rm -f JPsiApp JPsiFitApp
 
-all:  JPsiApp JPsiFitApp Fit2D FitMass ShowTruth FitMassSim
+all:  Fit2D FitMass FitMassSim
