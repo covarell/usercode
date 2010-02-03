@@ -321,9 +321,9 @@ int main(int argc, char* argv[]) {
   cout << "Number of events to fit  = " << reddata->sumEntries() << endl; 
 
   //get subdatasets. Some of them are useful. Some, however, not
-  RooDataSet *reddataPR = (RooDataSet*) reddata->reduce("MCType == MCType::PR");
-  RooDataSet *reddataNP = (RooDataSet*) reddata->reduce("MCType == MCType::NP");
-  RooDataSet *reddataBK = (RooDataSet*) reddata->reduce("MCType == MCType::BK");
+  RooDataSet *reddataPR = (RooDataSet*) reddata1->reduce("MCType == MCType::PR");
+  RooDataSet *reddataNP = (RooDataSet*) reddata1->reduce("MCType == MCType::NP");
+  RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
 
   RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsictTrue"))),*reddataNP); 
 

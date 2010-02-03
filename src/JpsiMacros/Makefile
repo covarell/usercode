@@ -79,11 +79,11 @@ FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
 FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSim $(GLIBS) $ $<
 
-ShowTruth:  $(INCLUDEDIR)showTruth.cxx
-	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
-
 Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)RooHistPdfConv.o  
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
+
+## ShowTruth:  $(INCLUDEDIR)showTruth.cxx
+##	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
 ## Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
 ##	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<
@@ -100,6 +100,8 @@ Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)RooHistPdfConv.o
 FitLifetimePrompt:  $(INCLUDEDIR)fitLifetimePrompt.cxx
 	$(CXX) $(CXXFLAGS) -o FitLifetimePrompt $(GLIBS) $ $<
 
+FitLifetimeNonPrompt:  $(INCLUDEDIR)fitLifetimeNonPrompt.cxx
+	$(CXX) $(CXXFLAGS) -o FitLifetimeNonPrompt $(OUTLIB)/*.o $(GLIBS) $ $<
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f $(OUTLIB)*.so
