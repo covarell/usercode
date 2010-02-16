@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.3 2009/11/11 09:27:46 pellicci Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.4 2010/01/11 09:11:52 pellicci Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -114,13 +114,17 @@ Double_t RooHistPdfConv::evaluate() const
   for (Int_t i=0; i<_histpdf->numEntries(); i++) {
     
     aRow = _histpdf->get(i);
-
-    const Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
-    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
+  
+    const Double_t halfBinSize = xprime->getBinning().binWidth(1)/2.0;
+    // std::cout << "half bin size = " << halfBinSize << std::endl;
+    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
+    // std::cout << "weight = " << weight << std::endl;
 
     const Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
+    // std::cout << "c = " << c << std::endl;
     const Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
+    // std::cout << "d = " << d << std::endl;
     result += 0.5*weight*(TMath::Erfc(c)-TMath::Erfc(d));
   }
 

@@ -14,7 +14,7 @@
 #include "RooPlot.h"
 #include "RooCategory.h"
 #include "RooFitResult.h"
-//#include "RooUniformBinning.h"
+#include "RooUniformBinning.h"
 #include "RooWorkspace.h"
 
 #include "RooHistPdfConv.h"
@@ -32,6 +32,7 @@ void defineCTSignal(RooWorkspace *ws, const bool isGG)
 
   // VARIABLES
   RooRealVar *Jpsict = ws->var("Jpsict");
+  RooRealVar *JpsictTrue = ws->var("JpsictTrue");
   RooRealVar meanResSigW("meanResSigW","Mean of the resolution wide gaussian",0.003,-1.,1.);
   RooRealVar sigmaResSigW("sigmaResSigW","#sigma of the resolution wide gaussian",0.05,0.001,5.);
   RooRealVar meanResSigN("meanResSigN","Mean of the resolution narrow gaussian",-0.17,-1.,1.);
@@ -43,7 +44,11 @@ void defineCTSignal(RooWorkspace *ws, const bool isGG)
   if(isGG) reddata2 = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GG");
   else reddata2 = (RooDataSet*)ws->data("data")->reduce("JpsiType == JpsiType::GT");
   RooDataSet *reddataNP = (RooDataSet*)reddata2->reduce("MCType == MCType::NP");
+  ws->var("JpsictTrue")->setRange(-1.0,5.0);
+  ws->var("JpsictTrue")->setBins(150);
   RooDataHist* redMCNP = new RooDataHist("redMCNP","MC ctau distribution for NP signal",*(ws->var("JpsictTrue")),*reddataNP); 
+  // const Double_t halfBinSize = ws->var("JpsictTrue")->getBinning().binWidth(1)/2.0;
+  // std::cout << "half bin size 2 = " << halfBinSize << std::endl;
 
   // RESOLUTION
 
@@ -77,8 +82,8 @@ void drawResults(RooWorkspace *ws, const bool isGG, float numEvents)
 
   RooPlot *tframe = Jpsict->frame();
 
-  if(isGG) tframe->SetTitle("Lifetime fit for non-prompt glb-glb J/  #psi");
-  else tframe->SetTitle("Lifetime fit for non-prompt glb-trk J/  #psi");
+  if(isGG) tframe->SetTitle("Lifetime fit for non-prompt glb-glb J/   #psi");
+  else tframe->SetTitle("Lifetime fit for non-prompt glb-trk J/   #psi");
 
   if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP && JpsiType == JpsiType::GG"));
   else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP && JpsiType == JpsiType::GT"));
@@ -161,8 +166,8 @@ int main(int argc, char* argv[]) {
   defineCTSignal(ws,isGG);
 
   //background
-  // ws->pdf("histPdf")->fitTo(*reddata,Minos(0),SumW2Error(kFALSE)/*,NumCPU(4)*/);
-  ws->pdf("histPdf")->fitTo(*reddata1,Minos(0),SumW2Error(kTRUE)/*,NumCPU(4)*/);
+  ws->pdf("histPdf")->fitTo(*reddata,Minos(0),SumW2Error(kFALSE)/*,NumCPU(4)*/);
+  // ws->pdf("histPdf")->fitTo(*reddata1,Minos(0),SumW2Error(kTRUE)/*,NumCPU(4)*/);
 
   //  ws->saveSnapshot("fit2dpart_GG.root",ws->components(),kFALSE);
 

@@ -61,7 +61,7 @@ OUTLIB	         = ../../../../../lib/
 ## $(OUTLIB)MakeDataSet.o: $(INCLUDEDIR)/MakeDataSet.cc
 ##	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)MakeDataSet.o $<
 
-$(OUTLIB)RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
+RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
 	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)/libRooHistPdfConv.o $<
 
 ## JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
