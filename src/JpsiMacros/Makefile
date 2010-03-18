@@ -102,6 +102,10 @@ FitLifetimePrompt:  $(INCLUDEDIR)fitLifetimePrompt.cxx
 
 FitLifetimeNonPrompt:  $(INCLUDEDIR)fitLifetimeNonPrompt.cxx
 	$(CXX) $(CXXFLAGS) -o FitLifetimeNonPrompt $(OUTLIB)/*.o $(GLIBS) $ $<
+
+FitLifetimeBkg:  $(INCLUDEDIR)fitLifetimeBkg.cxx
+	$(CXX) $(CXXFLAGS) -o FitLifetimeBkg $(GLIBS) $ $<
+
 clean:
 	rm -f $(OUTLIB)*.o $(OUTLIBCOMMON)*.o
 	rm -f $(OUTLIB)*.so

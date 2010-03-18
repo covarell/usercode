@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.4 2010/01/11 09:11:52 pellicci Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.5 2010/02/16 13:38:08 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -116,15 +116,17 @@ Double_t RooHistPdfConv::evaluate() const
     aRow = _histpdf->get(i);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
   
-    const Double_t halfBinSize = xprime->getBinning().binWidth(1)/2.0;
-    // std::cout << "half bin size = " << halfBinSize << std::endl;
-    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
-    // std::cout << "weight = " << weight << std::endl;
+    const Double_t halfBinSize = xprime->getBinning().binWidth(i)/2.0;
+
+    Double_t weight = (_histpdf->weight(*aRow,0,false)/_histpdf->sum(false))*((xprime->getBinning().highBound() - xprime->getBinning().lowBound())/halfBinSize);
+    //std::cout << "The bin " << i << " contains " << weight << " entries" << std::endl; 
+
+    // remove non-living components
+    if ( xprime->getBinning().binLow(i)*xprime->getBinning().binHigh(i) < 0) weight = 0.; 
 
     const Double_t c = (xprime->getVal() - halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
-    // std::cout << "c = " << c << std::endl;
     const Double_t d = (xprime->getVal() + halfBinSize - xIn + (mean*msf)) / (root2*sigma*ssf);
-    // std::cout << "d = " << d << std::endl;
+
     result += 0.5*weight*(TMath::Erfc(c)-TMath::Erfc(d));
   }
 
@@ -150,8 +152,11 @@ Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) c
   for (Int_t i=0; i<_histpdf->numEntries(); i++) {
     aRow = _histpdf->get(i);
     const Double_t halfBinSize = _histpdf->binVolume(*aRow)/2.0;
-    const Double_t weight = _histpdf->weight(*aRow,0,false)/_histpdf->sum(false);
     xprime = (RooRealVar*)aRow->find(_variableName.c_str());
+    Double_t weight =  (_histpdf->weight(*aRow,0,false)/_histpdf->sum(false))*((xprime->getBinning().highBound() - xprime->getBinning().lowBound())/halfBinSize);;
+
+    // remove non-living components
+    if ( xprime->getBinning().binLow(i)*xprime->getBinning().binHigh(i) < 0) weight = 0.;
 
     result += 0.5*weight*(cerfInt(xprime->getVal() - halfBinSize) - cerfInt(xprime->getVal() + halfBinSize) );
   }
