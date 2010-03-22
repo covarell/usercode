@@ -50,7 +50,7 @@ void defineCTSignal(RooWorkspace *ws, const bool isGG)
   RooBinning rb(-1.0,5.0);
   rb.addBoundary(-0.01);
   rb.addUniform(50,-0.01,0.5);
-  rb.addUniform(30,0.5,1.0);
+  rb.addUniform(10,0.5,1.0);
   rb.addUniform(15,1.0,3.0);
   rb.addUniform(2,3.0,5.0);
   ws->var("JpsictTrue")->setBinning(rb);
@@ -140,7 +140,7 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG, float numEvents)
+void drawResults(RooWorkspace *ws, const bool isGG, float numEvents, RooBinning binning)
 {
 
   RooRealVar *Jpsict = ws->var("Jpsict");
@@ -150,8 +150,8 @@ void drawResults(RooWorkspace *ws, const bool isGG, float numEvents)
   if(isGG) tframe->SetTitle("Lifetime fit for non-prompt glb-glb J/   #psi");
   else tframe->SetTitle("Lifetime fit for non-prompt glb-trk J/   #psi");
 
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP && JpsiType == JpsiType::GG && JpsictTrue > 0.0001"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP && JpsiType == JpsiType::GT && JpsictTrue > 0.0001"));
+  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("MCType == MCType::NP && JpsiType == JpsiType::GG && JpsictTrue > 0.0001"));
+  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("MCType == MCType::NP && JpsiType == JpsiType::GT && JpsictTrue > 0.0001"));
 
   ws->pdf("histPdf")->plotOn(tframe,Normalization(numEvents,RooAbsReal::NumEvent));
 
@@ -211,8 +211,15 @@ int main(int argc, char* argv[]) {
 
   setRanges(ws);
 
-  // ws->var("JpsiMass")->setBins(35);
-  ws->var("Jpsict")->setBins(50);
+  // ws->var("Jpsict")->setBins(50);
+  RooBinning rb2(-1.0,3.5);
+  rb2.addBoundary(-0.5);
+  rb2.addBoundary(-0.2);
+  rb2.addBoundary(-0.1);
+  rb2.addUniform(22,-0.05,0.5);
+  rb2.addUniform(10,0.5,1.0);
+  rb2.addUniform(5,1.0,3.5);
+  ws->var("Jpsict")->setBinning(rb2);
 
   //CONSIDER THE CASE
   RooDataSet *reddata1;
@@ -237,7 +244,7 @@ int main(int argc, char* argv[]) {
   ws->pdf("histPdf")->fitTo(*reddata,Minos(0),SumW2Error(kFALSE)/*,NumCPU(4)*/);
   // ws->pdf("histPdf")->fitTo(*reddata1,Minos(0),SumW2Error(kTRUE)/*,NumCPU(4)*/);
 
-  drawResults(ws,isGG,numEvents); 
+  drawResults(ws,isGG,numEvents,rb2); 
 
   return 1;
 }

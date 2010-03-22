@@ -31,7 +31,7 @@ void defineBackground(RooWorkspace *ws)
   ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-5.,-9.,0.1])");
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-2.,0.1])");
 
   return;
 }
@@ -48,7 +48,7 @@ void defineSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.96,0.,8.],enne[3.,0.,10.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,2.],enne[20.,2.,50.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -131,19 +131,18 @@ void drawResults(RooWorkspace *ws, const int DataCat)
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
   }
 
-  // totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  // totPDF->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-  // totPDF->plotOn(mframe,Components("expFunct"),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,Components("expFunct"),LineColor(kBlue),LineStyle(kDashed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
   // if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   // else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
   // else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
 
   TCanvas c1;
-  c1.cd();c1.SetLogy(1);mframe->Draw();
-  if(DataCat == 0) sprintf(reducestr,"GGmassplotlog.gif");
-  else if(DataCat == 1) sprintf(reducestr,"GTmassplotlog.gif");
-  else if(DataCat == 2) sprintf(reducestr,"TTmassplotlog.gif");
+  c1.cd(); /* c1.SetLogy(1) */; mframe->Draw();
+  if(DataCat == 0) sprintf(reducestr,"GGmassfit.gif");
+  else if(DataCat == 1) sprintf(reducestr,"GTmassfit.gif");
+  else if(DataCat == 2) sprintf(reducestr,"TTmassfit.gif");
   c1.SaveAs(reducestr);
 
   return;
@@ -264,8 +263,9 @@ int main(int argc, char* argv[])
   //GT case
 
   // fix some parameters 
-  //ws->var("alpha")->setConstant(kTRUE); 
+  ws->var("alpha")->setConstant(kTRUE); 
   //ws->var("enne")->setConstant(kTRUE); 
+  ws->var("meanSig1")->setConstant(kTRUE);
 
   if (sidebandPrefit) prefitSideband(ws,1);
 

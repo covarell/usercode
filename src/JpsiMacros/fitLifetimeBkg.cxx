@@ -14,7 +14,7 @@
 #include "RooPlot.h"
 #include "RooCategory.h"
 #include "RooFitResult.h"
-//#include "RooUniformBinning.h"
+#include "RooBinning.h"
 #include "RooWorkspace.h"
 
 #include "RooHistPdfConv.h"
@@ -63,7 +63,7 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG, float numEvents)
+void drawResults(RooWorkspace *ws, const bool isGG, float numEvents, RooBinning binning)
 {
 
   RooRealVar *Jpsict = ws->var("Jpsict");
@@ -73,8 +73,8 @@ void drawResults(RooWorkspace *ws, const bool isGG, float numEvents)
   if(isGG) tframe->SetTitle("Lifetime fit for background glb-glb J/  #psi");
   else tframe->SetTitle("Lifetime fit for background glb-trk J/  #psi");
 
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK && JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK && JpsiType == JpsiType::GT"));
+  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("MCType == MCType::BK && JpsiType == JpsiType::GG"));
+  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("MCType == MCType::BK && JpsiType == JpsiType::GT"));
 
   ws->pdf("bkgctauTOT")->plotOn(tframe,Normalization(numEvents,RooAbsReal::NumEvent));
 
@@ -134,8 +134,14 @@ int main(int argc, char* argv[]) {
 
   setRanges(ws);
 
-  // ws->var("JpsiMass")->setBins(35);
-  ws->var("Jpsict")->setBins(80);
+  // ws->var("Jpsict")->setBins(80);
+  RooBinning rb2(-1.0,3.5);
+  rb2.addBoundary(-0.5);
+  rb2.addBoundary(-0.2);
+  rb2.addUniform(30,-0.1,0.5);
+  rb2.addUniform(10,0.5,1.0);
+  rb2.addUniform(5,1.0,3.5);
+  ws->var("Jpsict")->setBinning(rb2);
 
   //CONSIDER THE CASE
   RooDataSet *reddata1;
@@ -166,7 +172,7 @@ int main(int argc, char* argv[]) {
 
   //  ws->saveSnapshot("fit2dpart_GG.root",ws->components(),kFALSE);
 
-  drawResults(ws,isGG,numEvents);
+  drawResults(ws,isGG,numEvents,rb2);
 
   return 1;
 }
