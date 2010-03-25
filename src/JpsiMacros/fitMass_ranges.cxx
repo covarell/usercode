@@ -11,8 +11,9 @@
 #include "RooFit.h"
 #include "RooGlobalFunc.h"
 #include "RooDataSet.h"
-#include "RooRealVar.h"
+#include "RooDataHist.h"
 #include "RooAbsPdf.h"
+#include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
 #include "RooWorkspace.h"
@@ -30,7 +31,7 @@ void defineBackground(RooWorkspace *ws)
   ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-5.,-9.,0.1])");
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-2.,0.1])");
 
   return;
 }
@@ -47,7 +48,7 @@ void defineSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.96,0.,8.],enne[3.,0.,10.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,20.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -113,32 +114,42 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
 {
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
-  RooAbsPdf *background = ws->pdf("expFunct");
 
   char reducestr[200];
 
   RooPlot *mframe = ws->var("JpsiMass")->frame();
 
-  if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
+  if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str()); 
   else if(DataCat == 1) sprintf(reducestr,"Mass fit for glb-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
   else if(DataCat == 2) sprintf(reducestr,"Mass fit for trk-trk muons p_{T} = %s GeV,   #eta = %s",prange.c_str(),etarange.c_str());
 
   mframe->SetTitle(reducestr);
 
-  if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
-  else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
+  if(DataCat == 0) {
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"),MarkerColor(4));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+  }
+  else if(DataCat == 1) {
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"),MarkerColor(4));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  }
+  else if(DataCat == 2) { 
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && MCType == MCType::BK"),MarkerColor(4));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
+  }
 
-  totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components(*background),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,Components("expFunct"),LineColor(kBlue),LineStyle(kDashed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-  if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
-  else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
+  // if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+  // else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  // else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
 
   TCanvas c1;
-  c1.cd();mframe->Draw();
+  c1.cd(); /* c1.SetLogy(1) */; mframe->Draw();
   if(DataCat == 0) sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
   else if(DataCat == 1) sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
   else if(DataCat == 2) sprintf(reducestr,"TTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
@@ -184,7 +195,7 @@ int main(int argc, char* argv[])
         cout << "File name for fitted data is " << filename << endl;
         break;
       }
-      
+     
       case 'p':{
 	prange = argv[i+1];
 	cout << "Range for pT is " << prange << " GeV/c" << endl;
@@ -196,7 +207,7 @@ int main(int argc, char* argv[])
         cout << "Range for |eta| is " << etarange << endl;
         break;
       }
-
+ 
       case 's':{
         sidebandPrefit = true;
         cout << "Sideband pre-fitting activated" << endl;
@@ -218,8 +229,9 @@ int main(int argc, char* argv[])
 
   TFile fIn(filename);
   fIn.cd();
+
   RooDataSet *data = (RooDataSet*)fIn.Get("data");
-  
+
   float pmin, pmax; 
   float etamin, etamax;
 
@@ -252,6 +264,11 @@ int main(int argc, char* argv[])
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
   RooDataSet *TTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT");
+  ws->var("JpsiMass")->setBins(80);
+
+  RooDataHist *GGdataBin = new RooDataHist("GGdataBin","GGdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdata);
+  RooDataHist *GTdataBin = new RooDataHist("GTdataBin","GTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GTdata);
+  RooDataHist *TTdataBin = new RooDataHist("TTdataBin","TTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*TTdata);
 
   //GG CASE
 
@@ -267,7 +284,11 @@ int main(int argc, char* argv[])
     ws->var("alpha")->setConstant(kTRUE);
   }
 
-  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->var("coeffGauss")->setVal(1.0);
+  // ws->var("coeffGauss")->setConstant(kTRUE);
+
+  // ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,0,prange,etarange);
 
@@ -277,12 +298,14 @@ int main(int argc, char* argv[])
   //GT case
 
   // fix some parameters 
-  //ws->var("alpha")->setConstant(kTRUE); 
+  ws->var("alpha")->setConstant(kTRUE); 
   //ws->var("enne")->setConstant(kTRUE); 
+  ws->var("meanSig1")->setConstant(kTRUE);
 
   if (sidebandPrefit) prefitSideband(ws,1);
 
-  ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF")->fitTo(*GTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,1,prange,etarange);
 
@@ -297,18 +320,21 @@ int main(int argc, char* argv[])
 
   if (sidebandPrefit) prefitSideband(ws,2);
 
-  ws->pdf("totPDF")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF")->fitTo(*TTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,2,prange,etarange);
 
   double NSigTT, errSigTT,resolTT;
   printResults(ws,NSigTT,errSigTT,resolTT);
 
-  cout << endl << "pT = " << prange << " GeV; |eta| = " << etarange << endl;
-  cout << endl << "GG J/psi yields:                 GT J/psi yields:                   TT J/psi yields:" << endl;
-  cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << "                   True MC : " << TTdataTr->sumEntries() << endl;
-  cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << "        Fit : " << NSigTT << " +/- " << errSigTT << endl;
-  cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV        Resolution : " << resolTT*1000. << " MeV" << endl; 
+  char oFile[200];
+  sprintf(oFile,"results/results_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
+  ofstream outputFile(oFile);
+  outputFile << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;
+  outputFile << "GT " << GTdataTr->sumEntries() << " " << NSigGT << " " << errSigGT << endl;
+  outputFile << "TT " << TTdataTr->sumEntries() << " " << NSigTT << " " << errSigTT << endl;
+  outputFile << endl;
 
   return 1;
 }
