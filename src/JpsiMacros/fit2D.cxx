@@ -64,18 +64,28 @@ void defineMassBackground(RooWorkspace *ws)
 void defineCTResol(RooWorkspace *ws)
 {
 
-  
+  // ONE RESOLUTION FUNCTION
   ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.05,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
+  // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.01,0.005,0.5])");
   ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,1.]})");
+
+  // ANOTHER RESOLUTION FUNCTION
+  ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
+  // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
+  ws->factory("GaussModel::resbkgGN(Jpsict,meanResSigW,sigmaResBkgN[0.01,0.005,0.5])");
+  ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracRes})");
 
   return;
 }
 
 void defineCTBackground(RooWorkspace *ws)
 {
-  //bkg1 is the resolution function
-  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resol,RooDecay::SingleSided");
+ 
+  // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resol,RooDecay::SingleSided");
+  // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.,5.],resol,RooDecay::Flipped");
+  // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.,10.],resol,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resbkg,RooDecay::SingleSided");
   ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.,5.],resol,RooDecay::Flipped");
   ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.,10.],resol,RooDecay::DoubleSided");
 
@@ -97,11 +107,13 @@ void defineCTSignal(RooWorkspace *ws, RooDataHist *reducedNP)
   //RooGExpModel physsigNP("physsigNP","Gauss + exp model",Jpsict,sigmaMC,taueff);
   //RooDecay sigNP("sigNP","Non-prompt signal",*Jpsict,taueff,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
 
-  RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
-  RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
-  RooAddPdf sigNP("sigNP","Non-prompt signal",sigNPW,sigNPN,*(ws->var("fracRes")));
-  // RooHistPdfConv sigNP("sigNP","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
+  // RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
+  // RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
 
+  RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResBkgW")),*reducedNP);
+  RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResBkgN")),*reducedNP);
+  RooAddPdf sigNP("sigNP","Non-prompt signal",sigNPW,sigNPN,*(ws->var("fracRes")));
+ 
   ws->import(sigNP);
 
   return;
@@ -113,26 +125,7 @@ void setRanges(RooWorkspace *ws){
   const float JpsiMassMax = 3.5;
 
   ws->var("JpsictTrue")->setRange(-1.0,5.0);
-  // define binning
-  RooBinning rb(-1.0,5.0);
-  rb.addBoundary(-0.01);
-  rb.addUniform(50,-0.01,0.5);
-  rb.addUniform(10,0.5,1.0);
-  rb.addUniform(15,1.0,3.0);
-  rb.addUniform(2,3.0,5.0);
-  ws->var("JpsictTrue")->setBinning(rb);
-
   ws->var("Jpsict")->setRange(-1.0,3.5);
-  // define binning
-  RooBinning rb2(-1.0,3.5);
-  rb2.addBoundary(-0.5);
-  rb2.addBoundary(-0.2);
-  rb2.addBoundary(-0.1);
-  rb2.addBoundary(-0.01);
-  rb2.addUniform(22,-0.05,0.5);
-  rb2.addUniform(10,0.5,1.0);
-  rb2.addUniform(5,1.0,3.5);
-  ws->var("Jpsict")->setBinning(rb2);
 
   ws->var("JpsiMass")->setRange("all",JpsiMassMin,JpsiMassMax);
   ws->var("JpsiMass")->setRange("left",JpsiMassMin,2.9);
@@ -148,14 +141,11 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG)
+void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning)
 {
   RooRealVar *JpsiMass = ws->var("JpsiMass");
   RooRealVar *Jpsict = ws->var("Jpsict");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
-  //RooAbsPdf *totsigPR = ws->pdf("totsigPR");
-  //RooAbsPdf *totsigNP = ws->pdf("totsigNP");
-  //RooAbsPdf *totBKG = ws->pdf("totBKG");
 
   RooPlot *mframe = JpsiMass->frame();
 
@@ -185,16 +175,16 @@ void drawResults(RooWorkspace *ws, const bool isGG)
   if(isGG) tframe->SetTitle("2D fit for glb-glb muons (c  #tau projection)");
   else tframe->SetTitle("2D fit for glb-trk muons (c  #tau projection)");
 
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
+  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
 
   totPDF->plotOn(tframe,Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(tframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(tframe,Components("totsigNP,totBKG"),DrawOption("F"),FillColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(tframe,Components("totBKG"),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
+  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
 
   totPDF->plotOn(tframe,Normalization(1.0,RooAbsReal::RelativeExpected));
 
@@ -213,8 +203,8 @@ void drawResults(RooWorkspace *ws, const bool isGG)
   if(isGG) tframe1->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal prompt");
   else tframe1->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal prompt");
 
-  if(isGG) ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::PR"));
-  else ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::PR"));
+  if(isGG) ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::PR"));
+  else ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::PR"));
 
   totPDF->plotOn(tframe1,Components("totsigPR"),LineColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
 
@@ -233,8 +223,8 @@ void drawResults(RooWorkspace *ws, const bool isGG)
   if(isGG) tframe2->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal non-prompt");
   else tframe2->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal non-prompt");
 
-  if(isGG) ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::NP"));
-  else ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::NP"));
+  if(isGG) ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::NP"));
+  else ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::NP"));
 
   totPDF->plotOn(tframe2,Components("totsigNP"),LineColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
 
@@ -253,8 +243,8 @@ void drawResults(RooWorkspace *ws, const bool isGG)
   if(isGG) tframe3->SetTitle("2D fit for glb-glb muons (c  #tau projection) - background");
   else tframe3->SetTitle("2D fit for glb-trk muons (c  #tau projection) - background");
 
-  if(isGG) ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"));
-  else ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"));
+  if(isGG) ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"));
+  else ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"));
 
   totPDF->plotOn(tframe3,Components("totBKG"),LineColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
 
@@ -333,6 +323,26 @@ int main(int argc, char* argv[]) {
 
   ws->var("JpsiMass")->setBins(60);
   // ws->var("Jpsict")->setBins(45);
+
+  // define binning
+  RooBinning rb(-1.0,5.0);
+  rb.addBoundary(-0.01);
+  rb.addUniform(50,-0.01,0.5);
+  rb.addUniform(10,0.5,1.0);
+  rb.addUniform(15,1.0,3.0);
+  rb.addUniform(2,3.0,5.0);
+  ws->var("JpsictTrue")->setBinning(rb);
+
+  // define binning
+  RooBinning rb2(-1.0,3.5);
+  rb2.addBoundary(-0.5);
+  // rb2.addBoundary(-0.2);
+  // rb2.addBoundary(-0.1);
+  // rb2.addBoundary(-0.01);
+  rb2.addUniform(44,-0.5,0.5);
+  rb2.addUniform(10,0.5,1.0);
+  rb2.addUniform(10,1.0,3.5);
+  ws->var("Jpsict")->setBinning(rb2);
 
   //CONSIDER THE CASE
   RooDataSet *reddata1;
@@ -428,9 +438,10 @@ int main(int argc, char* argv[]) {
   const Double_t NSigPR_static = ws->var("NSigPR")->getVal();
 
   Double_t Bfrac = NSigNP_static/(NSigNP_static + NSigPR_static);
-  cout << "B frac = " << Bfrac << " +/- " << Bfrac/NSigNP_static << endl;
+  Double_t BfracErr = sqrt(NSigNP_static*NSigPR_static/pow(NSigNP_static + NSigPR_static,3));
+  cout << "B frac = " << Bfrac << " +/- " << BfracErr << endl;
 
-  drawResults(ws,isGG);
+  drawResults(ws,isGG,rb2);
 
   cout << endl << "J/psi yields:" << endl;
   cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << ws->var("NSigPR")->getVal() << " +/- " << ws->var("NSigPR")->getError() << endl;
