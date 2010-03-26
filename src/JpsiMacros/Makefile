@@ -79,7 +79,7 @@ FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
 FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSim $(GLIBS) $ $<
 
-Fit2D:    $(INCLUDEDIR)fit2D.cxx $(OUTLIB)RooHistPdfConv.o  
+Fit2D:    $(INCLUDEDIR)fit2D.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
 ## ShowTruth:  $(INCLUDEDIR)showTruth.cxx
