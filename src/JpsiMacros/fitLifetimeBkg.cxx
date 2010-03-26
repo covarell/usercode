@@ -38,9 +38,9 @@ void defineCTResol(RooWorkspace *ws)
 
 void defineCTBackground(RooWorkspace *ws)
 {
-  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resol,RooDecay::SingleSided");
-  ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.,5.],resol,RooDecay::Flipped");
-  ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.,10.],resol,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resol,RooDecay::SingleSided");
+  ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resol,RooDecay::Flipped");
+  ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resol,RooDecay::DoubleSided");
 
   ws->factory("SUM::bkgPart1(fpm[1.,0.,1.]*bkg2,bkg3)");
   ws->factory("SUM::bkgPart2(fLiving[0.9,0.,1.]*bkgPart1,bkg4)");

@@ -121,6 +121,16 @@ void defineCTSignal(RooWorkspace *ws, RooDataHist *reducedNP)
   return;
 }
 
+void getrange(string &varRange, float *varmin, float *varmax)
+{
+ if (sscanf(varRange.c_str(), "%f-%f", varmin, varmax) == 0) {
+   cout << varRange.c_str() << ": range not valid!" << endl;
+    assert(0);
+  }
+
+ return;
+}
+
 void setRanges(RooWorkspace *ws){
 
   const float JpsiMassMin = 2.6;
@@ -143,7 +153,7 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning)
+void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const string prange, const string etarange)
 {
   RooRealVar *JpsiMass = ws->var("JpsiMass");
   RooRealVar *Jpsict = ws->var("Jpsict");
@@ -151,8 +161,10 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning)
 
   RooPlot *mframe = JpsiMass->frame();
 
-  if(isGG) mframe->SetTitle("2D fit for glb-glb muons (mass projection)");
-  else mframe->SetTitle("2D fit for glb-trk muons (mass projection)");
+  string titlestr;
+  if(isGG) titlestr = "2D fit for glb-glb muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  else titlestr = "2D fit for glb-trk muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  mframe->SetTitle(titlestr.c_str());
 
   if(isGG) ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
@@ -169,13 +181,15 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning)
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  if(isGG) c1.SaveAs("2D_GGmassfit.gif");
-  else c1.SaveAs("2D_GTmassfit.gif");
+  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  c1.SaveAs(titlestr.c_str());
 
   RooPlot *tframe = Jpsict->frame();
 
-  if(isGG) tframe->SetTitle("2D fit for glb-glb muons (c  #tau projection)");
-  else tframe->SetTitle("2D fit for glb-trk muons (c  #tau projection)");
+  if(isGG) titlestr = "2D fit for glb-glb muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  else titlestr = "2D fit for glb-trk muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  tframe->SetTitle(titlestr.c_str());
 
   if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
   else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
@@ -193,12 +207,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning)
   TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  if(isGG) c2.SaveAs("2D_GGtimefit_Lin.gif");
-  else c2.SaveAs("2DGTtimefit_Lin.gif");
+  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c1.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  if(isGG) c2.SaveAs("2D_GGtimefit_Log.gif");
-  else c2.SaveAs("2D_GTtimefit_Log.gif");
+  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c2.SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = Jpsict->frame();
 
@@ -269,6 +285,8 @@ int main(int argc, char* argv[]) {
 
   char *filename;
   bool isGG;
+  string prange;
+  string etarange;
   bool prefitSignalMass = false;
   bool prefitSignalCTau = false;
   bool prefitBackground = false;
@@ -297,6 +315,16 @@ int main(int argc, char* argv[]) {
 	cout << "The signal mass distribution will be prefitted on MC" << endl;
 	break;
 
+      case 'p':
+	prange = argv[i+1];
+	cout << "Range for pT is " << prange << " GeV/c" << endl;
+        break;      
+       
+      case 'e':
+        etarange = argv[i+1];
+        cout << "Range for |eta| is " << etarange << endl;
+        break;
+
       case 'c':
 	prefitSignalCTau = true;
 	cout << "The signal ctau distribution will be prefitted on MC, values will be fixed in the background prefit (if any)" << endl;
@@ -317,9 +345,19 @@ int main(int argc, char* argv[]) {
   fIn.cd();
   RooDataSet *data = (RooDataSet*)fIn.Get("data");
 
-  data->setWeightVar("MCweight");
+  float pmin, pmax; 
+  float etamin, etamax;
 
-  ws->import(*data);
+  getrange(prange,&pmin,&pmax);
+  getrange(etarange,&etamin,&etamax);
+
+  char reducestr[200];
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
+
+  reddata->setWeightVar("MCweight");
+
+  ws->import(*reddata);
 
   setRanges(ws);
 
@@ -351,8 +389,8 @@ int main(int argc, char* argv[]) {
   //CONSIDER THE CASE
   RooDataSet *reddata1;
 
-  if(isGG) reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GG");
-  else reddata1 = (RooDataSet*)data->reduce("JpsiType == JpsiType::GT");
+  if(isGG) reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
+  else reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
 
   RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict")),*(ws->cat("MCType"))),*reddata1);
 
@@ -452,7 +490,7 @@ int main(int argc, char* argv[]) {
   Double_t BfracErr = sqrt(NSigNP_static*NSigPR_static/pow(NSigNP_static + NSigPR_static,3));
   cout << "B frac = " << Bfrac << " +/- " << BfracErr << endl;
 
-  drawResults(ws,isGG,rb2);
+  drawResults(ws,isGG,rb2,prange,etarange);
 
   cout << endl << "J/psi yields:" << endl;
   cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << ws->var("NSigPR")->getVal() << " +/- " << ws->var("NSigPR")->getError() << endl;
