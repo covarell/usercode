@@ -68,8 +68,8 @@ void defineCTResol(RooWorkspace *ws)
   ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.05,0.005,0.5])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
   ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.008,0.002,0.5])");
-  // ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1,0.002,0.5])");
-  ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,1.]})");
+  ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1919,0.002,0.5])");
+  ws->factory("AddModel::resol({resGW,resGN,resGO},{fracRes[0.05,0.,1.],fracRes2[0.0319,0.,1.]})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
@@ -401,6 +401,9 @@ int main(int argc, char* argv[]) {
   ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
 
   ws->loadSnapshot("fit2dpars_GG.root");
+
+  ws->var("fracRes2")->setConstant(kTRUE);
+  ws->var("sigmaResSigO")->setConstant(kTRUE);
 
   if(prefitSignalMass){
     ws->pdf("sigCBGauss")->fitTo(*bindataPR,SumW2Error(kTRUE)/*,NumCPU(4)*/);

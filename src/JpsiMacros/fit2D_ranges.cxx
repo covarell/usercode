@@ -86,7 +86,7 @@ void defineCTBackground(RooWorkspace *ws)
   // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resol,RooDecay::SingleSided");
   // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.,5.],resol,RooDecay::Flipped");
   // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.,10.],resol,RooDecay::DoubleSided");
-  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resbkg,RooDecay::SingleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resol,RooDecay::SingleSided");
   ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resol,RooDecay::Flipped");
   ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resol,RooDecay::DoubleSided");
 
@@ -107,9 +107,6 @@ void defineCTSignal(RooWorkspace *ws, RooDataHist *reducedNP)
 
   //RooGExpModel physsigNP("physsigNP","Gauss + exp model",Jpsict,sigmaMC,taueff);
   //RooDecay sigNP("sigNP","Non-prompt signal",*Jpsict,taueff,*(RooResolutionModel*)(ws->pdf("resol")),RooDecay::SingleSided);
-
-  // RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
-  // RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigN")),*(ws->var("sigmaResSigN")),*reducedNP);
 
   RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*reducedNP);
   // RooHistPdfConv sigNPO("sigNPO","Non-prompt signal with outstanding gaussian",*(ws->var("Jpsict")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigO")),*reducedNP);
@@ -181,8 +178,8 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + ".gif";
-  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  if(isGG) titlestr = "pictures/2D_GGmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  else titlestr = "pictures/2D_GTmassfit_pT" + prange + "_eta" + etarange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   RooPlot *tframe = Jpsict->frame();
@@ -207,13 +204,13 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  c1.SaveAs(titlestr.c_str());
+  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c2.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  if(isGG) titlestr = "2D_GGmassfit_pT" + prange + "_eta" + etarange + "_Log.gif";
-  else titlestr = "2D_GTmassfit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
   c2.SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = Jpsict->frame();
@@ -229,12 +226,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  if(isGG) c3.SaveAs("2D_GGTruePR_Lin.gif");
-  else c3.SaveAs("2D_GTTruePR_Lin.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  if(isGG) c3.SaveAs("2D_GGTruePR_Log.gif");
-  else c3.SaveAs("2D_GTTruePR_Log.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c3.SaveAs(titlestr.c_str()); 
 
   RooPlot *tframe2 = Jpsict->frame();
 
@@ -249,12 +248,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   TCanvas c4;
   c4.cd();
   c4.cd();tframe2->Draw();
-  if(isGG) c4.SaveAs("2D_GGTrueNP_Lin.gif");
-  else c4.SaveAs("2D_GTTrueNP_Lin.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c4.SaveAs(titlestr.c_str());
   c4.SetLogy(1);
   c4.cd();tframe2->Draw();
-  if(isGG) c4.SaveAs("2D_GGTrueNP_Log.gif");
-  else c4.SaveAs("2D_GTTrueNP_Log.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c4.SaveAs(titlestr.c_str()); 
 
   RooPlot *tframe3 = Jpsict->frame();
 
@@ -269,12 +270,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   TCanvas c5;
   c5.cd();
   c5.cd();tframe3->Draw();
-  if(isGG) c5.SaveAs("2D_GGTrueBK_Lin.gif");
-  else c5.SaveAs("2D_GTTrueBK_Lin.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c5.SaveAs(titlestr.c_str());
   c5.SetLogy(1);
   c5.cd();tframe3->Draw();
-  if(isGG) c5.SaveAs("2D_GGTrueBK_Log.gif");
-  else c5.SaveAs("2D_GTTrueBK_Log.gif");
+  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c5.SaveAs(titlestr.c_str()); 
 
   return;
 }
@@ -379,11 +382,11 @@ int main(int argc, char* argv[]) {
   // rb2.addBoundary(-0.2);
   // rb2.addBoundary(-0.1);
   // rb2.addBoundary(-0.01);
-  rb2.addUniform(15,-0.5,-0.2);
-  rb2.addUniform(40,-0.2,0.2);
-  rb2.addUniform(15,0.2,0.5);
-  rb2.addUniform(10,0.5,1.0);
-  rb2.addUniform(10,1.0,3.5);
+  rb2.addUniform(10,-0.5,-0.2);
+  rb2.addUniform(20,-0.2,0.2);
+  rb2.addUniform(10,0.2,0.5);
+  rb2.addUniform(5,0.5,1.0);
+  rb2.addUniform(5,1.0,3.5);
   ws->var("Jpsict")->setBinning(rb2);
 
   //CONSIDER THE CASE
@@ -481,20 +484,32 @@ int main(int argc, char* argv[]) {
 
   ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
 
-  ws->saveSnapshot("fit2dpart_GG.root",ws->components(),kFALSE);
+  ws->saveSnapshot("fit2dpars_GG.root",ws->components(),kFALSE);
 
   const Double_t NSigNP_static = ws->var("NSigNP")->getVal();
   const Double_t NSigPR_static = ws->var("NSigPR")->getVal();
+  const Double_t ErrNP_static = ws->var("NSigNP")->getError();
+  const Double_t ErrPR_static = ws->var("NSigPR")->getError();
 
   Double_t Bfrac = NSigNP_static/(NSigNP_static + NSigPR_static);
-  Double_t BfracErr = sqrt(NSigNP_static*NSigPR_static/pow(NSigNP_static + NSigPR_static,3));
-  cout << "B frac = " << Bfrac << " +/- " << BfracErr << endl;
+  Double_t BfracErr = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
 
   drawResults(ws,isGG,rb2,prange,etarange);
 
   cout << endl << "J/psi yields:" << endl;
-  cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << ws->var("NSigPR")->getVal() << " +/- " << ws->var("NSigPR")->getError() << endl;
-  cout << "NON-PROMPT : True MC : " << bindataNP->sumEntries() << " Fit : " << ws->var("NSigNP")->getVal() << " +/- " << ws->var("NSigNP")->getError() << endl;
+  cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << NSigPR_static << " +/- " << ErrPR_static << endl;
+  cout << "NON-PROMPT : True MC : " << bindataNP->sumEntries() << " Fit : " << NSigNP_static << " +/- " << ErrNP_static << endl;
+  cout << "B fraction : True MC : " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " Fit : " << Bfrac << " +/- " << BfracErr << endl;
+
+  char oFile[200];
+  sprintf(oFile,"results/results2DGT_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
+  if(isGG) sprintf(oFile,"results/results2DGG_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
+
+  ofstream outputFile(oFile);
+  outputFile << "PR " << bindataPR->sumEntries() << " " << NSigPR_static << " " << ErrPR_static << endl;
+  outputFile << "NP " << bindataNP->sumEntries() << " " << NSigNP_static << " " << ErrNP_static << endl;
+  outputFile << "BF " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " " << Bfrac << " " << BfracErr << endl;
+  outputFile << endl;
 
   return 1;
 }

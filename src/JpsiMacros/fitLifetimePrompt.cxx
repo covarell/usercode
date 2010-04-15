@@ -30,7 +30,16 @@ void defineCTSignal(RooWorkspace *ws)
 {
   ws->factory("Gaussian::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.05,0.0001,0.5])");
   ws->factory("Gaussian::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.0001,0.5])");
-  ws->factory("SUM::resol(fracRes[0.05,0.,1.]*resGW,resGN)");
+  ws->factory("Gaussian::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1,0.0001,0.3])");
+  ws->factory("RooGExpModel::resLeft(Jpsict,sigmaResSigG[0.01,0.0001,0.5],resLife[0.1,0.0001,0.3])");
+  // ws->factory("RooGExpModel::resRight(Jpsict,sigmaResSigG,resLife,RooGExpModel::Flipped)");
+
+  // 3-Gaussian
+  ws->factory("SUM::resol(fracRes[0.05,0.,1.]*resGW,fracRes2[0.05,0.,1.]*resGO,resGN)");
+  // 2-Gaussian
+  // ws->factory("SUM::resol(fracRes[0.05,0.,1.]*resGW,resGN)");
+  // Gaussian + Gexp
+  // ws->factory("SUM::resol(fracRes[0.5,0.,1.]*resLeft,resRight)");
 
   return;
 }

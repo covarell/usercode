@@ -73,6 +73,12 @@ RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(GLIBS) $ $<
 
+FitMassData:  $(INCLUDEDIR)fitMassData.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassData $(GLIBS) $ $<
+
+FitMassSmall:  $(INCLUDEDIR)fitMassSmall.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassSmall $(GLIBS) $ $< 
+
 FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassRange $(GLIBS) $ $<
 
