@@ -31,7 +31,7 @@ void defineBackground(RooWorkspace *ws)
   ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-2.,0.1])");
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,0.1])");
 
   return;
 }
@@ -41,14 +41,14 @@ void defineSignal(RooWorkspace *ws)
   //SIGNAL FUNCTION CANDIDATES:
 
   //Normal Gaussians
-  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.,0.2])");
-  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.,0.2])");
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
 
   //Gaussian with same mean as signalG1
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,20.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,30.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -150,9 +150,9 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
 
   TCanvas c1;
   c1.cd(); /* c1.SetLogy(1) */; mframe->Draw();
-  if(DataCat == 0) sprintf(reducestr,"GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
-  else if(DataCat == 1) sprintf(reducestr,"GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
-  else if(DataCat == 2) sprintf(reducestr,"TTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  if(DataCat == 0) sprintf(reducestr,"pictures/GGmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 1) sprintf(reducestr,"pictures/GTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
+  else if(DataCat == 2) sprintf(reducestr,"pictures/TTmassfit_pT%s_eta%s.gif",prange.c_str(),etarange.c_str());
   c1.SaveAs(reducestr);
 
   return;
@@ -297,10 +297,12 @@ int main(int argc, char* argv[])
 
   //GT case
 
-  // fix some parameters 
-  ws->var("alpha")->setConstant(kTRUE); 
-  //ws->var("enne")->setConstant(kTRUE); 
-  ws->var("meanSig1")->setConstant(kTRUE);
+  // fix some parameters for barrel
+  if (etamin < 1.0) {
+    ws->var("alpha")->setConstant(kTRUE); 
+    ws->var("enne")->setConstant(kTRUE);
+  } 
+  // ws->var("meanSig1")->setConstant(kTRUE);
 
   if (sidebandPrefit) prefitSideband(ws,1);
 
@@ -315,8 +317,10 @@ int main(int argc, char* argv[])
   //TT case
 
   // fix some parameters 
-  //ws->var("alpha")->setConstant(kTRUE); 
-  //ws->var("enne")->setConstant(kTRUE); 
+  ws->var("alpha")->setConstant(kTRUE); 
+  ws->var("enne")->setConstant(kTRUE);
+  ws->var("meanSig1")->setConstant(kTRUE);
+  ws->var("sigmaSig1")->setConstant(kTRUE);
 
   if (sidebandPrefit) prefitSideband(ws,2);
 

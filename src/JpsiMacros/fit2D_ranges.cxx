@@ -65,9 +65,9 @@ void defineCTResol(RooWorkspace *ws)
 {
 
   // ONE RESOLUTION FUNCTION
-  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.05,0.005,0.5])");
+  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.02,0.008,0.5])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.008,0.002,0.5])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.008,0.001,0.2])");
   // ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1,0.002,0.5])");
   ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,1.]})");
 
@@ -75,7 +75,7 @@ void defineCTResol(RooWorkspace *ws)
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
   ws->factory("GaussModel::resbkgGN(Jpsict,meanResSigW,sigmaResBkgN[0.01,0.005,0.5])");
-  ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracRes})");
+  ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracRes2[0.05,0.,1.]})");
 
   return;
 }
@@ -83,16 +83,16 @@ void defineCTResol(RooWorkspace *ws)
 void defineCTBackground(RooWorkspace *ws)
 {
  
-  // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.,5.],resol,RooDecay::SingleSided");
-  // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.,5.],resol,RooDecay::Flipped");
-  // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.,10.],resol,RooDecay::DoubleSided");
-  ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resol,RooDecay::SingleSided");
-  ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resol,RooDecay::Flipped");
-  ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resol,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[0.42,0.0001,2.],resol,RooDecay::SingleSided");
+  ws->factory("Decay::bkg3(Jpsict,lambdam[0.79,0.0001,2.],resol,RooDecay::Flipped");
+  ws->factory("Decay::bkg4(Jpsict,lambdasym[0.69,0.0001,2.],resol,RooDecay::DoubleSided");
+  // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resbkg,RooDecay::SingleSided");
+  // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resbkg,RooDecay::Flipped");
+  // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resbkg,RooDecay::DoubleSided");
 
   ws->factory("SUM::bkgPart1(fpm[1.,0.,1.]*bkg2,bkg3)");
   ws->factory("SUM::bkgPart2(fLiving[0.9,0.,1.]*bkgPart1,bkg4)");
-  ws->factory("SUM::bkgctauTOT(fbkgTot[0.5,0.,1.]*resol,bkgPart2)");
+  ws->factory("SUM::bkgctauTOT(fbkgTot[0.29,0.,1.]*resol,bkgPart2)");
 
   return;
 }
@@ -464,8 +464,8 @@ int main(int argc, char* argv[]) {
     }
 
     ws->var("fpm")->setConstant(kTRUE);
-    ws->var("fLiving")->setConstant(kTRUE);
     ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE)/*,NumCPU(4)*/);
+    ws->var("fLiving")->setConstant(kTRUE);
     ws->var("lambdap")->setConstant(kTRUE);
     ws->var("lambdam")->setConstant(kTRUE);
     ws->var("lambdasym")->setConstant(kTRUE);
