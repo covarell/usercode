@@ -15,6 +15,8 @@
 #include "RooAbsPdf.h"
 #include "RooRealVar.h"
 #include "RooPlot.h"
+#include "RooHist.h"
+#include "RooCurve.h"
 #include "RooCategory.h"
 #include "RooWorkspace.h"
 
@@ -114,18 +116,27 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   else if(DataCat == 2) sprintf(reducestr,"Mass fit for trk-trk muons");
 
   mframe->SetTitle(reducestr);
+  RooHist* hresid;
 
   if(DataCat == 0) {
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+    totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+    hresid = mframe->pullHist();
+    hresid->SetName("hresid");
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"),MarkerColor(4));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   }
   else if(DataCat == 1) {
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+    totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"),MarkerColor(4));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
   }
   else if(DataCat == 2) { 
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
+    totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && MCType == MCType::BK"),MarkerColor(4));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
@@ -134,11 +145,15 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
   totPDF->plotOn(mframe,Components("expFunct"),LineColor(kBlue),LineStyle(kDashed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-  // if(DataCat == 0) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  // else if(DataCat == 1) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
-  // else if(DataCat == 2) data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
-
   TCanvas c1;
+  TCanvas c2("c2","c2",10,10,700,300);
+  if (DataCat == 0) {
+    c2.cd();
+    RooPlot* mframe2 =  ws->var("JpsiMass")->frame(Title("Residual Distribution")) ;
+    mframe2->addPlotable(hresid,"P") ;
+    mframe2->Draw();
+    c2.SaveAs("testpull.gif");
+  }
   c1.cd(); /* c1.SetLogy(1) */; mframe->Draw();
   if(DataCat == 0) sprintf(reducestr,"GGmassfit.gif");
   else if(DataCat == 1) sprintf(reducestr,"GTmassfit.gif");
@@ -148,15 +163,19 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   return;
 }
 
-void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol)
+void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol,double &errresol)
 {
   Nsig   = ws->var("NSig")->getVal();
   errSig = ws->var("NSig")->getError();
   const double coeffGauss = ws->var("coeffGauss")->getVal();
   const double sigmaSig1 = ws->var("sigmaSig1")->getVal();
   const double sigmaSig2 = ws->var("sigmaSig2")->getVal();
+  const double ecoeffGauss = ws->var("coeffGauss")->getError();
+  const double esigmaSig1 = ws->var("sigmaSig1")->getError();
+  const double esigmaSig2 = ws->var("sigmaSig2")->getError();
 
-  resol = (coeffGauss*coeffGauss*sigmaSig1 + (1-coeffGauss)*(1-coeffGauss)*sigmaSig2) / (coeffGauss*coeffGauss + (1-coeffGauss)*(1-coeffGauss)); 
+  resol = sqrt(coeffGauss*sigmaSig1*sigmaSig1 + (1-coeffGauss)*sigmaSig2*sigmaSig2);
+  errresol = (1/resol)*sqrt(pow(sigmaSig1*coeffGauss*esigmaSig1,2) + pow(sigmaSig2*(1-coeffGauss)*esigmaSig2,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2*sigmaSig2)*ecoeffGauss,2));
 
   return;
 }
@@ -257,8 +276,8 @@ int main(int argc, char* argv[])
 
   drawResults(ws,0);
 
-  double NSigGG, errSigGG,resolGG;
-  printResults(ws,NSigGG,errSigGG,resolGG);
+  double NSigGG, errSigGG,resolGG,errresolGG;
+  printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
 
   //GT case
 
@@ -274,8 +293,8 @@ int main(int argc, char* argv[])
 
   drawResults(ws,1);
 
-  double NSigGT, errSigGT,resolGT;
-  printResults(ws,NSigGT,errSigGT,resolGT);
+  double NSigGT, errSigGT,resolGT,errresolGT;
+  printResults(ws,NSigGT,errSigGT,resolGT,errresolGT);
 
   //TT case
 
@@ -290,13 +309,13 @@ int main(int argc, char* argv[])
 
   drawResults(ws,2);
 
-  double NSigTT, errSigTT,resolTT;
-  printResults(ws,NSigTT,errSigTT,resolTT);
+  double NSigTT, errSigTT,resolTT,errresolTT;
+  printResults(ws,NSigTT,errSigTT,resolTT,errresolTT);
 
   cout << endl << "GG J/psi yields:                 GT J/psi yields:                   TT J/psi yields:" << endl;
   cout << "True MC : " << GGdataTr->sumEntries() << "                   True MC : " << GTdataTr->sumEntries() << "                   True MC : " << TTdataTr->sumEntries() << endl;
   cout << "Fit : " << NSigGG << " +/- " << errSigGG << "        Fit : " << NSigGT << " +/- " << errSigGT << "        Fit : " << NSigTT << " +/- " << errSigTT << endl;
-  cout << "Resolution : " << resolGG*1000. << " MeV         Resolution : " << resolGT*1000. << " MeV        Resolution : " << resolTT*1000. << " MeV" << endl; 
+  cout << "Resolution : " << resolGG*1000. << " +/- " << errresolGG*1000. << " MeV  Resolution : " << resolGT*1000. << " +/- " << errresolGT*1000. << " MeV   Resolution : " << resolTT*1000. << " +/- " << errresolTT*1000. << " MeV" << endl; 
 
   return 1;
 }

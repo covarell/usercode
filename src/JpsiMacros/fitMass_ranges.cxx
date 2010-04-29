@@ -158,15 +158,19 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
   return;
 }
 
-void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol)
+void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol,double &errresol)
 {
   Nsig   = ws->var("NSig")->getVal();
   errSig = ws->var("NSig")->getError();
   const double coeffGauss = ws->var("coeffGauss")->getVal();
   const double sigmaSig1 = ws->var("sigmaSig1")->getVal();
   const double sigmaSig2 = ws->var("sigmaSig2")->getVal();
+  const double ecoeffGauss = ws->var("coeffGauss")->getError();
+  const double esigmaSig1 = ws->var("sigmaSig1")->getError();
+  const double esigmaSig2 = ws->var("sigmaSig2")->getError();
 
-  resol = (coeffGauss*coeffGauss*sigmaSig1 + (1-coeffGauss)*(1-coeffGauss)*sigmaSig2) / (coeffGauss*coeffGauss + (1-coeffGauss)*(1-coeffGauss)); 
+  resol = sqrt(coeffGauss*sigmaSig1*sigmaSig1 + (1-coeffGauss)*sigmaSig2*sigmaSig2);
+  errresol = (0.5/resol)*sqrt(pow(sigmaSig1*coeffGauss*esigmaSig1,2) + pow(sigmaSig2*(1-coeffGauss)*esigmaSig2,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2*sigmaSig2)*ecoeffGauss,2));
 
   return;
 }
@@ -292,8 +296,8 @@ int main(int argc, char* argv[])
 
   drawResults(ws,0,prange,etarange);
 
-  double NSigGG, errSigGG,resolGG;
-  printResults(ws,NSigGG,errSigGG,resolGG);
+  double NSigGG, errSigGG,resolGG,errresolGG;
+  printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
 
   //GT case
 
@@ -311,8 +315,8 @@ int main(int argc, char* argv[])
 
   drawResults(ws,1,prange,etarange);
 
-  double NSigGT, errSigGT,resolGT;
-  printResults(ws,NSigGT,errSigGT,resolGT);
+  double NSigGT, errSigGT,resolGT,errresolGT;
+  printResults(ws,NSigGT,errSigGT,resolGT,errresolGT);
 
   //TT case
 
@@ -329,13 +333,14 @@ int main(int argc, char* argv[])
 
   drawResults(ws,2,prange,etarange);
 
-  double NSigTT, errSigTT,resolTT;
-  printResults(ws,NSigTT,errSigTT,resolTT);
+  double NSigTT, errSigTT,resolTT,errresolTT;
+  printResults(ws,NSigTT,errSigTT,resolTT,errresolTT);
 
   char oFile[200];
   sprintf(oFile,"results/results_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
   ofstream outputFile(oFile);
   outputFile << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;
+  outputFile << "RE " << 0. << " " << resolGG*1000. << " " << errresolGG*1000. << endl;
   outputFile << "GT " << GTdataTr->sumEntries() << " " << NSigGT << " " << errSigGT << endl;
   outputFile << "TT " << TTdataTr->sumEntries() << " " << NSigTT << " " << errSigTT << endl;
   outputFile << endl;

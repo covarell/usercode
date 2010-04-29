@@ -13,7 +13,7 @@
 
 void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", float minMax = 500.) {
 
-  static const unsigned int nbinspt = 6;
+  static const unsigned int nbinspt = 7;
 
   double ptbincenters[nbinspt] = {nbinspt*20.};
   double ptbinerrors[nbinspt] = {nbinspt*0.};
@@ -104,7 +104,7 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
   gpull1->SetMarkerStyle(20);
   gpull1->SetMarkerColor(kRed);
   gpull1->SetMaximum(minMax);
-  gpull1->SetMinimum(-minMax);
+  gpull1->SetMinimum(-minMax);  if (!strcmp("RE",whichType.c_str())) gpull1->SetMinimum(2.);
   gpull1->Draw("AP");
 
   TLine aLine(theMinimumPt,0.,theMaximumPt,0.);
@@ -113,8 +113,10 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
   sprintf(fileName,"Pearson's test prob. = %f",TMath::Prob(chi2i,nbinspt));  
   TPaveLabel *pl1 = new TPaveLabel(0.2*(theMaximumPt-theMinimumPt),-0.9*minMax,
 				   0.8*(theMaximumPt-theMinimumPt),-0.8*minMax,fileName);
-  pl1->Draw("SAME");
-  aLine.Draw("SAME");
+  if (strcmp("RE",whichType.c_str())) {
+    pl1->Draw("SAME");
+    aLine.Draw("SAME");
+  }
 
   cutstring = fileNameBase + "_" + whichType + "resid_barrel.gif";
   c3.SaveAs(cutstring.c_str());
@@ -128,14 +130,16 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
   gpull2->SetMarkerStyle(20);
   gpull2->SetMarkerColor(kBlue);
   gpull2->SetMaximum(minMax);
-  gpull2->SetMinimum(-minMax);
+  gpull2->SetMinimum(-minMax);   if (!strcmp("RE",whichType.c_str())) gpull2->SetMinimum(2.);
   gpull2->Draw("AP");
 
   sprintf(fileName,"Pearson's test prob. = %f",TMath::Prob(chi2j,nbinspt));  
   TPaveLabel *pl2 = new TPaveLabel(0.2*(theMaximumPt-theMinimumPt),-0.9*minMax,
 				   0.8*(theMaximumPt-theMinimumPt),-0.8*minMax,fileName);
-  pl2->Draw("SAME");
-  aLine.Draw("SAME");
+  if (strcmp("RE",whichType.c_str())) { 
+    pl2->Draw("SAME");
+    aLine.Draw("SAME");
+  }
 
   cutstring = fileNameBase + "_" + whichType + "resid_endcap.gif";
   c4.SaveAs(cutstring.c_str());
