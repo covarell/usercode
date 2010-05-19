@@ -76,6 +76,9 @@ FitMass:  $(INCLUDEDIR)fitMass.cxx
 FitMassData:  $(INCLUDEDIR)fitMassData.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassData $(GLIBS) $ $<
 
+FitMassData2S:  $(INCLUDEDIR)fitMassDataPsi2S.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassData2S $(GLIBS) $ $<
+
 FitMassSmall:  $(INCLUDEDIR)fitMassSmall.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSmall $(GLIBS) $ $< 
 
@@ -103,8 +106,8 @@ Fit2DRange:    $(INCLUDEDIR)fit2D_ranges.cxx
 ## FitSmearFactor: $(INCLUDEDIR)fitSmearFactor.cxx
 ##	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
 
-## FitSidebands:  $(INCLUDEDIR)fitSidebands.cxx
-##	$(CXX) $(CXXFLAGS) -o FitSidebands $(OUTLIB)/*.o $(GLIBS) $ $<
+Compare:  $(INCLUDEDIR)compareWithMC.cxx
+	$(CXX) $(CXXFLAGS) -o Compare $(GLIBS) $ $<
 
 FitLifetimePrompt:  $(INCLUDEDIR)fitLifetimePrompt.cxx
 	$(CXX) $(CXXFLAGS) -o FitLifetimePrompt $(GLIBS) $ $<

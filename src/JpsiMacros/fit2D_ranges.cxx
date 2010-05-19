@@ -67,9 +67,9 @@ void defineCTResol(RooWorkspace *ws)
   // ONE RESOLUTION FUNCTION
   ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.02,0.008,0.5])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.008,0.001,0.2])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.01,0.005,0.2])");
   // ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1,0.002,0.5])");
-  ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,1.]})");
+  ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,0.5]})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
@@ -167,14 +167,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
 
   totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components("totsigNP,totBKG"),DrawOption("F"),FillColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components("totBKG"),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
 
   if(isGG) ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
 
-  totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
 
   TCanvas c1;
   c1.cd();mframe->Draw();
@@ -192,14 +192,14 @@ void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const st
   else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
 
   totPDF->plotOn(tframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,DrawOption("F"),FillColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,Components("totsigNP,totBKG"),DrawOption("F"),FillColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,Components("totBKG"),DrawOption("F"),FillColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(tframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
 
   if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
   else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
 
-  totPDF->plotOn(tframe,Normalization(1.0,RooAbsReal::RelativeExpected));
+  totPDF->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
 
   TCanvas c2;
   c2.cd();
@@ -466,6 +466,7 @@ int main(int argc, char* argv[]) {
     ws->var("fpm")->setConstant(kTRUE);
     ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE)/*,NumCPU(4)*/);
     ws->var("fLiving")->setConstant(kTRUE);
+    ws->var("fracRes")->setConstant(kTRUE);
     ws->var("lambdap")->setConstant(kTRUE);
     ws->var("lambdam")->setConstant(kTRUE);
     ws->var("lambdasym")->setConstant(kTRUE);

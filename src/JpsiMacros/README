@@ -10,7 +10,7 @@ First you need to merge them in one:
 - MergeDataSets <your file list>
 and you obtain the resulting merged RooDataSet totalDataSet.root
 
-2) The fit. You can do it for one sample (e.g. all the J/psi) using fitMass.cxx, or the J/psi in a single pt/eta bin using fitMass_ranges.cxx, or fit all together using fitMass_simul.cxx (using predefined bins, see above). The latter allows you to share fit parameters between the different bins, which get fitted all at the same time, improving stability. If you have used RooFit before, you probably know about this feature.
+2) The mass fit. You can do it for one sample (e.g. all the J/psi) using fitMass.cxx, or the J/psi in a single pt/eta bin using fitMass_ranges.cxx, or fit all together using fitMass_simul.cxx (using predefined bins, see above). The latter allows you to share fit parameters between the different bins, which get fitted all at the same time, improving stability. If you have used RooFit before, you probably know about this feature.
 - you move to UserCode/Covarell/src/JpsiMacros (HEAD version!)
 - make FitMass (FitMassSim/FitMassRange)
 - FitMass (FitMassSim/FitMassRange) <options>
@@ -20,3 +20,17 @@ Options can be found in the main() method of the classes. Briefly:
   -e <absetarange>: must be in the format absetamin-absetamax
   -c : activates prefitting of signal only to determine signal shape in advance
   -s : activates prefitting of sidebands only to determine background shape in advance 
+
+3) The mass-lifetime fit. You can do it for one sample (e.g. all the J/psi) using fit2D.cxx, or the J/psi in a single pt/eta bin using fit2D_ranges.cxx.
+- you move to UserCode/Covarell/src/JpsiMacros (HEAD version!)
+- make Fit2D (Fit2DRange)
+- Fit2D (Fit2DRange) <options>
+Options can be found in the main() method of the classes. Briefly:
+  -f <your total RooDataSet>: input file is always needed
+  -g 0 (global-tracker muon pairs) or 1 (global-global muon pairs) 
+  -p <pTrange>: must be in the format pTmin-pTmax
+  -e <absetarange>: must be in the format absetamin-absetamax
+  -s : activates prefitting of signal only to determine mass signal shape in advance
+  -c : activates prefitting of signal only to determine lifetime signal shape in advance
+  -b : activates prefitting of sidebands only to determine lifetime background shape in advance (RECOMMENDED) 
+If you want to determine lifetime distributions in advance on MC, compile and run respectively: FitLifetimePrompt, FitLifetimeNonPrompt, FitLifetimeBkg

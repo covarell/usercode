@@ -43,7 +43,7 @@ void defineSignal(RooWorkspace *ws)
 
   //Normal Gaussians
   ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.07,0.027,0.2])");
-  ws->factory("Gaussian::signalG2(JpsiMass,meanSig1,sigmaSig2[0.03,0.01,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.7,3.6,3.8],sigmaSig1)");
   // ws->factory("Gaussian::signalG2(JpsiMass,meanSig1,sigmaSig1");
 
   //Gaussian with same mean as signalG1
@@ -127,7 +127,7 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   if(DataCat == 0) {
     /* data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"),MarkerColor(4));
        data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));*/
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"),Binning(20));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"),Binning(32));
   }
   else if(DataCat == 1) {
     /* data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"),MarkerColor(4));
@@ -141,7 +141,7 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   }
   else if(DataCat == 3) { 
     // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG || JpsiType == JpsiType::GT"),Binning(20));
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Binning(20));
+    data->plotOn(mframe,DataError(RooAbsData::SumW2),Binning(32));
   }
 
   totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -179,9 +179,9 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   ws->var("JpsiPt")->setRange(0.,20.);
   ws->var("JpsiPt")->SetTitle("J/#psi p_{T}");
   RooPlot *ptframe = ws->var("JpsiPt")->frame();
-  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20),LineColor(kBlue),MarkerColor(kBlue));
-  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20));
-  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20),LineColor(kRed),MarkerColor(kRed));
+  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20),LineColor(kBlue),MarkerColor(kBlue));
+  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20));
+  data->plotOn(ptframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20),LineColor(kRed),MarkerColor(kRed));
   c2.cd(); /* c1.SetLogy(1) */; ptframe->Draw();
   // t->DrawLatex(0.3,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   c2.SaveAs("allptplot.gif");
@@ -189,17 +189,17 @@ void drawResults(RooWorkspace *ws, const int DataCat)
   TCanvas c3;
   ws->var("JpsiEta")->SetTitle("J/#psi y");
   RooPlot *etaframe = ws->var("JpsiEta")->frame();
-  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20),LineColor(kBlue),MarkerColor(kBlue));
-  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20));
-  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(20),LineColor(kRed),MarkerColor(kRed));
+  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20),LineColor(kBlue),MarkerColor(kBlue));
+  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20));
+  data->plotOn(etaframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(20),LineColor(kRed),MarkerColor(kRed));
   c3.cd(); /* c1.SetLogy(1) */; etaframe->Draw();
   // t->DrawLatex(0.2,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   c3.SaveAs("alletaplot.gif");
   
   TCanvas c4;
   RooPlot *ctframe = ws->var("Jpsict")->frame();
-  // data->plotOn(ctframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(18));
-  data->plotOn(ctframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.24 && JpsiMass > 2.9"),Binning(18));
+  // data->plotOn(ctframe,DataError(RooAbsData::SumW2),Cut("(JpsiType == JpsiType::GG || JpsiType == JpsiType::GT) && JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(18));
+  data->plotOn(ctframe,DataError(RooAbsData::SumW2),Cut("JpsiMass < 3.8 && JpsiMass > 3.6"),Binning(18));
   c4.cd();  c4.SetLogy(1) ; ctframe->Draw();
   c4.SaveAs("allctauplot.gif");
 
@@ -212,7 +212,7 @@ void printResults(RooWorkspace *ws, double &Nsig, double &errSig, double &resol)
   errSig = ws->var("NSig")->getError();
   const double coeffGauss = ws->var("coeffGauss")->getVal();
   const double sigmaSig1 = ws->var("sigmaSig1")->getVal();
-  const double sigmaSig2 = ws->var("sigmaSig2")->getVal();
+  // const double sigmaSig2 = ws->var("sigmaSig2")->getVal();
 
   // resol = (coeffGauss*coeffGauss*sigmaSig1 + (1-coeffGauss)*(1-coeffGauss)*sigmaSig2) / (coeffGauss*coeffGauss + (1-coeffGauss)*(1-coeffGauss)); 
   
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
   defineBackground(ws);
 
   // Total PDF (signal CB+Gauss)
-  ws->factory("SUM::totPDF(NSig[5000.,4.,10000000.]*signalG1,NBkg[2000.,4.,10000000.]*expFunct)");
+  ws->factory("SUM::totPDF(NSig[5000.,4.,10000000.]*signalG1,NSig2[5000.,-10.,10000000.]*signalG2,NBkg[2000.,4.,10000000.]*expFunct)");
 
   //Make subsamples to be used later
   /*
@@ -313,12 +313,12 @@ int main(int argc, char* argv[])
   // ws->var("coeffGauss")->setVal(1.0);
   // ws->var("coeffGauss")->setConstant(kTRUE);
 
-  // ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
-  ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   // ws->pdf("totPDF")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  // drawResults(ws,3);
-  drawResults(ws,0);
+  drawResults(ws,3);
+  // drawResults(ws,0);
 
   double NSigGG, errSigGG,resolGG;
   printResults(ws,NSigGG,errSigGG,resolGG);
