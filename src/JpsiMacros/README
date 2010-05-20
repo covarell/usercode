@@ -23,6 +23,10 @@ Options can be found in the main() method of the classes. Briefly:
 
 3) The mass-lifetime fit. You can do it for one sample (e.g. all the J/psi) using fit2D.cxx, or the J/psi in a single pt/eta bin using fit2D_ranges.cxx.
 - you move to UserCode/Covarell/src/JpsiMacros (HEAD version!)
+- check that the directory ../../../../../lib/ exists (it should be the case
+if you correctly installed JpsiMacros in a CMSSW directory, otherwise change
+the target directory in the MakeFile)
+- make RooHistPdfConv.o
 - make Fit2D (Fit2DRange)
 - Fit2D (Fit2DRange) <options>
 Options can be found in the main() method of the classes. Briefly:
