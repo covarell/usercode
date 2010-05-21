@@ -91,6 +91,9 @@ FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
 Fit2D:    $(INCLUDEDIR)fit2D.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2D $(OUTLIB)/*.o $(GLIBS) $ $<
 
+Fit2DData:    $(INCLUDEDIR)fit2DData.cxx   
+	$(CXX) $(CXXFLAGS) -o Fit2DData $(OUTLIB)/*.o $(GLIBS) $ $<
+
 Fit2DRange:    $(INCLUDEDIR)fit2D_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DRange $(OUTLIB)/*.o $(GLIBS) $ $<
 
