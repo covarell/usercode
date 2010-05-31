@@ -13,7 +13,7 @@
 
 void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", float minMax = 500.) {
 
-  static const unsigned int nbinspt = 7;
+  static const unsigned int nbinspt = 6;
 
   double ptbincenters[nbinspt] = {nbinspt*20.};
   double ptbinerrors[nbinspt] = {nbinspt*0.};
@@ -118,7 +118,7 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
     aLine.Draw("SAME");
   }
 
-  cutstring = fileNameBase + "_" + whichType + "resid_barrel.gif";
+  cutstring = "pictures/" + fileNameBase + "_" + whichType + "resid_barrel.gif";
   c3.SaveAs(cutstring.c_str());
 
   TGraphErrors *gpull2 = new TGraphErrors(nbinspt,ptbincenters,ycenters2,ptbinerrors,yerrors2);
@@ -141,10 +141,10 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
     aLine.Draw("SAME");
   }
 
-  cutstring = fileNameBase + "_" + whichType + "resid_endcap.gif";
+  cutstring = "pictures/" + fileNameBase + "_" + whichType + "resid_endcap.gif";
   c4.SaveAs(cutstring.c_str());
 
-   TGraphErrors *gpull3 = new TGraphErrors(nbinspt,ptbincenters,ycenters3,ptbinerrors,yerrors3);
+  TGraphErrors *gpull3 = new TGraphErrors(nbinspt,ptbincenters,ycenters3,ptbinerrors,yerrors3);
 
   c3.cd();
   sprintf(theCommand,"Pull of fit results - barrel - %s",whichType.c_str());
@@ -162,7 +162,7 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
   pl1->Draw("SAME");
   aLine.Draw("SAME");
 
-  cutstring = fileNameBase + "_" + whichType + "pull_barrel.gif";
+  cutstring = "pictures/" + fileNameBase + "_" + whichType + "pull_barrel.gif";
   c3.SaveAs(cutstring.c_str());
 
   TGraphErrors *gpull4 = new TGraphErrors(nbinspt,ptbincenters,ycenters4,ptbinerrors,yerrors3);
@@ -183,7 +183,7 @@ void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", f
   pl2->Draw("SAME");
   aLine.Draw("SAME");
 
-  cutstring = fileNameBase + "_" + whichType + "pull_endcap.gif";
+  cutstring = "pictures/" + fileNameBase + "_" + whichType + "pull_endcap.gif";
   c4.SaveAs(cutstring.c_str());
         
   return;

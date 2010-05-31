@@ -2,7 +2,7 @@
 
 # Copy a CASTOR dir or part of it
 
-$fitcommand = "FitMassRange -f totalDataSet_7TeV.root";
+$fitcommand = "FitMassRange -f totalDataSet_Mu3_05pb.root -c";
 $ptfile = "pranges.txt";
 $etafile = "etaranges.txt";
 

@@ -109,6 +109,7 @@ void drawResults(RooWorkspace *ws, const int DataCat)
 
   char reducestr[200];
 
+  ws->var("JpsiMass")->SetTitle("#mu^{+} #mu^{-} mass");
   RooPlot *mframe = ws->var("JpsiMass")->frame();
 
   if(DataCat == 0) sprintf(reducestr,"Mass fit for glb-glb muons");
