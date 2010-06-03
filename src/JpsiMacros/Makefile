@@ -109,6 +109,9 @@ Fit2DRange:    $(INCLUDEDIR)fit2D_ranges.cxx
 ## FitSmearFactor: $(INCLUDEDIR)fitSmearFactor.cxx
 ##	$(CXX) $(CXXFLAGS) -o FitSmearFactor $(OUTLIB)/*.o $(GLIBS) $ $<
 
+FindMeans:  $(INCLUDEDIR)findMeans.cxx
+	$(CXX) $(CXXFLAGS) -o FindMeans $(GLIBS) $ $<
+
 Compare:  $(INCLUDEDIR)compareWithMC.cxx
 	$(CXX) $(CXXFLAGS) -o Compare $(GLIBS) $ $<
 

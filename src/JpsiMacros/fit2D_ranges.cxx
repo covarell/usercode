@@ -22,19 +22,30 @@
 
 using namespace RooFit;
 
+void defineMassBackground(RooWorkspace *ws)
+{
+  //Second order polynomial, the 2nd coefficient is by default set to zero
+  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
+
+  //Exponential
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,0.1])");
+
+  return;
+}
+
 void defineMassSignal(RooWorkspace *ws)
 {
   //SIGNAL FUNCTION CANDIDATES:
 
   //Normal Gaussians
-  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.,0.2])");
-  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.,0.2])");
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
 
   //Gaussian with same mean as signalG1
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,2.],enne[20.,2.,50.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,30.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -47,19 +58,12 @@ void defineMassSignal(RooWorkspace *ws)
   //Sum of a Gaussian and a CrystallBall
   ws->factory("SUM::sigCBGauss(coeffGauss*sigCB,signalG2)");
 
-  return;
-}
-
-void defineMassBackground(RooWorkspace *ws)
-{
-  //Second order polynomial, the 2nd coefficient is by default set to zero
-  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
-
-  //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-2.,0.1])");
+  //Sum of a Gaussian and a CrystallBall
+  ws->factory("SUM::sigCBGaussOneMean(coeffGauss*sigCB,signalG1)");
 
   return;
 }
+
 
 void defineCTResol(RooWorkspace *ws)
 {
@@ -290,7 +294,7 @@ int main(int argc, char* argv[]) {
   bool isGG;
   string prange;
   string etarange;
-  bool prefitSignalMass = false;
+  bool prefitMass = false;
   bool prefitSignalCTau = false;
   bool prefitBackground = false;
 
@@ -310,12 +314,15 @@ int main(int argc, char* argv[]) {
 
       case 'g':
 	isGG = atoi(argv[i+1]);
-	cout << "Is global global? flag is " << isGG << endl;
+	cout << "Is global global? ";
+	if (isGG == 0) cout << "No" << endl;
+        else if (isGG == 1) cout << "Yes" << endl;
+        else cout << "Maybe" << endl;
 	break;
 
-      case 's':
-	prefitSignalMass = true;
-	cout << "The signal mass distribution will be prefitted on MC" << endl;
+      case 'u':
+	prefitMass = true;
+	cout << "Will determine Bfrac, not NsigPR and NsigNP" << endl;
 	break;
 
       case 'p':
@@ -330,12 +337,12 @@ int main(int argc, char* argv[]) {
 
       case 'c':
 	prefitSignalCTau = true;
-	cout << "The signal ctau distribution will be prefitted on MC, values will be fixed in the background prefit (if any)" << endl;
+	cout << "The signal ctau distribution will be prefitted on MC" << endl;
 	break;
 
       case 'b':
 	prefitBackground = true;
-	cout << "The background ctau distribution will be prefitted on MC (but not fixed!!!)" << endl;
+	cout << "The background ctau distribution will be prefitted on MC and some parameters fixed" << endl;
 	break;
       }
     }
@@ -389,7 +396,6 @@ int main(int argc, char* argv[]) {
   rb2.addUniform(5,1.0,3.5);
   ws->var("Jpsict")->setBinning(rb2);
 
-  //CONSIDER THE CASE
   RooDataSet *reddata1;
 
   if(isGG) reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
@@ -435,18 +441,50 @@ int main(int argc, char* argv[]) {
   defineCTSignal(ws,redMCNP);
 
   //putting all together
-  ws->factory("PROD::totsigPR(sigCBGauss,resol)");
-  ws->factory("PROD::totsigNP(sigCBGauss,sigNP)");
   ws->factory("PROD::totBKG(expFunct,bkgctauTOT)");
 
-  ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
+  // ws->loadSnapshot("fit2dpars_GG.root");
 
-  ws->loadSnapshot("fit2dpars_GG.root");
+  if(prefitMass){
 
-  if(prefitSignalMass){
     ws->pdf("sigCBGauss")->fitTo(*bindataPR,SumW2Error(kTRUE)/*,NumCPU(4)*/);
     ws->var("enne")->setConstant(kTRUE);
+
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+    ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE)/*,NumCPU(4)*/);
+
+  } else {
+
+    RooRealVar NSig("NSig","dummy total signal events",0.);
+    ws->import(NSig);
+
+  }
+
+  const Double_t NSig_static = ws->var("NSig")->getVal();
+  const Double_t Err_static  = ws->var("NSig")->getError() ;  
+  cout << NSig_static << " " << Err_static << endl;
+
+  return 1;
+
+  if (prefitMass) {
+    
     ws->var("alpha")->setConstant(kTRUE);
+    ws->var("coeffGauss")->setConstant(kTRUE); 
+    ws->var("NSig")->setConstant(kTRUE);
+    ws->var("NBkg")->setConstant(kTRUE);
+   
+    RooFormulaVar fSig("fSig","@0/(@0+@1)",RooArgList(*(ws->var("NSig")),*(ws->var("NBkg"))));
+    ws->import(fSig);
+    ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,resol");   
+    ws->factory("PROD::totsig(sigCBGauss,sigCtPDF)");
+    ws->factory("SUM::totPDF(fSig*totsig,totBKG)");
+
+  } else {
+
+    ws->factory("PROD::totsigPR(sigCBGauss,resol)");
+    ws->factory("PROD::totsigNP(sigCBGauss,sigNP)");
+    ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
+
   }
 
   if(prefitSignalCTau){
@@ -480,27 +518,51 @@ int main(int argc, char* argv[]) {
 
   }
 
+  // FIX IN ANY CASE FROM MC?
   ws->var("fpm")->setConstant(kTRUE);
   ws->var("fLiving")->setConstant(kTRUE);
 
-  ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
+  Double_t NSigNP_static;
+  Double_t NSigPR_static;
+  Double_t ErrNP_static;
+  Double_t ErrPR_static;
 
-  ws->saveSnapshot("fit2dpars_GG.root",ws->components(),kFALSE);
+  Double_t Bfrac_static;
+  Double_t BfracErr_static;
 
-  const Double_t NSigNP_static = ws->var("NSigNP")->getVal();
-  const Double_t NSigPR_static = ws->var("NSigPR")->getVal();
-  const Double_t ErrNP_static = ws->var("NSigNP")->getError();
-  const Double_t ErrPR_static = ws->var("NSigPR")->getError();
+  if(prefitMass) {
+    ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
 
-  Double_t Bfrac = NSigNP_static/(NSigNP_static + NSigPR_static);
-  Double_t BfracErr = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
+    Bfrac_static = ws->var("Bfrac")->getVal();
+    BfracErr_static = ws->var("Bfrac")->getError();
+    
+    NSigNP_static = NSig_static*Bfrac_static;
+    NSigPR_static = NSig_static*(1-Bfrac_static);
+    cout << NSig_static << " " << Err_static << endl;
+    cout << Bfrac_static << " " << BfracErr_static << endl;
+    ErrNP_static = NSigNP_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/Bfrac_static,2));
+    ErrPR_static = NSigPR_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/(1.-Bfrac_static),2));
+
+  } else {
+    ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
+
+    // ws->saveSnapshot("fit2dpars_GG.root",ws->components(),kFALSE);
+    
+    NSigNP_static = ws->var("NSigNP")->getVal();
+    NSigPR_static = ws->var("NSigPR")->getVal();
+    ErrNP_static = ws->var("NSigNP")->getError();
+    ErrPR_static = ws->var("NSigPR")->getError();
+
+    Bfrac_static = NSigNP_static/(NSigNP_static + NSigPR_static);
+    BfracErr_static = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
+  }
 
   drawResults(ws,isGG,rb2,prange,etarange);
 
   cout << endl << "J/psi yields:" << endl;
   cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << NSigPR_static << " +/- " << ErrPR_static << endl;
   cout << "NON-PROMPT : True MC : " << bindataNP->sumEntries() << " Fit : " << NSigNP_static << " +/- " << ErrNP_static << endl;
-  cout << "B fraction : True MC : " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " Fit : " << Bfrac << " +/- " << BfracErr << endl;
+  cout << "B fraction : True MC : " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " Fit : " << Bfrac_static << " +/- " << BfracErr_static << endl;
 
   char oFile[200];
   sprintf(oFile,"results/results2DGT_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
@@ -509,7 +571,7 @@ int main(int argc, char* argv[]) {
   ofstream outputFile(oFile);
   outputFile << "PR " << bindataPR->sumEntries() << " " << NSigPR_static << " " << ErrPR_static << endl;
   outputFile << "NP " << bindataNP->sumEntries() << " " << NSigNP_static << " " << ErrNP_static << endl;
-  outputFile << "BF " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " " << Bfrac << " " << BfracErr << endl;
+  outputFile << "BF " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " " << Bfrac_static << " " << BfracErr_static << endl;
   outputFile << endl;
 
   return 1;

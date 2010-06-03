@@ -12,7 +12,7 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void do2DResultPlot(string whichType = "GG", string fileNameBase = "results") {
+void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
 
   static const unsigned int nbinspt = 6;
 
@@ -24,12 +24,12 @@ void do2DResultPlot(string whichType = "GG", string fileNameBase = "results") {
   TH2F histPul("histPul","histPul",2,ybincenters,nbinspt,ptbincenters);
 
   gROOT->ProcessLine(".! rm -f lista");
-  char theCommand[50];
+  char theCommand[200];
   sprintf(theCommand,".! ls results/%s*.txt > lista",fileNameBase.c_str());
   gROOT->ProcessLine(theCommand);
   
   ifstream lista("lista");
-  char fileName[200];  
+  char fileName[300];  
   float ptmin, ptmax, etamin, etamax; 
   char theType[2];
   float trueMC, fitted, error; 
@@ -54,8 +54,10 @@ void do2DResultPlot(string whichType = "GG", string fileNameBase = "results") {
 	  
 	  float ptbincenter = (ptmax + ptmin)/2. ;
 	  float ybincenter = (etamax + etamin)/2. ; 
+          cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
 	  int theBin = histRes.FindBin(ybincenter,ptbincenter);
 	  histRes.SetBinContent(theBin,fitted);
+          histRes.SetBinError(theBin,error);
 	  histErr.SetBinContent(theBin,error);
 	  histPul.SetBinContent(theBin,(fitted-trueMC)/error);
 	  chi2i += pow((fitted-trueMC)/error,2);
