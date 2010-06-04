@@ -359,6 +359,7 @@ int main(int argc, char* argv[])
   ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
 
   //Make subsamples to be used later
+  ws->var("JpsiMass")->setBins(60);
 
   RooDataSet *reddataTr = (RooDataSet*)reddata->reduce("MCType == MCType::PR || MCType == MCType::NP");
   RooDataSet *GGdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG && (MCType == MCType::PR || MCType == MCType::NP)");
@@ -370,15 +371,21 @@ int main(int argc, char* argv[])
   RooDataSet *TTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT");
 
   RooDataHist *reddataBin = new RooDataHist("reddataBin","reddataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*reddata);
+
   RooDataHist *GGdataBin = new RooDataHist("GGdataBin","GGdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdata);
+
+  cout << "Number of events to fit  = " << GGdata->sumEntries() << endl; 
+
   RooDataHist *GTdataBin = new RooDataHist("GTdataBin","GTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GTdata);
   RooDataHist *TTdataBin = new RooDataHist("TTdataBin","TTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*TTdata);
 
   RooDataHist *GGdataTrBin = new RooDataHist("GGdataTrBin","GGdataTrBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdataTr);
 
+  cout << "Number of true events to fit  = " << GGdataTr->sumEntries() << endl;
+
   // OPTION A: All together
 
-  ws->var("JpsiMass")->setBins(90);
+  /* ws->var("JpsiMass")->setBins(90);
   // if (etamin < 1.0)  ws->var("JpsiMass")->setBins(18);
 
   // fix some parameters 
@@ -409,12 +416,11 @@ int main(int argc, char* argv[])
   ofstream outputFile(oFile);
   outputFile << "AL " << reddataTr->sumEntries() << " " << NSig << " " << errSig << endl;
   outputFile << "RE " << 0. << " " << resol*1000. << " " << errresol*1000. << endl;
-  outputFile << endl;
+  outputFile << endl;*/
 
   // OPTION B: Separate
 
   //GG CASE
-  /* ws->var("JpsiMass")->setBins(45);
   // if (etamin < 1.0)  ws->var("JpsiMass")->setBins(18);
 
   // fix some parameters 
@@ -440,6 +446,9 @@ int main(int argc, char* argv[])
   double NSigGG, errSigGG,resolGG,errresolGG;
   printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
 
+  cout << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;
+
+  /* 
   //GT case
   // ws->var("JpsiMass")->setBins(45);
 

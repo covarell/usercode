@@ -11,6 +11,7 @@
 #include "RooGlobalFunc.h"
 #include "RooDataSet.h"
 #include "RooRealVar.h"
+#include "RooAbsReal.h"
 #include "RooPlot.h"
 #include "RooCategory.h"
 #include "RooFitResult.h"
@@ -73,7 +74,7 @@ void defineCTResol(RooWorkspace *ws)
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
   ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.01,0.005,0.2])");
   // ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.1,0.002,0.5])");
-  ws->factory("AddModel::resol({resGW,resGN},{fracRes[0.05,0.,0.5]})");
+  ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.,0.5]})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
@@ -87,16 +88,16 @@ void defineCTResol(RooWorkspace *ws)
 void defineCTBackground(RooWorkspace *ws)
 {
  
-  ws->factory("Decay::bkg2(Jpsict,lambdap[0.42,0.0001,2.],resol,RooDecay::SingleSided");
-  ws->factory("Decay::bkg3(Jpsict,lambdam[0.79,0.0001,2.],resol,RooDecay::Flipped");
-  ws->factory("Decay::bkg4(Jpsict,lambdasym[0.69,0.0001,2.],resol,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[0.42,0.0001,2.],sigPR,RooDecay::SingleSided");
+  ws->factory("Decay::bkg3(Jpsict,lambdam[0.79,0.0001,2.],sigPR,RooDecay::Flipped");
+  ws->factory("Decay::bkg4(Jpsict,lambdasym[0.69,0.0001,2.],sigPR,RooDecay::DoubleSided");
   // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resbkg,RooDecay::SingleSided");
   // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resbkg,RooDecay::Flipped");
   // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resbkg,RooDecay::DoubleSided");
 
   ws->factory("SUM::bkgPart1(fpm[1.,0.,1.]*bkg2,bkg3)");
   ws->factory("SUM::bkgPart2(fLiving[0.9,0.,1.]*bkgPart1,bkg4)");
-  ws->factory("SUM::bkgctauTOT(fbkgTot[0.29,0.,1.]*resol,bkgPart2)");
+  ws->factory("SUM::bkgctauTOT(fbkgTot[0.29,0.,1.]*sigPR,bkgPart2)");
 
   return;
 }
@@ -154,138 +155,6 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
-void drawResults(RooWorkspace *ws, const bool isGG, RooBinning binning, const string prange, const string etarange)
-{
-  RooRealVar *JpsiMass = ws->var("JpsiMass");
-  RooRealVar *Jpsict = ws->var("Jpsict");
-  RooAbsPdf *totPDF = ws->pdf("totPDF");
-
-  RooPlot *mframe = JpsiMass->frame();
-
-  string titlestr;
-  if(isGG) titlestr = "2D fit for glb-glb muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
-  else titlestr = "2D fit for glb-trk muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
-  mframe->SetTitle(titlestr.c_str());
-
-  if(isGG) ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
-
-  totPDF->plotOn(mframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(mframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  if(isGG) ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
-
-  totPDF->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  TCanvas c1;
-  c1.cd();mframe->Draw();
-  if(isGG) titlestr = "pictures/2D_GGmassfit_pT" + prange + "_eta" + etarange + ".gif";
-  else titlestr = "pictures/2D_GTmassfit_pT" + prange + "_eta" + etarange + ".gif";
-  c1.SaveAs(titlestr.c_str());
-
-  RooPlot *tframe = Jpsict->frame();
-
-  if(isGG) titlestr = "2D fit for glb-glb muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
-  else titlestr = "2D fit for glb-trk muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
-  tframe->SetTitle(titlestr.c_str());
-
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
-
-  totPDF->plotOn(tframe,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
-  totPDF->plotOn(tframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG"));
-  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT"));
-
-  totPDF->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  TCanvas c2;
-  c2.cd();
-  c2.cd();tframe->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  c2.SaveAs(titlestr.c_str());
-  c2.SetLogy(1);
-  c2.cd();tframe->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
-  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
-  c2.SaveAs(titlestr.c_str());
-
-  RooPlot *tframe1 = Jpsict->frame();
-
-  if(isGG) tframe1->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal prompt");
-  else tframe1->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal prompt");
-
-  if(isGG) ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::PR"));
-  else ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::PR"));
-
-  totPDF->plotOn(tframe1,Components("totsigPR"),Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  TCanvas c3;
-  c3.cd();
-  c3.cd();tframe1->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  c3.SaveAs(titlestr.c_str());
-  c3.SetLogy(1);
-  c3.cd();tframe1->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
-  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
-  c3.SaveAs(titlestr.c_str()); 
-
-  RooPlot *tframe2 = Jpsict->frame();
-
-  if(isGG) tframe2->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal non-prompt");
-  else tframe2->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal non-prompt");
-
-  if(isGG) ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::NP"));
-  else ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::NP"));
-
-  totPDF->plotOn(tframe2,Components("totsigNP"),Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  TCanvas c4;
-  c4.cd();
-  c4.cd();tframe2->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  c4.SaveAs(titlestr.c_str());
-  c4.SetLogy(1);
-  c4.cd();tframe2->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
-  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
-  c4.SaveAs(titlestr.c_str()); 
-
-  RooPlot *tframe3 = Jpsict->frame();
-
-  if(isGG) tframe3->SetTitle("2D fit for glb-glb muons (c  #tau projection) - background");
-  else tframe3->SetTitle("2D fit for glb-trk muons (c  #tau projection) - background");
-
-  if(isGG) ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"));
-  else ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(binning),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"));
-
-  totPDF->plotOn(tframe3,Components("totBKG"),Normalization(1.0,RooAbsReal::RelativeExpected));
-
-  TCanvas c5;
-  c5.cd();
-  c5.cd();tframe3->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
-  c5.SaveAs(titlestr.c_str());
-  c5.SetLogy(1);
-  c5.cd();tframe3->Draw();
-  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
-  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
-  c5.SaveAs(titlestr.c_str()); 
-
-  return;
-}
-
 int main(int argc, char* argv[]) {
 
   gROOT->SetStyle("Plain");
@@ -323,6 +192,7 @@ int main(int argc, char* argv[]) {
       case 'u':
 	prefitMass = true;
 	cout << "Will determine Bfrac, not NsigPR and NsigNP" << endl;
+        cout << "Signal MC mass pre-fitting activated" << endl;
 	break;
 
       case 'p':
@@ -406,20 +276,24 @@ int main(int argc, char* argv[]) {
   cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
 
   //get subdatasets. Some of them are useful. Some, however, not
+  RooDataSet *reddataTr = (RooDataSet*) reddata1->reduce("MCType == MCType::PR || MCType == MCType::NP");
   RooDataSet *reddataPR = (RooDataSet*) reddata1->reduce("MCType == MCType::PR");
   RooDataSet *reddataNP = (RooDataSet*) reddata1->reduce("MCType == MCType::NP");
-  RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
+  // RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
   RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("JpsiMass < 2.9 || JpsiMass > 3.3");
 
+  RooDataHist* bindataTr = new RooDataHist("bindataTr","MC distribution for signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataTr);
+  
+  cout << "Number of true events to fit  = " << bindataTr->sumEntries() << endl; 
   RooDataHist* bindataPR = new RooDataHist("bindataPR","MC distribution for PR signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataPR);
-
+  
   RooDataHist* bindataNP = new RooDataHist("bindataNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataNP);
 
   RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsictTrue"))),*reddataNP); 
 
-  RooDataHist* bindataBK = new RooDataHist("bindataBK","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataBK);
+  // RooDataHist* bindataBK = new RooDataHist("bindataBK","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataBK);
 
-  RooDataHist* bindataSB = new RooDataHist("bindataBK","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataSB);
+  RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataSB);
 
   //JPSI MASS PARAMETRIZATION
 
@@ -447,11 +321,11 @@ int main(int argc, char* argv[]) {
 
   if(prefitMass){
 
-    ws->pdf("sigCBGauss")->fitTo(*bindataPR,SumW2Error(kTRUE)/*,NumCPU(4)*/);
+    ws->pdf("sigCBGauss")->fitTo(*bindataTr,SumW2Error(kTRUE));
     ws->var("enne")->setConstant(kTRUE);
 
     ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
-    ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE)/*,NumCPU(4)*/);
+    ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
 
   } else {
 
@@ -462,9 +336,6 @@ int main(int argc, char* argv[]) {
 
   const Double_t NSig_static = ws->var("NSig")->getVal();
   const Double_t Err_static  = ws->var("NSig")->getError() ;  
-  cout << NSig_static << " " << Err_static << endl;
-
-  return 1;
 
   if (prefitMass) {
     
@@ -475,20 +346,20 @@ int main(int argc, char* argv[]) {
    
     RooFormulaVar fSig("fSig","@0/(@0+@1)",RooArgList(*(ws->var("NSig")),*(ws->var("NBkg"))));
     ws->import(fSig);
-    ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,resol");   
+    ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,sigPR");   
     ws->factory("PROD::totsig(sigCBGauss,sigCtPDF)");
     ws->factory("SUM::totPDF(fSig*totsig,totBKG)");
 
   } else {
 
-    ws->factory("PROD::totsigPR(sigCBGauss,resol)");
+    ws->factory("PROD::totsigPR(sigCBGauss,sigPR)");
     ws->factory("PROD::totsigNP(sigCBGauss,sigNP)");
     ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
 
   }
 
   if(prefitSignalCTau){
-    ws->pdf("resol")->fitTo(*bindataPR,SumW2Error(kTRUE)/*,NumCPU(4)*/);
+    ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE)/*,NumCPU(4)*/);
   }
 
   if(prefitBackground){
@@ -522,13 +393,14 @@ int main(int argc, char* argv[]) {
   ws->var("fpm")->setConstant(kTRUE);
   ws->var("fLiving")->setConstant(kTRUE);
 
+  Double_t NBkg_static = ws->var("NBkg")->getVal();
   Double_t NSigNP_static;
   Double_t NSigPR_static;
   Double_t ErrNP_static;
   Double_t ErrPR_static;
 
   Double_t Bfrac_static;
-  Double_t BfracErr_static;
+  Double_t BfracErr_static;  
 
   if(prefitMass) {
     ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
@@ -538,8 +410,6 @@ int main(int argc, char* argv[]) {
     
     NSigNP_static = NSig_static*Bfrac_static;
     NSigPR_static = NSig_static*(1-Bfrac_static);
-    cout << NSig_static << " " << Err_static << endl;
-    cout << Bfrac_static << " " << BfracErr_static << endl;
     ErrNP_static = NSigNP_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/Bfrac_static,2));
     ErrPR_static = NSigPR_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/(1.-Bfrac_static),2));
 
@@ -557,21 +427,161 @@ int main(int argc, char* argv[]) {
     BfracErr_static = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
   }
 
-  drawResults(ws,isGG,rb2,prange,etarange);
+  // drawResults(ws,isGG,!prefitMass,rb2,prange,etarange);
+  
+  RooRealVar tempVar1("tempVar1","tempVar1",NSigNP_static);
+  RooRealVar tempVar2("tempVar2","tempVar2",NBkg_static);
+
+  RooPlot *mframe = ws->var("JpsiMass")->frame();
+
+  string titlestr;
+  if(isGG) titlestr = "2D fit for glb-glb muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  else titlestr = "2D fit for glb-trk muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  mframe->SetTitle(titlestr.c_str());
+
+  if(isGG) ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
+  else ws->data("data")->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
+
+  if (prefitMass) {
+    ws->pdf("totPDF")->plotOn(mframe,Components("expFunct"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGauss")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
+    tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(mframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("totPDF")->plotOn(mframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+    ws->pdf("totPDF")->plotOn(mframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+    ws->pdf("totPDF")->plotOn(mframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  }
+
+  TCanvas c1;
+  c1.cd();mframe->Draw();
+  if(isGG) titlestr = "pictures/2D_GGmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  else titlestr = "pictures/2D_GTmassfit_pT" + prange + "_eta" + etarange + ".gif";
+  c1.SaveAs(titlestr.c_str());
+
+  RooPlot *tframe = ws->var("Jpsict")->frame();
+
+  if(isGG) titlestr = "2D fit for glb-glb muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  else titlestr = "2D fit for glb-trk muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
+  tframe->SetTitle(titlestr.c_str());
+
+  if(isGG) ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GG"));
+  else ws->data("data")->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GT"));
+
+  if (prefitMass) {
+    ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
+    tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("totPDF")->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed)/*,LineStyle(kDotted)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+    ws->pdf("totPDF")->plotOn(tframe,Components("totBKG"),LineColor(kBlue)/*,LineStyle(kDashed)*/,Normalization(1.0,RooAbsReal::RelativeExpected));
+    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
+  }
+
+  TCanvas c2;
+  c2.cd();
+  c2.cd();tframe->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c2.SaveAs(titlestr.c_str());
+  c2.SetLogy(1);
+  c2.cd();tframe->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c2.SaveAs(titlestr.c_str());
+
+  RooPlot *tframe1 = ws->var("Jpsict")->frame();
+
+  if(isGG) tframe1->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal prompt");
+  else tframe1->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal prompt");
+
+  if(isGG) ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GG && MCType == MCType::PR"));
+  else ws->data("data")->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GT && MCType == MCType::PR"));
+
+  if (prefitMass) {
+    ws->pdf("totPDF")->plotOn(tframe1,Components("sigPR"),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("totPDF")->plotOn(tframe1,Components("totsigPR"),Normalization(1.0,RooAbsReal::RelativeExpected));
+  }
+
+  TCanvas c3;
+  c3.cd();
+  c3.cd();tframe1->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c3.SaveAs(titlestr.c_str());
+  c3.SetLogy(1);
+  c3.cd();tframe1->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetruePR_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c3.SaveAs(titlestr.c_str()); 
+
+  RooPlot *tframe2 = ws->var("Jpsict")->frame();
+
+  if(isGG) tframe2->SetTitle("2D fit for glb-glb muons (c  #tau projection) - signal non-prompt");
+  else tframe2->SetTitle("2D fit for glb-trk muons (c  #tau projection) - signal non-prompt");
+
+  if(isGG) ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GG && MCType == MCType::NP"));
+  else ws->data("data")->plotOn(tframe2,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GT && MCType == MCType::NP"));
+
+  if (prefitMass) {
+    ws->pdf("totPDF")->plotOn(tframe2,Components("sigNP"),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("totPDF")->plotOn(tframe2,Components("totsigNP"),Normalization(1.0,RooAbsReal::RelativeExpected));
+  }
+
+  TCanvas c4;
+  c4.cd();
+  c4.cd();tframe2->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c4.SaveAs(titlestr.c_str());
+  c4.SetLogy(1);
+  c4.cd();tframe2->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetrueNP_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c4.SaveAs(titlestr.c_str()); 
+
+  RooPlot *tframe3 = ws->var("Jpsict")->frame();
+
+  if(isGG) tframe3->SetTitle("2D fit for glb-glb muons (c  #tau projection) - background");
+  else tframe3->SetTitle("2D fit for glb-trk muons (c  #tau projection) - background");
+
+  if(isGG) ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"));
+  else ws->data("data")->plotOn(tframe3,DataError(RooAbsData::SumW2),Binning(rb2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"));
+
+  if (prefitMass) {
+    ws->pdf("totPDF")->plotOn(tframe3,Components("bkgctauTOT"),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("totPDF")->plotOn(tframe3,Components("totBKG"),Normalization(1.0,RooAbsReal::RelativeExpected));
+  }
+
+  TCanvas c5;
+  c5.cd();
+  c5.cd();tframe3->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c5.SaveAs(titlestr.c_str());
+  c5.SetLogy(1);
+  c5.cd();tframe3->Draw();
+  if(isGG) titlestr = "pictures/2D_GGtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
+  else titlestr = "pictures/2D_GTtimetrueBK_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c5.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
-  cout << "PROMPT :     True MC : " << bindataPR->sumEntries() << " Fit : " << NSigPR_static << " +/- " << ErrPR_static << endl;
-  cout << "NON-PROMPT : True MC : " << bindataNP->sumEntries() << " Fit : " << NSigNP_static << " +/- " << ErrNP_static << endl;
-  cout << "B fraction : True MC : " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " Fit : " << Bfrac_static << " +/- " << BfracErr_static << endl;
+  cout << "PROMPT :     True MC : " << reddataPR->sumEntries() << " Fit : " << NSigPR_static << " +/- " << ErrPR_static << endl;
+  cout << "NON-PROMPT : True MC : " << reddataNP->sumEntries() << " Fit : " << NSigNP_static << " +/- " << ErrNP_static << endl;
+  cout << "B fraction : True MC : " << reddataNP->sumEntries()/(reddataNP->sumEntries()+reddataPR->sumEntries()) << " Fit : " << Bfrac_static << " +/- " << BfracErr_static << endl;
 
   char oFile[200];
   sprintf(oFile,"results/results2DGT_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
   if(isGG) sprintf(oFile,"results/results2DGG_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
 
   ofstream outputFile(oFile);
-  outputFile << "PR " << bindataPR->sumEntries() << " " << NSigPR_static << " " << ErrPR_static << endl;
-  outputFile << "NP " << bindataNP->sumEntries() << " " << NSigNP_static << " " << ErrNP_static << endl;
-  outputFile << "BF " << bindataNP->sumEntries()/(bindataNP->sumEntries()+bindataPR->sumEntries()) << " " << Bfrac_static << " " << BfracErr_static << endl;
+  outputFile << "PR " << reddataPR->sumEntries() << " " << NSigPR_static << " " << ErrPR_static << endl;
+  outputFile << "NP " << reddataNP->sumEntries() << " " << NSigNP_static << " " << ErrNP_static << endl;
+  outputFile << "BF " << reddataNP->sumEntries()/(reddataNP->sumEntries()+reddataPR->sumEntries()) << " " << Bfrac_static << " " << BfracErr_static << endl;
   outputFile << endl;
 
   return 1;
