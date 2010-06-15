@@ -282,6 +282,7 @@ int main(int argc, char* argv[])
   string etarange;
   bool sidebandPrefit = false;
   bool prefitSignalMass = false;
+  int theTrigger = -1;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -322,6 +323,12 @@ int main(int argc, char* argv[])
         break;
       }
 
+      case 't':{ 
+        theTrigger = atoi(argv[i+1]);
+        cout << "Using trigger bit n. " << theTrigger << endl;
+        break;
+      } 
+
       }
     }
     }
@@ -342,6 +349,9 @@ int main(int argc, char* argv[])
 
   char reducestr[200];
   sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+
+  if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr); 
+  else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr); 
 
   RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
   reddata->setWeightVar("MCweight");
