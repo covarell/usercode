@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
-# Copy a CASTOR dir or part of it
+# Launch many fits
 
-$fitcommand = "Fit2DRange -f totalDataSet_Mu3_05pb.root -b";
-$ptfile = "pranges.txt";
+$fitcommand = "FitMassDataRange -f DatiDMuOpen.root";
+# $fitcommand = "Fit2DRange -f totalDataSet_allTriggers_05pb.root -g 1 -t 0 -b -u -c";
+$ptfile = "prangesdata.txt";
 $etafile = "etaranges.txt";
 
 open(INFILE,${ptfile}) or die "cannot open ${ptfile}";;

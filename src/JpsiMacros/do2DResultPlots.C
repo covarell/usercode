@@ -14,10 +14,10 @@
 
 void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
 
-  static const unsigned int nbinspt = 6;
+  static const unsigned int nbinspt = 4;
 
-  double ptbincenters[nbinspt+1] = {3.0,6.0,8.0,9.0,10.0,13.0,30.0};
-  double ybincenters[3] = {0.0,1.4,2.5};
+  double ptbincenters[nbinspt+1] = {0.0,2.0,5.0,8.0,20.0};
+  double ybincenters[3] = {0.0,1.4,2.4};
   
   TH2F histRes("histRes","histRes",2,ybincenters,nbinspt,ptbincenters);
   TH2F histErr("histErr","histErr",2,ybincenters,nbinspt,ptbincenters);
@@ -56,12 +56,14 @@ void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
 	  float ybincenter = (etamax + etamin)/2. ; 
           cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
 	  int theBin = histRes.FindBin(ybincenter,ptbincenter);
-	  histRes.SetBinContent(theBin,fitted);
-          histRes.SetBinError(theBin,error);
-	  histErr.SetBinContent(theBin,error);
-	  histPul.SetBinContent(theBin,(fitted-trueMC)/error);
-	  chi2i += pow((fitted-trueMC)/error,2);
-	  i++;
+	  if (fitted > 20.) {
+	    histRes.SetBinContent(theBin,fitted);
+	    histRes.SetBinError(theBin,error);
+	    histErr.SetBinContent(theBin,error);
+	    histPul.SetBinContent(theBin,(fitted-trueMC)/error);
+	    chi2i += pow((fitted-trueMC)/error,2);
+	    i++;
+	  }
 	  
 	}
       }  
@@ -78,7 +80,7 @@ void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
   histErr.Write();
   histPul.Write();
   f55.Close();   
-  cout << "chi2 = " << chi2i/12. << endl;
+  cout << "chi2 = " << chi2i/6. << endl;
 
   return;
 }

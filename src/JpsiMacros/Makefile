@@ -76,6 +76,9 @@ FitMass:  $(INCLUDEDIR)fitMass.cxx
 FitMassData:  $(INCLUDEDIR)fitMassData.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassData $(GLIBS) $ $<
 
+FitMassDataRange:  $(INCLUDEDIR)fitMassData_ranges.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassDataRange $(GLIBS) $ $<
+
 FitMassData2S:  $(INCLUDEDIR)fitMassDataPsi2S.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassData2S $(GLIBS) $ $<
 
@@ -94,11 +97,14 @@ Fit2D:    $(INCLUDEDIR)fit2D.cxx
 Fit2DData:    $(INCLUDEDIR)fit2DData.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DData $(OUTLIB)/*.o $(GLIBS) $ $<
 
+Fit2DDataRange:    $(INCLUDEDIR)fit2DData_ranges.cxx   
+	$(CXX) $(CXXFLAGS) -o Fit2DDataRange $(OUTLIB)/*.o $(GLIBS) $ $<
+
 Fit2DRange:    $(INCLUDEDIR)fit2D_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DRange $(OUTLIB)/*.o $(GLIBS) $ $<
 
-## ShowTruth:  $(INCLUDEDIR)showTruth.cxx
-##	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
+ShowTruth:  $(INCLUDEDIR)showTruth.cxx
+	$(CXX) $(CXXFLAGS) -o ShowTruth $(OUTLIB)/*.o $(GLIBS) $ $<
 
 ## Fit2DGT:    $(INCLUDEDIR)fit2DGT.cxx
 ##	$(CXX) $(CXXFLAGS) -o Fit2DGT $(OUTLIB)/*.o $(GLIBS) $ $<

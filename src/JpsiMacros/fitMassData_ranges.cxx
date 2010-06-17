@@ -53,7 +53,7 @@ void defineSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,30.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,50.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -112,9 +112,9 @@ void setRanges(RooWorkspace *ws)
   ws->cat("JpsiType")->setRange("glbtrk","GT");
   ws->cat("JpsiType")->setRange("trktrk","TT");
 
-  ws->cat("MCType")->setRange("prompt","PR");
+  /* ws->cat("MCType")->setRange("prompt","PR");
   ws->cat("MCType")->setRange("nonprompt","NP");
-  ws->cat("MCType")->setRange("bkg","BK");
+  ws->cat("MCType")->setRange("bkg","BK"); */
 
   return;
 }
@@ -128,7 +128,7 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
   RooDataSet *data = (RooDataSet*)ws->data("data");
   RooAbsPdf *totPDF = ws->pdf("totPDF");
 
-  char reducestr[200];
+  char reducestr[300];
 
   ws->var("JpsiMass")->SetTitle("#mu^{+} #mu^{-} mass");
   RooPlot *mframe = ws->var("JpsiMass")->frame();
@@ -148,8 +148,8 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
     hresid = mframe->residHist();
     hresid->SetName("hresid");
     chi2 = mframe->chiSquare(nFitPar);
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"),MarkerColor(4));
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && MCType == MCType::BK"),MarkerColor(4));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GG"));
   }
   else if(DataCat == 1) {
@@ -158,8 +158,8 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
     hresid = mframe->residHist();
     hresid->SetName("hresid");
     chi2 = mframe->chiSquare(nFitPar);
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"),MarkerColor(4));
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && MCType == MCType::BK"),MarkerColor(4));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::GT"));
   }
   else if(DataCat == 2) {
@@ -168,8 +168,8 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
     hresid = mframe->residHist();
     hresid->SetName("hresid");
     chi2 = mframe->chiSquare(nFitPar);
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && MCType == MCType::BK"),MarkerColor(4));
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && MCType == MCType::BK"),MarkerColor(4));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT && (MCType == MCType::BK || MCType == MCType::NP)"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("JpsiType == JpsiType::TT"));
   }
   else if(DataCat == 3) {
@@ -178,8 +178,8 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
     hresid = mframe->residHist();
     hresid->SetName("hresid");
     chi2 = mframe->chiSquare(nFitPar);
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK"),MarkerColor(4));
-    data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK || MCType == MCType::NP"),MarkerColor(2));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK"),MarkerColor(4));
+    // data->plotOn(mframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::BK || MCType == MCType::NP"),MarkerColor(2));
     data->plotOn(mframe,DataError(RooAbsData::SumW2));
   }
 
@@ -187,8 +187,8 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
   totPDF->plotOn(mframe,Components("expFunct"),LineColor(kBlue),LineStyle(kDashed),Normalization(1.0,RooAbsReal::RelativeExpected));
 
   // NO RESIDUALS 
-  c1 = new TCanvas();
-  c1->cd();  /* c1.SetLogy(1) */; 
+  /* c1 = new TCanvas();
+  c1->cd();  
   mframe->Draw();
   // Do not use ugly paramOn layout, but nice TLatex
   TLatex *t = new TLatex();
@@ -211,9 +211,9 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
   t->SetTextAlign(12); // left, vertically centered
   //  t->SetTextAlign(22); // centered horizontally and vertically
   //  t->SetTextAlign(11); //default bottom alignment
-  
-  // WITH RESIDUALS 
-  /* c1 = new TCanvas("c1","The Canvas",200,10,600,880);
+  */
+    // WITH RESIDUALS 
+  c1 = new TCanvas("c1","The Canvas",200,10,600,880);
   c1->cd();
 
   TPad *pad1 = new TPad("pad1","This is pad1",0.05,0.35,0.95,0.97);
@@ -223,6 +223,21 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
 
   pad1->cd(); mframe->Draw();
 
+  TLatex *t = new TLatex();
+  t->SetNDC();
+  t->SetTextAlign(22);
+  t->SetTextAlign(12); // left, vertically centered
+  // t->SetTextFont(63);
+  t->SetTextSize(0.036);
+  // sprintf(reducestr,"N_{sig} = %.0f #pm %.0f",int(ws->var("NSig")->getVal()/10)*10.,int(ws->var("NSig")->getError()/10)*10.);
+  sprintf(reducestr,"N_{sig} = %.0f #pm %.0f",ws->var("NSig")->getVal(),ws->var("NSig")->getError());
+  t->DrawLatex(0.15,0.9,reducestr);
+  sprintf(reducestr,"#LT m #GT = %.1f #pm %.1f MeV/c^{2}",ws->var("meanSig1")->getVal()*1000.,ws->var("meanSig1")->getError()*1000.);
+  // sprintf(reducestr,"#LT m #GT = 3.097.1 #pm 0.3 MeV/c^{2}");
+  t->DrawLatex(0.15,0.86,reducestr);
+  sprintf(reducestr,"#sigma = %.1f #pm %.1f MeV/c^{2}",ws->var("sigmaSig1")->getVal()*1000.,ws->var("sigmaSig1")->getError()*1000.);
+  t->DrawLatex(0.15,0.82,reducestr);
+
   RooPlot* mframe2 =  ws->var("JpsiMass")->frame(Title("Residuals Distribution")) ;
   mframe2->addPlotable(hresid,"P") ;  
 
@@ -230,19 +245,13 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
 
   int nDOF = ws->var("JpsiMass")->getBinning().numBins() - nFitPar;
 
-  TLatex *t = new TLatex();
-  t->SetNDC();
-  t->SetTextAlign(22);
+  TLatex *t2 = new TLatex();
+  t2->SetNDC();
+  t2->SetTextAlign(22);
   // t->SetTextFont(63);
-  t->SetTextSizePixels(22);
+  t2->SetTextSizePixels(22);
   sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
-  if (chi2 < 10.) t->DrawLatex(0.6,0.9,reducestr);
-
-  t->SetTextAlign(13); //align at top left
-  t->SetTextAlign(12); // left, vertically centered
-  t->SetTextAlign(22); // centered horizontally and vertically
-  t->SetTextAlign(11); //default bottom alignment
-  */
+  if (chi2 < 10.) t2->DrawLatex(0.6,0.9,reducestr);
   
   c1->Update();
 
@@ -277,7 +286,7 @@ int main(int argc, char* argv[])
 {
   gROOT->SetStyle("Plain");
 
-  char *filename;
+  char *filename, *filenameMC;
   string prange;
   string etarange;
   bool sidebandPrefit = false;
@@ -296,6 +305,12 @@ int main(int argc, char* argv[])
       case 'f':{
         filename = argv[i+1];
         cout << "File name for fitted data is " << filename << endl;
+        break;
+      }
+
+      case 'm':{
+        filenameMC = argv[i+1];
+        cout << "File name for MC data is " << filenameMC << endl;
         break;
       }
      
@@ -353,14 +368,14 @@ int main(int argc, char* argv[])
   if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr); 
   else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr); 
 
-  // hack for selecting only opposite sign pairs if needed 
+  // for selecting only opposite sign pairs if needed 
   const RooArgSet* thisRow = data->get(0);  
   RooCategory* theSign = (RooCategory*)thisRow->find("JpsiSign");
   if (theSign) sprintf(reducestr,"%s && JpsiSign == JpsiSign::OS",reducestr); 
   //
 
   RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
-  reddata->setWeightVar("MCweight");
+  // reddata->setWeightVar("MCweight");
 
   ws->import(*reddata);
 
@@ -372,36 +387,28 @@ int main(int argc, char* argv[])
 
   // Total PDF (signal CB+Gauss)
   
-  ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+  // ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+  ws->factory("SUM::totPDF(NSig[5000.,10.,100000.]*sigCB,NBkg[2000.,1.,100000.]*expFunct)");
 
   //Make subsamples to be used later
-  ws->var("JpsiMass")->setBins(60);
-
-  RooDataSet *reddataTr = (RooDataSet*)reddata->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  RooDataSet *GGdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG && (MCType == MCType::PR || MCType == MCType::NP)");
-  RooDataSet *GTdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT && (MCType == MCType::PR || MCType == MCType::NP)");
-  RooDataSet *TTdataTr = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT && (MCType == MCType::PR || MCType == MCType::NP)");
+  ws->var("JpsiMass")->setBins(45);
 
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
   RooDataSet *TTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::TT");
 
-  RooDataHist *reddataBin = new RooDataHist("reddataBin","reddataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*reddata);
+  RooDataHist *reddataBin = new RooDataHist("reddataBin","reddataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*reddata);
 
-  RooDataHist *GGdataBin = new RooDataHist("GGdataBin","GGdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdata);
+  cout << "Number of events to fit  = " << reddata->sumEntries() << endl;
 
-  cout << "Number of events to fit  = " << GGdata->sumEntries() << endl; 
+  RooDataHist *GGdataBin = new RooDataHist("GGdataBin","GGdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("JpsiEtaType"))),*GGdata); 
 
-  RooDataHist *GTdataBin = new RooDataHist("GTdataBin","GTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GTdata);
-  RooDataHist *TTdataBin = new RooDataHist("TTdataBin","TTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*TTdata);
-
-  RooDataHist *GGdataTrBin = new RooDataHist("GGdataTrBin","GGdataTrBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("MCType")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GGdataTr);
-
-  cout << "Number of true events to fit  = " << GGdataTr->sumEntries() << endl;
+  RooDataHist *GTdataBin = new RooDataHist("GTdataBin","GTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*GTdata);
+  RooDataHist *TTdataBin = new RooDataHist("TTdataBin","TTdataBin",RooArgSet(*(ws->var("JpsiMass")),*(ws->cat("JpsiPtType")),*(ws->cat("JpsiEtaType"))),*TTdata);
 
   // OPTION A: All together
 
-  /* ws->var("JpsiMass")->setBins(90);
+  ws->var("JpsiMass")->setBins(36);
   // if (etamin < 1.0)  ws->var("JpsiMass")->setBins(18);
 
   // fix some parameters 
@@ -411,16 +418,42 @@ int main(int argc, char* argv[])
   if (sidebandPrefit) prefitSideband(ws,0);
 
   if(prefitSignalMass){
-    ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin,SumW2Error(kTRUE));
-    ws->var("enne")->setConstant(kTRUE);
-    // ws->var("alpha")->setConstant(kTRUE);
+    
+     TFile fIn2(filenameMC);
+     fIn2.cd();
+
+     RooDataSet *dataMC = (RooDataSet*)fIn2.Get("data");
+     dataMC->SetName("dataMC");
+     
+     sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f && (MCType == MCType::PR || MCType == MCType::NP)",pmax,pmin,etamax,etamin);
+
+     if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr);  
+     else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr);  
+     
+     // for selecting only opposite sign pairs if needed  
+     const RooArgSet* thisRow2 = dataMC->get(0);   
+     RooCategory* theSign = (RooCategory*)thisRow2->find("JpsiSign");
+     if (theSign) sprintf(reducestr,"%s && JpsiSign == JpsiSign::OS",reducestr); 
+     //
+
+     RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr);
+     reddataMC->setWeightVar("MCweight");
+     
+     ws->import(*reddataMC);
+
+     RooDataHist *reddataTrBin = new RooDataHist("reddataTrBin","reddataTrBin",RooArgSet(*(ws->var("JpsiMass"))),*reddataMC);
+
+     ws->pdf("sigCBGauss")->fitTo(*reddataTrBin,SumW2Error(kTRUE));
+     ws->var("enne")->setConstant(kTRUE);
+     ws->var("alpha")->setConstant(kTRUE);
+
   }
 
   // ws->var("coeffGauss")->setVal(1.0);
   // ws->var("coeffGauss")->setConstant(kTRUE);
 
-  // ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
-  RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
+  // RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
   drawResults(ws,3,prange,etarange,rfr->floatParsFinal().getSize());
 
@@ -430,9 +463,9 @@ int main(int argc, char* argv[])
   char oFile[200];
   sprintf(oFile,"results/results_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
   ofstream outputFile(oFile);
-  outputFile << "AL " << reddataTr->sumEntries() << " " << NSig << " " << errSig << endl;
+  outputFile << "AL " << 0. << " " << NSig << " " << errSig << endl;
   outputFile << "RE " << 0. << " " << resol*1000. << " " << errresol*1000. << endl;
-  outputFile << endl;*/
+  outputFile << endl;
 
   // OPTION B: Separate
 
@@ -443,7 +476,7 @@ int main(int argc, char* argv[])
   // ws->var("alpha")->setConstant(kTRUE); 
   // ws->var("enne")->setConstant(kTRUE); 
 
-  if (sidebandPrefit) prefitSideband(ws,0);
+  /* if (sidebandPrefit) prefitSideband(ws,0);
 
   if(prefitSignalMass){
     ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin,SumW2Error(kTRUE));
@@ -462,7 +495,7 @@ int main(int argc, char* argv[])
   double NSigGG, errSigGG,resolGG,errresolGG;
   printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
 
-  cout << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;
+  cout << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;*/
 
   /* 
   //GT case

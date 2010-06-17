@@ -13,7 +13,7 @@
 
 void doDeviationPlot(string whichType = "GG", string fileNameBase = "results", float minMax = 500.) {
 
-  static const unsigned int nbinspt = 6;
+  static const unsigned int nbinspt = 7;
 
   double ptbincenters[nbinspt] = {nbinspt*20.};
   double ptbinerrors[nbinspt] = {nbinspt*0.};
