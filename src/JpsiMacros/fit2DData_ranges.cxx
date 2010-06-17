@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
   if (theTrigger == 0) sprintf(reducestr2,"%s && trigger0 > 0",reducestr);
   else if (theTrigger == 1) sprintf(reducestr2,"%s && trigger1 > 0",reducestr);
 
-  RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr);
+  RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr2);
 
   reddataMC->setWeightVar("MCweight");
 
@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) {
   if (theSign) sprintf(reducestr2,"%s && JpsiSign == JpsiSign::OS",reducestr); 
   //
 
-  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr2);
 
   ws->import(*reddata);
 
@@ -321,28 +321,30 @@ int main(int argc, char* argv[]) {
   rb2.addUniform(10,1.0,3.5);
   ws->var("Jpsict")->setBinning(rb2);
 
-  RooDataSet *reddata1, *reddataMC1;
+  RooDataSet *reddata1;
 
   // DATASETS
+  string aLongString;
   if(isGG == 0) {
-    reddataMC1 = (RooDataSet*)reddataMC->reduce("JpsiType == JpsiType::GG && (MCType != MCType::NP || JpsictTrue > 0.0001)");
+    aLongString = "JpsiType == JpsiType::GG && (MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   } else if (isGG == 1) {
-    reddataMC1 = (RooDataSet*)reddataMC->reduce("JpsiType == JpsiType::GT && (MCType != MCType::NP || JpsictTrue > 0.0001)");
+    aLongString = "JpsiType == JpsiType::GT && (MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
   } else {
-    reddataMC1 = (RooDataSet*)reddataMC->reduce("MCType != MCType::NP || JpsictTrue > 0.0001");
+    aLongString = "(MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("Jpsict < 600000.");  // i.e. all
   }
-  
+
   RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddata1);
 
   cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
 
   //get subdatasets. Some of them are useful. Some, however, not
-  RooDataSet *reddataTr = (RooDataSet*) reddataMC1->reduce("MCType == MCType::PR || MCType == MCType::NP");
-  RooDataSet *reddataPR = (RooDataSet*) reddataMC1->reduce("MCType == MCType::PR");
-  RooDataSet *reddataNP = (RooDataSet*) reddataMC1->reduce("MCType == MCType::NP");
+  RooDataSet *reddataTr = (RooDataSet*) reddataMC->reduce(aLongString.c_str());
+
+  RooDataSet *reddataPR = (RooDataSet*) reddataTr->reduce("MCType == MCType::PR");
+  RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce("MCType == MCType::NP");
   // RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
   RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("JpsiMass < 2.9 || JpsiMass > 3.3");
 
@@ -351,7 +353,7 @@ int main(int argc, char* argv[]) {
   cout << "Number of true events to fit  = " << bindataTr->sumEntries() << endl; 
   RooDataHist* bindataPR = new RooDataHist("bindataPR","MC distribution for PR signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataPR);
   
-  RooDataHist* bindataNP = new RooDataHist("bindataNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataNP);
+  // RooDataHist* bindataNP = new RooDataHist("bindataNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataNP);
 
   RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("JpsictTrue"))),*reddataNP); 
 
@@ -385,10 +387,10 @@ int main(int argc, char* argv[]) {
 
   if(prefitMass){
 
-    ws->pdf("sigCBGauss")->fitTo(*bindataTr,SumW2Error(kTRUE));
-    ws->var("enne")->setConstant(kTRUE);
+    // ws->pdf("sigCBGauss")->fitTo(*bindataTr,SumW2Error(kTRUE));
+    // ws->var("enne")->setConstant(kTRUE);
 
-    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
     // ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     ws->pdf("massPDF")->fitTo(*reddata1,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     
@@ -405,22 +407,25 @@ int main(int argc, char* argv[]) {
   if (prefitMass) {
     
     ws->var("alpha")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
     ws->var("coeffGauss")->setConstant(kTRUE); 
     ws->var("sigmaSig1")->setConstant(kTRUE);
     ws->var("sigmaSig2")->setConstant(kTRUE);
+    ws->var("meanSig1")->setConstant(kTRUE);
+    // ws->var("meanSig2")->setConstant(kTRUE);
     ws->var("NSig")->setConstant(kTRUE);
     ws->var("NBkg")->setConstant(kTRUE);
    
     RooFormulaVar fSig("fSig","@0/(@0+@1)",RooArgList(*(ws->var("NSig")),*(ws->var("NBkg"))));
     ws->import(fSig);
     ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,sigPR");   
-    ws->factory("PROD::totsig(sigCBGauss,sigCtPDF)");
+    ws->factory("PROD::totsig(sigCBGaussOneMean,sigCtPDF)");
     ws->factory("SUM::totPDF(fSig*totsig,totBKG)");
 
   } else {
 
-    ws->factory("PROD::totsigPR(sigCBGauss,sigPR)");
-    ws->factory("PROD::totsigNP(sigCBGauss,sigNP)");
+    ws->factory("PROD::totsigPR(sigCBGaussOneMean,sigPR)");
+    ws->factory("PROD::totsigNP(sigCBGaussOneMean,sigNP)");
     ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
 
   }
@@ -534,7 +539,7 @@ int main(int argc, char* argv[]) {
 
   if (prefitMass) {
     ws->pdf("totPDF")->plotOn(mframe,Components("expFunct"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
-    RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGauss")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
+    RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
     tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
     ws->pdf("totPDF")->plotOn(mframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
   } else {
