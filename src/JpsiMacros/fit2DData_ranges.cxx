@@ -504,14 +504,12 @@ int main(int argc, char* argv[]) {
   Double_t Bfrac_static;
   Double_t BfracErr_static;  
 
-  RooFitResult *rfr;
   int nFitPar;
 
   if(prefitMass) {
     // ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    rfr = ws->pdf("totPDF")->fitTo(*reddata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    // nFitPar = rfr->floatParsFinal().getSize();  DOES NOT WORK IN SLC5
-    nFitPar = 6;
+    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+    nFitPar = rfr->floatParsFinal().getSize();  
     Bfrac_static = ws->var("Bfrac")->getVal();
     BfracErr_static = ws->var("Bfrac")->getError();
     
@@ -522,9 +520,8 @@ int main(int argc, char* argv[]) {
     
   } else {
     // ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    // nFitPar = rfr->floatParsFinal().getSize();  DOES NOT WORK IN SLC5 
-    nFitPar = 7;
+    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+    nFitPar = rfr->floatParsFinal().getSize();   
     
     NSigNP_static = ws->var("NSigNP")->getVal();
     NSigPR_static = ws->var("NSigPR")->getVal();
