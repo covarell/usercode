@@ -100,6 +100,9 @@ Fit2DData:    $(INCLUDEDIR)fit2DData.cxx
 Fit2DDataRange:    $(INCLUDEDIR)fit2DData_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DDataRange $(OUTLIB)/*.o $(GLIBS) $ $<
 
+Toy2DDataRange:    $(INCLUDEDIR)toy2DData_ranges.cxx   
+	$(CXX) $(CXXFLAGS) -o Toy2DDataRange $(OUTLIB)/*.o $(GLIBS) $ $<
+
 Fit2DRange:    $(INCLUDEDIR)fit2D_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DRange $(OUTLIB)/*.o $(GLIBS) $ $<
 

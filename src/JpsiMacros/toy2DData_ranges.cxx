@@ -4,13 +4,16 @@
 
 // ROOT includes
 #include <TROOT.h>
+#include <TH1.h>
 #include <TFile.h>
 #include <TAxis.h>
 #include <TLatex.h>
 #include <TMath.h>
 #include <TCanvas.h>
+#include <TDatime.h>
 
 #include "RooFit.h"
+#include "RooRandom.h"
 #include "RooGlobalFunc.h"
 #include "RooDataSet.h"
 #include "RooRealVar.h"
@@ -26,6 +29,9 @@
 #include "RooHistPdfConv.h"
 
 using namespace RooFit;
+float initialNsig = 600.;
+float initialNbkg = 200.;
+float initialBfrac = 0.60;
 
 void defineMassBackground(RooWorkspace *ws)
 {
@@ -33,7 +39,7 @@ void defineMassBackground(RooWorkspace *ws)
   ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,0.1])");
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-0.8,-3.,1.])");
 
   return;
 }
@@ -43,8 +49,8 @@ void defineMassSignal(RooWorkspace *ws)
   //SIGNAL FUNCTION CANDIDATES:
 
   //Normal Gaussians
-  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
-  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.096,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.096,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
 
   //Gaussian with same mean as signalG1
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
@@ -55,7 +61,7 @@ void defineMassSignal(RooWorkspace *ws)
   //SUM OF SIGNAL FUNCTIONS
 
   //Sum of Gaussians with different mean
-  ws->factory("SUM::sigPDF(coeffGauss[0.5,0.,1.]*signalG1,signalG2)");
+  ws->factory("SUM::sigPDF(coeffGauss[0.25,0.,1.]*signalG1,signalG2)");
 
   //Sum of Gaussians with same mean
   ws->factory("SUM::sigPDFOneMean(coeffGauss*signalG1,signalG2OneMean)");
@@ -74,9 +80,9 @@ void defineCTResol(RooWorkspace *ws)
 {
 
   // ONE RESOLUTION FUNCTION
-  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.02,0.008,0.2])");
+  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.1,0.06,0.2])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.02,0.01,0.03])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.06])");
   ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.2,0.1,0.3])");
   ws->factory("GaussModel::resGM(Jpsict,meanResSigW,sigmaResSigM[0.4,0.3,0.5])");
   // ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.,0.5]})");
@@ -101,8 +107,8 @@ void defineCTBackground(RooWorkspace *ws)
   // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resbkg,RooDecay::Flipped");
   // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resbkg,RooDecay::DoubleSided");
 
-  ws->factory("SUM::bkgPart1(fpm[1.,0.,1.]*bkg2,bkg3)");
-  ws->factory("SUM::bkgPart2(fLiving[0.9,0.,1.]*bkgPart1,bkg4)");
+  ws->factory("SUM::bkgPart1(fpm[0.2,0.,1.]*bkg2,bkg3)");
+  ws->factory("SUM::bkgPart2(fLiving[0.5,0.,1.]*bkgPart1,bkg4)");
   ws->factory("SUM::bkgctauTOT(fbkgTot[0.29,0.,1.]*sigPR,bkgPart2)");
 
   return;
@@ -288,17 +294,7 @@ int main(int argc, char* argv[]) {
   setRanges(ws);
 
   string titlestr;
-  
-  // *** test True Lifetimes
-  ws->var("JpsictTrue")->setBins(2000);
-  RooPlot *trueframe = ws->var("JpsictTrue")->frame();
-  ws->data("dataMC")->plotOn(trueframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP"));
-
-  TCanvas c0;
-  c0.cd(); trueframe->Draw();
-  titlestr = "pictures/testTrueLife_Lin.gif";
-  c0.SaveAs(titlestr.c_str());
-  // *** end test True Lifetimes
+  char theFunction[300];
 
   ws->var("JpsiMass")->setBins(60);
   // ws->var("Jpsict")->setBins(45);
@@ -348,17 +344,18 @@ int main(int argc, char* argv[]) {
     reddata1 = (RooDataSet*)reddata->reduce("Jpsict < 600000.");  // i.e. all
   }
 
-  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddata1);
+  // RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddata1);
 
-  cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
+  // cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
 
   //get subdatasets. Some of them are useful. Some, however, not
+  RooDataSet *reddataTime = (RooDataSet*) reddata1->reduce(RooArgSet(*(ws->var("Jpsict"))));  
+
   RooDataSet *reddataTr = (RooDataSet*) reddataMC->reduce(aLongString.c_str());
 
   RooDataSet *reddataPR = (RooDataSet*) reddataTr->reduce("MCType == MCType::PR");
   RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce("MCType == MCType::NP");
   // RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
-  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("JpsiMass < 2.9 || JpsiMass > 3.3");
 
   RooDataHist* bindataTr = new RooDataHist("bindataTr","MC distribution for signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataTr);
   
@@ -371,7 +368,7 @@ int main(int argc, char* argv[]) {
 
   // RooDataHist* bindataBK = new RooDataHist("bindataBK","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataBK);
 
-  RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataSB);
+  // RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataSB);
 
   //JPSI MASS PARAMETRIZATION
 
@@ -401,150 +398,243 @@ int main(int argc, char* argv[]) {
 
     // ws->pdf("sigCBGauss")->fitTo(*bindataTr,SumW2Error(kTRUE));
     // ws->var("enne")->setConstant(kTRUE);
-
-    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
+    sprintf(theFunction,"SUM::massPDF(NSig[%f,10.,10000000.]*sigCBGaussOneMean,NBkg[%f,10.,10000000.]*expFunct)",initialNsig,initialNbkg);
+    ws->factory(theFunction);
     // ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
-    ws->pdf("massPDF")->fitTo(*reddata1,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
-    
-  } else {
-
-    RooRealVar NSig("NSig","dummy total signal events",0.);
-    ws->import(NSig);
-
-  }
-
-  const Double_t NSig_static = ws->var("NSig")->getVal();
-  const Double_t Err_static  = ws->var("NSig")->getError() ;  
-
-  if (prefitMass) {
-    
-    ws->var("alpha")->setConstant(kTRUE);
-    ws->var("enne")->setConstant(kTRUE);
-    ws->var("coeffGauss")->setConstant(kTRUE); 
-    ws->var("sigmaSig1")->setConstant(kTRUE);
-    ws->var("sigmaSig2")->setConstant(kTRUE);
-    ws->var("meanSig1")->setConstant(kTRUE);
-    // ws->var("meanSig2")->setConstant(kTRUE);
-    ws->var("NSig")->setConstant(kTRUE);
-    ws->var("NBkg")->setConstant(kTRUE);
-   
     RooFormulaVar fSig("fSig","@0/(@0+@1)",RooArgList(*(ws->var("NSig")),*(ws->var("NBkg"))));
     ws->import(fSig);
-    ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,sigPR");   
+    sprintf(theFunction,"SUM::sigCtPDF(Bfrac[%f,0.,1.]*sigNP,sigPR",initialBfrac);
+    ws->factory(theFunction);
     ws->factory("PROD::totsig(sigCBGaussOneMean,sigCtPDF)");
     ws->factory("SUM::totPDF(fSig*totsig,totBKG)");
 
   } else {
-
+    
     ws->factory("PROD::totsigPR(sigCBGaussOneMean,sigPR)");
     ws->factory("PROD::totsigNP(sigCBGaussOneMean,sigNP)");
-    ws->factory("SUM::totPDF(NSigPR[4000.,10.,1000000.]*totsigPR,NSigNP[900.,10.,1000000.]*totsigNP,NBkg[1400.,10.,1000000.]*totBKG)");
+    sprintf(theFunction,"SUM::totPDF(NSigPR[%f,10.,1000000.]*totsigPR,NSigNP[%f,10.,1000000.]*totsigNP,NBkg[%f,10.,1000000.]*totBKG)",initialNsig*(1-initialBfrac),initialNsig*initialBfrac,initialNbkg);
+    ws->factory(theFunction);
 
   }
 
+  double theActualNsig = reddata1->numEntries()*initialNsig/(initialNsig + initialNbkg);
+
+  string partTit, partFile;
+  if (isGG == 0) { partTit = " glb-glb "; partFile = "GG"; }
+  else if (isGG == 1) { partTit = " glb-trk "; partFile = "GT"; }
+  else { partTit = " all "; partFile = "ALL"; }
+  
+  titlestr = "results/toy4Gauss/2D_" + partFile + "toy_pT" + prange + "_eta" + etarange + ".root";
+  TFile theOutput(titlestr.c_str(),"RECREATE");
+  TH1F* theLogL = new TH1F("theLogL","negative log-likelihood",20,-280.,80.);
+  TH1F* pullNsig = new TH1F("pullNsig","pull of Nsig",20,-5.,5.);
+  TH1F* pullBfrac = new TH1F("pullBfrac","pull of Bfrac",20,-5.,5.);
+  
   if(prefitSignalCTau){
     ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE));
-
+    
     if (ws->var("fracRes2")) ws->var("fracRes2")->setConstant(kTRUE);
     if (ws->var("sigmaResSigO")) ws->var("sigmaResSigO")->setConstant(kTRUE);
     if (ws->var("fracRes3")) ws->var("fracRes3")->setConstant(kTRUE);
     if (ws->var("sigmaResSigM")) ws->var("sigmaResSigM")->setConstant(kTRUE);
-
+    
     /* ws->var("fracRes")->setConstant(kTRUE);
-    ws->var("sigmaResSigW")->setConstant(kTRUE);
-    ws->var("sigmaResSigN")->setConstant(kTRUE);
-    ws->var("meanResSigW")->setConstant(kTRUE);
+       ws->var("sigmaResSigW")->setConstant(kTRUE);
+       ws->var("sigmaResSigN")->setConstant(kTRUE);
+       ws->var("meanResSigW")->setConstant(kTRUE);
+       
+       ws->pdf("sigNP")->fitTo(*bindataNP,SumW2Error(kTRUE));
+       ws->var("NpPrRatio")->setConstant(kTRUE);
+       
+       ws->var("fracRes")->setConstant(kFALSE);
+       ws->var("sigmaResSigW")->setConstant(kFALSE);
+       ws->var("sigmaResSigN")->setConstant(kFALSE);
+       ws->var("meanResSigW")->setConstant(kFALSE);*/
+  }
 
-    ws->pdf("sigNP")->fitTo(*bindataNP,SumW2Error(kTRUE));
-    ws->var("NpPrRatio")->setConstant(kTRUE);
+  for (unsigned int iToy; iToy < 200; iToy++) {
 
+    //RESET ALL PARAMETERS TO FREE
+    ws->var("alpha")->setConstant(kFALSE);
+    ws->var("enne")->setConstant(kFALSE);
+    ws->var("coeffGauss")->setConstant(kFALSE); 
+    ws->var("sigmaSig1")->setConstant(kFALSE);
+    ws->var("sigmaSig2")->setConstant(kFALSE);
+    ws->var("meanSig1")->setConstant(kFALSE);
+    // ws->var("meanSig2")->setConstant(kFALSE);
+    ws->var("NSig")->setConstant(kFALSE);
+    ws->var("NBkg")->setConstant(kFALSE);
+    ws->var("fpm")->setConstant(kFALSE);
+    ws->var("fLiving")->setConstant(kFALSE);
     ws->var("fracRes")->setConstant(kFALSE);
-    ws->var("sigmaResSigW")->setConstant(kFALSE);
-    ws->var("sigmaResSigN")->setConstant(kFALSE);
-    ws->var("meanResSigW")->setConstant(kFALSE);*/
-  }
+    ws->var("lambdap")->setConstant(kFALSE);
+    ws->var("lambdam")->setConstant(kFALSE);
+    ws->var("lambdasym")->setConstant(kFALSE);
 
-  if(prefitBackground){
-    cout << "Prefitting background on " << bindataSB->sumEntries() << " MC events " << endl;
+    ws->var("alpha")->setVal(0.5);
+    ws->var("enne")->setVal(10.);
+    ws->var("coeffGauss")->setVal(0.25); 
+    ws->var("sigmaSig1")->setVal(0.02);
+    ws->var("sigmaSig2")->setVal(0.03);
+    ws->var("meanSig1")->setVal(3.1);
+    ws->var("coefExp")->setVal(-0.8);
+    ws->var("meanResSigW")->setVal(0.);
+    ws->var("sigmaResSigW")->setVal(0.1);
+    ws->var("sigmaResSigN")->setVal(0.04);
+    // ws->var("meanSig2")->setVal(kFALSE);
+    ws->var("fpm")->setVal(0.2);
+    ws->var("fLiving")->setVal(0.5);
+    ws->var("fbkgTot")->setVal(0.29);
+    ws->var("fracRes")->setVal(0.4);
+    ws->var("lambdap")->setVal(0.42);
+    ws->var("lambdam")->setVal(0.79);
+    ws->var("lambdasym")->setVal(0.49);
 
-    if(prefitSignalCTau){
-      //ws->var("meanResSigN")->setConstant(kTRUE);
-      ws->var("meanResSigW")->setConstant(kTRUE);
-      //ws->var("sigmaResSigN")->setConstant(kTRUE);
-      ws->var("sigmaResSigW")->setConstant(kTRUE);
+    ws->var("NBkg")->setVal(initialNbkg);
+    if (prefitMass) {
+      ws->var("NSig")->setVal(initialNsig);
+      ws->var("Bfrac")->setVal(initialBfrac);
+    } else {
+      ws->var("NSigPR")->setVal(initialNsig*(1-initialBfrac));
+      ws->var("NSigNP")->setVal(initialNsig*initialBfrac);
+    } 
+
+    cout << endl << "####" << endl;
+    cout << "Generating toy experiment n. " << iToy+1 << endl;
+
+    TDatime *now = new TDatime();
+    Int_t today = now->GetDate();
+    Int_t clock = now->GetTime();
+    Int_t seed = today+clock;
+    cout << "RooFit Generation Seed = " << seed << endl;
+    RooRandom::randomGenerator()->SetSeed(seed);
+    cout << "####" << endl << endl;
+
+    // RooDataSet *reddataToy = ws->pdf("totPDF")->generate(*(ws->var("JpsiMass")),*reddataTime);
+    RooDataSet *reddataToy = ws->pdf("totPDF")->generate(RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),reddata1->numEntries());
+    RooDataSet *reddataSB = (RooDataSet*) reddataToy->reduce("JpsiMass < 2.9 || JpsiMass > 3.3");
+
+    if (prefitMass) {
+  
+      ws->pdf("massPDF")->fitTo(*reddataToy,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
+
+    } else {
+      
+      RooRealVar NSig("NSig","dummy total signal events",0.);
+      ws->import(NSig);
+      
     }
 
+    const Double_t NSig_static = ws->var("NSig")->getVal();
+    const Double_t Err_static  = ws->var("NSig")->getError() ;  
+
+    if (prefitMass) {
+      
+      ws->var("alpha")->setConstant(kTRUE);
+      ws->var("enne")->setConstant(kTRUE);
+      ws->var("coeffGauss")->setConstant(kTRUE); 
+      ws->var("sigmaSig1")->setConstant(kTRUE);
+      ws->var("sigmaSig2")->setConstant(kTRUE);
+      ws->var("meanSig1")->setConstant(kTRUE);
+      // ws->var("meanSig2")->setConstant(kTRUE);
+      ws->var("NSig")->setConstant(kTRUE);
+      ws->var("NBkg")->setConstant(kTRUE);
+      
+    }
+    
+    if(prefitBackground){
+      cout << "Prefitting background on " << reddataSB->sumEntries() << " MC events " << endl;
+
+      if(prefitSignalCTau){
+	//ws->var("meanResSigN")->setConstant(kTRUE);
+	ws->var("meanResSigW")->setConstant(kTRUE);
+	//ws->var("sigmaResSigN")->setConstant(kTRUE);
+	ws->var("sigmaResSigW")->setConstant(kTRUE);
+      }
+      
+      ws->var("fpm")->setConstant(kTRUE);
+      // ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE));
+      ws->pdf("bkgctauTOT")->fitTo(*reddataSB,SumW2Error(kTRUE));
+      ws->var("fLiving")->setConstant(kTRUE);
+      ws->var("fracRes")->setConstant(kTRUE);
+      ws->var("lambdap")->setConstant(kTRUE);
+      ws->var("lambdam")->setConstant(kTRUE);
+      ws->var("lambdasym")->setConstant(kTRUE);
+      
+      if(prefitSignalCTau){
+	//ws->var("meanResSigN")->setConstant(kFALSE);
+	ws->var("meanResSigW")->setConstant(kFALSE);
+	//ws->var("sigmaResSigN")->setConstant(kFALSE);
+	ws->var("sigmaResSigW")->setConstant(kFALSE);
+      }
+      
+    }
+    
+    // FIX IN ANY CASE FROM MC?
     ws->var("fpm")->setConstant(kTRUE);
-    // ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE));
-    ws->pdf("bkgctauTOT")->fitTo(*reddataSB,SumW2Error(kTRUE));
     ws->var("fLiving")->setConstant(kTRUE);
-    ws->var("fracRes")->setConstant(kTRUE);
-    ws->var("lambdap")->setConstant(kTRUE);
-    ws->var("lambdam")->setConstant(kTRUE);
-    ws->var("lambdasym")->setConstant(kTRUE);
-
-    if(prefitSignalCTau){
-      //ws->var("meanResSigN")->setConstant(kFALSE);
-      ws->var("meanResSigW")->setConstant(kFALSE);
-      //ws->var("sigmaResSigN")->setConstant(kFALSE);
-      ws->var("sigmaResSigW")->setConstant(kFALSE);
+    
+    Double_t NBkg_static = ws->var("NBkg")->getVal();
+    Double_t NSigNP_static;
+    Double_t NSigPR_static;
+    Double_t ErrNP_static;
+    Double_t ErrPR_static;
+    
+    Double_t Bfrac_static;
+    Double_t BfracErr_static;  
+    
+    int nFitPar;  Double_t theNLL;
+    
+    if(prefitMass) {
+      // ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
+      RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+      nFitPar = rfr->floatParsFinal().getSize();  theNLL = rfr->minNll();
+      Bfrac_static = ws->var("Bfrac")->getVal();
+      BfracErr_static = ws->var("Bfrac")->getError();
+      
+      NSigNP_static = NSig_static*Bfrac_static;
+      NSigPR_static = NSig_static*(1-Bfrac_static);
+      ErrNP_static = NSigNP_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/Bfrac_static,2));
+      ErrPR_static = NSigPR_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/(1.-Bfrac_static),2));
+      
+    } else {
+      // ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
+      RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+      nFitPar = rfr->floatParsFinal().getSize();   theNLL = rfr->minNll();
+      
+      NSigNP_static = ws->var("NSigNP")->getVal();
+      NSigPR_static = ws->var("NSigPR")->getVal();
+      ErrNP_static = ws->var("NSigNP")->getError();
+      ErrPR_static = ws->var("NSigPR")->getError();
+      
+      Bfrac_static = NSigNP_static/(NSigNP_static + NSigPR_static);
+      BfracErr_static = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
     }
     
-  }
-					 
-  // FIX IN ANY CASE FROM MC?
-  ws->var("fpm")->setConstant(kTRUE);
-  ws->var("fLiving")->setConstant(kTRUE);
-
-  Double_t NBkg_static = ws->var("NBkg")->getVal();
-  Double_t NSigNP_static;
-  Double_t NSigPR_static;
-  Double_t ErrNP_static;
-  Double_t ErrPR_static;
-
-  Double_t Bfrac_static;
-  Double_t BfracErr_static;  
-
-  int nFitPar;
-
-  if(prefitMass) {
-    // ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
-    nFitPar = rfr->floatParsFinal().getSize();  
-    Bfrac_static = ws->var("Bfrac")->getVal();
-    BfracErr_static = ws->var("Bfrac")->getError();
+    const double coeffGauss = ws->var("fracRes")->getVal();
+    const double sigmaSig1 = ws->var("sigmaResSigW")->getVal();
+    const double sigmaSig2 = ws->var("sigmaResSigN")->getVal();
+    const double ecoeffGauss = ws->var("fracRes")->getError();
+    const double esigmaSig1 = ws->var("sigmaResSigW")->getError();
+    const double esigmaSig2 = ws->var("sigmaResSigN")->getError();
     
-    NSigNP_static = NSig_static*Bfrac_static;
-    NSigPR_static = NSig_static*(1-Bfrac_static);
-    ErrNP_static = NSigNP_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/Bfrac_static,2));
-    ErrPR_static = NSigPR_static*sqrt(pow(Err_static/NSig_static,2) + pow(BfracErr_static/(1.-Bfrac_static),2));
-    
-  } else {
-    // ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
-    nFitPar = rfr->floatParsFinal().getSize();   
-    
-    NSigNP_static = ws->var("NSigNP")->getVal();
-    NSigPR_static = ws->var("NSigPR")->getVal();
-    ErrNP_static = ws->var("NSigNP")->getError();
-    ErrPR_static = ws->var("NSigPR")->getError();
+    float resol = sqrt(coeffGauss*sigmaSig1*sigmaSig1 + (1-coeffGauss)*sigmaSig2*sigmaSig2);
+    float errresol = (0.5/resol)*sqrt(pow(sigmaSig1*coeffGauss*esigmaSig1,2) + pow(sigmaSig2*(1-coeffGauss)*esigmaSig2,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2*sigmaSig2)*ecoeffGauss,2));
 
-    Bfrac_static = NSigNP_static/(NSigNP_static + NSigPR_static);
-    BfracErr_static = sqrt(pow(NSigNP_static*ErrPR_static,2) + pow(NSigPR_static*ErrNP_static,2))/pow(NSigNP_static + NSigPR_static,2);
+    theLogL->Fill(theNLL);
+    pullNsig->Fill((NSig_static-theActualNsig)/Err_static);
+    pullBfrac->Fill((Bfrac_static-initialBfrac)/BfracErr_static);
+    
   }
 
-  const double coeffGauss = ws->var("fracRes")->getVal();
-  const double sigmaSig1 = ws->var("sigmaResSigW")->getVal();
-  const double sigmaSig2 = ws->var("sigmaResSigN")->getVal();
-  const double ecoeffGauss = ws->var("fracRes")->getError();
-  const double esigmaSig1 = ws->var("sigmaResSigW")->getError();
-  const double esigmaSig2 = ws->var("sigmaResSigN")->getError();
+  theOutput.cd();
+  theLogL->Write();
+  pullNsig->Write();
+  pullBfrac->Write();
+  theOutput.Close(); 
 
-  float resol = sqrt(coeffGauss*sigmaSig1*sigmaSig1 + (1-coeffGauss)*sigmaSig2*sigmaSig2);
-  float errresol = (0.5/resol)*sqrt(pow(sigmaSig1*coeffGauss*esigmaSig1,2) + pow(sigmaSig2*(1-coeffGauss)*esigmaSig2,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2*sigmaSig2)*ecoeffGauss,2));
-
-  // drawResults(ws,isGG,!prefitMass,rb2,prange,etarange);
-  gROOT->ProcessLine(".L mytdrstyle.C");
+    // drawResults(ws,isGG,!prefitMass,rb2,prange,etarange);
+    /* gROOT->ProcessLine(".L mytdrstyle.C");
   gROOT->ProcessLine("setTDRStyle()");		
 			 
   RooRealVar tempVar1("tempVar1","tempVar1",NSigNP_static);
@@ -560,13 +650,13 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (mass projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
   mframe->SetTitle(titlestr.c_str());
 
-  reddata1->plotOn(mframe,DataError(RooAbsData::SumW2));
+  reddataToy->plotOn(mframe,DataError(RooAbsData::SumW2));
 
   if (prefitMass) {
-    ws->pdf("totPDF")->plotOn(mframe,Components("expFunct"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(mframe,Components("expFunct"),LineColor(kBlue),Normalization(reddataToy->sumEntries(),RooAbsReal::NumEvent));
     RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
     tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
-    ws->pdf("totPDF")->plotOn(mframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(mframe,LineColor(kBlack),Normalization(reddataToy->sumEntries(),RooAbsReal::NumEvent));
   } else {
     ws->pdf("totPDF")->plotOn(mframe,Components("totsigNP,totBKG"),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
     ws->pdf("totPDF")->plotOn(mframe,Components("totBKG"),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -589,17 +679,17 @@ int main(int argc, char* argv[]) {
   RooHist* hresid;
   double chi2;
 
-  reddata1->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2));
+  reddataToy->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2));
 
   if (prefitMass) {
-    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddataToy->sumEntries(),RooAbsReal::NumEvent));
     hresid = tframe->pullHist();
     hresid->SetName("hresid");
     chi2 = tframe->chiSquare(nFitPar);
-    ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddataToy->sumEntries(),RooAbsReal::NumEvent));
     RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
     tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
-    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddataToyy->sumEntries(),RooAbsReal::NumEvent));
   } else {
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
     hresid = tframe->pullHist();
@@ -609,7 +699,7 @@ int main(int argc, char* argv[]) {
     ws->pdf("totPDF")->plotOn(tframe,Components("totBKG"),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
   }
-
+    */
   // NORMAL
   /* TCanvas c2;
   c2.cd();
@@ -622,7 +712,7 @@ int main(int argc, char* argv[]) {
   c2.SaveAs(titlestr.c_str()); */
 
   // WITH RESIDUALS
-  TCanvas* c2 = new TCanvas("c2","The Canvas",200,10,600,880);
+  /* TCanvas* c2 = new TCanvas("c2","The Canvas",200,10,600,880);
   c2->cd();
 
   TPad *pad1 = new TPad("pad1","This is pad1",0.05,0.35,0.95,0.97);
@@ -684,7 +774,7 @@ int main(int argc, char* argv[]) {
   outputFile << "PR " << 0. << " " << NSigPR_static << " " << ErrPR_static << endl;
   outputFile << "NP " << 0. << " " << NSigNP_static << " " << ErrNP_static << endl;
   outputFile << "BF " << 0. << " " << Bfrac_static << " " << BfracErr_static << endl;
-  outputFile << endl; 
+  outputFile << endl; */
 
   return 1;
 }
