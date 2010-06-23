@@ -263,25 +263,37 @@ int main(int argc, char* argv[]) {
   getrange(prange,&pmin,&pmax);
   getrange(etarange,&etamin,&etamax);
 
-  char reducestr[300], reducestr2[300];
+  char reducestr[300];
   sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
 
-  if (theTrigger == 0) sprintf(reducestr2,"%s && trigger0 > 0",reducestr);
-  else if (theTrigger == 1) sprintf(reducestr2,"%s && trigger1 > 0",reducestr);
+  // for selecting triggers and only opposite sign pairs if needed 
+  const RooArgSet* thisRowMC = dataMC->get(0);  
+  RooCategory* thetriggerMC = (RooCategory*)thisRowMC->find("trigger0");
+  if (thetriggerMC) {
+    if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr);
+    else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr);
+  }
 
-  RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr2);
+  RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr);
 
   reddataMC->setWeightVar("MCweight");
 
   ws->import(*reddataMC);
+
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
   
-  // for selecting only opposite sign pairs if needed 
+  // for selecting triggers and only opposite sign pairs if needed 
   const RooArgSet* thisRow = data->get(0);  
   RooCategory* theSign = (RooCategory*)thisRow->find("JpsiSign");
-  if (theSign) sprintf(reducestr2,"%s && JpsiSign == JpsiSign::OS",reducestr); 
+  if (theSign) sprintf(reducestr,"%s && JpsiSign == JpsiSign::OS",reducestr);
+  RooCategory* thetrigger = (RooCategory*)thisRow->find("trigger0");
+  if (thetrigger) {
+    if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr);
+    else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr);
+  }
   //
 
-  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr2);
+  RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
 
   ws->import(*reddata);
 
@@ -575,7 +587,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   ws->var("Jpsict")->SetTitle("J/#psi c#tau");
@@ -614,11 +626,11 @@ int main(int argc, char* argv[]) {
   /* TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c2.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
   c2.SaveAs(titlestr.c_str()); */
 
   // WITH RESIDUALS
@@ -649,7 +661,7 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
   c2->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsict")->frame();
@@ -664,11 +676,11 @@ int main(int argc, char* argv[]) {
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
   c3.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
@@ -678,7 +690,7 @@ int main(int argc, char* argv[]) {
   cout << "Resolution : Fit : " << resol*1000. << " +/- " << errresol*1000. << " mum" << endl;
 
   char oFile[200];
-  sprintf(oFile,"results/data4Gauss/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
+  sprintf(oFile,"results/data4GaussCRAFT/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "PR " << 0. << " " << NSigPR_static << " " << ErrPR_static << endl;
