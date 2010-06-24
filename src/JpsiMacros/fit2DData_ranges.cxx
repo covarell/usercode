@@ -33,7 +33,7 @@ void defineMassBackground(RooWorkspace *ws)
   ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,0.1])");
+  ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,1.])");
 
   return;
 }
@@ -60,10 +60,10 @@ void defineMassSignal(RooWorkspace *ws)
   //Sum of Gaussians with same mean
   ws->factory("SUM::sigPDFOneMean(coeffGauss*signalG1,signalG2OneMean)");
 
-  //Sum of a Gaussian and a CrystallBall
+  //Sum of a Gaussian and a CrystalBall
   ws->factory("SUM::sigCBGauss(coeffGauss*sigCB,signalG2)");
 
-  //Sum of a Gaussian and a CrystallBall
+  //Sum of a Gaussian and a CrystalBall
   ws->factory("SUM::sigCBGaussOneMean(coeffGauss*sigCB,signalG1)");
 
   return;
@@ -74,13 +74,13 @@ void defineCTResol(RooWorkspace *ws)
 {
 
   // ONE RESOLUTION FUNCTION
-  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.02,0.008,0.2])");
+  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.3])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.02,0.01,0.03])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.1])");
   ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.2,0.1,0.3])");
   ws->factory("GaussModel::resGM(Jpsict,meanResSigW,sigmaResSigM[0.4,0.3,0.5])");
   // ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.,0.5]})");
-  ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.4,0.3,0.8],fracRes2[0.02,0.0,0.15],fracRes3[0.1,0.0,0.5]})");
+  ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.1,0.8],fracRes2[0.02,0.0,0.15],fracRes3[0.1,0.0,0.5]})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
@@ -462,7 +462,8 @@ int main(int argc, char* argv[]) {
     if (ws->var("fracRes3")) ws->var("fracRes3")->setConstant(kTRUE);
     if (ws->var("sigmaResSigM")) ws->var("sigmaResSigM")->setConstant(kTRUE);
 
-    /* ws->var("fracRes")->setConstant(kTRUE);
+    ws->var("fracRes")->setConstant(kTRUE);
+    /*
     ws->var("sigmaResSigW")->setConstant(kTRUE);
     ws->var("sigmaResSigN")->setConstant(kTRUE);
     ws->var("meanResSigW")->setConstant(kTRUE);
