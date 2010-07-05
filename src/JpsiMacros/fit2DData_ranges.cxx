@@ -5,10 +5,12 @@
 // ROOT includes
 #include <TROOT.h>
 #include <TFile.h>
+#include <TH1F.h>
 #include <TAxis.h>
 #include <TLatex.h>
 #include <TMath.h>
 #include <TCanvas.h>
+#include <TLegend.h>
 
 #include "RooFit.h"
 #include "RooGlobalFunc.h"
@@ -588,10 +590,10 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
-  ws->var("Jpsict")->SetTitle("J/#psi c#tau");
+  ws->var("Jpsict")->SetTitle("#ell_{J/#psi}");
   RooPlot *tframe = ws->var("Jpsict")->frame();
 
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
@@ -609,17 +611,17 @@ int main(int argc, char* argv[]) {
     hresid = tframe->pullHist();
     hresid->SetName("hresid");
     chi2 = tframe->chiSquare(nFitPar);
-    ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+    ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDotted));
     RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
-    tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent));
+    tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent),LineStyle(kDashed));
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
   } else {
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
     hresid = tframe->pullHist();
     hresid->SetName("hresid");
     chi2 = tframe->chiSquare(nFitPar);
-    ws->pdf("totPDF")->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
-    ws->pdf("totPDF")->plotOn(tframe,Components("totBKG"),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
+    ws->pdf("totPDF")->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected),LineStyle(kDashed));
+    ws->pdf("totPDF")->plotOn(tframe,Components("totBKG"),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected),LineStyle(kDotted));
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
   }
 
@@ -627,11 +629,11 @@ int main(int argc, char* argv[]) {
   /* TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c2.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
   c2.SaveAs(titlestr.c_str()); */
 
   // WITH RESIDUALS
@@ -644,6 +646,35 @@ int main(int argc, char* argv[]) {
   pad2->Draw();
 
   pad1->cd(); pad1->SetLogy(1); tframe->Draw();
+
+  TLatex *t = new TLatex();
+  t->SetNDC();
+  t->SetTextAlign(22);
+  // t->SetTextFont(63);
+  t->SetTextSize(0.035);
+  t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = XXX.XX nb^{-1}"); 
+
+  TH1F hfake1 = TH1F("hfake1","hfake1",100,200,300);
+  hfake1.SetLineColor(kBlue);
+  hfake1.SetLineStyle(kDotted);
+  hfake1.SetLineWidth(2);
+  TH1F hfake2 = TH1F("hfake2","hfake2",100,200,300);
+  hfake2.SetLineColor(kBlack);
+  hfake2.SetLineWidth(2);
+  TH1F hfake3 = TH1F("hfake3","hfake3",100,200,300);
+  hfake3.SetLineColor(kRed);
+  hfake1.SetLineStyle(kDashed);
+  hfake3.SetLineWidth(2);
+
+  TLegend * leg = new TLegend(0.49,0.64,0.92,0.815,NULL,"brNDC");
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetShadowColor(0);
+  leg->AddEntry(&hfake1,"background component","L");
+  leg->AddEntry(&hfake3,"background + non-prompt component","L"); 
+  leg->AddEntry(&hfake2,"total fit","L");
+  leg->Draw("same"); 
 
   RooPlot* tframeres =  ws->var("Jpsict")->frame(Title("Residuals Distribution")) ;
   tframeres->addPlotable(hresid,"P") ;  
@@ -662,7 +693,7 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
   c2->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsict")->frame();
@@ -677,11 +708,11 @@ int main(int argc, char* argv[]) {
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4GaussCRAFT/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
   c3.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
@@ -691,7 +722,7 @@ int main(int argc, char* argv[]) {
   cout << "Resolution : Fit : " << resol*1000. << " +/- " << errresol*1000. << " mum" << endl;
 
   char oFile[200];
-  sprintf(oFile,"results/data4GaussCRAFT/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
+  sprintf(oFile,"results/data4Gauss/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "PR " << 0. << " " << NSigPR_static << " " << ErrPR_static << endl;
