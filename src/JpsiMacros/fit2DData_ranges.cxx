@@ -327,23 +327,15 @@ int main(int argc, char* argv[]) {
   ws->var("JpsictTrue")->setBinning(rb);
 
   // define binning
-  /* RooBinning rb2(-1.0,3.5);
-  rb2.addBoundary(-0.5);
-  // rb2.addBoundary(-0.2);
-  // rb2.addBoundary(-0.1);
-  // rb2.addBoundary(-0.01);
-  rb2.addUniform(10,-0.5,-0.2); 
-  rb2.addUniform(20,-0.2,0.2); 
-  rb2.addUniform(10,0.2,0.5); 
-  rb2.addUniform(5,0.5,1.0); 
-  rb2.addUniform(10,1.0,3.5);*/
   RooBinning rb2(-1.0,2.7);
-  rb2.addBoundary(-0.75);
+  // rb2.addBoundary(-0.8);
+  rb2.addBoundary(-0.7);
+  // rb2.addBoundary(-0.6);
   rb2.addBoundary(-0.5);
   rb2.addUniform(6,-0.5,-0.2);
-  rb2.addUniform(16,-0.2,0.2);
-  rb2.addUniform(9,0.2,0.5);
-  rb2.addUniform(5,0.5,1.0);
+  rb2.addUniform(32,-0.2,0.2);
+  rb2.addUniform(18,0.2,0.5);
+  rb2.addUniform(7,0.5,1.0);
   rb2.addUniform(3,1.0,2.7);
   ws->var("Jpsict")->setBinning(rb2);
 
@@ -589,17 +581,17 @@ int main(int argc, char* argv[]) {
   }
 
   TCanvas c1;
-  c1.cd();mframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
+  c1.cd(); mframe->Draw();
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
-  ws->var("Jpsict")->SetTitle("#ell_{J/#psi}");
+  ws->var("Jpsict")->SetTitle("l_{J/#psi}");
   RooPlot *tframe = ws->var("Jpsict")->frame();
 
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
-  tframe->GetYaxis()->SetTitle("Events / (0.09 mm)");
+  tframe->GetYaxis()->SetTitle("Events / (0.045 mm)");
 
   RooHist* hresid;
   double chi2;
@@ -610,7 +602,7 @@ int main(int argc, char* argv[]) {
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
     hresid = tframe->pullHist();
     hresid->SetName("hresid");
-    chi2 = tframe->chiSquare(nFitPar);
+    // chi2 = tframe->chiSquare(nFitPar);
     ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDotted));
     RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
     tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static + NBkg_static,RooAbsReal::NumEvent),LineStyle(kDashed));
@@ -619,21 +611,29 @@ int main(int argc, char* argv[]) {
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
     hresid = tframe->pullHist();
     hresid->SetName("hresid");
-    chi2 = tframe->chiSquare(nFitPar);
+    // chi2 = tframe->chiSquare(nFitPar);
     ws->pdf("totPDF")->plotOn(tframe,Components("totsigNP,totBKG"),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected),LineStyle(kDashed));
     ws->pdf("totPDF")->plotOn(tframe,Components("totBKG"),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected),LineStyle(kDotted));
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
   }
 
+  double *ypulls = hresid->GetY();
+  unsigned int nBins = ws->var("Jpsict")->getBinning().numBins();
+  for (unsigned int i = 0; i < nBins; i++) {
+    cout << "Pull of bin " << i << " = " << ypulls[i] << endl;
+    chi2 += ypulls[i]*ypulls[i];
+  }
+  chi2 /= (nBins - nFitPar);
+
   // NORMAL
   /* TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c2.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
   c2.SaveAs(titlestr.c_str()); */
 
   // WITH RESIDUALS
@@ -645,7 +645,7 @@ int main(int argc, char* argv[]) {
   TPad *pad2 = new TPad("pad2","This is pad2",0.05,0.02,0.95,0.30);
   pad2->Draw();
 
-  pad1->cd(); pad1->SetLogy(1); tframe->Draw();
+  pad1->cd(); /* pad1->SetLogy(1); */ tframe->Draw();
 
   TLatex *t = new TLatex();
   t->SetNDC();
@@ -664,7 +664,7 @@ int main(int argc, char* argv[]) {
   hfake2.SetLineWidth(2);
   TH1F hfake3 = TH1F("hfake3","hfake3",100,200,300);
   hfake3.SetLineColor(kRed);
-  hfake1.SetLineStyle(kDashed);
+  hfake3.SetLineStyle(kDashed);
   hfake3.SetLineWidth(2);
 
   TLegend * leg = new TLegend(0.49,0.64,0.92,0.815,NULL,"brNDC");
@@ -693,13 +693,38 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
+
+  TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
+  c2a->cd();
+
+  TPad *pad1a = new TPad("pad1a","This is pad1",0.05,0.35,0.95,0.97);
+  pad1a->Draw();
+  TPad *pad2a = new TPad("pad2a","This is pad2",0.05,0.02,0.95,0.30);
+  pad2a->Draw();
+
+  pad1a->cd(); pad1a->SetLogy(1);  tframe->Draw();
+
+  t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = XXX.XX nb^{-1}"); 
+
+  leg->Draw("same"); 
+
+  pad2a->cd(); tframeres->Draw();
+
+  sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
+  if (chi2 < 10.) t2->DrawLatex(0.6,0.9,reducestr);
+  
+  c2a->Update();
+
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  c2a->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsict")->frame();
 
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection, mass sidebands), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
-  tframe->SetTitle(titlestr.c_str());
+  tframe1->SetTitle(titlestr.c_str());
 
   reddataSB->plotOn(tframe1,DataError(RooAbsData::SumW2),Binning(rb2));
 
@@ -708,11 +733,11 @@ int main(int argc, char* argv[]) {
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/data4Gauss/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
   c3.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
@@ -722,7 +747,7 @@ int main(int argc, char* argv[]) {
   cout << "Resolution : Fit : " << resol*1000. << " +/- " << errresol*1000. << " mum" << endl;
 
   char oFile[200];
-  sprintf(oFile,"results/data4Gauss/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
+  sprintf(oFile,"results/dataHLTMu3/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "PR " << 0. << " " << NSigPR_static << " " << ErrPR_static << endl;
