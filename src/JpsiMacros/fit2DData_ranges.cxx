@@ -76,17 +76,18 @@ void defineCTResol(RooWorkspace *ws)
 {
 
   // ONE RESOLUTION FUNCTION
-  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.3])");
-  // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
-  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.1])");
+  // ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.6])");
+  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.9])");
+  // ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.18])");
+  ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.3])");
   ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.2,0.1,0.3])");
   ws->factory("GaussModel::resGM(Jpsict,meanResSigW,sigmaResSigM[0.4,0.3,0.5])");
   // ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.,0.5]})");
-  ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.1,0.8],fracRes2[0.02,0.0,0.15],fracRes3[0.1,0.0,0.5]})");
+  // ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.01,0.5],fracRes2[0.02,0.0,0.30],fracRes3[0.1,0.001,0.5]})");
+  ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.01,0.9],fracRes2[0.02,0.0,0.25],fracRes3[0.1,0.0,0.5]})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsict,meanResSigW,sigmaResBkgW[0.05,0.005,0.5])");
-  // ws->factory("GaussModel::resGN(Jpsict,meanResSigN[0.,-0.1,0.1],sigmaResSigN[0.01,0.005,0.5])");
   ws->factory("GaussModel::resbkgGN(Jpsict,meanResSigW,sigmaResBkgN[0.01,0.005,0.5])");
   ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracResBkg[0.05,0.,1.]})");
 
@@ -154,7 +155,7 @@ void setRanges(RooWorkspace *ws){
   const float JpsiMassMax = 3.5;
 
   ws->var("JpsictTrue")->setRange(0.0,4.0);
-  ws->var("Jpsict")->setRange(-1.0,2.7);
+  ws->var("Jpsict")->setRange(-1.5,2.7);
 
   ws->var("JpsiMass")->setRange("all",JpsiMassMin,JpsiMassMax);
   ws->var("JpsiMass")->setRange("left",JpsiMassMin,2.9);
@@ -327,16 +328,16 @@ int main(int argc, char* argv[]) {
   ws->var("JpsictTrue")->setBinning(rb);
 
   // define binning
-  RooBinning rb2(-1.0,2.7);
-  // rb2.addBoundary(-0.8);
+  RooBinning rb2(-1.5,2.7);
+  rb2.addBoundary(-1.0);
   rb2.addBoundary(-0.7);
   // rb2.addBoundary(-0.6);
   rb2.addBoundary(-0.5);
   rb2.addUniform(6,-0.5,-0.2);
-  rb2.addUniform(32,-0.2,0.2);
-  rb2.addUniform(18,0.2,0.5);
-  rb2.addUniform(7,0.5,1.0);
-  rb2.addUniform(3,1.0,2.7);
+  rb2.addUniform(28,-0.2,0.2);
+  rb2.addUniform(12,0.2,0.5);
+  rb2.addUniform(5,0.5,1.0);
+  rb2.addUniform(2,1.0,2.7);
   ws->var("Jpsict")->setBinning(rb2);
 
   RooDataSet *reddata1;
@@ -448,6 +449,19 @@ int main(int argc, char* argv[]) {
 
   }
 
+  // SYSTEMATICS (2 Gaussians)
+  /* if (ws->var("fracRes2")) {
+    ws->var("fracRes2")->setVal(0.);
+    ws->var("fracRes2")->setConstant(kTRUE);
+  }
+  if (ws->var("sigmaResSigO")) ws->var("sigmaResSigO")->setConstant(kTRUE);
+  if (ws->var("fracRes3")) {
+    ws->var("fracRes3")->setVal(0.);
+    ws->var("fracRes3")->setConstant(kTRUE);
+  }
+  if (ws->var("sigmaResSigM")) ws->var("sigmaResSigM")->setConstant(kTRUE);*/
+  
+
   if(prefitSignalCTau){
     ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE));
 
@@ -479,6 +493,8 @@ int main(int argc, char* argv[]) {
       ws->var("meanResSigW")->setConstant(kTRUE);
       //ws->var("sigmaResSigN")->setConstant(kTRUE);
       ws->var("sigmaResSigW")->setConstant(kTRUE);
+      // ws->var("fracRes")->setConstant(kTRUE);
+      // ws->var("fLiving")->setConstant(kTRUE);
     }
 
     ws->var("fpm")->setConstant(kTRUE);
@@ -582,7 +598,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd(); mframe->Draw();
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "massfit_pT" + prange + "_eta" + etarange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   ws->var("Jpsict")->SetTitle("l_{J/#psi}");
@@ -591,7 +607,7 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
-  tframe->GetYaxis()->SetTitle("Events / (0.045 mm)");
+  tframe->GetYaxis()->SetTitle("Events / (0.06 mm)");
 
   RooHist* hresid;
   double chi2;
@@ -619,21 +635,23 @@ int main(int argc, char* argv[]) {
 
   double *ypulls = hresid->GetY();
   unsigned int nBins = ws->var("Jpsict")->getBinning().numBins();
+  unsigned int nFullBins = 0;
   for (unsigned int i = 0; i < nBins; i++) {
     cout << "Pull of bin " << i << " = " << ypulls[i] << endl;
     chi2 += ypulls[i]*ypulls[i];
+    if (fabs(ypulls[i]) > 0.0001) nFullBins++;
   }
-  chi2 /= (nBins - nFitPar);
+  chi2 /= (nFullBins - nFitPar);
 
   // NORMAL
   /* TCanvas c2;
   c2.cd();
   c2.cd();tframe->Draw();
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c2.SaveAs(titlestr.c_str());
   c2.SetLogy(1);
   c2.cd();tframe->Draw();
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
   c2.SaveAs(titlestr.c_str()); */
 
   // WITH RESIDUALS
@@ -642,7 +660,7 @@ int main(int argc, char* argv[]) {
 
   TPad *pad1 = new TPad("pad1","This is pad1",0.05,0.35,0.95,0.97);
   pad1->Draw();
-  TPad *pad2 = new TPad("pad2","This is pad2",0.05,0.02,0.95,0.30);
+  TPad *pad2 = new TPad("pad2","This is pad2",0.05,0.02,0.95,0.35);
   pad2->Draw();
 
   pad1->cd(); /* pad1->SetLogy(1); */ tframe->Draw();
@@ -653,7 +671,7 @@ int main(int argc, char* argv[]) {
   // t->SetTextFont(63);
   t->SetTextSize(0.035);
   t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.84,"L_{int} = XXX.XX nb^{-1}"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = 100 nb^{-1}"); 
 
   TH1F hfake1 = TH1F("hfake1","hfake1",100,200,300);
   hfake1.SetLineColor(kBlue);
@@ -667,16 +685,19 @@ int main(int argc, char* argv[]) {
   hfake3.SetLineStyle(kDashed);
   hfake3.SetLineWidth(2);
 
-  TLegend * leg = new TLegend(0.49,0.64,0.92,0.815,NULL,"brNDC");
+  TLegend * leg = new TLegend(0.53,0.60,0.96,0.815,NULL,"brNDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetShadowColor(0);
-  leg->AddEntry(&hfake1,"background component","L");
-  leg->AddEntry(&hfake3,"background + non-prompt component","L"); 
+  leg->AddEntry(&hfake1,"background","L");
+  leg->AddEntry(&hfake3,"background + non-prompt","L"); 
   leg->AddEntry(&hfake2,"total fit","L");
   leg->Draw("same"); 
 
   RooPlot* tframeres =  ws->var("Jpsict")->frame(Title("Residuals Distribution")) ;
+  tframeres->SetLabelSize(0.08,"XYZ");
+  tframeres->SetTitleSize(0.08,"XYZ");
+  tframeres->SetTitleOffset(1.0,"XYZ");
   tframeres->addPlotable(hresid,"P") ;  
 
   pad2->cd(); tframeres->Draw();
@@ -687,13 +708,13 @@ int main(int argc, char* argv[]) {
   t2->SetNDC();
   t2->SetTextAlign(22);
   // t->SetTextFont(63);
-  t2->SetTextSizePixels(22);
+  t2->SetTextSizePixels(30);
   sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
-  if (chi2 < 10.) t2->DrawLatex(0.6,0.9,reducestr);
+  if (chi2 < 10.) t2->DrawLatex(0.7,0.92,reducestr);
   
   c2->Update();
 
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.pdf";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -707,18 +728,18 @@ int main(int argc, char* argv[]) {
   pad1a->cd(); pad1a->SetLogy(1);  tframe->Draw();
 
   t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.84,"L_{int} = XXX.XX nb^{-1}"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = 100 nb^{-1}"); 
 
   leg->Draw("same"); 
 
   pad2a->cd(); tframeres->Draw();
 
   sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
-  if (chi2 < 10.) t2->DrawLatex(0.6,0.9,reducestr);
+  if (chi2 < 10.) t2->DrawLatex(0.7,0.92,reducestr);
   
   c2a->Update();
 
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsict")->frame();
@@ -733,11 +754,11 @@ int main(int argc, char* argv[]) {
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Lin.gif";
   c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/dataHLTMu3/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
+  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timeSide_pT" + prange + "_eta" + etarange + "_Log.gif";
   c3.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
@@ -747,7 +768,7 @@ int main(int argc, char* argv[]) {
   cout << "Resolution : Fit : " << resol*1000. << " +/- " << errresol*1000. << " mum" << endl;
 
   char oFile[200];
-  sprintf(oFile,"results/dataHLTMu3/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
+  sprintf(oFile,"results/dataDMuOpen/results2D%s_pT%s_eta%s.txt",partFile.c_str(),prange.c_str(),etarange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "PR " << 0. << " " << NSigPR_static << " " << ErrPR_static << endl;

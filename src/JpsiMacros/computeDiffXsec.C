@@ -17,8 +17,8 @@ void computeDiffXsec() {
   static const unsigned int smallBins = 13;
   static const unsigned int largeBins = 8;
   int howManyBins[largeBins] = {1,2,1,3,2,1,2,1};
-  double binWidths[smallBins] = {2.,2.,4.,20.,1.,0.5,0.5,1.,1.,2.,2.,4.,20.};
-  double binWidths2[largeBins] = {2.,6.,20.,2.,2.,2.,6.,20.};
+  double binWidths[smallBins] = {2.,2.,2.,20.,1.,0.5,0.5,1.,1.,2.,2.,2.,20.};
+  double binWidths2[largeBins] = {2.,4.,20.,2.,2.,2.,4.,20.};
    
   // YIELDS AND ERRORS ("MIXED" POLARIZATION)
   // double inclXsec[smallBins] = {34.622,15.951,8.514,0.662,191.050,375.838,344.348,199.419,111.534,55.972,14.289,7.019,0.322};
@@ -66,8 +66,7 @@ void computeDiffXsec() {
   // B-FRACTION
   double Bfrac[largeBins] = {0.158,0.255,0.375,0.085,0.115,0.189,0.207,0.346};
   double errstBfrac[largeBins] = {0.042,0.024,0.029,0.023,0.015,0.021,0.021,0.043};
-  // to be updated
-  double errsyBfrac[largeBins] = {0.018,0.009,0.012,0.027,0.016,0.011,0.017,0.010};
+  double errsyBfrac[largeBins] = {0.036,0.011,0.013,0.032,0.008,0.012,0.018,0.017};
 
   int tsb = 0;
   for (int i=0; i < largeBins; i++) {
