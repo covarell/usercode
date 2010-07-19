@@ -25,9 +25,9 @@ void computeDiffXsec() {
   // double errstXsec[smallBins] = {2.971,0.936,0.498,0.035,11.849,34.427,38.920,8.197,12.335,2.455,0.690,0.440,0.024};
   // double errsyXsec[smallBins] = {7.575,2.384,1.379,0.091,58.991,95.725,72.548,30.253,18.289,13.247,2.395,2.085,0.050};
   // YIELDS AND ERRORS (NO POLARIZATION)
-  double inclXsec[smallBins] = {34.622,15.951,8.514,0.662,191.050,375.838,344.348,199.419,111.534,55.972,14.289,7.019,0.322};
-  double errstXsec[smallBins] = {2.971,0.936,0.498,0.035,11.849,34.427,38.920,8.197,12.335,2.455,0.690,0.440,0.024};
-  double errsyXsec[smallBins] = {7.575,2.384,1.379,0.091,58.991,95.725,72.548,30.253,18.289,13.247,2.395,2.085,0.050};
+  double inclXsec[smallBins] = {34.89,16.18,8.49,0.653,214.0,357.0,335.0,197.0,109.0,54.6,14.91,5.88,0.307};
+  double errstXsec[smallBins] = {2.50,0.84,0.45,0.031,14.0,34.0,20.0,8.0,4.0,3.1,0.64,0.34,0.024};
+  double errsyXsec[smallBins] = {6.00,2.33,1.35,0.097,66.0,90.0,70.0,29.0,17.0,10.0,2.61,1.00,0.048};
 
   // POLARIZATION FROM FILE
   double nopol[smallBins];
@@ -36,6 +36,7 @@ void computeDiffXsec() {
   double trasvCS[smallBins];
   double longCS[smallBins];
   double B409[smallBins];
+  double B333[smallBins];
 
   TFile f1("large_bins/acceptance_polarized.root");
 
@@ -45,6 +46,7 @@ void computeDiffXsec() {
   TH2F *Jpsi_t_CStheta = (TH2F*)f1.Get("Jpsi_t_CStheta");
   TH2F *Jpsi_l_CStheta = (TH2F*)f1.Get("Jpsi_l_CStheta");
   TH2F *B_409 = (TH2F*)f1.Get("B_409");
+  TH2F *B_333 = (TH2F*)f1.Get("B_333");
   
   int nn = 0;
   for (int ii=1; ii <= Jpsi_non->GetNbinsX(); ii++) {
@@ -56,7 +58,8 @@ void computeDiffXsec() {
 	trasvCS[nn] = Jpsi_t_CStheta->GetBinContent(ii,jj);
 	longCS[nn]  = Jpsi_l_CStheta->GetBinContent(ii,jj);
 	B409[nn]   = B_409->GetBinContent(ii,jj);
-	cout << "nn " << ii << " " << jj << " " << nn << " " << nopol[nn] << " " << trasvHX[nn] << " " << longHX[nn] << " " << trasvCS[nn] << " " << longCS[nn] << " " << B409[nn] << endl;
+	B333[nn]   = B_333->GetBinContent(ii,jj);
+	cout << "nn " << ii << " " << jj << " " << nn << " " << nopol[nn] << " " << trasvHX[nn] << " " << longHX[nn] << " " << trasvCS[nn] << " " << longCS[nn] << " " << B409[nn] << " " << B333[nn] << endl;
 	nn++;
       }
     }
@@ -64,16 +67,16 @@ void computeDiffXsec() {
   cout << "OK qui " << endl;  
 
   // B-FRACTION
-  double Bfrac[largeBins] = {0.158,0.255,0.375,0.085,0.115,0.189,0.207,0.346};
-  double errstBfrac[largeBins] = {0.042,0.024,0.029,0.023,0.015,0.021,0.021,0.043};
-  double errsyBfrac[largeBins] = {0.036,0.011,0.013,0.032,0.008,0.012,0.018,0.017};
+  double Bfrac[largeBins] = {0.162,0.257,0.369,0.098,0.112,0.165,0.203,0.331};
+  double errstBfrac[largeBins] = {0.038,0.022,0.027,0.022,0.013,0.019,0.019,0.039};
+  double errsyBfrac[largeBins] = {0.033,0.011,0.014,0.036,0.011,0.010,0.010,0.018};
 
   int tsb = 0;
   for (int i=0; i < largeBins; i++) {
     
-    double totinclXsec[6] = {0.,0.,0.,0.,0.,0.};
-    double totinclstXsec[6] = {0.,0.,0.,0.,0.,0.};
-    double totinclsyXsec[6] = {0.,0.,0.,0.,0.,0.};
+    double totinclXsec[7] = {0.,0.,0.,0.,0.,0.,0.};
+    double totinclstXsec[7] = {0.,0.,0.,0.,0.,0.,0.};
+    double totinclsyXsec[7] = {0.,0.,0.,0.,0.,0.,0.};
     double promptXsec[5] = {0.,0.,0.,0.,0.};
     double promptstXsec[5] = {0.,0.,0.,0.,0.};
     double promptsyXsec[5] = {0.,0.,0.,0.,0.};
@@ -100,13 +103,16 @@ void computeDiffXsec() {
       totinclXsec[5] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/B409[tsb];
       totinclstXsec[5] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/B409[tsb],2);
       totinclsyXsec[5] += pow(binWidths[tsb]*errsyXsec[tsb]*nopol[tsb]/B409[tsb],2);
+      totinclXsec[6] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/B333[tsb];
+      totinclstXsec[6] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/B333[tsb],2);
+      totinclsyXsec[6] += pow(binWidths[tsb]*errsyXsec[tsb]*nopol[tsb]/B333[tsb],2);
       tsb++;
     }
 
     cout << endl;
     cout << "Bin number " << i << endl << endl;    
 
-    for (int pol=0; pol < 6; pol++) {
+    for (int pol=0; pol < 7; pol++) {
       totinclstXsec[pol] = sqrt(totinclstXsec[pol]);
       totinclsyXsec[pol] = sqrt(totinclsyXsec[pol]);
       totinclXsec[pol] /= binWidths2[i];
@@ -121,14 +127,10 @@ void computeDiffXsec() {
       cout << "Prompt polarization type " << polpr << " : $" << promptXsec[polpr] << " \\pm " << promptstXsec[polpr] << " \\pm " << promptsyXsec[polpr] << "$" << endl;
     }
 
-    bXsec[0] = totinclXsec[0]*Bfrac[i];
-    bstXsec[0] = bXsec[0]*sqrt(pow(totinclstXsec[0]/totinclXsec[0],2) + pow(errstBfrac[i]/Bfrac[i],2));
-    bsyXsec[0] = bXsec[0]*sqrt(pow(totinclsyXsec[0]/totinclXsec[0],2) + pow(errsyBfrac[i]/Bfrac[i],2));
-    bXsec[1] = totinclXsec[5]*Bfrac[i];
-    bstXsec[1] = bXsec[1]*sqrt(pow(totinclstXsec[5]/totinclXsec[5],2) + pow(errstBfrac[i]/Bfrac[i],2));
-    bsyXsec[1] = bXsec[1]*sqrt(pow(totinclsyXsec[5]/totinclXsec[5],2) + pow(errsyBfrac[i]/Bfrac[i],2));
-
     for (int polnpr=0; polnpr < 2; polnpr++) {
+      bXsec[polnpr] = totinclXsec[polnpr+5]*Bfrac[i];
+      bstXsec[polnpr] = bXsec[polnpr]*sqrt(pow(totinclstXsec[polnpr+5]/totinclXsec[polnpr+5],2) + pow(errstBfrac[i]/Bfrac[i],2));
+      bsyXsec[polnpr] = bXsec[polnpr]*sqrt(pow(totinclsyXsec[polnpr+5]/totinclXsec[polnpr+5],2) + pow(errsyBfrac[i]/Bfrac[i],2));
       cout << "Non-prompt polarization type " << polnpr << " : $" << bXsec[polnpr] << " \\pm " << bstXsec[polnpr] << " \\pm " << bsyXsec[polnpr] << "$" << endl;
     }
       
