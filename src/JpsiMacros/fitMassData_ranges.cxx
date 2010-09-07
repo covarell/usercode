@@ -24,6 +24,7 @@
 
 using namespace RooFit;
 TCanvas* c1;
+TCanvas* c3;
 
 //Convention: when necessary, use the following convention
 // 0 Global-Global
@@ -33,7 +34,7 @@ TCanvas* c1;
 void defineBackground(RooWorkspace *ws)
 {
   //Second order polynomial, the 2nd coefficient is by default set to zero
-  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[-0.05,-1500.,1500.],CcoefPol2[0.]})");
+  ws->factory("Polynomial::CPolFunct(JpsiMass,{CoefPol1[0.,-15.,15.],CcoefPol2[-0.03,-15.,15.]})");
 
   //Exponential
   ws->factory("Exponential::expFunct(JpsiMass,coefExp[-1.,-3.,0.1])");
@@ -53,7 +54,7 @@ void defineSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,50.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.1,5.],enne[10.,1.,60.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -119,7 +120,7 @@ void setRanges(RooWorkspace *ws)
   return;
 }
 
-void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const string etarange, const int nFitPar)
+void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const string etarange, int theTrigger, const int nFitPar)
 {
 
   gROOT->ProcessLine(".L mytdrstyle.C");
@@ -255,10 +256,10 @@ void drawResults(RooWorkspace *ws, const int DataCat, const string prange, const
   
   c1->Update();
 
-  if(DataCat == 0) sprintf(reducestr,"pictures/GGmassfit_pT%s_eta%s.pdf",prange.c_str(),etarange.c_str());
-  else if(DataCat == 1) sprintf(reducestr,"pictures/GTmassfit_pT%s_eta%s.pdf",prange.c_str(),etarange.c_str());
-  else if(DataCat == 2) sprintf(reducestr,"pictures/TTmassfit_pT%s_eta%s.pdf",prange.c_str(),etarange.c_str());
-  else if(DataCat == 3) sprintf(reducestr,"pictures/ALLmassfit_pT%s_eta%s.pdf",prange.c_str(),etarange.c_str());
+  if(DataCat == 0) sprintf(reducestr,"pictures/runs132440-139981/GGmassfit_pT%s_eta%s_trig%d.pdf",prange.c_str(),etarange.c_str(),theTrigger);
+  else if(DataCat == 1) sprintf(reducestr,"pictures/runs132440-139981/GTmassfit_pT%s_eta%s_trig%d.pdf",prange.c_str(),etarange.c_str(),theTrigger);
+  else if(DataCat == 2) sprintf(reducestr,"pictures/runs132440-139981/TTmassfit_pT%s_eta%s_trig%d.pdf",prange.c_str(),etarange.c_str(),theTrigger);
+  else if(DataCat == 3) sprintf(reducestr,"pictures/runs132440-139981/ALLmassfit_pT%s_eta%s_trig%d.pdf",prange.c_str(),etarange.c_str(),theTrigger);
 
   c1->SaveAs(reducestr);
 
@@ -365,8 +366,11 @@ int main(int argc, char* argv[])
   char reducestr[200];
   sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
 
-  if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr); 
-  else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr); 
+  if (theTrigger == 0) sprintf(reducestr,"%s && triggerDMu > 0",reducestr); 
+  else if (theTrigger == 1) sprintf(reducestr,"%s && triggerMuPre > 0",reducestr); 
+  else if (theTrigger == 2) sprintf(reducestr,"%s && triggerMu > 0",reducestr);
+  else if (theTrigger == 3) sprintf(reducestr,"%s && triggerOniaTrack > 0",reducestr);
+  else if (theTrigger == 4) sprintf(reducestr,"%s && triggerOniaL1Mu > 0",reducestr);
 
   // for selecting only opposite sign pairs if needed 
   const RooArgSet* thisRow = data->get(0);  
@@ -387,11 +391,11 @@ int main(int argc, char* argv[])
 
   // Total PDF (signal CB+Gauss)
   
-  // ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
-  ws->factory("SUM::totPDF(NSig[5000.,10.,100000.]*sigCB,NBkg[2000.,1.,100000.]*expFunct)");
+  ws->factory("SUM::totPDF(NSig[5000.,10.,10000000.]*sigCBGauss,NBkg[2000.,10.,10000000.]*expFunct)");
+  // ws->factory("SUM::totPDF(NSig[5000.,10.,100000.]*sigCB,NBkg[2000.,1.,100000.]*expFunct)");
 
   //Make subsamples to be used later
-  ws->var("JpsiMass")->setBins(45);
+  ws->var("JpsiMass")->setBins(60);
 
   RooDataSet *GGdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   RooDataSet *GTdata = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
@@ -425,7 +429,11 @@ int main(int argc, char* argv[])
      RooDataSet *dataMC = (RooDataSet*)fIn2.Get("data");
      dataMC->SetName("dataMC");
      
-     sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f && (MCType == MCType::PR || MCType == MCType::NP)",pmax,pmin,etamax,etamin);
+     // if signal MC, take all
+     sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f",pmax,pmin,etamax,etamin);
+     // else select signal
+     RooCategory* theMCType = (RooCategory*)thisRow->find("MCType");
+     if (theMCType) sprintf(reducestr,"%s && (MCType == MCType::PR || MCType == MCType::NP)",reducestr); 
 
      if (theTrigger == 0) sprintf(reducestr,"%s && trigger0 > 0",reducestr);  
      else if (theTrigger == 1) sprintf(reducestr,"%s && trigger1 > 0",reducestr);  
@@ -437,15 +445,25 @@ int main(int argc, char* argv[])
      //
 
      RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr);
-     reddataMC->setWeightVar("MCweight");
+     // reddataMC->setWeightVar("MCweight");
      
      ws->import(*reddataMC);
-
+     cout << "Number of MC events to fit  = " << reddataMC->sumEntries() << endl;
+     RooPlot *mcframe = ws->var("JpsiMass")->frame();
+     
      RooDataHist *reddataTrBin = new RooDataHist("reddataTrBin","reddataTrBin",RooArgSet(*(ws->var("JpsiMass"))),*reddataMC);
 
      ws->pdf("sigCBGauss")->fitTo(*reddataTrBin,SumW2Error(kTRUE));
      ws->var("enne")->setConstant(kTRUE);
      ws->var("alpha")->setConstant(kTRUE);
+
+     reddataMC->plotOn(mcframe,DataError(RooAbsData::SumW2));
+     ws->pdf("sigCBGauss")->plotOn(mcframe);
+     c3 = new TCanvas();
+     c3->cd();
+
+     mcframe->Draw();
+     c3->SaveAs("testMC.pdf");
 
   }
 
@@ -455,13 +473,13 @@ int main(int argc, char* argv[])
   RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   // RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,3,prange,etarange,rfr->floatParsFinal().getSize());
+  drawResults(ws,3,prange,etarange,theTrigger,rfr->floatParsFinal().getSize());
 
   double NSig, errSig,resol,errresol;
   printResults(ws,NSig,errSig,resol,errresol);
 
   char oFile[200];
-  sprintf(oFile,"results/results_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
+  sprintf(oFile,"results/runs132440-139981/results_pT%s_eta%s_trig%d.txt",prange.c_str(),etarange.c_str(),theTrigger);
   ofstream outputFile(oFile);
   outputFile << "AL " << 0. << " " << NSig << " " << errSig << endl;
   outputFile << "RE " << 0. << " " << resol*1000. << " " << errresol*1000. << endl;
@@ -490,7 +508,7 @@ int main(int argc, char* argv[])
   // ws->pdf("totPDF")->fitTo(*GGdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*GGdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,0,prange,etarange,rfr->floatParsFinal().getSize());
+  drawResults(ws,0,prange,etarange,theTrigger,rfr->floatParsFinal().getSize());
 
   double NSigGG, errSigGG,resolGG,errresolGG;
   printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
@@ -513,7 +531,7 @@ int main(int argc, char* argv[])
   // ws->pdf("totPDF")->fitTo(*GTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   rfr = ws->pdf("totPDF")->fitTo(*GTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  drawResults(ws,1,prange,etarange,rfr->floatParsFinal().getSize());
+  drawResults(ws,1,prange,etarange,theTrigger,rfr->floatParsFinal().getSize());
 
   double NSigGT, errSigGT,resolGT,errresolGT;
   printResults(ws,NSigGT,errSigGT,resolGT,errresolGT);
@@ -531,7 +549,7 @@ int main(int argc, char* argv[])
   // ws->pdf("totPDF")->fitTo(*TTdata,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
   // rfr = ws->pdf("totPDF")->fitTo(*TTdataBin,Extended(1),Save(1),Minos(0),NumCPU(2),SumW2Error(kTRUE));
 
-  // drawResults(ws,2,prange,etarange,rfr->floatParsFinal().getSize());
+  // drawResults(ws,2,prange,etarange,theTrigger,rfr->floatParsFinal().getSize());
 
   // double NSigTT, errSigTT,resolTT,errresolTT;
   // printResults(ws,NSigTT,errSigTT,resolTT,errresolTT);

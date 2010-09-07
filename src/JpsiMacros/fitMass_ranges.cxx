@@ -401,7 +401,7 @@ int main(int argc, char* argv[])
 
   // OPTION A: All together
 
-  /* ws->var("JpsiMass")->setBins(90);
+  ws->var("JpsiMass")->setBins(90);
   // if (etamin < 1.0)  ws->var("JpsiMass")->setBins(18);
 
   // fix some parameters 
@@ -432,7 +432,7 @@ int main(int argc, char* argv[])
   ofstream outputFile(oFile);
   outputFile << "AL " << reddataTr->sumEntries() << " " << NSig << " " << errSig << endl;
   outputFile << "RE " << 0. << " " << resol*1000. << " " << errresol*1000. << endl;
-  outputFile << endl;*/
+  outputFile << endl;
 
   // OPTION B: Separate
 
@@ -443,7 +443,7 @@ int main(int argc, char* argv[])
   // ws->var("alpha")->setConstant(kTRUE); 
   // ws->var("enne")->setConstant(kTRUE); 
 
-  if (sidebandPrefit) prefitSideband(ws,0);
+  /* if (sidebandPrefit) prefitSideband(ws,0);
 
   if(prefitSignalMass){
     ws->pdf("sigCBGauss")->fitTo(*GGdataTrBin,SumW2Error(kTRUE));
@@ -462,7 +462,7 @@ int main(int argc, char* argv[])
   double NSigGG, errSigGG,resolGG,errresolGG;
   printResults(ws,NSigGG,errSigGG,resolGG,errresolGG);
 
-  cout << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl;
+  cout << "GG " << GGdataTr->sumEntries() << " " << NSigGG << " " << errSigGG << endl; */
 
   /* 
   //GT case
