@@ -52,7 +52,7 @@ void defineMassSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[10.,1.,30.])");
+  ws->factory("CBShape::sigCB(JpsiMass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[5.,1.,30.])");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -77,7 +77,7 @@ void defineCTResol(RooWorkspace *ws)
 
   // ONE RESOLUTION FUNCTION
   // ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.6])");
-  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.03,0.9])");
+  ws->factory("GaussModel::resGW(Jpsict,meanResSigW[0.,-0.1,0.1],sigmaResSigW[0.07,0.01,0.9])");
   // ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.18])");
   ws->factory("GaussModel::resGN(Jpsict,meanResSigW,sigmaResSigN[0.04,0.01,0.3])");
   ws->factory("GaussModel::resGO(Jpsict,meanResSigW,sigmaResSigO[0.2,0.1,0.3])");
@@ -97,9 +97,10 @@ void defineCTResol(RooWorkspace *ws)
 void defineCTBackground(RooWorkspace *ws)
 {
  
-  ws->factory("Decay::bkg2(Jpsict,lambdap[0.42,0.0001,2.],sigPR,RooDecay::SingleSided");
-  ws->factory("Decay::bkg3(Jpsict,lambdam[0.79,0.0001,2.],sigPR,RooDecay::Flipped");
-  ws->factory("Decay::bkg4(Jpsict,lambdasym[0.69,0.0001,2.],sigPR,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsict,lambdap[0.42,0.05,1.5],sigPR,RooDecay::SingleSided");
+  ws->factory("Decay::bkg3(Jpsict,lambdam[0.79,0.05,1.5],sigPR,RooDecay::Flipped");
+  ws->factory("Decay::bkg4(Jpsict,lambdasym[0.69,0.05,5.0],sigPR,RooDecay::DoubleSided");
+
   // ws->factory("Decay::bkg2(Jpsict,lambdap[1.4,0.1,5.],resbkg,RooDecay::SingleSided");
   // ws->factory("Decay::bkg3(Jpsict,lambdam[1.88,0.1,5.],resbkg,RooDecay::Flipped");
   // ws->factory("Decay::bkg4(Jpsict,lambdasym[1.16,0.1,10.],resbkg,RooDecay::DoubleSided");
@@ -171,6 +172,48 @@ void setRanges(RooWorkspace *ws){
   return;
 }
 
+RooBinning setMyBinning(float lmin, float lmax){
+
+  RooBinning rb2(-lmin,lmax);
+
+  if (lmax+lmin > 4.9) {
+    rb2.addBoundary(-1.5);
+    rb2.addBoundary(-1.0);
+    rb2.addBoundary(-0.8);
+    rb2.addBoundary(-0.6);
+    rb2.addBoundary(-0.5);
+    rb2.addUniform(6,-0.5,-0.2);
+    rb2.addUniform(18,-0.2,0.2);
+    rb2.addUniform(9,0.2,0.5);
+    rb2.addUniform(5,0.5,1.0);
+    rb2.addUniform(15,1.0,lmax);
+  } else if (lmax+lmin > 4.4) {
+    rb2.addBoundary(-1.5);
+    rb2.addBoundary(-1.0);
+    rb2.addBoundary(-0.8);
+    rb2.addBoundary(-0.6);
+    rb2.addBoundary(-0.5);
+    rb2.addUniform(6,-0.5,-0.2);
+    rb2.addUniform(18,-0.2,0.2);
+    rb2.addUniform(9,0.2,0.5);
+    rb2.addUniform(5,0.5,1.0);
+    rb2.addUniform(5,1.0,lmax);
+  } else {
+    rb2.addBoundary(-1.5);
+    rb2.addBoundary(-1.0);
+    rb2.addBoundary(-0.7);
+    // rb2.addBoundary(-0.6);
+    rb2.addBoundary(-0.5);
+    rb2.addUniform(6,-0.5,-0.2);
+    rb2.addUniform(28,-0.2,0.2);
+    rb2.addUniform(12,0.2,0.5);
+    rb2.addUniform(5,0.5,1.0);
+    rb2.addUniform(3,1.0,lmax);
+  }
+
+  return rb2;
+}
+
 int main(int argc, char* argv[]) {
 
   gROOT->SetStyle("Plain");
@@ -179,6 +222,7 @@ int main(int argc, char* argv[]) {
   int isGG = 2;
   string prange;
   string etarange;
+  string lrange;
   bool prefitMass = false;
   bool prefitSignalCTau = false;
   bool prefitBackground = false;
@@ -200,10 +244,9 @@ int main(int argc, char* argv[]) {
 
       case 'g':
 	isGG = atoi(argv[i+1]);
-	cout << "Is global global? ";
-	if (isGG == 1) cout << "No" << endl;
-        else if (isGG == 0) cout << "Yes" << endl;
-        else cout << "Maybe" << endl;
+	cout << "Which muons? ";
+	if (isGG == 1) cout << "GT and GG" << endl;
+        else if (isGG == 0) cout << "GG only" << endl;
 	break;
 
       case 'u':
@@ -215,8 +258,13 @@ int main(int argc, char* argv[]) {
       case 'p':
 	prange = argv[i+1];
 	cout << "Range for pT is " << prange << " GeV/c" << endl;
-        break;      
-       
+        break;  
+    
+      case 'l':
+	lrange = argv[i+1];
+	cout << "Range for l(J/psi) is -" << lrange << " mm" << endl;
+        break;  
+
       case 'e':
         etarange = argv[i+1];
         cout << "Range for |eta| is " << etarange << endl;
@@ -262,12 +310,14 @@ int main(int argc, char* argv[]) {
 
   float pmin, pmax; 
   float etamin, etamax;
+  float lmin, lmax;
 
+  getrange(lrange,&lmin,&lmax);
   getrange(prange,&pmin,&pmax);
   getrange(etarange,&etamin,&etamax);
 
   char reducestr[300];
-  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f && Jpsict < %f && Jpsict > %f", pmax,pmin,etamax,etamin,lmax,-lmin);
 
   // for selecting triggers and only opposite sign pairs if needed 
   const RooArgSet* thisRowMC = dataMC->get(0);  
@@ -324,7 +374,7 @@ int main(int argc, char* argv[]) {
   ws->var("JpsiMass")->setBins(60);
   // ws->var("Jpsict")->setBins(45);
 
-  // define binning
+  // define binning for true lifetime
   RooBinning rb(0.0001,4.0);
   // rb.addBoundary(-0.01);
   rb.addUniform(100,0.0001,0.5);
@@ -333,17 +383,8 @@ int main(int argc, char* argv[]) {
   rb.addUniform(5,2.5,4.0);
   ws->var("JpsictTrue")->setBinning(rb);
 
-  // define binning
-  RooBinning rb2(-1.5,2.7);
-  rb2.addBoundary(-1.0);
-  rb2.addBoundary(-0.7);
-  // rb2.addBoundary(-0.6);
-  rb2.addBoundary(-0.5);
-  rb2.addUniform(6,-0.5,-0.2);
-  rb2.addUniform(28,-0.2,0.2);
-  rb2.addUniform(12,0.2,0.5);
-  rb2.addUniform(5,0.5,1.0);
-  rb2.addUniform(2,1.0,2.7);
+  // define binning for lifetime
+  RooBinning rb2 = setMyBinning(lmin,lmax);
   ws->var("Jpsict")->setBinning(rb2);
 
   RooDataSet *reddata1;
@@ -354,8 +395,8 @@ int main(int argc, char* argv[]) {
     aLongString = "JpsiType == JpsiType::GG && (MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GG");
   } else if (isGG == 1) {
-    aLongString = "JpsiType == JpsiType::GT && (MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
-    reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT");
+    aLongString = "(JpsiType == JpsiType::GT || JpsiType == JpsiType::GG) && (MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
+    reddata1 = (RooDataSet*)reddata->reduce("JpsiType == JpsiType::GT || JpsiType == JpsiType::GG");
   } else {
     aLongString = "(MCType != MCType::NP || JpsictTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("Jpsict < 600000.");  // i.e. all
@@ -371,7 +412,9 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddataPR = (RooDataSet*) reddataTr->reduce("MCType == MCType::PR");
   RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce("MCType == MCType::NP");
   // RooDataSet *reddataBK = (RooDataSet*) reddata1->reduce("MCType == MCType::BK");
+  // SYSTEMATICS 1 (vary sidebands)
   RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("JpsiMass < 2.9 || JpsiMass > 3.3");
+  // RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("JpsiMass < 2.8 || JpsiMass > 3.4");
 
   RooDataHist* bindataTr = new RooDataHist("bindataTr","MC distribution for signal",RooArgSet(*(ws->var("JpsiMass")),*(ws->var("Jpsict"))),*reddataTr);
   
@@ -412,10 +455,14 @@ int main(int argc, char* argv[]) {
 
   if(prefitMass){
 
+    // ws->pdf("expFunct")->fitTo(*reddata1,Range("left,right"),SumW2Error(kTRUE));
+    // ws->var("coefExp")->setConstant(kTRUE);
     // ws->pdf("sigCBGauss")->fitTo(*bindataTr,SumW2Error(kTRUE));
-    // ws->var("enne")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
+    ws->var("alpha")->setConstant(kTRUE);
 
     ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
+    /// ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigPDFOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
     // ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     ws->pdf("massPDF")->fitTo(*reddata1,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     
@@ -455,7 +502,7 @@ int main(int argc, char* argv[]) {
 
   }
 
-  // SYSTEMATICS (2 Gaussians)
+  // SYSTEMATICS 2 (2 Gaussians)
   /* if (ws->var("fracRes2")) {
     ws->var("fracRes2")->setVal(0.);
     ws->var("fracRes2")->setConstant(kTRUE);
@@ -503,9 +550,10 @@ int main(int argc, char* argv[]) {
       // ws->var("fLiving")->setConstant(kTRUE);
     }
 
-    ws->var("fpm")->setConstant(kTRUE);
+    // ws->var("fpm")->setConstant(kTRUE);
     // ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE));
     ws->pdf("bkgctauTOT")->fitTo(*reddataSB,SumW2Error(kTRUE));
+    ws->var("fpm")->setConstant(kTRUE);
     ws->var("fLiving")->setConstant(kTRUE);
     ws->var("fracRes")->setConstant(kTRUE);
     ws->var("lambdap")->setConstant(kTRUE);
@@ -565,7 +613,8 @@ int main(int argc, char* argv[]) {
   const double coeffGauss = ws->var("fracRes")->getVal();
   const double sigmaSig1 = ws->var("sigmaResSigW")->getVal();
   const double sigmaSig2 = ws->var("sigmaResSigN")->getVal();
-  const double ecoeffGauss = ws->var("fracRes")->getError();
+  // const double ecoeffGauss = ws->var("fracRes")->getError();
+  const double ecoeffGauss = 0.;
   const double esigmaSig1 = ws->var("sigmaResSigW")->getError();
   const double esigmaSig2 = ws->var("sigmaResSigN")->getError();
 
@@ -613,7 +662,7 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
-  tframe->GetYaxis()->SetTitle("Events / (0.06 mm)");
+  tframe->GetYaxis()->SetTitle("Events / (0.09 mm)");
 
   RooHist* hresid;
   double chi2;
@@ -669,7 +718,7 @@ int main(int argc, char* argv[]) {
   TPad *pad2 = new TPad("pad2","This is pad2",0.05,0.02,0.95,0.35);
   pad2->Draw();
 
-  pad1->cd(); /* pad1->SetLogy(1); */ tframe->Draw();
+  pad1->cd(); /* pad1->SetLogy(1) */; tframe->Draw();
 
   TLatex *t = new TLatex();
   t->SetNDC();
@@ -677,7 +726,7 @@ int main(int argc, char* argv[]) {
   // t->SetTextFont(63);
   t->SetTextSize(0.035);
   t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.84,"L_{int} = 100 nb^{-1}"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = 314 nb^{-1}"); 
 
   TH1F hfake1 = TH1F("hfake1","hfake1",100,200,300);
   hfake1.SetLineColor(kBlue);
@@ -700,12 +749,12 @@ int main(int argc, char* argv[]) {
   leg->AddEntry(&hfake2,"total fit","L");
   leg->Draw("same"); 
 
-  TLatex *t = new TLatex();
+  /* TLatex *t = new TLatex();
   t->SetNDC();
   t->SetTextAlign(22);
   // t->SetTextFont(63);
   t->SetTextSize(0.05);
-  t->DrawLatex(0.6,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");  
+  t->DrawLatex(0.6,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");  */
 
   RooPlot* tframeres =  ws->var("Jpsict")->frame(Title("Residuals Distribution")) ;
   tframeres->SetLabelSize(0.08,"XYZ");
@@ -727,7 +776,9 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/data300nb/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/data300nb/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.gif";
+  c2->SaveAs(titlestr.c_str());
+  titlestr = "pictures/data300nb/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -741,7 +792,7 @@ int main(int argc, char* argv[]) {
   pad1a->cd(); pad1a->SetLogy(1);  tframe->Draw();
 
   t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.84,"L_{int} = 100 nb^{-1}"); 
+  t->DrawLatex(0.7,0.84,"L_{int} = 314 nb^{-1}"); 
 
   leg->Draw("same"); 
 
@@ -752,7 +803,9 @@ int main(int argc, char* argv[]) {
   
   c2a->Update();
 
-  titlestr = "pictures/dataDMuOpen/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
+  titlestr = "pictures/data300nb/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.gif";
+  c2a->SaveAs(titlestr.c_str());
+  titlestr = "pictures/data300nb/2D_" + partFile + "timefit_pT" + prange + "_eta" + etarange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsict")->frame();

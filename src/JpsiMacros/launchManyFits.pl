@@ -2,10 +2,10 @@
 
 # Launch many fits
 
-$fitcommand = "FitMassDataRange -f DatiDMuOpen.root";
-# $fitcommand = "Fit2DRange -f totalDataSet_allTriggers_05pb.root -g 1 -t 0 -b -u -c";
-$ptfile = "prangesdata.txt";
-$etafile = "etaranges.txt";
+# $fitcommand = "FitMassDataRange -f DatiDMuOpen.root";
+$fitcommand = "Fit2DDataRange -f datasets/DataSet_314nb.root -m datasets/totalDataSet_allTriggers_05pb.root -t 0 -u -b -c";
+$ptfile = $ARGV[0];
+$etafile = $ARGV[1];
 
 open(INFILE,${ptfile}) or die "cannot open ${ptfile}";;
 @log=<INFILE>;
@@ -18,9 +18,12 @@ close(INFILE2);
 # loop on files
 foreach $line2 (@log2) {
     foreach $line (@log) {
+
 	chomp($line);
+        @splitline = split(/ +/, $line);
 	chomp($line2);
-        my $currentfit = $fitcommand . ' -p ' . $line . ' -e ' . $line2;
+
+        my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] .' -e ' . $line2;
         print "${currentfit} \n";
 	system("${currentfit}");
     }
