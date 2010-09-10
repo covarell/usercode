@@ -3,7 +3,7 @@
 # Launch many fits
 
 # $fitcommand = "FitMassDataRange -f DatiDMuOpen.root";
-$fitcommand = "Fit2DDataRange -f datasets/DataSet_314nb.root -m datasets/totalDataSet_allTriggers_05pb.root -t 0 -u -b -c";
+$fitcommand = "Fit2DDataRange -f datasets/DataSet_314nb_PV.root -m datasets/totalDataSet_allTriggers_05pb.root -t 0 -u -b -c";
 $ptfile = $ARGV[0];
 $etafile = $ARGV[1];
 
