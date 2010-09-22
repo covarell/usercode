@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.6 2010/03/18 14:31:55 covarell Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.7 2010/03/26 10:03:36 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -207,7 +207,7 @@ Double_t RooHistPdfConv::cerfInt(Double_t xi) const
 
 
 //_____________________________________________________________________________
-Int_t RooHistPdfConv::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t /*staticInitOK*/) const
+/* Int_t RooHistPdfConv::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK) const
 {
   if (matchArgs(directVars,generateVars,xIn)) return 1 ;  
   return 0 ;
@@ -227,7 +227,7 @@ void RooHistPdfConv::generateEvent(Int_t code)
       return ;
     }
   }
-}
+}*/
 
 
 

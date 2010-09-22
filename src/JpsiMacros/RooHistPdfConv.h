@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- *    File: $Id: RooHistPdfConv.h,v 1.3 2009/11/11 09:27:46 pellicci Exp $
+ *    File: $Id: RooHistPdfConv.h,v 1.4 2010/03/26 10:03:36 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -48,8 +48,8 @@ public:
   void init() const;
   Double_t cerfInt(Double_t xi) const;
 
-  Int_t getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK=kTRUE) const;
-  void generateEvent(Int_t code);
+  // Int_t getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK=kTRUE) const;
+  // void generateEvent(Int_t code);
 
 protected:
 
