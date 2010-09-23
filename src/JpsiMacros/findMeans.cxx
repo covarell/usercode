@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
   char *filename;
   string prange;
   string etarange;
+  int theTrigger = -1;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -60,6 +61,13 @@ int main(int argc, char* argv[]) {
         cout << "Range for |eta| is " << etarange << endl;
         break;
       }
+
+      case 't':{
+        theTrigger = atoi(argv[i+1]);
+        cout << "Using trigger bit n. " << theTrigger << endl;
+        break; 
+
+      }
       }
     }
     }
@@ -80,47 +88,57 @@ int main(int argc, char* argv[]) {
  
   char reducestr[200];
  
-  string type = "GG";
   char oFile[200];
   sprintf(oFile,"results/meanPt/results_pT%s_eta%s.txt",prange.c_str(),etarange.c_str());
   ofstream outputFile(oFile);
   
-  for (int j=0; j < 2; j++) {
+  // for (int j=0; j < 2; j++) {
 
-    if (j == 1) type = "GT";
-
-    sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f && JpsiType == JpsiType::%s", pmax,pmin,etamax,etamin,type.c_str());
-
-    reddata = (RooDataSet*)data->reduce(reducestr);
-    // reddata->setWeightVar("MCweight");
-    
-    float meanP = 0.;
-    float meanP2 = 0.;
+  sprintf(reducestr,"JpsiPt < %f && JpsiPt > %f && abs(JpsiEta) < %f && abs(JpsiEta) > %f", pmax,pmin,etamax,etamin);
   
-    const RooArgSet* thisRow;   
-  
-    for (Int_t iSamp = 0; iSamp < reddata->numEntries(); iSamp++)
-      {
-	thisRow = reddata->get(iSamp);
-
-	RooRealVar* myPt = (RooRealVar*)thisRow->find("JpsiPt");
-        float thePt = myPt->getVal();
-        float theWeight = reddata->weight();
-	meanP += thePt*theWeight;
-	meanP2 += thePt*thePt*theWeight;
-        
-      }
-    
-    reddata->setWeightVar("MCweight");
-
-    if (reddata->sumEntries() > 0 ) {
-       meanP = meanP / reddata->sumEntries();
-       meanP2 = meanP2 / reddata->sumEntries();
-    }
-
-    outputFile << type << " " << meanP << " " << meanP2 << " 0.0" << endl;
-    
+  // for selecting triggers and only opposite sign pairs if needed 
+  const RooArgSet* thisRow = data->get(0);  
+  RooCategory* theSign = (RooCategory*)thisRow->find("JpsiSign");
+  if (theSign) sprintf(reducestr,"%s && JpsiSign == JpsiSign::OS",reducestr);
+  RooCategory* thetrigger = (RooCategory*)thisRow->find("triggerMu");
+  if (thetrigger) {
+    if (theTrigger == 0) sprintf(reducestr,"%s && triggerDMu > 0",reducestr); 
+    else if (theTrigger == 1) sprintf(reducestr,"%s && triggerMuPre > 0",reducestr); 
+    else if (theTrigger == 2) sprintf(reducestr,"%s && triggerMu > 0",reducestr);
+    else if (theTrigger == 3) sprintf(reducestr,"%s && triggerOniaTrack > 0",reducestr);
+    else if (theTrigger == 4) sprintf(reducestr,"%s && triggerOniaL1Mu > 0",reducestr);
   }
+  //
+  
+  reddata = (RooDataSet*)data->reduce(reducestr);
+  // reddata->setWeightVar("MCweight");
+  
+  float meanP = 0.;
+  float meanP2 = 0.;
+  
+  // const RooArgSet* thisRow;   
+  
+  for (Int_t iSamp = 0; iSamp < reddata->numEntries(); iSamp++)
+    {
+      thisRow = reddata->get(iSamp);
+      
+      RooRealVar* myPt = (RooRealVar*)thisRow->find("JpsiPt");
+      float thePt = myPt->getVal();
+      float theWeight = reddata->weight();
+      meanP += thePt*theWeight;
+      meanP2 += thePt*thePt*theWeight;
+      
+    }
+  
+  // reddata->setWeightVar("MCweight");
+  
+  if (reddata->sumEntries() > 0 ) {
+    meanP = meanP / reddata->sumEntries();
+    meanP2 = meanP2 / reddata->sumEntries();
+  }
+  
+  float rms = sqrt(meanP2 - pow(meanP,2));
+  outputFile << "ME " << meanP << " ME2 " << meanP2 << " RMS " << rms << endl;
 
   return 0;
   
