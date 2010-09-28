@@ -12,7 +12,7 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void computeDiffXsec() {
+void computeDiffXsec(bool isDoubleDiff = false) { 
 
   static const unsigned int smallBins = 33;
   static const unsigned int largeBins = 15;
@@ -22,23 +22,28 @@ void computeDiffXsec() {
 				 0.25,0.25,0.25,0.25,0.25,0.5,0.5,0.5,1.,
 				 1.5,2.,20.};
   double binWidths2[largeBins] = {2.,3.5,20.,2.5,2.,3.5,20.,1.25,0.75,0.75,0.75,1.,2.,3.5,20.};
+
+  double ybinWidths[3] = {2.4,0.8,1.6};
+  if (!isDoubleDiff) {
+    for (int k=0; k < 3; k++) { ybinWidths[k] = 1.0; }
+  }
    
   // YIELDS AND ERRORS ("MIXED" POLARIZATION)
-  double inclXsec[smallBins] = {35.33,23.29,18.31,7.84,2.86,0.278,
-				55.04,37.95,23.62,13.22,6.12,2.21,0.145,
-				62.64,146.08,170.64,219.17,203.07,230.44,
-				194.60,200.09,157.40,155.64,123.94,118.03,
-				107.12,80.03,62.94,38.27,20.22,9.92,3.85,0.239};
-  double errstXsec[smallBins] = {2.31,1.38,0.71,0.28,0.13,0.011,
-				 4.92,2.33,1.19,0.65,0.24,0.11,0.008,
-				 4.37,10.47,10.28,12.18,9.87,11.05,
-				 9.69,10.14,31.46,9.66,5.98,5.52,
-				 4.80,17.81,2.32,1.19,0.72,0.39,0.17,0.012};
-  double errsyXsec[smallBins] = {9.33,5.72,2.93,1.20,0.57,0.044,
-				 14.55,9.14,3.56,1.64,0.79,0.30,0.022,
-				 15.03,49.32,62.07,73.25,69.14,73.25,
-				 50.51,43.32,30.94,28.03,21.03,19.93,
-				 16.33,12.23,8.40,5.43,2.81,1.28,0.49,0.031};
+  double inclXsec[smallBins] = {35.2,23.3,18.3,7.75,2.83,0.278,
+				55,36.9,22.8,13.2,6.11,2.21,0.145,
+				58.9,133,164,195,204,212,
+				195,200,154,154,125,118,
+				107,79.4,63.5,39.2,20.1,9.91,3.85,0.239};
+  double errstXsec[smallBins] = {2.3,1.4,0.71,0.27,0.13,0.011,
+				 5,2.1,1.1,0.65,0.24,0.11,0.008,
+				 3.5,7.2,7.9,8.5,8.9,8.5,
+				 9.9,9.8,6.8,12,5.9,5.6,
+				 5.1,2.8,2.3,1.2,0.7,0.39,0.17,0.012};
+  double errsyXsec[smallBins] = {5.5,3.3,2.4,0.9,0.33,0.031,
+				 9.4,4.9,3.0,1.6,0.7,0.25,0.017,
+				 8.5,22,24,31,31,32,
+				 25,27,21,19,16,14,
+				 13,10,7.4,5,2.6,1.2,0.45,0.031};
 
   // POLARIZATION FROM FILE
   double nopol[smallBins];
@@ -51,9 +56,9 @@ void computeDiffXsec() {
 
   TFile* accfile[3];
 
-  accfile[0] = TFile::Open("accept/0._1.2_acceptance_polarized.root");
-  accfile[1] = TFile::Open("accept/1.2_1.6_acceptance_polarized.root");
-  accfile[2] = TFile::Open("accept/1.6_2.4_acceptance_polarized.root");
+  accfile[0] = TFile::Open("accept/0.0_1.2_Acc_acceptance_polarized.root");
+  accfile[1] = TFile::Open("accept/1.2_1.6_Acc_acceptance_polarized.root");
+  accfile[2] = TFile::Open("accept/1.6_2.4_Acc_acceptance_polarized.root");
 
   TH2F *Jpsi_non[3];
   TH2F *Jpsi_t_HXtheta[3];
@@ -92,9 +97,14 @@ void computeDiffXsec() {
   // B-FRACTION
   double Bfrac[largeBins] = {0.181,0.261,0.405,0.147,0.178,0.204,0.363,0.057,0.087,0.113,0.138,0.160,0.173,0.233,0.377};
   double errstBfrac[largeBins] = {0.024,0.015,0.018,0.021,0.017,0.017,0.031,0.021,0.014,0.013,0.014,0.014,0.012,0.016,0.031};
-  double errsyBfrac[largeBins] = {0.019,0.023,0.014,0.034,0.036,0.054,0.028,0.050,0.024,0.022,0.009,0.012,0.009,0.022,0.019};
+  double errsyBfrac[largeBins] = {0.014,0.014,0.005,0.027,0.019,0.003,0.015,
+0.042,0.022,0.020,0.009,0.012,0.010,0.012,0.005};
 
   int tsb = 0;
+
+  double totpr, errsttotpr, errsytotpr;
+  double totb, errsttotb, errsytotb;
+
   for (int i=0; i < largeBins; i++) {
     
     double totinclXsec[7] = {0.,0.,0.,0.,0.,0.,0.};
@@ -103,9 +113,11 @@ void computeDiffXsec() {
     double promptXsec[5] = {0.,0.,0.,0.,0.};
     double promptstXsec[5] = {0.,0.,0.,0.,0.};
     double promptsyXsec[5] = {0.,0.,0.,0.,0.};
+    double prompttoXsec[5] = {0.,0.,0.,0.,0.};
     double bXsec[2] = {0.,0.};
     double bstXsec[2] = {0.,0.};
     double bsyXsec[2] = {0.,0.};
+    double btoXsec[2] = {0.,0.};
 
     for (int k=0; k < howManyBins[i]; k++) {
       totinclXsec[0] += binWidths[tsb]*inclXsec[tsb];
@@ -147,17 +159,41 @@ void computeDiffXsec() {
       promptXsec[polpr] = totinclXsec[polpr]*(1-Bfrac[i]);
       promptstXsec[polpr] = promptXsec[polpr]*sqrt(pow(totinclstXsec[polpr]/totinclXsec[polpr],2) + pow(errstBfrac[i]/(1-Bfrac[i]),2));
       promptsyXsec[polpr] = promptXsec[polpr]*sqrt(pow(totinclsyXsec[polpr]/totinclXsec[polpr],2) + pow(errsyBfrac[i]/(1-Bfrac[i]),2));
-      cout << "Prompt polarization type " << polpr << " : $" << promptXsec[polpr] << " \\pm " << promptstXsec[polpr] << " \\pm " << promptsyXsec[polpr] << "$" << endl;
+      prompttoXsec[polpr] = sqrt(pow(promptstXsec[polpr],2) + pow(promptsyXsec[polpr],2));
+      // cout << "Prompt polarization type " << polpr << " : $" << promptXsec[polpr] << " \\pm " << promptstXsec[polpr] << " \\pm " << promptsyXsec[polpr] << "$" << endl;
     }
 
     for (int polnpr=0; polnpr < 2; polnpr++) {
       bXsec[polnpr] = totinclXsec[polnpr+5]*Bfrac[i];
       bstXsec[polnpr] = bXsec[polnpr]*sqrt(pow(totinclstXsec[polnpr+5]/totinclXsec[polnpr+5],2) + pow(errstBfrac[i]/Bfrac[i],2));
       bsyXsec[polnpr] = bXsec[polnpr]*sqrt(pow(totinclsyXsec[polnpr+5]/totinclXsec[polnpr+5],2) + pow(errsyBfrac[i]/Bfrac[i],2));
-      cout << "Non-prompt polarization type " << polnpr << " : $" << bXsec[polnpr] << " \\pm " << bstXsec[polnpr] << " \\pm " << bsyXsec[polnpr] << "$" << endl;
+      btoXsec[polnpr] = sqrt(pow(bstXsec[polnpr],2) + pow(bsyXsec[polnpr],2));
+      // cout << "Non-prompt polarization type " << polnpr << " : $" << bXsec[polnpr] << " \\pm " << bstXsec[polnpr] << " \\pm " << bsyXsec[polnpr] << "$" << endl;
     }
+
+    cout << "Prompt : $" << promptXsec[0] << " \\pm " << promptstXsec[0] << " \\pm " << promptsyXsec[0] << "$ & $" << promptXsec[1] << " \\pm " << prompttoXsec[1] << "$ & $" << promptXsec[2] << " \\pm " << prompttoXsec[2] << "$ & $" << promptXsec[3] << " \\pm " << prompttoXsec[3] << "$ & $" << promptXsec[4] << " \\pm " << prompttoXsec[4] << "$" << endl;
+    cout << "Non-prompt : $" << bXsec[0] << " \\pm " << bstXsec[0] << " \\pm " << bsyXsec[0] << "$ & $" << bXsec[1] << " \\pm " << btoXsec[1] << "$" << endl;
+    
+    if (i != 3 && (i < 7 || i > 11)) {
+
+      int ybin = 2;
+      if (i < 3) ybin = 0;
+      else if (i < 7) ybin = 1;
+
+      totpr += promptXsec[0]*binWidths2[i]*ybinWidths[ybin];  
+      totb += bXsec[0]*binWidths2[i]*ybinWidths[ybin];
       
-  }
+      errsttotpr += pow(promptstXsec[0]*binWidths2[i]*ybinWidths[ybin],2);
+      errsttotb += pow(bstXsec[0]*binWidths2[i]*ybinWidths[ybin],2);
       
+      errsytotpr += pow(promptsyXsec[0]*binWidths2[i]*ybinWidths[ybin],2);
+      errsytotb += pow(bsyXsec[0]*binWidths2[i]*ybinWidths[ybin],2);
+    } 
+  }  
+
+  cout << endl;
+  cout << "TOTAL PROMPT: $" << totpr << " \\pm " << sqrt(errsttotpr) << " \\pm " << sqrt(errsytotpr) << "$" << endl;
+  cout << "TOTAL NON-PROMPT: $" << totb << " \\pm " << sqrt(errsttotb) << " \\pm " << sqrt(errsytotb) << "$" << endl;
+
   return;
 }
