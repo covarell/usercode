@@ -455,9 +455,9 @@ int main(int argc, char* argv[]) {
   
   titlestr = "results/toy4Gauss/2D_" + partFile + "toy_pT" + prange + "_eta" + etarange + ".root";
   TFile theOutput(titlestr.c_str(),"RECREATE");
-  TH1F* theLogL = new TH1F("theLogL","negative log-likelihood",20,-280.,80.);
-  TH1F* pullNsig = new TH1F("pullNsig","pull of Nsig",20,-5.,5.);
-  TH1F* pullBfrac = new TH1F("pullBfrac","pull of Bfrac",20,-5.,5.);
+  TH1F* theLogL = new TH1F("theLogL","negative log-likelihood",200000,-100000.,100000.);
+  TH1F* pullNsig = new TH1F("pullNsig","pull of Nsig",36,-6.,6.);
+  TH1F* pullBfrac = new TH1F("pullBfrac","pull of Bfrac",36,-6.,6.);
   
   if(prefitSignalCTau){
     ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE));
@@ -481,7 +481,7 @@ int main(int argc, char* argv[]) {
        ws->var("meanResSigW")->setConstant(kFALSE);*/
   }
 
-  for (unsigned int iToy = 0; iToy < 200; iToy++) {
+  for (unsigned int iToy = 0; iToy < 150; iToy++) {
 
     //RESET ALL PARAMETERS TO FREE
     ws->var("alpha")->setConstant(kFALSE);
@@ -547,7 +547,7 @@ int main(int argc, char* argv[]) {
   
       ws->var("alpha")->setConstant(kTRUE);
       ws->var("enne")->setConstant(kTRUE); 
-      ws->pdf("massPDF")->fitTo(*reddataToy,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
+      ws->pdf("massPDF")->fitTo(*reddataToy,Extended(1),Minos(1),Save(1),SumW2Error(kTRUE),NumCPU(2));
 
     } else {
       

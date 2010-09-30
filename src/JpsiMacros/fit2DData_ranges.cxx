@@ -45,8 +45,8 @@ void defineMassSignal(RooWorkspace *ws)
   //SIGNAL FUNCTION CANDIDATES:
 
   //Normal Gaussians
-  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.1,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
-  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.1,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
+  ws->factory("Gaussian::signalG1(JpsiMass,meanSig1[3.0975,3.05,3.15],sigmaSig1[0.02,0.008,0.2])");
+  ws->factory("Gaussian::signalG2(JpsiMass,meanSig2[3.0975,3.05,3.15],sigmaSig2[0.03,0.008,0.2])");
 
   //Gaussian with same mean as signalG1
   ws->factory("Gaussian::signalG2OneMean(JpsiMass,meanSig1,sigmaSig2)");
@@ -57,7 +57,7 @@ void defineMassSignal(RooWorkspace *ws)
   //SUM OF SIGNAL FUNCTIONS
 
   //Sum of Gaussians with different mean
-  ws->factory("SUM::sigPDF(coeffGauss[0.5,0.,1.]*signalG1,signalG2)");
+  ws->factory("SUM::sigPDF(coeffGauss[0.1,0.,1.]*signalG1,signalG2)");
 
   //Sum of Gaussians with same mean
   ws->factory("SUM::sigPDFOneMean(coeffGauss*signalG1,signalG2OneMean)");
@@ -586,7 +586,7 @@ int main(int argc, char* argv[]) {
 
   if(prefitMass) {
     // ws->pdf("totPDF")->fitTo(*bindata,Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata1,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
     nFitPar = rfr->floatParsFinal().getSize();  
     Bfrac_static = ws->var("Bfrac")->getVal();
     BfracErr_static = ws->var("Bfrac")->getError();
@@ -598,7 +598,7 @@ int main(int argc, char* argv[]) {
     
   } else {
     // ws->pdf("totPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(4));
-    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+    RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata1,Extended(1),Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
     nFitPar = rfr->floatParsFinal().getSize();   
     
     NSigNP_static = ws->var("NSigNP")->getVal();
@@ -662,7 +662,7 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (c  #tau projection), p_{T} = " + prange + " GeV/c and |eta| = " + etarange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
-  tframe->GetYaxis()->SetTitle("Events / (0.09 mm)");
+  tframe->GetYaxis()->SetTitle("Events / (0.065 mm)");
 
   RooHist* hresid;
   double chi2;
@@ -723,9 +723,9 @@ int main(int argc, char* argv[]) {
   TLatex *t = new TLatex();
   t->SetNDC();
   t->SetTextAlign(22);
-  // t->SetTextFont(63);
   t->SetTextSize(0.035);
-  t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
+  // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
+  t->DrawLatex(0.7,0.9,"CMS -  #sqrt{s} = 7 TeV"); 
   t->DrawLatex(0.7,0.84,"L_{int} = 314 nb^{-1}"); 
 
   TH1F hfake1 = TH1F("hfake1","hfake1",100,200,300);
@@ -772,7 +772,7 @@ int main(int argc, char* argv[]) {
   // t->SetTextFont(63);
   t2->SetTextSizePixels(30);
   sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
-  if (chi2 < 10.) t2->DrawLatex(0.7,0.92,reducestr);
+  if (chi2 < 10.) t2->DrawLatex(0.5,0.92,reducestr);
   
   c2->Update();
 
@@ -791,15 +791,29 @@ int main(int argc, char* argv[]) {
 
   pad1a->cd(); pad1a->SetLogy(1);  tframe->Draw();
 
-  t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.84,"L_{int} = 314 nb^{-1}"); 
-
-  leg->Draw("same"); 
+  if (etamin > 1.4 && pmin < 2.5) {
+    t->DrawLatex(0.52,0.51,"CMS Preliminary -");
+    t->DrawLatex(0.52,0.45,"#sqrt{s} = 7 TeV"); 
+    t->DrawLatex(0.52,0.39,"L_{int} = 314 nb^{-1}"); 
+    TLegend * leg2 = new TLegend(0.35,0.15,0.74,0.365,NULL,"brNDC");
+    leg2->SetFillStyle(0);
+    leg2->SetBorderSize(0);
+    leg2->SetShadowColor(0);
+    leg2->AddEntry(&hfake1,"background","L");
+    leg2->AddEntry(&hfake3,"background + non-prompt","L"); 
+    leg2->AddEntry(&hfake2,"total fit","L");
+    leg2->Draw("same");
+  } else {
+    // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
+    t->DrawLatex(0.7,0.9,"CMS -  #sqrt{s} = 7 TeV"); 
+    t->DrawLatex(0.7,0.84,"L_{int} = 314 nb^{-1}");
+    leg->Draw("same"); 
+  } 
 
   pad2a->cd(); tframeres->Draw();
 
   sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
-  if (chi2 < 10.) t2->DrawLatex(0.7,0.92,reducestr);
+  if (chi2 < 10.) t2->DrawLatex(0.65,0.92,reducestr);
   
   c2a->Update();
 
