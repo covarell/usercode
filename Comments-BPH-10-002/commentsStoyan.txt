@@ -1,0 +1,46 @@
+General: What is the plan for measuring the polarization in J/psi? Is it a
+question of statistics or what is the problem?
+
+Lines 183-186: Either include the plots you are mentioning in the comment or
+give the average efficiencies (in few pt,eta ranges?).
+
+L 216: <1/(A*eff)>  (comment related to the muon efficiencies)
+The acceptance A is from MC, the efficiency eff, and in particular the muon efficiencies "inside",
+is from data (or MC?). Did you check how compatible are the T&P muon efficiency results between
+data and MC? Could you point me to them?
+Shouldn't you introduce a correction factor of some kind (if not statistically compatible)?
+My point is that only A*eff is well defined - A and eff alone are subjective in some extend.
+In the same context, Tab 2, A*eff uncertainties: which is the leading source - A or eff
+(probably it vary with bins?)? In the conclusions you state explicitly that the systematics
+is dominated by the statistical uncertainty of the muon efficiency. It is also in Tab. 3. Then is it
+true that the uncertainties of your results (cross-sections) are still statistically dominated?
+When do you expect "irreducible" systematics to dominate?
+
+Eq 6. : For which polarization is this? "Null"?
+Does it make sense to try to give an estimate for the cross-section in the whole phase space?
+
+Systematics and Table 3 : You have the misalignment in the tracker specially considered for the B-fraction.
+Why isn't it important here (or where is it absorbed? did you make a cross-check with it in some way)?
+
+Section 7 ("Comparisons"): Please correct me if I am wrong:
+MC is produced using tuning (generally speaking) to CDF data, so at "Some" (maybe "Null") polarization.
+Our data (used for comparisons on Fig. 5) are "produced" with the "Real" polarization and analyzed with
+the "Null" polarization hypothesis.
+How should I understand the statement on lines 330-331 that the cross-section (analyzed at "Null" hypothesis)
+is "higher than expected" ? Could this be just the wrong polarization hypothesis?
+
+Section 8 ("Conclusions"): The first result given is for the "Null" hypothesis, isn't it?
+Just not clear to me.
+
+General: Did you try comparing results obtained from TT and GG muon pairs? Are they consistent?
+
+Minor comments:
+
+L 113 : "per event" -> "per selected event" (right?)
+
+Fig. 1 : if using SS data - give it with a different marker type (i.e. colorblind/black&white readable)
+         Why not giving the fitted ("nominal"?) mass as well?
+
+Below L 138: "nominal J/Psi mass" - what is "nominal" (from the fit? PDG?)?
+
+L 239: "noticed" -> "noted" (I think this is more "English" though I am not a native speaker)

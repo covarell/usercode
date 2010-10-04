@@ -1,0 +1,74 @@
+General: I think that it is a good practice for all papers to explain  
+the CMS coordinate system, phi, theta/eta and pT in a footnote the  
+first time any of these appears.
+
+Abstract line 11: ?for J/psi transverse momenta?and in the J/psi  
+rapidity range?
+line 4: produced directly ->produced directly in the proton-proton  
+collision (or something like that)
+
+lines 60-64: the trigger description is very brief and does not really  
+tell anything. We should add a couple of sentences to describe what is  
+a ?muon at L1? and then put a reference. I cannot find any public  
+results (PAS or performance plots) for the trigger, are there any, or  
+is the JINST detector paper the only reference?
+
+line 67: ?ad-hoc filters? sounds bad
+
+line 90 (and probably also elsewhere): 4 -> four (all integers below  
+ten in text)
+
+lines 109-113: you select only one J/psi combination per event. Is  
+this really correct? Since we are measuring the inclusive J/psi cross  
+section, in principle this should include all the J/psi?s, including  
+also ?higher-order effects? such as multiple production per event.  
+Furthermore, since you are measuring the J/psi efficiency as the  
+efficiency per J/psi, removing extra J/psis in the event means that  
+use are effectively using the measured efficiency as the efficiency  
+per event.
+
+same-sign combinations: if this is left in, it requires an explanation  
+of the expected level of DY contribution.
+
+line 132+4: track segment -> muon track segment
+
+lines 153-155: I don?t understand the argument for the possible  
+different acceptance for prompt J/psis and J/psis from B?s. The  
+acceptance is defined per J/psi in a given pT and y bin irrespective  
+of the origin of the J/psi, and the original pT spectrum should not  
+matter. A difference in the pT spectra of prompt J/psis and J/psis  
+from B?s would only affect the statistics per bin, but not the  
+acceptance in a bin.
+
+subchapter 4.2 Efficiency: you have to explain more about the T&P  
+efficiencies (triggers, independent samples)
+
+lines 202-205: ?The uncertainties due to the estimated muon  
+efficiencies were assessed by taking into account their statistical  
+errors and by comparing in the simulation the values found with the  
+Tag and Probe method with the true selection efficiencies. The two  
+uncertainties were summed in quadrature.? I do not understand. Should  
+this be ?The uncertainty of the J/psi efficiency originating from the  
+estimated muon efficiencies was assessed?The two muon efficiency  
+uncertainties were summed???
+
+Table 3: Add in the table caption: ?In addition, the relative error on  
+the luminosity determination is 11%, and is common to all bins.?
+
+lines 269-270: it looks strange that you take the ?outliers? from MC,  
+since tails in MC are always less reliable. Can you explain/justify?  
+Why can?t you take these from data?
+
+line 291: rephrase ?poorly constrained? into ?requires more  
+statistics? or similar
+
+lines 308-309: different efficiencies ? are these due to the lifetime?  
+Explain.
+
+line 320: make a cross-reference to subchapter 3.1/line 70.
+
+Fig. 5: agree with Carlos, take away the whole rapidity range. The  
+point at 8 GeV in the |eta|<2.4 must be wrong, it is above the MC  
+curves in all the 3 other plots.
+
+Fig 6: same.
