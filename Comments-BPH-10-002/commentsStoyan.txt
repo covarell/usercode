@@ -1,46 +1,66 @@
-General: What is the plan for measuring the polarization in J/psi? Is it a
-question of statistics or what is the problem?
+>General: What is the plan for measuring the polarization in J/psi? Is it a
+>question of statistics or what is the problem?
+>
+I leave Carlos the detailed answer. The short one is that we need a few tens of pb-1 and it belongs to a separate paper.
+>
+>Lines 183-186: Either include the plots you are mentioning in the comment or
+>give the average efficiencies (in few pt,eta ranges?).
+We will probably give two tables showing the muon-id and muon-trigger efficiencies, and provide two plots for comparison with the MC.
+>
+>L 216: <1/(A*eff)>  (comment related to the muon efficiencies)
+>The acceptance A is from MC, the efficiency eff, and in particular the muon efficiencies "inside",
+>is from data (or MC?). 
+Exact. We compute the Acceptance from the MC, while the muon efficiencies are computed from the data.
+>Did you check how compatible are the T&P muon efficiency results between
+>data and MC? Could you point me to them?
+The two are compatible indeed, but in the end we use the data T&P efficiencies and correct for the difference between the
+MC T&P and the true MC efficiencies, which
+arises from the bias that the Tag Muon introduces to the Probe spectrum.
+Here are the values: 
+http://gpetrucc.web.cern.ch/gpetrucc/mu10-plots-tnp/jpsi/bph-04.10.2010
 
-Lines 183-186: Either include the plots you are mentioning in the comment or
-give the average efficiencies (in few pt,eta ranges?).
+>Shouldn't you introduce a correction factor of some kind (if not statistically compatible)?
+Indeed we correct for the difference between  the T&P MC efficiency and the true MC efficiency.
+>My point is that only A*eff is well defined - A and eff alone are subjective in some extend.
+It is only mildly subjective, even if we introduced a strict criterion to divide the two: the Acceptance is provided by the "detectabiliy" criterion (Eq. 2) and Section 4.1. The efficiency can be measured from the data. We set the detectability criterion to the minimum acceptance of a single muon (10% acceptance efficiency).
+>In the same context, Tab 2, A*eff uncertainties: which is the leading source - A or eff
+>(probably it vary with bins?)? 
+The systematics from the FSR, pT calibation, B-fraction and non-prompt polarization are all coming through A and in fact are negligible compared to the others which are instead coming from the efficiency or fit function.
+> In the conclusions you state explicitly that the systematics
+>is dominated by the statistical uncertainty of the muon efficiency. It is also in Tab. 3. Then is it
+>true that the uncertainties of your results (cross-sections) are still statistically dominated?
+Yes indeed. Remember however that the systematics from the luminosity - in common to all bins - is 11%.
+>When do you expect "irreducible" systematics to dominate?
+>
+>Eq 6. : For which polarization is this? "Null"?
+Yes
+>Does it make sense to try to give an estimate for the cross-section in the whole phase space?
+>
+We don't have a model.
+>Systematics and Table 3 : You have the misalignment in the tracker specially considered for the B-fraction.
+>Why isn't it important here (or where is it absorbed? did you make a cross-check with it in some way)?
+>
+We did not try explicitly. The fit result do not vary from different alignments.
+>Section 7 ("Comparisons"): Please correct me if I am wrong:
+>MC is produced using tuning (generally speaking) to CDF data, so at "Some" (maybe "Null") polarization.
+>Our data (used for comparisons on Fig. 5) are "produced" with the "Real" polarization and analyzed with
+>the "Null" polarization hypothesis.
+>How should I understand the statement on lines 330-331 that the cross-section (analyzed at "Null" hypothesis)
+>is "higher than expected" ? Could this be just the wrong polarization hypothesis?
+>
+>Section 8 ("Conclusions"): The first result given is for the "Null" hypothesis, isn't it?
+>Just not clear to me.
+>
+>General: Did you try comparing results obtained from TT and GG muon pairs? Are they consistent?
+>
+No, we did not. It would require a lot more work. In addition, the phase space covered from exclusive TT and exclusive GG will differ and the two are just covering different regions in phase space.
+>Minor comments:
+>
+>L 113 : "per event" -> "per selected event" (right?)
+>
+>Fig. 1 : if using SS data - give it with a different marker type (i.e. colorblind/black&white readable)
+>         Why not giving the fitted ("nominal"?) mass as well?
+>
+>Below L 138: "nominal J/Psi mass" - what is "nominal" (from the fit? PDG?)?
 
-L 216: <1/(A*eff)>  (comment related to the muon efficiencies)
-The acceptance A is from MC, the efficiency eff, and in particular the muon efficiencies "inside",
-is from data (or MC?). Did you check how compatible are the T&P muon efficiency results between
-data and MC? Could you point me to them?
-Shouldn't you introduce a correction factor of some kind (if not statistically compatible)?
-My point is that only A*eff is well defined - A and eff alone are subjective in some extend.
-In the same context, Tab 2, A*eff uncertainties: which is the leading source - A or eff
-(probably it vary with bins?)? In the conclusions you state explicitly that the systematics
-is dominated by the statistical uncertainty of the muon efficiency. It is also in Tab. 3. Then is it
-true that the uncertainties of your results (cross-sections) are still statistically dominated?
-When do you expect "irreducible" systematics to dominate?
-
-Eq 6. : For which polarization is this? "Null"?
-Does it make sense to try to give an estimate for the cross-section in the whole phase space?
-
-Systematics and Table 3 : You have the misalignment in the tracker specially considered for the B-fraction.
-Why isn't it important here (or where is it absorbed? did you make a cross-check with it in some way)?
-
-Section 7 ("Comparisons"): Please correct me if I am wrong:
-MC is produced using tuning (generally speaking) to CDF data, so at "Some" (maybe "Null") polarization.
-Our data (used for comparisons on Fig. 5) are "produced" with the "Real" polarization and analyzed with
-the "Null" polarization hypothesis.
-How should I understand the statement on lines 330-331 that the cross-section (analyzed at "Null" hypothesis)
-is "higher than expected" ? Could this be just the wrong polarization hypothesis?
-
-Section 8 ("Conclusions"): The first result given is for the "Null" hypothesis, isn't it?
-Just not clear to me.
-
-General: Did you try comparing results obtained from TT and GG muon pairs? Are they consistent?
-
-Minor comments:
-
-L 113 : "per event" -> "per selected event" (right?)
-
-Fig. 1 : if using SS data - give it with a different marker type (i.e. colorblind/black&white readable)
-         Why not giving the fitted ("nominal"?) mass as well?
-
-Below L 138: "nominal J/Psi mass" - what is "nominal" (from the fit? PDG?)?
-
-L 239: "noticed" -> "noted" (I think this is more "English" though I am not a native speaker)
+>L 239: "noticed" -> "noted" (I think this is more "English" though I am not a native speaker)
