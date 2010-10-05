@@ -5,6 +5,8 @@
   where $p_{T}$ is the measured muon transverse momentum and
   $p_{T}^{corr}$ is the corrected transverse momentum. 
 
+OK
+
 - lines 166-169 (from "As a conservative" to the end of the
   paragraph):
   The method used is not exactly the one described here. I would
