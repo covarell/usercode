@@ -23,6 +23,7 @@ The problem is the length of them. We will try not to rotate and see.
 >
 
 Yes, we can, even if this goes out of the specs of the tdr style macro.
+We can try to write "BR" for "BR(J/psi)->mu mu".
 
 > I have a couple of more "interesting" comments.  Do we really need
 > to show the same-sign points in the Fig. 1 ?  I did not find any

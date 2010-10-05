@@ -119,7 +119,8 @@ only).
 > line 291: rephrase ?poorly constrained? into ?requires more  
 >statistics? or similar
 
-OK.
+No. The 'weak modes' are those which are virtually chi2-invariant
+for the alignment and cannot be corrected even with infinite statistics.
 
 >lines 308-309: different efficiencies ? are these due to the lifetime?  
 >Explain.
