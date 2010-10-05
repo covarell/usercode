@@ -16,3 +16,5 @@ OK
   adding the maximum residual shift to the momenta of all simulated
   muons, or subtracting it. The relative difference between these
   values is taken as the systematic uncertainty."
+
+I don't see any difference with what is written...
