@@ -41,8 +41,10 @@ the true MC efficiency.
 >My point is that only A*eff is well defined - A and eff alone are subjective in some extent.
 
 It is only mildly subjective, even if we introduced a strict criterion to 
-divide the two: the Acceptance is provided by the "detectabiliy" criterion 
-(Eq. 2) and Section 4.1. The efficiency can be measured from the data once
+divide the two: the Acceptance is provided by the "detectabiliy" criterion that each muon should
+lie within the geometric acceptance of the muon detectors and have enough momentum to
+cross at least three active layers in any of the muon stations -
+see Eq. (2) and Section 4.1. The efficiency can be measured from the data once
 this criterion is applied, thus factorizing them. We set the detectability 
 criterion to a minimum acceptance of a single muon (roughly 10% 
 acceptance*efficiency).
@@ -50,7 +52,7 @@ acceptance*efficiency).
 >In the same context, Tab 2, A*eff uncertainties: which is the leading source - A or eff
 >(probably it vary with bins?)? 
 
-The systematics from the FSR, pT calibation, B-fraction and non-prompt 
+The systematics from the FSR, pT calibration, B-fraction and non-prompt 
 polarization are all coming through A and in fact are negligible compared to 
 the others which are instead coming from the efficiency or fit function.
 Some columns will be probably removed as the effect is zero (see answer to
@@ -86,6 +88,9 @@ relevant for a physics measurement.
 >
 
 (WAIT FOR ERNEST)
+We have checked that the different alignment geometries influence less than 1% the yields of the 
+prompt and non-prompt Jpsi from the B-fraction measurement. We do not expect they will change the inclusive
+yield more than that - somehow we expect a smaller effect. 
 We did not try explicitly.
 In principle aligment effects on the muon pT (which is the only thing that
 matters here) are included in the muon momentum scale correction and the
