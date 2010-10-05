@@ -2,7 +2,7 @@
 >question of statistics or what is the problem?
 >
 
-I leave Carlos the detailed answer. The short one is that we need a few 
+I leave to Carlos the detailed answer. The short one is that we need a few 
 tens of pb-1 and it belongs to a separate paper.
 
 >
@@ -19,7 +19,8 @@ reasons) how much of that should be included in the paper.
 > muon efficiencies "inside",
 >is from data (or MC?). 
 
-Exact. We compute the Acceptance from the MC, while the muon efficiencies are computed from the data.
+Exactly. We compute the Acceptance from the MC, while the muon efficiencies 
+are computed from the data.
 
 >Did you check how compatible are the T&P muon efficiency results between
 >data and MC? Could you point me to them?
@@ -41,8 +42,9 @@ the true MC efficiency.
 >My point is that only A*eff is well defined - A and eff alone are subjective in some extent.
 
 It is only mildly subjective, even if we introduced a strict criterion to 
-divide the two: the Acceptance is provided by the "detectabiliy" criterion that each muon should
-lie within the geometric acceptance of the muon detectors and have enough momentum to
+divide the two: the Acceptance is provided by the "detectabiliy" criterion 
+that each muon should lie within the geometric acceptance of the muon 
+detectors and have enough momentum to
 cross at least three active layers in any of the muon stations -
 see Eq. (2) and Section 4.1. The efficiency can be measured from the data once
 this criterion is applied, thus factorizing them. We set the detectability 
@@ -75,6 +77,7 @@ depends on when/how its uncertainty can be reduced.
 >Eq 6. : For which polarization is this? "Null"?
 
 Yes
+
 >Does it make sense to try to give an estimate for the cross-section in the whole phase space?
 >
 
@@ -87,14 +90,14 @@ relevant for a physics measurement.
 >Why isn't it important here (or where is it absorbed? did you make a cross-check with it in some way)?
 >
 
-(WAIT FOR ERNEST)
-We have checked that the different alignment geometries influence less than 1% the yields of the 
-prompt and non-prompt Jpsi from the B-fraction measurement. We do not expect they will change the inclusive
+We have checked that the different alignment geometries influence less 
+than 1% the yields of the prompt and non-prompt Jpsi from the B-fraction 
+measurement. We do not expect they will change the inclusive
 yield more than that - somehow we expect a smaller effect. 
-We did not try explicitly.
-In principle aligment effects on the muon pT (which is the only thing that
-matters here) are included in the muon momentum scale correction and the
-uncertainty assigned to that should include also this contribution.
+
+Also, in principle aligment effects on the muon pT (which is the only 
+thing that matters here) are included in the muon momentum scale correction 
+and the uncertainty assigned to that should include also this contribution.
 
 >Section 7 ("Comparisons"): Please correct me if I am wrong:
 >MC is produced using tuning (generally speaking) to CDF data, so at "Some" (maybe "Null") polarization.
@@ -103,7 +106,7 @@ uncertainty assigned to that should include also this contribution.
 >How should I understand the statement on lines 330-331 that the cross-section (analyzed at "Null" hypothesis)
 >is "higher than expected" ? Could this be just the wrong polarization hypothesis?
 
-This sentence must be removed anyway or at least rephrased. It's noy true 
+This sentence must be removed anyway or at least rephrased. It's not true 
 anymore since the Pythia estimate has been corrected. Thanks for the catch.
 
 >Section 8 ("Conclusions"): The first result given is for the "Null" hypothesis, isn't it?

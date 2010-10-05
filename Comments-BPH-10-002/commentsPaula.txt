@@ -25,8 +25,7 @@ reference.
 
 >line 67: ?ad-hoc filters? sounds bad
 
-There is a reference in there ... We can remove the expression "ad-hoc 
-filters"
+We can remove the expression "ad-hoc filters".
 
 >line 90 (and probably also elsewhere): 4 -> four (all integers below  
 >ten in text)
@@ -41,9 +40,9 @@ OK.
 Whatever the QCD factors of higher-order effects are, double J/psi
 detection is suppressed at least by a factor <A*eff>*BR(J/psi -> mu mu)
 ~ 0.002. So, using inclusive muons as we do in the analysis (also tracker 
-muons), the number of non-genuine low-purity dimuon combination is already
+muons), the fraction of non-genuine low-purity dimuon combination is already
 larger than that. Therefore, we consider the double J/psi production
-contribution as negliglible and remove the double candidates in the events.
+contribution as negligible and remove the double candidates in the events.
 
 > Furthermore, since you are measuring the J/psi efficiency as the  
 >efficiency per J/psi, removing extra J/psis in the event means that  
@@ -110,7 +109,7 @@ We can add that.
 >Why can?t you take these from data?
 
 The fraction of outliers is very small (varying with the bin, but typically 
-<1%) and, with ~1K events per bin; moreover, in the data it's convoluted
+<1%) and we have ~1K events per bin; moreover, in the data it's convoluted
 with the long tails of the non-prompt and background components. 
 So the fit is not able to measure the width and fraction at the same time, 
 and we have to fix some of them to prompt MC. Conservatively, in the 
@@ -131,7 +130,7 @@ and eff_nonprompt. See:
 
 http://cmsdoc.cern.ch/~covarell/Jpsinote/BfracSyst.pdf
 
-which corresponds to the number in the table.
+which corresponds to the numbers in the table.
 
 > line 320: make a cross-reference to subchapter 3.1/line 70.
 
