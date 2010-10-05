@@ -97,7 +97,8 @@ No, we have two sources: one is coming from the pure statistical error from
 the data T&P efficiency. The other one is coming from the fact that the T&P 
 is biasing the true MC efficiency (even in the MC), and we correct for it. So 
 we assign an error to that, which is the full difference wrt the true MC and 
-the T&P bias.
+the T&P bias. Actually, the dominant by far is the first one, the second one is always
+smaller than 1% (relative).
 
 >Table 3: Add in the table caption: ?In addition, the relative error on  
 >the luminosity determination is 11%, and is common to all bins.?
