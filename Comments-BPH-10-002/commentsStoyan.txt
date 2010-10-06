@@ -1,9 +1,13 @@
+Dear Stoyan,
+
+thanks for your useful comments.
+
 >General: What is the plan for measuring the polarization in J/psi? Is it a
 >question of statistics or what is the problem?
 >
 
-I leave to Carlos the detailed answer. The short one is that we need a few 
-tens of pb-1 and it belongs to a separate paper.
+See Carlos' detailed answer. The short one is that we need a few 
+tens of pb^-1 and it belongs to a separate paper.
 
 >
 >Lines 183-186: Either include the plots you are mentioning in the comment or
@@ -11,15 +15,16 @@ tens of pb-1 and it belongs to a separate paper.
 
 We can easily give two tables showing the muon-id and muon-trigger 
 efficiencies, and provide two plots for comparison with the MC.
-All of this will be included very soon in the AN: we don't know (for space
-reasons) how much of that should be included in the paper.
+All of this is being included in the AN: we don't know (for space
+reasons) how much of that should be included in the paper. Probably we will
+go for the efficiency table only.
 
 >L 216: <1/(A*eff)>  (comment related to the muon efficiencies)
 >The acceptance A is from MC, the efficiency eff, and in particular the 
 > muon efficiencies "inside",
 >is from data (or MC?). 
 
-Exactly. We compute the Acceptance from the MC, while the muon efficiencies 
+Exactly. We compute the acceptance from the MC, while the muon efficiencies 
 are computed from the data.
 
 >Did you check how compatible are the T&P muon efficiency results between
@@ -30,26 +35,26 @@ and correct for the difference between the MC T&P and the true MC
 efficiencies, which arises from the bias that the "tag" muon introduces to 
 the "probe" spectra.
 
-Here are the details: 
+Here are the plots proving that: 
 http://gpetrucc.web.cern.ch/gpetrucc/mu10-plots-tnp/jpsi/bph-04.10.2010
 
 > Shouldn't you introduce a correction factor of some kind 
 > (if not statistically compatible)?
 
-Indeed we correct for the difference between  the T&P MC efficiency and 
-the true MC efficiency.
+Indeed we correct for the difference between the T&P MC efficiency and 
+the true MC efficiency, as mentioned in the paper.
 
 >My point is that only A*eff is well defined - A and eff alone are subjective in some extent.
 
-It is only mildly subjective, even if we introduced a strict criterion to 
-divide the two: the Acceptance is provided by the "detectabiliy" criterion 
+It is only mildly subjective, if we introduced a strict criterion to 
+divide the two: the acceptance is provided by the "detectabiliy" criterion 
 that each muon should lie within the geometric acceptance of the muon 
 detectors and have enough momentum to
 cross at least three active layers in any of the muon stations -
 see Eq. (2) and Section 4.1. The efficiency can be measured from the data once
 this criterion is applied, thus factorizing them. We set the detectability 
-criterion to a minimum acceptance of a single muon (roughly 10% 
-acceptance*efficiency).
+criterion in order to correspond to a minimum acceptance of a single muon 
+(roughly 10% acceptance*efficiency).
 
 >In the same context, Tab 2, A*eff uncertainties: which is the leading source - A or eff
 >(probably it vary with bins?)? 
@@ -72,7 +77,7 @@ exapected to decrease as the muon statistics increases.
 >When do you expect "irreducible" systematics to dominate?
 
 Not easy to say. Since one of the dominant sources is luminosity, it mostly
-depends on when/how its uncertainty can be reduced. 
+depends on when/how its uncertainty can be reduced by the lumi group. 
 
 >Eq 6. : For which polarization is this? "Null"?
 
@@ -129,9 +134,23 @@ Yes. Right.
 
 >
 >Fig. 1 : if using SS data - give it with a different marker type (i.e. colorblind/black&white readable)
+
+As per Carlos' comments, we will probably remove the SS data overall.
+But an alternative plot with different marker types will be available, in case
+the final decision is to show them.
+
 >         Why not giving the fitted ("nominal"?) mass as well?
 
-(Francesco?)
+In a discussion with the muon momentum scale group it was decided not to 
+give the nominal mass, since, even after the correction, is not compatible
+with the PDG value in some pT-y bins:
+ 
+http://cmsdoc.cern.ch/~covarell/Jpsinote/MassPlot.png
+
+This is due to the muon momentum scale correction missing some terms, due
+to insufficient statistics. So, waiting for a more final result on that, it
+was agreed not to show the mass value (which is anyway not relevant for
+the scope of the paper).
 
 >Below L 138: "nominal J/Psi mass" - what is "nominal" (from the fit? PDG?)?
 
