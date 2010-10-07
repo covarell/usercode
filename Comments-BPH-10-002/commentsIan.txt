@@ -1,73 +1,65 @@
-> Between L132-L133: It is still not very clear how you determine that a given 
-> muon is " detectable". When you say that you check that the muon crosses at 
-> least 3 active layers, do you do this by checking with the full GEANT 
-> simulation if the muon crosses these layers, or do you instead simply 
-> extrapolate the muon helix into the muon chambers and neglecting material 
-> effects estimate if it will cross these layers? Please clarify the text.
-> 
 
-I think in the end we will remove the sentence about the three layers since,
+Dear authors,
+
+Unsurprisingly, after all your hard work on the PAS, the paper looks really very good. I have just a few comments ...
+Thanks, we are happy you like it.
+
+PHYSICS
+========
+
+Between L132-L133: It is still not very clear how you determine that a given muon is " detectable". When you say that you check that the muon crosses at least 3 active layers, do you do this by checking with the full GEANT simulation if the muon crosses these layers, or do you instead simply extrapolate the muon helix into the muon chambers and neglecting material effects estimate if it will cross these layers? Please clarify the text.
+We will remove the sentence about the three layers since,
 as Stoyan is poiting out, the only requirement on the acceptance is the
 three lines above line 133.
 
-> L156: Can you justify that 20% uncertainty that you assume here in the 
-> non-prompt J/psi fraction? Since you measure this fraction later in the paper, 
-> why not just use your measured uncertainty?
 
-The weighted measured uncertainty with properly weighted errors has an
-uncertainty which is smaller than 20%. So we conservatively take this number. 
+L156: Can you justify that 20% uncertainty that you assume here in the non-prompt J/psi fraction? Since you measure this fraction later in the paper, why not just use your measured uncertainty?
 
-> Table 2 caption: Clarify if the " event yield" is already corrected by 
-> 1/(A*epsilon) or if these are the uncorrected numbers.
+The 20% was the simple average uncertainty. The weighted measured uncertainty with properly weighted errors has an uncertainty which is ~28%, we could use that in turn. 
+The effect of using this number is anyway negligible (at most 0.3%). 
+
+Table 2 caption: Clarify if the " event yield" is already corrected by 1/(A*epsilon) or if these are the uncorrected numbers.
+
 
 OK. It's uncorrected, we will make it clear.
 
-> L248: Does CMS have a reference for the primary vertex algorithm?
+
+L248: Does CMS have a reference for the primary vertex algorithm?
+
 
 That is Reference 16 and is given at line 67.
  
-> L253: Replace " decay length" by " proper decay length" (since corrected for 
-> Lorentz boost).
+L253: Replace " decay length" by " proper decay length" (since corrected for Lorentz boost).
 
 Right.
-
-> 
-> Equations 11 and 12: You measure the prompt J/psi cross section to be 181.5 
-> nb and the non-prompt J/psi cross section to be 50.1 nb. Why is the sum of 
-> these two not equal to your measured inclusive J/psi cross section of 251.4 
-> nb !??
+Equations 11 and 12: You measure the prompt J/psi cross section to be 181.5 nb and the non-prompt J/psi cross section to be 50.1 nb. Why is the sum of these two not equal to your measured inclusive J/psi cross section of 251.4 nb !??
 
 Thanks for spotting this out; we found a trivial mismatch between the uploaded numbers and
 a previous version of the file... Now is cured.
- 
-> Fig. 5: I find it difficult to draw any conclusions from this figure. The 
-> problem is that the predictions are not plotted using the same bin size as 
-> the data, so one can't compare them. I recommend using the same bin size for 
-> the predictions and the data.
 
-We will change that
+Fig. 5: I find it difficult to draw any conclusions from this figure. The problem is that the predictions are not plotted using the same bin size as the data, so one can't compare them. I recommend using the same bin size for the predictions and the data.
+See Carlos' comments. We will change that 
 
-> Page 3: Move Table 1 to end of Sect. 2.2 so close to where text refers to it.
- 
+ENGLISH/STYLE
+=============
+
+Page 3: Move Table 1 to end of Sect. 2.2 so close to where text refers to it.
+
 Not so easy, being a LateX float, but we will try.
 
-> Page 3 (unnumbered paragraph between line 99 and 100): The words 
-> "spotted out" are a typo.
 
-Ok.
- 
-> Line 113: Replace "per event" -> "per selected event" ?
+Page 3 (unnumbered paragraph between line 99 and 100): The words "spotted out" are a typo.
 
-Done.
+OK
+Line 113: Replace "per event" -> "per selected event" ?
 
-> L131: Replace "large amount" -> "large number"
+Done
+L131: Replace "large amount" -> "large number"
 
-OK.
+OK
+Between L132 - L133: Replace " each muon" --> " both muons" ?
 
-> Between L132 - L133: Replace " each muon" --> " both muons" ?
+OK
+L184: Replace " are then" by " so are".
 
-OK.
-
-> L184: Replace " are then" by " so are".
-
-Fine.
+OK
