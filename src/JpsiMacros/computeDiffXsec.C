@@ -54,6 +54,7 @@ void computeDiffXsec(bool isDoubleDiff = false) {
 				 7.39,6.10,4.39,2.94,1.49,0.69,0.272,0.018};
 
   // POLARIZATION FROM FILE
+  double mixpol[smallBins];
   double nopol[smallBins];
   double trasvHX[smallBins];
   double longHX[smallBins];
@@ -68,6 +69,13 @@ void computeDiffXsec(bool isDoubleDiff = false) {
   accfile[1] = TFile::Open("accept/1.2_1.6_Acc_acceptance_polarized.root");
   accfile[2] = TFile::Open("accept/1.6_2.4_Acc_acceptance_polarized.root");
 
+  TFile* accMixfile[3];
+
+  accMixfile[0] = TFile::Open("accept/shuang_Acc_Dimuon_mix_centralvalue_0.0.root");
+  accMixfile[1] = TFile::Open("accept/shuang_Acc_Dimuon_mix_centralvalue_1.2.root");
+  accMixfile[2] = TFile::Open("accept/shuang_Acc_Dimuon_mix_centralvalue_1.6.root");
+
+  TH2F *Jpsi_mix[3];
   TH2F *Jpsi_non[3];
   TH2F *Jpsi_t_HXtheta[3];
   TH2F *Jpsi_l_HXtheta[3];
@@ -77,6 +85,7 @@ void computeDiffXsec(bool isDoubleDiff = false) {
   TH2F *B_333[3];
 
   for (int i=0; i < 3; i++) {
+    Jpsi_mix[i] = (TH2F*)(accMixfile[i]->Get("Jpsi_non"));
     Jpsi_non[i] = (TH2F*)(accfile[i]->Get("Jpsi_non"));
     Jpsi_t_HXtheta[i] = (TH2F*)(accfile[i]->Get("Jpsi_t_HXtheta"));
     Jpsi_l_HXtheta[i] = (TH2F*)(accfile[i]->Get("Jpsi_l_HXtheta"));
@@ -89,6 +98,7 @@ void computeDiffXsec(bool isDoubleDiff = false) {
   int nn = 0;
   for (int ii=1; ii <= 3; ii++) {
     for (int jj=1; jj <= Jpsi_non[ii-1]->GetNbinsY(); jj++) {
+      mixpol[nn]   = Jpsi_mix[ii-1]->GetBinContent(ii,jj);
       nopol[nn]   = Jpsi_non[ii-1]->GetBinContent(ii,jj);
       trasvHX[nn] = Jpsi_t_HXtheta[ii-1]->GetBinContent(ii,jj);	
       longHX[nn]  = Jpsi_l_HXtheta[ii-1]->GetBinContent(ii,jj);
@@ -96,7 +106,7 @@ void computeDiffXsec(bool isDoubleDiff = false) {
       longCS[nn]  = Jpsi_l_CStheta[ii-1]->GetBinContent(ii,jj);
       B409[nn]   = B_409[ii-1]->GetBinContent(ii,jj);
       B333[nn]   = B_333[ii-1]->GetBinContent(ii,jj);
-      cout << "nn " << ii << " " << jj << " " << nn << " " << nopol[nn] << " " << trasvHX[nn] << " " << longHX[nn] << " " << trasvCS[nn] << " " << longCS[nn] << " " << B409[nn] << " " << B333[nn] << endl;
+      cout << "nn " << ii << " " << jj << " " << nn << " " << mixpol[nn] << " " << nopol[nn] << " " << trasvHX[nn] << " " << longHX[nn] << " " << trasvCS[nn] << " " << longCS[nn] << " " << B409[nn] << " " << B333[nn] << endl;
       nn++;
     }
   }
@@ -105,8 +115,8 @@ void computeDiffXsec(bool isDoubleDiff = false) {
   // B-FRACTION
   double Bfrac[largeBins] = {0.181,0.261,0.405,0.147,0.178,0.204,0.363,0.057,0.087,0.113,0.138,0.160,0.173,0.233,0.377};
   double errstBfrac[largeBins] = {0.024,0.015,0.018,0.021,0.017,0.017,0.031,0.021,0.014,0.013,0.014,0.014,0.012,0.016,0.031};
-  double errsyBfrac[largeBins] = {0.015,0.017,0.006,0.030,0.040,0.006,0.016,
-0.045,0.025,0.021,0.010,0.013,0.010,0.019,0.017};
+  double errsyBfrac[largeBins] = {0.015,0.014,0.005,0.028,0.019,0.004,0.016,
+0.042,0.022,0.020,0.009,0.013,0.012,0.012,0.008};
 
   int tsb = 0;
 
@@ -149,40 +159,40 @@ void computeDiffXsec(bool isDoubleDiff = false) {
     double btoXsec[2] = {0.,0.};
 
     for (int k=0; k < howManyBins[i]; k++) {
-      totinclXsec[0] += binWidths[tsb]*inclXsec[tsb];
-      totinclstXsec[0] += pow(binWidths[tsb]*errstXsec[tsb],2);
-      totinclsycXsec[0] += binWidths[tsb]*errsycXsec[tsb];
-      totinclsyuncXsec[0] += pow(binWidths[tsb]*errsyuncXsec[tsb],2);
+      totinclXsec[0] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/nopol[tsb];
+      totinclstXsec[0] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/nopol[tsb],2);
+      totinclsycXsec[0] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/nopol[tsb];;
+      totinclsyuncXsec[0] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/nopol[tsb],2);
 
-      totinclXsec[4] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/trasvHX[tsb];
-      totinclstXsec[4] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/trasvHX[tsb],2);
-      totinclsycXsec[4] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/trasvHX[tsb];
-      totinclsyuncXsec[4] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/trasvHX[tsb],2);
+      totinclXsec[4] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/trasvHX[tsb];
+      totinclstXsec[4] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/trasvHX[tsb],2);
+      totinclsycXsec[4] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/trasvHX[tsb];
+      totinclsyuncXsec[4] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/trasvHX[tsb],2);
 
-      totinclXsec[2] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/trasvCS[tsb];
-      totinclstXsec[2] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/trasvCS[tsb],2);
-      totinclsycXsec[2] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/trasvCS[tsb];
-      totinclsyuncXsec[2] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/trasvCS[tsb],2);
+      totinclXsec[2] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/trasvCS[tsb];
+      totinclstXsec[2] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/trasvCS[tsb],2);
+      totinclsycXsec[2] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/trasvCS[tsb];
+      totinclsyuncXsec[2] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/trasvCS[tsb],2);
 
-      totinclXsec[3] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/longHX[tsb];
-      totinclstXsec[3] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/longHX[tsb],2);
-      totinclsycXsec[3] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/longHX[tsb];
-      totinclsyuncXsec[3] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/longHX[tsb],2);
+      totinclXsec[3] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/longHX[tsb];
+      totinclstXsec[3] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/longHX[tsb],2);
+      totinclsycXsec[3] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/longHX[tsb];
+      totinclsyuncXsec[3] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/longHX[tsb],2);
 
-      totinclXsec[1] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/longCS[tsb];
-      totinclstXsec[1] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/longCS[tsb],2);
-      totinclsycXsec[1] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/longCS[tsb];
-      totinclsyuncXsec[1] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/longCS[tsb],2);
+      totinclXsec[1] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/longCS[tsb];
+      totinclstXsec[1] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/longCS[tsb],2);
+      totinclsycXsec[1] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/longCS[tsb];
+      totinclsyuncXsec[1] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/longCS[tsb],2);
 
-      totinclXsec[5] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/B409[tsb];
-      totinclstXsec[5] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/B409[tsb],2);
-      totinclsycXsec[5] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/B409[tsb];
-      totinclsyuncXsec[5] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/B409[tsb],2); 
+      totinclXsec[5] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/B409[tsb];
+      totinclstXsec[5] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/B409[tsb],2);
+      totinclsycXsec[5] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/B409[tsb];
+      totinclsyuncXsec[5] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/B409[tsb],2); 
 
-      totinclXsec[6] += binWidths[tsb]*inclXsec[tsb]*nopol[tsb]/B333[tsb];
-      totinclstXsec[6] += pow(binWidths[tsb]*errstXsec[tsb]*nopol[tsb]/B333[tsb],2);
-      totinclsycXsec[6] += binWidths[tsb]*errsycXsec[tsb]*nopol[tsb]/B333[tsb];
-      totinclsyuncXsec[6] += pow(binWidths[tsb]*errsyuncXsec[tsb]*nopol[tsb]/B333[tsb],2);
+      totinclXsec[6] += binWidths[tsb]*inclXsec[tsb]*mixpol[tsb]/B333[tsb];
+      totinclstXsec[6] += pow(binWidths[tsb]*errstXsec[tsb]*mixpol[tsb]/B333[tsb],2);
+      totinclsycXsec[6] += binWidths[tsb]*errsycXsec[tsb]*mixpol[tsb]/B333[tsb];
+      totinclsyuncXsec[6] += pow(binWidths[tsb]*errsyuncXsec[tsb]*mixpol[tsb]/B333[tsb],2);
       
       tsb++;
     }
