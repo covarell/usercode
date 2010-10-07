@@ -24,7 +24,7 @@ OK. It's uncorrected, we will make it clear.
 
 > L248: Does CMS have a reference for the primary vertex algorithm?
 
-???
+That is Reference 16 and is given at line 67.
  
 > L253: Replace " decay length" by " proper decay length" (since corrected for 
 > Lorentz boost).
@@ -37,17 +37,15 @@ Right.
 > these two not equal to your measured inclusive J/psi cross section of 251.4 
 > nb !??
 
-Because in the inclusive cross-section measurement a "general" hypothesis
-on the acceptance must be taken. When the two contributions are separated out, 
-one can re-weight the B part for the acceptance corresponding the measured 
-polarization by Babar, corresponding to lambda_HX ~ -0.41. 
+Thanks for spotting this out; we found a trivial mismatch between the uploaded numbers and
+a previous version of the file... Now is cured.
  
 > Fig. 5: I find it difficult to draw any conclusions from this figure. The 
 > problem is that the predictions are not plotted using the same bin size as 
 > the data, so one can't compare them. I recommend using the same bin size for 
 > the predictions and the data.
 
-???
+We will change that
 
 > Page 3: Move Table 1 to end of Sect. 2.2 so close to where text refers to it.
  
