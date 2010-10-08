@@ -1,0 +1,26 @@
+The acceptance is the single largest correction you apply (per bin). Yet,
+there are no figures, tables or references addressing the overall
+quality of the MC ("tune the selection", "check the agreement" are not statements).
+From
+https://hypernews.cern.ch/HyperNews/CMS/get/AUX/2010/10/07/11:09:37-28975-pt_muons.gif
+I see the agreement is not perfect which is probably attributed to different polarizations
+(or?). The paragraph starting at line 197 (about rho) is somewhat also related to
+the acceptance (and anyway from this paper it is not clear how adequate are the
+"different MC models" in covering the systematic effects mentioned).
+If we exclude the rho (which is clearly separated from the acceptance in the paper)
+and the polarization (problem) you claim that FSR, resolution, momentum scale, IP
+and B-fraction are the main systematic sources. Then by "tuning" them you
+should be able to show relatively good data/MC agreement (eventually + efficiency corrections)
+which I don't see. Or do you say the deviations in the plot above (upto 30-40%) are covered
+by the systematics mentioned (by which part predominantly?)? If the polarization is the problem
+how do you prove/check/cross-check it?
+
+Line 112: "1.07 J/Psi". What is the number in MC? Is this pure combinatorics or real
+double J/Psi dominate? Does this number have deeper meaning (just curious)?
+
+You don't say it explicitly but you estimate the double muon trigger efficiency by parameterizing
+it with the single muon trigger efficiency. This is an assumption (as good as it may be). Did you
+check it (from non-muon triggered datasets?)?
+
+Line 213: "a fit". You are giving the main results in this section. What kind of fit? What was
+the quality, goodness-of-fit tests?
