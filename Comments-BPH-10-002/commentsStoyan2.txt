@@ -1,26 +1,41 @@
-The acceptance is the single largest correction you apply (per bin). Yet,
-there are no figures, tables or references addressing the overall
-quality of the MC ("tune the selection", "check the agreement" are not statements).
-From
-https://hypernews.cern.ch/HyperNews/CMS/get/AUX/2010/10/07/11:09:37-28975-pt_muons.gif
-I see the agreement is not perfect which is probably attributed to different polarizations
-(or?). The paragraph starting at line 197 (about rho) is somewhat also related to
-the acceptance (and anyway from this paper it is not clear how adequate are the
-"different MC models" in covering the systematic effects mentioned).
-If we exclude the rho (which is clearly separated from the acceptance in the paper)
-and the polarization (problem) you claim that FSR, resolution, momentum scale, IP
-and B-fraction are the main systematic sources. Then by "tuning" them you
-should be able to show relatively good data/MC agreement (eventually + efficiency corrections)
-which I don't see. Or do you say the deviations in the plot above (upto 30-40%) are covered
-by the systematics mentioned (by which part predominantly?)? If the polarization is the problem
-how do you prove/check/cross-check it?
+>The acceptance is the single largest correction you apply (per bin). Yet,
+>there are no figures, tables or references addressing the overall
+>uality of the MC ("tune the selection", "check the agreement" are not statements).
+>From
+>https://hypernews.cern.ch/HyperNews/CMS/get/AUX/2010/10/07/11:09:37-28975-pt_muons.gif
+>I see the agreement is not perfect which is probably attributed to different polarizations
+>(or?). The paragraph starting at line 197 (about rho) is somewhat also related to
+>the acceptance (and anyway from this paper it is not clear how adequate are the
+>"different MC models" in covering the systematic effects mentioned).
+>If we exclude the rho (which is clearly separated from the acceptance in the paper)
+>and the polarization (problem) you claim that FSR, resolution, momentum scale, IP
+>and B-fraction are the main systematic sources. Then by "tuning" them you
+>should be able to show relatively good data/MC agreement (eventually + efficiency corrections)
+>which I don't see. Or do you say the deviations in the plot above (upto 30-40%) are covered
+>by the systematics mentioned (by which part predominantly?)? If the polarization is the problem
+>how do you prove/check/cross-check it?
 
-Line 112: "1.07 J/Psi". What is the number in MC? Is this pure combinatorics or real
-double J/Psi dominate? Does this number have deeper meaning (just curious)?
+Actually, the acceptance is computed in fine grained bins of the pt-|y| of the Jpsi and sampled in the 
+actual (in data) Jpsi pt-|y| of each single event, so any particular "feature" which has a residual
+dependence from the exact MC generator should be taken out. In other words we do not rely on the MC
+except for the geometric acceptance in a small bin in the kinematic variables of the Jpsi which in fact
+depends only on the polarization. This is shown in the AN Section 4.1. 
 
-You don't say it explicitly but you estimate the double muon trigger efficiency by parameterizing
-it with the single muon trigger efficiency. This is an assumption (as good as it may be). Did you
-check it (from non-muon triggered datasets?)?
+For the rho we compute the systematic by reweightin the Pythia to the other MC models and take the largest difference.
 
-Line 213: "a fit". You are giving the main results in this section. What kind of fit? What was
-the quality, goodness-of-fit tests?
+Finally, in the data we just take the T&P efficiency. The only thing to be sure is that the shape of the MC
+within the given muon-pt/eta bin is not terribly different between MC and data. For instance if you wish to compute the correlation of the DoubleMuOpenLoose trigger by using a MC which is using the DoubleMuOpen_Tight (as was done at the ICHEP times) that will give totally different (and wrong) values of the correlation.
+ 
+>Line 112: "1.07 J/Psi". What is the number in MC? Is this pure combinatorics or real
+>double J/Psi dominate? Does this number have deeper meaning (just curious)?
+See answers to Paula
+
+>You don't say it explicitly but you estimate the double muon trigger efficiency by parameterizing
+>it with the single muon trigger efficiency. This is an assumption (as good as it may be). Did you
+>check it (from non-muon triggered datasets?)?
+>
+In fact rho is "taking care" of the goodness of the assumption
+>Line 213: "a fit". You are giving the main results in this section. What kind of fit? What was
+>the quality, goodness-of-fit tests?
+In the AN there is the total set of fits with the chi^2
+>
