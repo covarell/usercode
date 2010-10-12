@@ -12,7 +12,7 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void computeDiffXsec(bool isDoubleDiff = false) { 
+void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) { 
 
   static const unsigned int smallBins = 33;
   static const unsigned int largeBins = 15;
@@ -43,13 +43,13 @@ void computeDiffXsec(bool isDoubleDiff = false) {
 				 6.19,6.13,4.22,7.72,3.72,3.48,
 				 3.19,1.73,1.43,0.72,0.44,0.24,0.11,0.008};
   double errsyuncXsec[smallBins] = {1.58,0.66,0.39,0.096,0.033,0.002,
-				 10.05,3.59,1.49,0.56,0.20,0.073,0.005,
+				 10.05,3.60,1.49,0.56,0.20,0.073,0.005,
 				 3.75,9.46,11.54,13.77,12.55,13.39,
-				 9.96,10.88,8.06,6.28,5.47,4.76,
+				 9.96,10.89,8.06,6.28,5.47,4.76,
 				 3.69,2.75,1.83,1.09,0.61,0.263,0.066,0.007};
-  double errsycXsec[smallBins] = {1.79,1.23,0.91,0.37,0.132,0.013,
-				 8.16,5.40,3.54,1.92,0.85,0.31,0.020,
-				 4.60,11.74,12.15,15.47,17.01,16.66,
+  double errsycXsec[smallBins] = {1.72,1.12,0.89,0.36,0.132,0.013,
+				 8.16,5.40,3.54,1.86,0.85,0.31,0.020,
+				 4.61,11.74,12.15,15.47,17.01,16.66,
 				 14.18,14.66,11.13,10.94,8.91,8.16,
 				 7.39,6.10,4.39,2.94,1.49,0.69,0.272,0.018};
 
@@ -231,6 +231,10 @@ void computeDiffXsec(bool isDoubleDiff = false) {
 
     cout << "Prompt : $" << promptXsec[0] << " \\pm " << prompttoXsec[0] << " (\\pm " << promptstXsec[0] << "_{\\mathrm{stat.}} \\pm " << promptsyXsec[0] << "_{\\mathrm{syst.}})$ & $" << promptXsec[1] << " \\pm " << prompttoXsec[1] << "$ & $" << promptXsec[2] << " \\pm " << prompttoXsec[2] << "$ & $" << promptXsec[3] << " \\pm " << prompttoXsec[3] << "$ & $" << promptXsec[4] << " \\pm " << prompttoXsec[4] << "$" << endl;
     cout << "Non-prompt : $" << bXsec[0] << " \\pm " << btoXsec[0] << " (\\pm " << bstXsec[0] << "_{\\mathrm{stat.}} \\pm " << bsyXsec[0] << "_{\\mathrm{syst.}})$" << endl;
+    if (plotDellaMinchia) {
+      double BfracCorr = bXsec[0]/(promptXsec[0]+bXsec[0]);
+      cout << "Corrected B-fraction : $" << BfracCorr << " \\pm " << errstBfrac[i]*(BfracCorr/Bfrac[i]) << "_{\\mathrm{stat.}} \\pm " << errsyBfrac[i]*(BfracCorr/Bfrac[i]) << "_{\\mathrm{syst.}})$" << endl; 
+    }
     
     if (i < 3) {
 
