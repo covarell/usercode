@@ -1,0 +1,492 @@
+In general
+
+(1) throughout the paper (including the Abstract, text and references, 
+etc.),
+the "b-hadron" (as well as "b-fraction", etc.) and "B-hadron" (as well as 
+"B-fraction", etc.) are used mixedly. It seems should make them all 
+consistent.
+
+
+Page 1
+
+(2) L5, I presume that the "J/psi's" indicates the plural of "J/psi", if 
+so, it
+seems should change from
+
+"non-prompt J/psi's from the decay of a b-hadron." -->
+"non-prompt J/psi's from the decay of b-hadrons." or
+"non-prompt J/psi's from the decay of B-hadrons."
+
+depending on which consistent expression would be used as mention in the 
+above 
+item (1).
+
+
+(3) L32, it seems slightly better to add 3 words as
+"The paper finishes with some comparisons ..." -->
+"The paper finishes in Section 7 with some comparisons ..."
+
+(4) L34, the "Compact Muon Solenoid (CMS)" has already mentioned in L25,
+thus, here it can be
+"Compact Muon Solenoid (CMS)" -->
+"CMS"
+
+(5) L37, the "ECAL" and "HCAL" have never been used elsewhere in this
+paper, so they seem can be deleted as
+"calorimeter (ECAL) and the brass/scintillator hadron calorimeter (HCAL)." 
+-->
+"calorimeter and the brass/scintillator hadron calorimeter."
+
+
+Page 2
+
+(6) L70, it seems should add a word as
+"the leading-order singlet" -->
+"the leading-order color singlet"
+
+
+Page 3
+
+(7) L93, as the other few clauses in the sentence started from "must", so
+a "must have" seems should be added as
+"pixel layers, a chi2 per degree of freedom smaller than four, and 
+must pass" -->
+"pixel layers, must have a chi2 per degree of freedom smaller than four, 
+and 
+must pass"
+
+
+(8) L97, it seems clearer if adding two words as
+"between the extrapolated track and the segment ..." -->
+"between the extrapolated track from Tracker and the segment
+
+(9) The 3rd-4th lines below L99, I'm not sure whether the clause 
+after the colon ":" is referring to the all systematic uncertainties 
+listed before the ":" or not;
+
+    (a) if yes, then it may should be changed from
+
+": this can shift ..." -->
+"; these can shift ..." 
+(please notice that the ":" may be better to be changed to ";")
+
+    (b) if not, i.e. it only refers to the last systematic (i.e. the 
+"sub-detector 
+misalignment and biases in the algorithms which fit the track 
+trajectory"),
+then the clause in 3rd-4th lines may be better to be changed from
+
+": this can shift ... of dimuon resonances." -->
+" (this can shift ... of dimuon resonances)."
+(please notice that the ":" is replaced by a bracket)
+
+
+(10) L102, I'm not sure what the "expected mass distributions" is 
+referring 
+to, would it be possible to explain briefly what is the "expected"?
+
+
+(11) In the caption of Table 1, according to the common expression of many 
+other CMS papers and HEP papers, all Equation series numbers in the text 
+should be in a bracket, i.e.
+"Eq.1" -->
+"Eq.(1)"
+
+These are also the case in L135 and L152 for Eq.(2), and L276 for Eq.(10).
+
+
+(12) The 1st line in Table 1, the error of "a1" is a half of the a1 value,
+I'm not sure what is the reason for it and whether it would cause any 
+concerns.
+
+
+(13) L110, it prints that "the combination with the purest muon content is 
+chosen",
+
+    (a) so far in this paper, the definition of the "purity" has not been 
+given
+yet. It seems better to give the definition somewhere prior it is used.
+
+    (b) If always the Global muon is purer than the Tracker muon, whether 
+we can
+simply change from 
+"the combination with the purest muon content is chosen" -->
+"the combination with the Global muon is chosen
+
+
+(14) L112,
+
+    (a) it prints that "the one with the largest pT is chosen". I'm not 
+sure whether this pT is referring to the the vector sum of two pT's in the 
+pair? Or something else? It seems better to be explained more precisely.
+
+    (b) it seems better to add a comma as
+"On average 1.07 J/psi" -->
+"On average, 1.07 J/psi"
+ 
+
+Page 4
+
+(15) in Figure 1, in each sub-figures, it seems better to enlarge the 
+letter sizes of "sigma = xxx MeV/c2" and "xxx < |y(J/psi)| < xxx".
+
+
+(16) L118, according to the style of all other Section and sub-Section
+titles, it should be changed from
+"4 Acceptance and Efficiency" -->
+"4 Acceptance and efficiency"
+
+
+(17) L124-125, I'm not sure whether it would be better to explain 
+briefly how the "material in front of the muon detectors, acting as an 
+absorber" will "introduce a momentum threshold".
+
+
+Page 5
+
+(18) the 4th line, it prints that "to guarantee a single-muon 
+detectability exceeding about 10%". I'm not sure whether the reason
+for choosing the "10%" should be briefed, i.e. readers may quite be
+possible to ask why not to choose 20%, 40% or any other numbers.
+
+
+(19) L135, it prints that "Monte Carlo reconstructed dimuon variables
+used in the numerator of Eq. 2.". The numerator of Eq.(2) is 
+Ndet(pT,y,lambda(theta)), would it means that the "pT,y,lambda(theta)" are
+"Monte Carlo reconstructed dimuon variables"? In any case, the sentence
+in L135 seems not very clear to readers, and may be better to be 
+re-phrased.
+
+
+(20) L136, it seems better to add 2 words as
+"is given in Fig. 2 for ..." -->
+"is given in Fig. 2 (left figure) for ..."
+
+(21) L138, it seems better to add 4 words as
+"Also shown is the ..." -->
+"Also shown in the right figure is the ..."
+
+(22) the line below L138, it seems clearer to change from
+
+"of the muon pairs within  100 MeV/c2 from the PDG J/psi mass." -->
+"for the number of muon pairs within  100 MeV/c2 from the J/psi mass
+given by PDG (Particle Data Group)."
+
+
+(23) in Fig.2, the vertical axes on the right side of each sub-figures 
+should add the labels of
+
+    (a) the "Acceptance" for the left figure;
+    (b) the "Number of mu pair" for the right figure.
+
+
+(24) in the 2nd line of the caption of Fig.2, two words seem should be
+added as
+"two-dimensional distribution of the muon pairs" -->
+"two-dimensional distribution of the number of muon pairs"
+
+
+(25) L140, two words seem should be added as
+"The dependence on the J/psi polarization" -->
+"The dependence of Acceptance on the J/psi polarization"
+
+
+(26) L142, I'm not sure whether it would be better to change from
+"where the polarization is not well known at present" -->
+"where the polarization is not well measured at present yet"
+
+(27) L150-152, it seems to me that a percentage number should be quoted 
+for this 1st item of systematic uncertainties.
+
+
+Page 6
+
+(28) L155, according to the expressions in most cases in this paper, 
+"(see Sect. 7)" -->
+"(see Section 7)"
+
+(29) L163, it seems better to change from
+"at the permille level" -->
+"at the 0.1% level"
+
+(30) L172, it seems better to add one comma as
+"As a conservative estimate a bias equivalent to ..." -->
+"As a conservative estimate, a bias equivalent to ...'
+
+(31) L184, two dashes seem should be added as
+"Tag and Probe method" -->
+"Tag-and-Probe method"
+
+There are also the same cases in L199 and L203.
+
+
+(32) L185-186, it prints that "eff(off|track) is the muon identification 
+in the muon systems for a tracker-reconstructed muon". There is no a word
+in the explanation relating with the "off" in the "eff(off|track)" yet. 
+Would it be better to re-phrase it so that the "off" can be explicitly 
+explained?
+
+
+Page 7
+
+(33) L194, it prints that "value of rho is 0.095 with a RMS of 0.11"
+
+    (a) I wonder how the RMS is larger than the value, and whether it 
+should 
+be explained;
+
+    (b) a period is missing at the end, and it should be added in.
+
+
+(34) L208, according to the expressions in most cases in this paper, 
+"(see Sec. 7)" -->
+"(see Section 7)"
+
+(35) L211, L216 and in Eq.(5), the letter size of "corr" in the "N(corr)" 
+is 
+looked a little too large, it is better to change to a smaller letter 
+size.
+
+
+Page 8
+
+(36) L240, a reference should be given to the uncertainty (of 11%) on the 
+luminosity, as well as in the 3rd line of Table 3's caption on Page 9.
+
+(37) L245, it seems better to add one word as
+"the first bin in the forward rapidity region" -->
+"the first pT bin in the forward rapidity region"
+
+
+Page 10
+
+(38) in the 1st line of Table 4's caption, would the table be about the 
+inclusive 
+cross section? If yes, a word seems should be added as 
+"Table 4: Differential cross sections, and ..." -->
+"Table 4: Inclusive differential cross sections, and ..."
+
+(39) in Table 4,
+
+    (a) it can be seen that
+
+the result data in the column of "lambda(theta-CS)=-1" are all larger than 
+the result data in the column of "lambda(theta-CS)=+1" for the first 
+rapidity 
+range (i.e. |y|<1.2).
+
+This is opposite to all other cases, i.e. for all "lambda(theta-HX)" cases
+and other 2 rapidity ranges [including the cases for the 
+lambda(theta-CS)], i.e.
+
+the result data in the column of "lambda=-1" are mostly smaller than
+the result data in the column of "lambda=+1"
+
+Should we highlight this difference to readers? If yes, should we try to 
+explain
+this difference?
+
+(b) a few data numbers have only one significant digit or without digit 
+after
+the decimal point, I'm not sure whether they can be adjusted as,
+
+for |y|<1.2, in the pT bin of 4.5-5.5 GeV/c, the column of 
+lambda(theta-HX)=-1, from
+"10.7 +- 2" -->
+"10.7 +- 2.0"
+
+for 1.2<|y|<1.6, in the pT bin of 3.5-4.5 GeV/c, the column of 
+lambda(theta-CS)=-1, from
+"37.3 +- 6" -->
+"37.3 +- 6.0"
+
+for 1.6<|y|<2.4, in the pT bin of 1.0-1.25 GeV/c, the column of 
+lambda(theta-CS)=+1, from
+"152.4 +- 28" -->
+"152.4 +- 28.0"
+
+in the pT bin of 2.5-2.75 GeV/c, the column of lambda(theta-HX)=+1, from
+
+"113.2 +- 19" -->
+"113.2 +- 19.0"
+
+next line in the same column, from
+
+"91.55 +- 14" -->
+"91.55 +- 14.0"
+
+in the pT bin of 3.25-3.5 GeV/c, the column of lambda(theta-HX)=-1, from
+
+"52.1 +- 7.81" -->
+"52.1 +- 7.8"
+
+
+Page 11
+
+(40) L257
+
+    (a) it prints "a large component is considered", would it be possible 
+to 
+explain the component of what here is referring?
+
+    (b) it prints "(see below)", it seems better to be a little more 
+precise on
+(see below in xxxx Section).
+
+
+(41) in the line below L258, is it possible to give a name for the 
+quantity of
+"l(J/psi)", then, it can be changed from
+
+"the quantity l(J/psi) =" -->
+"the 'name' l(J/psi) ="
+
+
+Page 12
+
+(42) in the line below Eq.(8), a word seems should be added as 
+"and m the invariant mass of the muon pair." -->
+"and m is the invariant mass of the muon pair."
+
+(43) L276, it seems slightly better to change the "of" to "in", as
+"shape of the non-prompt component of Eq. 10" -->
+"shape of the non-prompt component in Eq.(10)"
+
+(44) L283, it may make things slightly clearer if two spaces can be 
+inserted as
+"[2.6,2.9] and [3.3,3.5]" -->
+"[2.6, 2.9] and [3.3, 3.5]
+
+
+Page 13
+
+(45) in Figure 4, the conditions
+
+    (a) "2 < pT(J/psi) < 4.5 GeV/c and 1.2 < |y| < 1.6" should be 
+indicated inside
+the left figure;
+
+    (b) "6.5 < pT(J/psi) < 10 GeV/c and 1.6 < |y| < 2.4" should be 
+indicated inside
+the right figure;
+
+
+(46) In the 3rd line of the Table 5's caption, it seems should be more 
+precise to
+give the explicit section number as
+"(see next section)." -->
+"(see Section xxx.xxx).
+
+
+Page 14
+
+(47) L297-298, it seems should add a word as
+"between the results with the nominal model and with these models ..." -->
+"between the results with the nominal model and with these misaligned 
+models ..."
+
+(48) L300, a typo
+"a exponential decay" -->
+"an exponential decay"
+
+(49) L308, according to the expression everywhere in this paper,
+"100 MeV/c2" -->
+"100 MeV/(italic)c2'
+
+(50) L316, it should be changed from
+"is given in Tab. 6." -->
+"is given in Table 6."
+
+(51) in the caption of Table 6, the "absolute systematic uncertainties" 
+has 
+never been used elsewhere in this paper, would the "absolute" be needed to 
+be
+explained or deleted?
+
+
+Page 15
+
+(52) L320 and L324, would the italic "prompt" be necessary? If yes, please 
+enlighten me the reason; if not, please change them to be "non-italic".
+
+(53) L321, I'm not sure whether it would be better to add two words as
+"7 Comparison with model calculations" -->
+"7 Comparison with the theoretical model calculations"
+
+(54) L325, it should be changed from
+"(see Sec. 3.1)" -->
+"(see Section 3.1)"
+
+
+Page 17
+
+(55) in Fig.5, in all labels on (horizontal and vertical) axes, it should 
+be
+changed from
+"GeV" -->
+"GeV/c"
+
+(56) I presume that the data points for the bottom-right figure (i.e. 
+|y|<2.4)
+should be a summation of other 3 sub-figures, but I'm curious why the 
+current
+bottom-right figure only has 3 data points which is much less than the 
+summation
+of other 3 sub-figures.
+
+There is a same case in the Fig.6 on Page 18.
+
+(57) L350, since it has not been mentioned yet before the conclusion about 
+the 
+"region where the theoretical calculation has under-estimation", I'm not 
+sure whether it should be changed from
+
+"where the calculations underestimate the measured yield." -->
+"where the calculations underestimate the measured yield as shown in the
+bottom-left figures of Figs. 5 and 6."
+
+
+Pages 19-21, in References Section,
+
+(58) Titles of articles in Ref. [1]-[4], [7], [9]-[13], [18], [28] and 
+[34] 
+should be added.
+
+(59) For consistency, all references should have only one page number
+instead of two. The ones which need to be modified are Refs. [19]-[22], 
+[33]-[35], [42] and [43].
+
+(60) According to the common practices in all HEP papers, if the number
+of authors is more than 3, only the 1st author is put in the Reference 
+plus "et al.", instead of "2 or 3 names + et al." The ones which need 
+to be modified are Refs. [6], [41] and [47].
+
+(61) in Ref.[2], 
+"A 21 (2006) 3857" -->
+"A(bold)21 (2006) 3857"
+
+Please notice that there should be no space between "A" and "21".
+
+There are the similar cases for Refs. [9], [28], [32], [33], [44] and 
+[45].
+
+
+(62) in Ref.[14],
+"(2008) 0803:S08004." -->
+"0803(bold) (2008) S08004."
+
+There is a similar case for Ref. [17].
+
+(63) L374, the author(s) is(are) missing.
+
+(64) in Ref.[23],
+"5:T03009 (2010)." -->
+"5 (2010) T03009(non-bold)."
+
+There is a similar case for Ref. [25].
+
+(65) L402, I'm curious about the long name of "T. U. A. D. Frawley", would 
+you
+please cross-check it?
+
+
