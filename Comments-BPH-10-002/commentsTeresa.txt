@@ -1,71 +1,75 @@
-I have a "but" though.. it is related with the quality of the write-up. It 
-looks to me more a internal communication that a journal paper. The 
-quality of the content will, in my opinion, very much benefit from a 
-better description. I think with a bit of dedicated effort the paper can 
-be improved avoiding too "colloquial" descriptions, vague statements 
-and/or imprecisions. 
+Dear Teresa, 
 
-I send you some specific examples: 
+Thanks for the careful reading of the paper.
 
-Lines 21-22: "validate QCD and parton distribution functions in Mc 
-generation2. I think you do not talk of PDFs in the rest of the text. The 
-comparisons are between different models. Also the MC generation can be 
-removed. 
-
-Line 61: two muon candidates at the hardware trigger level (Level 1). 
-Althouth it will be clearer if you explain the trigger in terms of minimum 
-number of stubs (or segments) required in the muon detectors. 
-
-No further processing means that you do not require high level triggers?. 
-No clear in the text. 
-
-Lines 85-86: unclear description of Global and Tracker muons. Would not be 
-better to briefly explain the different seeding used in the two 
-reconstruction/fitting methods and comment (as you do) the different 
-performance (efficiency and purity)?
-
-Lines 114-117: Global-Tracker muon category ? or combination? 
-
-In Fig 1 there are two effects when changing eta: the bckg level and the 
-mass resolution. You choose to comment the second one in the fig caption 
-(lever arm). For the bckg you mention the SS dimuon check but you do not 
-say the result from it. Although it may sound obvious, I think you should 
-comment the two effects in the text (not in the caption).  
-
-Lines 131-132: is the last sentence necesary? I think no. 
-
-Eq 3: why not using the standard notation Epsilon-id and Epsilon-trig? in 
-fact you refer to them like that in the text line 189.
-
-Line 189-191: --" describe reasonably" sound strange. Just explain bettre 
-the granularity you use. 
-
-Line 194: can you quote "rho" with its error rather teh RMS? 
-
-Section 4.2: Can you please look at the order of the paragraphs?..i.e you 
-start talking about tag&probe .. and then you come back to that in lines 
-195-198. And, you talk about "rho" in lines 192-194 and you can back to it 
-at the last paragraph lines 205-209. 
-
-Lines 233-236: It is section 3.2 instead of 3.3, right?. BTW the entry in 
-table 3 (pt calibration) refers to the muon momentum scale? If it is the 
-case, why not called it like this?. More, the numbers in the table 3 for 
-the pt calibration have similar magnitude that other error sources, while 
-in these lines (and if we refer to the same effect) you say is negligable. 
-Can you find a different wording? .. Maybe i am lost and you are talking 
-of different things.. but it is really not clear. 
-
-Lines 254-257: The sentences of this paragraph are a bit obscure. You 
-mention a large component is considered in the vertex resolution 
-(outlier). This  outlier is mentioned again in the fit to the 
-pseudo-proper decay length (lines 274-275) . Could not be better to say 
-that vertex resolution effects are taken into account in the treatement of 
-the speudo-proper decay length. The stuff of the outliers is not clear in 
-any of the places. 
-
-General Acknowledgments are missing.
-
-Sorry i do not give you alternative statements in my comments (in fact 
-they are just a subset of examples). As i said, it will be good to try to 
-improve the text in general, maybe if you do so specific corrections are 
-not anymore useful. 
+> I have a "but" though.. it is related with the quality of the write-up. It 
+> looks to me more a internal communication that a journal paper. The 
+> quality of the content will, in my opinion, very much benefit from a 
+> better description. I think with a bit of dedicated effort the paper can 
+> be improved avoiding too "colloquial" descriptions, vague statements 
+> and/or imprecisions. 
+> 
+> I send you some specific examples: 
+> 
+> Lines 21-22: "validate QCD and parton distribution functions in Mc 
+> generation2. I think you do not talk of PDFs in the rest of the text. The 
+> comparisons are between different models. Also the MC generation can be 
+> removed. 
+> 
+> Line 61: two muon candidates at the hardware trigger level (Level 1). 
+> Althouth it will be clearer if you explain the trigger in terms of minimum 
+> number of stubs (or segments) required in the muon detectors. 
+> 
+> No further processing means that you do not require high level triggers?. 
+> No clear in the text. 
+> 
+> Lines 85-86: unclear description of Global and Tracker muons. Would not be 
+> better to briefly explain the different seeding used in the two 
+> reconstruction/fitting methods and comment (as you do) the different 
+> performance (efficiency and purity)?
+> 
+> Lines 114-117: Global-Tracker muon category ? or combination? 
+> 
+> In Fig 1 there are two effects when changing eta: the bckg level and the 
+> mass resolution. You choose to comment the second one in the fig caption 
+> (lever arm). For the bckg you mention the SS dimuon check but you do not 
+> say the result from it. Although it may sound obvious, I think you should 
+> comment the two effects in the text (not in the caption).  
+> 
+> Lines 131-132: is the last sentence necesary? I think no. 
+> 
+> Eq 3: why not using the standard notation Epsilon-id and Epsilon-trig? in 
+> fact you refer to them like that in the text line 189.
+> 
+> Line 189-191: --" describe reasonably" sound strange. Just explain bettre 
+> the granularity you use. 
+> 
+> Line 194: can you quote "rho" with its error rather teh RMS? 
+> 
+> Section 4.2: Can you please look at the order of the paragraphs?..i.e you 
+> start talking about tag&probe .. and then you come back to that in lines 
+> 195-198. And, you talk about "rho" in lines 192-194 and you can back to it 
+> at the last paragraph lines 205-209. 
+> 
+> Lines 233-236: It is section 3.2 instead of 3.3, right?. BTW the entry in 
+> table 3 (pt calibration) refers to the muon momentum scale? If it is the 
+> case, why not called it like this?. More, the numbers in the table 3 for 
+> the pt calibration have similar magnitude that other error sources, while 
+> in these lines (and if we refer to the same effect) you say is negligable. 
+> Can you find a different wording? .. Maybe i am lost and you are talking 
+> of different things.. but it is really not clear. 
+> 
+> Lines 254-257: The sentences of this paragraph are a bit obscure. You 
+> mention a large component is considered in the vertex resolution 
+> (outlier). This  outlier is mentioned again in the fit to the 
+> pseudo-proper decay length (lines 274-275) . Could not be better to say 
+> that vertex resolution effects are taken into account in the treatement of 
+> the speudo-proper decay length. The stuff of the outliers is not clear in 
+> any of the places. 
+> 
+> General Acknowledgments are missing.
+> 
+> Sorry i do not give you alternative statements in my comments (in fact 
+> they are just a subset of examples). As i said, it will be good to try to 
+> improve the text in general, maybe if you do so specific corrections are 
+> not anymore useful. 

@@ -1,161 +1,249 @@
-first of all let me congratulate for this result, and in particular for 
-the way
-in which you decided to present it. In fact, I appreciated very much the
-inclusion in the paper of all the relevant numbers in form of tables 
-rather
-than as plots. The numbers in the tables allow other people to derive 
-their
-own results and this is the main intent of a scientific paper, in my 
-opinion.
-It is very uncommon, in fact, to find papers in which numbers are shown so
-clearly, that I feel the need to thank you for this :-)
+Dear Giovanni,
 
-Let's move to comments.
+> first of all let me congratulate for this result, and in particular for 
+> the way
+> in which you decided to present it. In fact, I appreciated very much the
+> inclusion in the paper of all the relevant numbers in form of tables 
+> rather
+> than as plots. The numbers in the tables allow other people to derive 
+> their
+> own results and this is the main intent of a scientific paper, in my 
+> opinion.
+> It is very uncommon, in fact, to find papers in which numbers are shown so
+> clearly, that I feel the need to thank you for this :-)
 
-Figure 1: internal text is too small. Larger fonts should be used in my 
-opinion
+You're welcome.
 
-Line 129: here you mention MC simulation and you give as obvious that you 
-used
-such a technique. I would add a small sentence at the beginning (before
-eq. 2) that introduces it. As a consequence you will have to remove
-some text elsewhere. For example, you can put a full stop after the words
-"rapidity y" and add
+> Let's move to comments.
+> 
+> Figure 1: internal text is too small. Larger fonts should be used in my 
+> opinion
 
-"The acceptance was estimated using MC events, generated using the Pythia
-event generator [cite] and the CMS detector simulation based on
-GEANT4 [cite], as"
+Using larger fonts means suppressing some of the information contained 
+there, which was required by the coordination to make plots self-explanatory
+for conference presentation. Which ones should we suppress (if any)?
+ 
+> Line 129: here you mention MC simulation and you give as obvious that you 
+> used
+> such a technique. I would add a small sentence at the beginning (before
+> eq. 2) that introduces it. As a consequence you will have to remove
+> some text elsewhere. For example, you can put a full stop after the words
+> "rapidity y" and add
+> 
+> "The acceptance was estimated using MC events, generated using the Pythia
+> event generator [cite] and the CMS detector simulation based on
+> GEANT4 [cite], as"
 
-eq.2
+This is already in lines 68-74. Should we repeat it here?
 
-"where N_{det} is the number of selected J/\Psi events...."
+> eq.2
+> 
+> "where N_{det} is the number of selected J/\Psi events...."
 
-Another consequence of this remodulation is that you must eliminate the
-last sentence in the paragraph (lines 134-135).
+No. N_det is not the number of selected J/psi events, it's the number of
+J/psi that can in principle be detected because both muons lie in the 
+acceptance (before any analysis cut).
 
+> Another consequence of this remodulation is that you must eliminate the
+> last sentence in the paragraph (lines 134-135).
 
-Line 138: "unphysical" is somewhat disturbing in a physics paper. I would 
-say
-that models do not allow us to predict the effective polarization of
-the J/\Psi in these kind of events. We then obtained results assuming
-different polarization schemas, namely with full longitudinal
-polarization (\lambda_\theta = +1), full transverse polarization
-(\lambda_\theta = -1) and null polarization. Then, the paragraph in
-lines 140-147 can be moved before presenting Fig. 2.
+We can do that, putting this information before.
 
-Figure 2: in my opinion is quite less informative than others. It could be
-eliminated, too. Please take this as an option in case the paper length
-has to be shortened, and not as a request.
+> 
+> Line 138: "unphysical" is somewhat disturbing in a physics paper. I would 
+> say
+> that models do not allow us to predict the effective polarization of
+> the J/\Psi in these kind of events. We then obtained results assuming
+> different polarization schemas, namely with full longitudinal
+> polarization (\lambda_\theta = +1), full transverse polarization
+> (\lambda_\theta = -1) and null polarization. Then, the paragraph in
+> lines 140-147 can be moved before presenting Fig. 2.
 
-Line 147: EvtGen was never introduced before. Change "predicted by EvtGen" 
--->
-"predicted using the EvtGen MC generator [cite]".
+Yes. We can remove "unphysical" and re-arrange the two paragraphs.
+ 
+> Figure 2: in my opinion is quite less informative than others. It could be
+> eliminated, too. Please take this as an option in case the paper length
+> has to be shortened, and not as a request.
 
-Line 147: A negligible variation... it is not clear to which case you are
-referring. In all cases? In the last case?
+OK.
 
-Line 151: Add the acronym (used later) "due to final state radiation 
-(FSR).
+> Line 147: EvtGen was never introduced before. Change "predicted by EvtGen" 
+> -->
+> "predicted using the EvtGen MC generator [cite]".
 
-Line 155: "is at on" --> "is on"
+This is already in lines 68-74. Should we repeat it here?
 
-Line 156: "middle rapidity" --> "middle rapidity range"
+> 
+> Line 147: A negligible variation... it is not clear to which case you are
+> referring. In all cases? In the last case?
 
-Line 185: I must confess I didn't understand. What is "muon 
-identification"?
-Do you mean "muon identification efficiency"?
+In the last case (EvtGen vs. Babar measurement).
 
-Line 194: the average value of \rho is well consistent with zero. Is it 
-worth
-to add such an effect if you know that is consistent with zero? Aren't you
-introducing some bias, some systematic? That is true also for single
-bins in Table 3. In my opinion \rho, once evaluated to be consistent with
-zero, must be eliminated by the equation. At most its average can be
-taken as a source of systematic error.
+> Line 151: Add the acronym (used later) "due to final state radiation 
+> (FSR).
 
-Line 196: remove the parenthesis (see Section 3.3).
+OK. 
 
+> Line 155: "is at on" --> "is on"
 
-Lines 205-209: Whether you take into account my comment of line 194 or 
-not,
-you should move this paragraph just after line 194.
+OK.
 
-Table 2: the left part is quite difficult to "read". I would arrange three
-identical tables, two on the left and one on the right, instead of
-composing such a complicated single table.
+> 
+> Line 156: "middle rapidity" --> "middle rapidity range"
 
-Table 3: in fact the comment has nothing to do with the table, that is 
-used
-just as a reference. In the final version of the paper, pay attention
-to "orphan" lines like this. Here we have an incomplete line and an
-equation just below a large table. As a result, the text is "lost" in the
-page. Better to try to put this text close to the previous one. Of course
-this is useless at this stage, because the page layout is going to change
-in any case. But take it into account in the final version.
+OK.
 
-Table 4: the table is too large. In order to reduce its width one can 
-introduce
-another column in Table 3, called Pt_bin, as an integer from 1 to 33.
-Then one can remove the Pt column from Table 4 and use the Pt_bin,
-instead.
+> Line 185: I must confess I didn't understand. What is "muon 
+> identification"?
+> Do you mean "muon identification efficiency"?
 
-In the caption "the polarization fully longitudinal and fully
-transversal" --> "the full longitudinal polarization and the full
-transversal polarization"
+Yes. Thanks for spotting this. 
 
-I'm not sure it is correct, but substituting "null" with \lambda_\theta=0
-in the third column may make the table clearer. "null" seems a mistake
-at first sight. You can probably remove the "Prompt j/\Psi polarization"
-caption in the middle of the last columns.
+> Line 194: the average value of \rho is well consistent with zero. 
+> Is it 
+> worth
+> to add such an effect if you know that is consistent with zero? Aren't you
+> introducing some bias, some systematic? That is true also for single
+> bins in Table 3. In my opinion \rho, once evaluated to be consistent with
+> zero, must be eliminated by the equation. At most its average can be
+> taken as a source of systematic error.
 
-Lines 256-257: "To account for..." is rather obscure. A possible 
-alternative is
-to remove the sentence here and rephrase the one at lines 274-275 (see
-below).
+No. The large value of the RMS is actually an indication that in some bins 
+rho is not consistent with zero (especially in the forward region, see
+Analysis Note). That's why we need to apply the correction.
 
+> Line 196: remove the parenthesis (see Section 3.3).
 
-Lines 274-275: "free in the nominal fit, ..." --> "free in the nominal 
-fit.
-lJclearlydependsonthepositionoftheprimaryvertexTotakeintoaccountpossiblewrongassignmentoftheprimaryvertextoeacheventweaddedafixedcomponenttoF_p(l_{J/\Psi})$ 
-estimated
-from Monte Carlo simulation".
+I don't understand this comment.
 
-Line 281: "fit of the" ---> "fit to the"
+> 
+> Lines 205-209: Whether you take into account my comment of line 194 or 
+> not,
+> you should move this paragraph just after line 194.
 
-Table 5: remove (see next section) in the caption of the table.
+Correct. We will do that.
 
-Line 299: "pseudo-proper" is a term I never heard and is not defined. It 
-could
-be my ignorance, but I believe it is worth to add a definition or a
-different description.
+> Table 2: the left part is quite difficult to "read". I would arrange three
+> identical tables, two on the left and one on the right, instead of
+> composing such a complicated single table.
 
-Line 304: I don't see this as a source of systematic error. In fact here 
-you
-deliberately take as a good model a worst model of the primary vertex
-distribution. You are then deliberately making the measurement worst with
-respect to what you are able to do. This is then an artificial worsening
-of the detector performance that cannot influence the determination of the
-result as a systematic error does. Systematic errors should be the
-result of the incompleteness of the knowledge of your detector. In this
-case you know that taking the run-by-run vertex is worst w.r.t. taking
-the run-by-run vertex. I don't like to have this as a source of systematic
-error, even if the effect would be negligible.
+No problem, but the table seems quite clear to us. Where is the difficulty
+in "reading" it?
 
+> Table 3: in fact the comment has nothing to do with the table, that is 
+> used
+> just as a reference. In the final version of the paper, pay attention
+> to "orphan" lines like this. Here we have an incomplete line and an
+> equation just below a large table. As a result, the text is "lost" in the
+> page. Better to try to put this text close to the previous one. Of course
+> this is useless at this stage, because the page layout is going to change
+> in any case. But take it into account in the final version.
 
-Line 314: "slightly differences" --> "small differences"
+OK.
 
-Line 324: do not emphasize "prompt"
+> Table 4: the table is too large. In order to reduce its width one can 
+> introduce
+> another column in Table 3, called Pt_bin, as an integer from 1 to 33.
+> Then one can remove the Pt column from Table 4 and use the Pt_bin,
+> instead.
 
-Table 8: see comments on Table 4. Here you have to use ranges of pt_bin's.
+In the original version, the table was put sideways. We need to see the final
+page layout to know if this must be done.
+ 
+> In the caption "the polarization fully longitudinal and fully
+> transversal" --> "the full longitudinal polarization and the full
+> transversal polarization"
 
-Figure 5: either I have not understood or there is a mistake here. Why 
-there
-are only three points in bottom-right figure?
+OK.
 
-Page 17: in both equations it is worth to add the left side member, as 
-given
-in previous equations.
+> I'm not sure it is correct, but substituting "null" with \lambda_\theta=0
+> in the third column may make the table clearer. "null" seems a mistake
+> at first sight. 
 
-Figure 6: same comment about Figure 5
+OK.
+ 
+> You can probably remove the "Prompt j/\Psi polarization"
+> caption in the middle of the last columns.
+
+We prefer to leave that line.
+
+> Lines 256-257: "To account for..." is rather obscure. A possible 
+> alternative is
+> to remove the sentence here and rephrase the one at lines 274-275 (see
+> below).
+> 
+> Lines 274-275: "free in the nominal fit, ..." --> "free in the nominal 
+> fit.
+> lJclearlydependsonthepositionoftheprimaryvertexTotakeintoaccount
+> possiblewrongassignmentoftheprimaryvertextoeacheventweaddedafixed
+> componenttoF_p(l_{J/\Psi})$ 
+> estimated
+> from Monte Carlo simulation".
+
+We will follow this suggestion.
+
+> Line 281: "fit of the" ---> "fit to the"
+
+OK.
+
+> Table 5: remove (see next section) in the caption of the table.
+
+OK.
+
+> Line 299: "pseudo-proper" is a term I never heard and is not defined. It 
+> could
+> be my ignorance, but I believe it is worth to add a definition or a
+> different description.
+
+We will change it to l_J/psi, as previously defined.
+
+> Line 304: I don't see this as a source of systematic error. In fact here 
+> you
+> deliberately take as a good model a worst model of the primary vertex
+> distribution. You are then deliberately making the measurement worst with
+> respect to what you are able to do. This is then an artificial worsening
+> of the detector performance that cannot influence the determination of the
+> result as a systematic error does. Systematic errors should be the
+> result of the incompleteness of the knowledge of your detector. In this
+> case you know that taking the run-by-run vertex is worst w.r.t. taking
+> the run-by-run vertex. I don't like to have this as a source of systematic
+> error, even if the effect would be negligible.
+
+This is not completely true because at this stage different factors enter
+the beam-spot and primary vertex estimation. The beam spot, as you say,
+gives a worst estimation because of averaging many events. On the other hand,
+the primary vertex can suffer from other uncertainties as misassignment due
+to pile-up, bias due to the displacement of tracks in bbbar events, etc.
+Those were not studied in detail due to the limited amount of statistics:
+so we're not able at this stage to tell which of the two methods gives the
+worse resolution (resolution parameter results of the two fits are actually
+compatible within errors). 
+
+> Line 314: "slightly differences" --> "small differences"
+
+OK.
+ 
+> Line 324: do not emphasize "prompt"
+
+Ok.
+
+> Table 8: see comments on Table 4. Here you have to use ranges of pt_bin's.
+
+See answer to table 4.
+
+> Figure 5: either I have not understood or there is a mistake here. Why 
+> there
+> are only three points in bottom-right figure?
+
+Because we're integrating over the full rapidity range and we can only do that
+in the pT bins which are in acceptance for all |y| sub-ranges, i.e. only
+the last three bins.
+
+> Page 17: in both equations it is worth to add the left side member, as 
+> given
+> in previous equations.
+
+OK.
+
 
 
