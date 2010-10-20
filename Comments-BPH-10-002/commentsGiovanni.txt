@@ -65,8 +65,8 @@ Yes. We can remove "unphysical" and re-arrange the two paragraphs.
 > eliminated, too. Please take this as an option in case the paper length
 > has to be shortened, and not as a request.
 
-Fig. 2 gives the reader the only information of where the acceptance is and where the data
-are distributed. We believe is important.
+Fig. 2 gives the reader the only information of where the acceptance is and 
+where the data are distributed. We believe is important.
 
 > Line 147: EvtGen was never introduced before. Change "predicted by EvtGen" 
 > -->
@@ -109,10 +109,11 @@ Yes. Thanks for spotting this.
 > zero, must be eliminated by the equation. At most its average can be
 > taken as a source of systematic error.
 
-No. Here we quote only two "figures" but the rho vary from one bin to another and they are statistical accurate.
-  The large value of the RMS is actually an indication that in some bins 
-rho is not consistent with zero (especially in the forward region, see
-Analysis Note). That's why we need to apply the correction.
+No. Here we quote only two "figures" but the rho vary from one bin to another 
+and they are statistically very accurate. The large value of the RMS is 
+actually an indication that in some bins rho is not consistent with zero 
+(especially in the forward region, see Analysis Note). That's why we need to 
+apply the correction.
 
 > Line 196: remove the parenthesis (see Section 3.3).
 
@@ -130,7 +131,7 @@ Correct. We will do that.
 > composing such a complicated single table.
 
 The table seems quite clear to us. Where is the difficulty in "reading" it?
-It will be re-formatted anyway by the Journal (EPJC).
+It will be re-formatted anyway by the Journal (EPJ-C).
 
 > Table 3: in fact the comment has nothing to do with the table, that is 
 > used
@@ -162,7 +163,8 @@ OK.
 > in the third column may make the table clearer. "null" seems a mistake
 > at first sight. 
 
-No, it is not correct. We should also put \lambda_\phi =0 (actually in all) 
+No, it is not correct. We should also put \lambda_\phi = 0 (actually in 
+all), but it's intended to be like that. 
  
 > You can probably remove the "Prompt j/\Psi polarization"
 > caption in the middle of the last columns.
@@ -227,7 +229,7 @@ OK.
  
 > Line 324: do not emphasize "prompt"
 
-Ok.
+OK.
 
 > Table 8: see comments on Table 4. Here you have to use ranges of pt_bin's.
 
