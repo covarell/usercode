@@ -47,7 +47,7 @@ acceptance (before any analysis cut).
 > Another consequence of this remodulation is that you must eliminate the
 > last sentence in the paragraph (lines 134-135).
 
-We can do that, putting this information before.
+We can move this information before.
 
 > 
 > Line 138: "unphysical" is somewhat disturbing in a physics paper. I would 
@@ -65,13 +65,14 @@ Yes. We can remove "unphysical" and re-arrange the two paragraphs.
 > eliminated, too. Please take this as an option in case the paper length
 > has to be shortened, and not as a request.
 
-OK.
+Fig. 2 gives the reader the only information of where the acceptance is and where the data
+are distributed. We believe is important.
 
 > Line 147: EvtGen was never introduced before. Change "predicted by EvtGen" 
 > -->
 > "predicted using the EvtGen MC generator [cite]".
 
-This is already in lines 68-74. Should we repeat it here?
+This is already in lines 68-74. We should not repeat here.
 
 > 
 > Line 147: A negligible variation... it is not clear to which case you are
@@ -108,7 +109,8 @@ Yes. Thanks for spotting this.
 > zero, must be eliminated by the equation. At most its average can be
 > taken as a source of systematic error.
 
-No. The large value of the RMS is actually an indication that in some bins 
+No. Here we quote only two "figures" but the rho vary from one bin to another and they are statistical accurate.
+  The large value of the RMS is actually an indication that in some bins 
 rho is not consistent with zero (especially in the forward region, see
 Analysis Note). That's why we need to apply the correction.
 
@@ -127,8 +129,8 @@ Correct. We will do that.
 > identical tables, two on the left and one on the right, instead of
 > composing such a complicated single table.
 
-No problem, but the table seems quite clear to us. Where is the difficulty
-in "reading" it?
+The table seems quite clear to us. Where is the difficulty in "reading" it?
+It will be re-formatted anyway by the Journal (EPJC).
 
 > Table 3: in fact the comment has nothing to do with the table, that is 
 > used
@@ -139,7 +141,7 @@ in "reading" it?
 > this is useless at this stage, because the page layout is going to change
 > in any case. But take it into account in the final version.
 
-OK.
+This is LaTeX, but we will try to do.
 
 > Table 4: the table is too large. In order to reduce its width one can 
 > introduce
@@ -148,7 +150,7 @@ OK.
 > instead.
 
 In the original version, the table was put sideways. We need to see the final
-page layout to know if this must be done.
+page layout to know if this must be done. Same comment above applies.
  
 > In the caption "the polarization fully longitudinal and fully
 > transversal" --> "the full longitudinal polarization and the full
@@ -160,7 +162,7 @@ OK.
 > in the third column may make the table clearer. "null" seems a mistake
 > at first sight. 
 
-OK.
+No, it is not correct. We should also put \lambda_\phi =0 (actually in all) 
  
 > You can probably remove the "Prompt j/\Psi polarization"
 > caption in the middle of the last columns.

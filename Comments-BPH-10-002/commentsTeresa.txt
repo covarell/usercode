@@ -39,7 +39,7 @@ Yes. We can change that.
 > reconstruction/fitting methods and comment (as you do) the different 
 > performance (efficiency and purity)?
 
-Do we really want to mention muon seeding methods in a physics paper?
+We find too technical to mention muon seeding methods in a physics paper.
 The description is missing, because the reference to the muon performance 
 paper is given here. You can find the original description in the corresponding
 passage of the Analysis Note, but it seemed to us very lengthy and 
@@ -61,7 +61,7 @@ fact, the opinion of some reviewers is to remove the SS distribution.
  
 > Lines 131-132: is the last sentence necesary? I think no. 
 
-It is. Otherwise we could have "rho-like" effects in the acceptance 
+Yes, it is. Otherwise we could have "rho-like" effects in the acceptance 
 determination as we have in the muon efficiencies.
 
 > Eq 3: why not using the standard notation Epsilon-id and Epsilon-trig? in 
