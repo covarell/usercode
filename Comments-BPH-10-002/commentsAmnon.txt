@@ -1,0 +1,290 @@
+ general typesetting: are you sure the construct "J/'s" is
+a correct plural form? A plural form can not be built with ', so I 
+assume this a short form for J/psi mesons, where the ' indicates that 
+"meson" was dropped. That is very unusual! The normal construct is
+simply "J/s"
+
+- related - inconsist use of "italics" fonts for particle names.
+
+- Fig 1's quality was reduced by compression. Please use vector graphics 
+throughout.
+
+- why is "transverse momentum" spelled out throughout? Why not use p_T?
+
+- tenses and subjects:
+I think the past tense is overused in this paper. 
+In particular, when describing how this analysis is done in the middle of
+the paper, in contrast to previous results you use, or the summary 
+section,
+the present tense is usually best. I've noted some cases below.
+There's also a tendency not to use "we" when it is called for, e.g. in 
+Line 108, wouldn't "We use" be better?
+
+L6: this is nice text, but the paragraph reads fine without it.
+L9-12: there's a tense problem here (what Greg calls "breaking casuality"
+I think): you haven't presented your analysis yet, so from the reader's
+perspective there are no such LHC results yet. So they can't "help" (in 
+the present tense), at least not at this stage of the paper. It's also
+a bit wordy.
+
+An alternative:
+"Cross-section measurements for prompt \Jpsi at the Large Hadron Collider 
+(LHC) 
+may clarify the production mechanism by testing theoretical predictions
+at a higher energy and in a wider rapidity range than was previously 
+possible."
+
+
+L14: a "historical discrepancy" sounds like this was big enough to 
+make the history books. How about:
+
+"Past discrepancies between .... were recently resolved using the FONLL 
+... "
+
+L18-19: clearly, the theory is being tuned to the data, not the the other 
+way around. So maybe:
+
+"The cross-section values and spectra predicted by Monte Carlo
+generators that implement this model, such as MC@NLO[12,13], agree
+with the Tevatron results." (or "with the measurements"?)
+
+ 
+
+L20-22: The reader will decide if this is relevant, we should only present 
+the facts.
+How about:
+
+"Studying the production of J/s from B-decay at the LHC tests
+these models at higher energies and also tests the QCD modeling and 
+parton density functions used in Monte Carlo generation."
+
+But do you really say anything about the QCD modeling and the PDFs
+in the rest of the paper? Do the comparisons to theory depend on the
+accuracy of the MC simulation?
+
+Line 34: CMS was spelled out earlier, in line 25, why repeat it?
+
+Footnote 1: "The CMS coordinate system has its origin ... "
+
+L56-57: This sentence sounds too passive. Also "the average" isn't really 
+defined.
+How about:
+
+"In this data sample, the LHC averaged 1.6 pp collisions per bunch 
+crossing."
+
+I think the verb "averaged" is appropriate since the LHC is a collider.
+
+L68, L75: "were" --> "are" etc.
+
+L71: first "Octet" is misspelled
+
+L80: no they are not. E.g. in line 25 when you defined CMS, and in line 
+54.
+What you're defining here are muon CANDIDATES.
+
+
+L83: there is some confusion here. It is the reconstruction algorithms 
+that provide, e.g., high purity muon reconstruction. But here "the first
+one" refer to a "reconstructed muon type", which does not "provide"
+muon reconstruction.
+
+L83-90: should provide the reader, in the text, with some explanation of
+what the two different types actually are. I think the additional 
+details (on pT thresholds, what is kept exclusive, pT reconstructions)
+can not be understood without this basic information of what the
+types mean. Hence this basic information is more important than the
+additional details and should appear in the text.
+
+The 4th paragraph in TRK-10-004 does this well.
+
+L92-93: Exactly 2? Phrase on pixel layers missing a verb, e.g. "are", 
+"must be". 
+So how about: "..., at least two of which are required to be in the pixel
+layers, ... "
+
+L93: The chi^2 is undefined. It the output of a fit, but no (tracking) 
+fit has been mentioned in the text yet (it's in the next paragraph).
+
+L100: in principle, including the J/psi fit in such an optimization biases
+a subsequent measurement of J/psi cross-section towards the expect value. 
+AFAIK the optimization allowed the amount of signal to vary freely
+while fixing only its shape, to avoid this. But the text currently hints
+differently since it says only "expected mass distributions".
+A comment on possible bias being small may also resolve this.
+
+L110/112: "is chosen" --> "is used"
+
+
+Above Eq. 1: is "material budget" clear here? Sounds a bit jargonish.
+
+Above L133: 
+- should this equation have a number?
+- it's great that you choose to provide the 10\% number, but I think it
+requires context: how high can this probability go? What's the average
+within these cuts? 
+- This is somewhat addressed by Fig. 2.
+
+L135: why repeat "Monte Carlo" here? You could use the less distracting
+"simulated", but why repeat this information here at all? It's already
+been said in lines 129, 131, and 133 ("generated").
+
+L142: "we chose"?
+
+L145: How is BaBar's production relevant here? 
+The collisions are very too different (e.g. more ISR --> less 
+polarization, no?).
+How is it comparable to a default LHC simulation? Shouldn't you compare it
+to BaBar's default simulation and then translate to the LHC?
+
+L150: I found this sentence very confusing. I think that was caused by
+stressing "generated" for the di-muons when it applies equally
+well to the J/psi.
+
+L155, 303, 306, 315: "systematics" --> "source of systematic uncertainty" 
+or
+"systematic uncertainty" depending on context
+(systematics as a shortform for systematic uncertainty is HEP-EX jargon)
+
+L161: is this 20% relative or absolute? That is, would you change a 
+simulated
+25% to 20-30% or to 5-45%?
+
+L164: pp is italicized, unlike in the rest of the text.
+
+L170: Doesn't this correction also apply to MC? 
+"The reconstructed muon p_T was calibrations..."
+
+L171: residual bias where? In data? In MC? In both? On the difference?
+The current text implies the answer is "In data", but what about
+the MC, is the reconstruction tuned to be perfect there by definition?
+
+L172: Remove "below" (right now you're saying the maximum is below 0.05%,
+like you want to keep the actual maximum a secret).
+
+L172-175: very wordy. How about:
+
+"...0.05%, which is taken as a source of systematic uncertainty on the 
+acceptance."
+I realize this suggestion is probably wrong, due to my lack of 
+understanding
+as per the questions above. I write it only to note that it may be
+possible to rewrite this as much shorter text.
+
+L176-177: Remove the first "also". "give a systematics on" --> "bias".
+
+L150-176: 
+- what are the sizes of these uncertainties? Which ones are important?
+- What about the charge-dependence and phi-modulation mentioned in 
+TRK-10-004?
+
+L188: "and varies only slightly"
+
+L194: Is the 0.11 used in the systematic uncertainties?
+
+L195-198: Is background subtraction used? If so, it'll probably help to 
+mention the background levels in Fig. 1.
+Should this text be in the present tense?
+
+L200: which distribution of the probe muon? How big is the difference?
+
+207-210: a) You varied by reweighting, these are not separate actions.
+b) why the plural "spectra"?
+c) this is a run-on sentence
+d) shouldn't this be in the present tense?
+How about:
+"Hence we reweight the simulated J/psi pT spectrum to reproduce different 
+theoretical predictions (see Sec. 7)
+and take the largest variation as a systematic uncertainty on r."
+
+ 
+
+Table 3: 
+The fit uncertainties fluctuate wildly. It seems their estimation is
+unstable (are you only comparing 2/3 shapes?) and thus some uncertainties
+are underestimated. E.g. is it really 0.0 uncertainty for |eta|<1.2 and 
+pT~6GeV?
+To my mind, a simple smoothing as a function of pT would suffice.
+This may also be useful for the muon efficiency uncertainties.
+
+ 
+
+
+L251: "of the event"?
+"calculate by" --> "found by performing a"?
+
+ 
+
+Above Eq. 7: the nominal mass (is so reference PDG), or the reconstructed 
+one?
+
+L259: why is x bold? Is it a vector? Then why does the text say "distance"
+(i.e., a scalar)?
+
+L265: remove the first "the" ("are functional forms describing").
+L267: ending is awkward. How about "as described in Section 5.1" (or "as 
+detailed").
+L268: remove the first "the"
+
+L273: are all Gaussian constrained to peak at 0?
+
+L279: an active voice may help:
+
+"For the ... F_bkg(..) we use the function form of Ref.[25], convoluted 
+..."
+
+L281: what are "effective parameters"?
+
+L284: "b" is italicized, unlike in rest of paper. Also, you often use a 
+capital B,
+e.g. Table 5.
+
+L288: What are "sample bins"?
+L289: how can you exclude any bias? Probably better to say that any 
+possible bias
+was found to be negligible. Or to say that the bias was quantified and
+found to be negligible.
+
+Fig. 4 caption: Was "pull" defined somewhere?
+
+L310: bold math symbols would look better.
+
+Tables 4,8 - it is not clear from the caption whether these are the 
+predicted
+cross sections, or the measured ones (with acceptance and such 
+depending on the assumptions).
+Add "measured"?
+
+L324 - why is prompt italicized, this isn't the definition since it 
+appeared before.
+
+L334 - "falling significantly steeper" is very awkward.
+What's "models represented"? Did you mean "presented above"?
+How about:
+"The differential cross decreases as a function of p_T more rapidly
+than predicted by the models presented above."
+
+L338 - drop last comma?
+
+L341 - drop "have"
+- why is J/psi italicized while pp is not in L342?
+
+
+L342 - nb-1 are not units of data, so "314nb-1 of data" 
+--> something like in the abstract and the introduction
+
+Fig. 5 - caption doesn't describe the x-axis error bars.
+
+After L343 - are these "regions" or "windows"? Would read better
+with a consistent term.
+
+L346b - Drop "the" before "J/psi production"
+
+L347 - the differential measurements split into prompt and non-prompt
+haven't been mentioned in the conclusions yet. So "the" is inappropriate,
+it can be dropped.
+- drop "some"
+
+L348 - drop "in general"
+
+
