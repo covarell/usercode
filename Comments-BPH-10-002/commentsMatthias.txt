@@ -43,7 +43,10 @@ TRANSVERSE MUON MOMENTUM, DEPENDING ON |ETA|, are then chosen etc."
 > pronounced it may be better to obtain the uncertainties for subsamples 
 > that integrate over larger kinematic regions.
 
-Your comment is very sensible. In principle no contribution should come from 
+General concern. We will post the final choice in HN, after agreement with
+ARC and Phys-Coord.
+
+Just a few words here. In principle no contribution should come from 
 the statistical fluctuation of the bin contents, since the systematics are
 computed fitting THE SAME data with different conditions: but this is not
 strictly true e.g. for the "background fit", as you point out.

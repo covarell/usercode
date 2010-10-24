@@ -61,7 +61,7 @@ a detailed description here.
 > I'm not sure what is the reason for it and whether it would cause any 
 > concerns.
 
-No. It simply means that the correction is too small to be significantly
+It simply means that the correction is too small to be significantly
 different from 0 with the available statistics. This error is taken into 
 account in the acceptance systematics (lines 169-175).
   
@@ -121,7 +121,7 @@ Yes.
 > in L135 seems not very clear to readers, and may be better to be 
 > re-phrased.
 
-Other reviewers have had problems understanding this sentence, so we will
+Other reviewers too have had problems understanding this sentence, so we will
 change it.
  
 > 
@@ -131,7 +131,7 @@ change it.
 >     (a) the "Acceptance" for the left figure;
 >     (b) the "Number of mu pair" for the right figure.
 
-I don't know if ROOT supports palette labelling. We will try.
+I don't know if ROOT supports palette labeling. We will try.
   
 > (26) L142, I'm not sure whether it would be better to change from
 > "where the polarization is not well known at present" -->
@@ -142,7 +142,7 @@ No, "known" also includes uncertainties in the theoretical description.
 > (27) L150-152, it seems to me that a percentage number should be quoted 
 > for this 1st item of systematic uncertainties.
 
-It is reported in table 3 per each bin (3rd column from the left)/
+It is reported in table 3 per each bin (3rd column from the left).
  
 > (29) L163, it seems better to change from
 > "at the permille level" -->
@@ -169,7 +169,8 @@ This will be changed to "id" (see answers to Teresa).
 
 See answers to Giovanni. Because it's not a statistical error, but a
 RMS over the values per bin: since in some bins rho is not compatible with 0
-(hence the correction) the RMS is larger than the mean.
+(hence the correction) the RMS is larger than the mean. This sentence will
+be changed or removed.
 
 > 
 > (35) L211, L216 and in Eq.(5), the letter size of "corr" in the "N(corr)" 
@@ -205,10 +206,10 @@ Correct! We should add PAS EWK-10-004.
 > explain
 > this difference?
 
-It is the simple observation that polarization in different frames have a
+It is the simple observation that polarizations in different frames have a
 crossing point in the forward and middle regions. 2D figures proving that
 are available in the Analysis note and we can also provide |y|-integrated
-acceptances (we did it for the PAS). <-- Shuang
+acceptances (we did it for the PAS). 
  
 > (b) a few data numbers have only one significant digit or without digit 
 > after

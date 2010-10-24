@@ -184,7 +184,7 @@ mention.
 > "simulated", 
 
 But then the sentence would read "the simulated reconstructed dimuon..."
-(not nice)
+(not nice).
 
 > but why repeat this information here at all? It's already
 > been said in lines 129, 131, and 133 ("generated").
@@ -206,7 +206,7 @@ From private communication with Pietro Faccioli, we concluded that in
 general what you say is true for directly produced particles but, if the
 charmonium is a product of a heavy quark decay, the same polarization
 is observed in the helicity frame irrespective of the production mechanism
-of the parent particle. Citing:
+of the parent particle, to a good approximation. Citing:
 
 "The following considerations apply to the perturbative production of a
 c-cbar pair. The c-cbar will then evolve into the Jpsi and this phase may 
@@ -285,7 +285,7 @@ OK.
 > as per the questions above. I write it only to note that it may be
 > possible to rewrite this as much shorter text.
 
-In fact this is not waht we do. 0.05% is the amount by which we shift the
+In fact this is not what we do. 0.05% is the amount by which we shift the
 muon momentum value in the two directions (+/- 0.05%). The resulting
 difference in acceptance is taken as systematics.
  
@@ -317,8 +317,9 @@ and should be either completely changed or removed.
 > mention the background levels in Fig. 1.
 
 No, the background levels of Fig. 1 are done using also Tracker muons, so they
-are much higher. Global Muons are almost background-free (and are the same
-as the others for what concerns inner tracking which is used for vertex
+are much higher. Global Muons are almost background-free, yet they can be used
+in un unbiased way for this study, because they do not differ from othe types
+of muons for what concerns inner tracking (which is used for vertex
 efficiency estimation).
 
 > Should this text be in the present tense?
@@ -355,7 +356,8 @@ Yes.
 > To my mind, a simple smoothing as a function of pT would suffice.
 > This may also be useful for the muon efficiency uncertainties.
  
-General concern. We will post a solution in HN.
+General concern. We will post the final choice in HN, after agreement with
+ARC and Phys-Coord.
 
 > L251: "of the event"?
 
@@ -435,7 +437,8 @@ OK.
 > depending on the assumptions).
 > Add "measured"?
 
-We can, even if we think that this is the result of the measurement.
+We could, even if we think that it's clear: this is the result of the 
+measurement.
  
 > L324 - why is prompt italicized, this isn't the definition since it 
 > appeared before.
