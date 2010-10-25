@@ -44,7 +44,7 @@ Right. We will remove it.
 > perspective there are no such LHC results yet. So they can't "help" (in 
 > the present tense), at least not at this stage of the paper. It's also
 > a bit wordy.
->
+> 
 > An alternative:
 > "Cross-section measurements for prompt \Jpsi at the Large Hadron Collider 
 > (LHC) 

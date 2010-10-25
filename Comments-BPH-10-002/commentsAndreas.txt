@@ -1,0 +1,168 @@
+> Dear Editors and Analysis Team!
+> 
+> Congratulations on this nice measurement! The analysis appears sound and 
+> corrent to us and the paper is already very well written
+> 
+> Our single most important general comment is the following:
+> 
+> We have the impression that some of the uncertainties quoted are dominated 
+> by the lack of statistics, leading to bin-to-bin fluctuations of the size 
+> of the systematic errors. The effect seems to be most apparent in tables 3 
+> and 6. With the small data sample at hand, those fluctuations may be largely 
+> unavoidable.
+> 
+> However, given the qualitative character of the present measurement, 
+> we question the need for the many detailed listings of acceptance and numbers 
+> in tables.
+> 
+> We think the paper would overall profit, if tables 1, 2, 3, 5 were removed. 
+> The relevant information from these tables could (and should) be given 
+> in the text.
+> 
+> Apart from this main comment, we have only few small comments as listed below.
+> 
+> We wish you good look for the remaining steps towards the final publication!
+>  
+> Detailed comments
+> 
+> Title: 
+> 
+>     * How about "First Measurement of ..."
+> 
+> Abstract:
+> 
+>     * Mention that the decay into muons is used for this measurement
+> 
+> Introduction:
+> 
+>     * It is important to say a few words about the issue of polarization, 
+> that it is still unknown, that the measurement of the cross section has a 
+> strong dependence on the assumption of the quarkonium polarization and that 
+> it will be for future analyses to resolve the issue.
+>     * It may be in order to mention the recent calculations by Kniehl et al 
+> (arXiv:1009.5662) and Ma et al. (arXiv:1009.3655) (see below).
+> 
+> Tables:
+> 
+>     * Suggest to remove tables 1,2,3,5
+>     * Suggest to move tables 4,6,7,8 to the back of the paper.
+>     * Use references to the tables in the text everywhere.
+> 
+> Figures:
+> 
+>     * The labels are generally a bit small
+> 
+> Figure 1: 
+> 
+>     *  suggest to replace "signal+background" by "fit (signal+bg)"
+>     *  caption: lever arm -> transverse length
+>     *  caption worse => worsening of the
+> 
+> Figure 2:
+> 
+>     *  consider "box" style for better b/w compatibility
+>     *  caption: "Right: Measured number of muon pairs in bins of pt and |y|.
+> 
+> 
+> Figure 3:
+> 
+>     *  caption: replace "in the null polarization scenario" by 
+> "assuming zero polarization".
+> 
+> 
+> Figure 4:
+> 
+>     *  labels are very small.
+>     *  caption: mention that these are distributions two bins selected 
+> as example.
+> 
+> Figures: 3,5 and 6:
+> 
+>     *  We understand that the horizontal error bars are the RMS of the 
+> distribution of events in the bin. Since the central values <pt> and RMS 
+> have been determined using an assumption on the distribution of the cross 
+> section inside the bin, it may be more appropriate to plot the uncertainty 
+> on the result of  this bin-center correction, rather than the RMS.
+> 
+> References:
+> 
+>     *   Recently Kniehl et al and Ma et al. have independently from each 
+> other calculated the NRQCD hadroproduction matrix elements (color octet) 
+> at NLO and determined the corresponding long-distance matrix elements. 
+> The references are:
+> 
+> %\cite{Ma:2010yw}
+> \bibitem{Ma:2010yw}
+> Y.~Q.~Ma, K.~Wang and K.~T.~Chao,
+> %``J/psi (psi') production at Tevatron and LHC at O(\alpha_s^4v^4) in
+> %nonrelativistic QCD,''
+> arXiv:1009.3655 [hep-ph].
+> %%CITATION = ARXIV:1009.3655;%%
+> and
+> %\cite{Butenschoen:2010rq}
+> \bibitem{Butenschoen:2010rq}
+> M.~Butenschoen and B.~A.~Kniehl,
+> %``Reconciling J/psi production at HERA, RHIC, Tevatron, and LHC with NRQCD
+> %factorization at next-to-leading order,''
+> arXiv:1009.5662 [hep-ph].
+> %%CITATION = ARXIV:1009.5662;%%
+> 
+>     *   We noticed that the references to FONLL in the draft is not in 
+> agreement with the list of references on this webpage 
+> http://cacciari.web.cern.ch/cacciari/FONLL/README
+> 
+> Citation for this work:
+> 
+> 1) M. Cacciari, M. Greco and P. Nason,
+> "The p_T Spectrum in Heavy Flavor Hadroproduction",
+> JHEP 9805 (1998) 007 [hep-ph/9803400]
+> 2) M. Cacciari, S. Frixione and P. Nason,
+> "The p_T Spectrum in Heavy Flavor Photoproduction",
+> JHEP 0103 (2001) 006 [hep-ph/0102134]
+> %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+> %\cite{Cacciari:1998it}
+> \bibitem{Cacciari:1998it}
+> M.~Cacciari, M.~Greco and P.~Nason,
+> %``The p(T) spectrum in heavy-flavour hadroproduction,''
+> JHEP {\bf 9805} (1998) 007
+> [arXiv:hep-ph/9803400].
+> %%CITATION = HEP-PH 9803400;%%
+> %\cite{Cacciari:2001td}
+> \bibitem{Cacciari:2001td}
+> M.~Cacciari, S.~Frixione and P.~Nason,
+> %``The p(T) spectrum in heavy-flavor photoproduction,''
+> JHEP {\bf 0103} (2001) 006
+> [arXiv:hep-ph/0102134].
+> %%CITATION = HEP-PH 0102134;%%
+> %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+> 
+>  
+> 
+> Text:
+> 
+>     * 54: suggest to move to after 57
+>     * 61: filtering -> processing
+>     * 65: Anomalous -> non-collision
+>     * 66,67: mention ref [16] only once.
+>     * 69: to -> for
+>     * 92: which two -> which at least two
+>     * 100: is affected by -> has
+>     * 116: and the rest is trk trk ?
+>     * 131/132: move to after line 134
+>     * 138: remove "(unphysical)" as it is not really unphysical, even 
+> though not expected quantitatively.
+>     * 140-148: would be better understandable with a little bit of 
+> introduction in introduction (see our comment above)
+>     * 150 and following: give numbers in the text.
+>     * 155: remove "at"
+>     * 164: on -> from
+>     * 190-191: english ?: "... and so are mapped ..."
+>     * 191: We have not understood the relation between the finite bin 
+> size in pt and eta and the parameter rho.
+>     * 194: what is RMS ? is RMS representative of the systematic error on 
+> rho ? RMS is likely a statistical uncertainty ?
+>     * 320: The numbers for the cross sections 196.7 nb and 53.3 nb add up to 
+> 250.0 nb. However, the inclusive cross section quoted is 251.4 nb. We assume 
+> that the discrepancy is due to numerical issues. If this is true, it may be 
+> useful to state somewhere in the text.
+>     * 334: We dont understand the statement ".. is likely to depend on pt."
