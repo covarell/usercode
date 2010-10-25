@@ -48,7 +48,7 @@ Yes.
 OK.
 
 Personally I would leave "this" (meaning: the fact that the p measurement is affected..). 
-I think "these" might be interpreted as referring to the "biases in the algorithms" alone.
+I think "these" might be interpreted as referring to the "biases in the algorithms" alone (FL)
 
    
 > (10) L102, I'm not sure what the "expected mass distributions" is 
