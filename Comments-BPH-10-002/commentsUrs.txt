@@ -1,0 +1,172 @@
+> We have read your paper draft informally at PSI. We think that the
+> systematic error determination is flawed in such a way that it should
+> be changed before publication. The manuscript needs to be revised
+> substantially before publication.
+> 
+> Please find our comments below:
+> 
+> L3: It is not good style at all to abbreviate J/\psi's. Use J/\psi
+>     mesons instead. This applies to many places in your text
+> 
+> L9: [6] hardly qualifies as a polarization measurement at the
+> Tevatron.
+> 
+> L14: You are inconsistent in your usage of roman or italic fonts for
+>      particles. Compare pp here and \bbbar and pp on L 164. This
+>      inconsistency remark applies to many places.
+> 
+> L18: b -> J/psi is not fragmentation. b -> B is fragmentation. B ->
+> J/psi is a decay
+> 
+> L21: No measurement of J/psi production will ever (in)validate QCD. It
+>      might at most invalidate certain approximations/approaches. QCD
+>      as a theory of the strong interaction will not be touched.
+> 
+> L23: a/bc is an abbreviation for a/b*c. You should not abbreviate
+>      d2sigma/dpt deta like this.
+> 
+> L41: two forward disks ON either side ...
+> 
+> L43: nine forward disks ON either side ...
+> 
+> L47: add 'primary' in front of vertex
+> 
+> L53: "is" is an inconsistent tense to the rest of the paragraph
+> 
+> L58: Do not capitalize Tracker or Muon and use non-CMS-jargon terms
+>      instead (e.g. add "systems" behind them)
+> 
+> L60: Of course this will not be the last J/psi from CMS, but "The
+>      current" would be better phrased as "This"
+> 
+> L62: Consider removing the last sentence of this paragraph. It is
+>      useless.
+> 
+> L69: Add 'color' in front of 'singlet'
+> 
+> L99: Why bother mentioning a cut chi2/dof < 20, which must be VERY
+>      loose?
+> 
+> L102: 'expected ' -> why no PDG reference here?
+> 
+> Table 1: two numbers do not make a table! Put the numbers into the
+>      text instead.
+> 
+> L113: Is there no explicit pT cut on the muons?
+> 
+> L116: Explicitly mention that the rest is tracker muon - tracker muon
+> 
+> L117: Do you use this like-sign background anywhere in the analysis
+>       later? If not, then remove the sentence.
+> 
+> Fig 1: Aesthetics: The ordinate-0 and abscissa-2.6 touch Do you use
+>                    the J/psi mass to cut on the rapidity of a dimuon
+>                    with m = 3.4 or do you use the dimuon mass? The
+>                    label on the plot would suggest m(J/psi)?!
+> 
+> *Fig 1 caption: The forward muons are affected by more material than
+>                 the barrel muons. This will also deteriorate the
+>                 resolution. Have you verified that your statement
+>                 about the lever arm is in fact true? How much more
+>                 important than the increased material is the lever
+>                 arm? We suggest removing this sentence.
+> 
+> L132: Why do you have such large white space before the ',' and '.' in
+>       the displayed equations?
+> 
+> L140: Our native English speakers suggest replacing "cause" with
+>       "have"
+> 
+> *L146: Why don't you use the (total) error of the BABAR measurement
+>        for this systematic error? It is completely unclear from the
+>        text what the 'prediction' of EvtGen is.
+> 
+> L155: typo "is at on" -> "is on"
+> 
+> *L176-L181: Nobody in our group understood what is really done. This
+>        paragraph should be rephrased.
+> 
+> eq(4): Why the large white space before the '.'?
+> 
+> *L196: Do you have a systematic error for eps_vertex? From the way how
+>        you determine it, it is not clear that the systematic error
+>        should be smaller than 1.65%.
+> 
+> L205: Move this paragraph after L194
+> 
+> L211: Why is 'acceptance' missing?
+> 
+> L225: The CB function also takes into account bremsstrahlung in the
+>       detector (which may or may not be what you mean with detector
+>       resolution)
+> 
+> Table 2 caption: should mention explicitly that the errors are
+>       statistical only
+> 
+> **table 3: You systematic error determination is *flawed* and very
+>   strongly affected by a statistical component. Some of your
+>   systematic errors are plainly "random numbers", e.g. in the fwd bin
+>   for 4.00 < pT < 4.50, where you quote 0.3, to be compared against
+>   the neighboring bins at 5.5 and 4.7. Many other examples can be
+>   provided.
+> 
+>   This must be changed. It would be much better to fit an appropriate
+>   function to the errors to be less affected by these very strong
+>   fluctuations.
+> 
+>   It is not clear why the table is included in the paper in the first
+>   place. It attempts to convey the message that the systematic error
+>   has been studied in detail, however reading the table carefully
+>   reveals that the systematic error has been determined 'blindly'.
+> 
+>   Why are the FSR errors in the fwd region so much smaller than in the
+>   barrel? From the paper we think that it does not include
+>   (external/detector) bremsstrahlung; that component is included in
+>   the fit function (which indeed is larger in the fwd as expected). Is
+>   our understanding correct?
+> 
+> eq (6): for which polarization is this BF*x-section given?
+> 
+> table 4 caption: We suggest quoting the original references for the CS
+>      and HX frames
+> 
+> table 4: inconsistent number of (significant) digits in some places,
+>       e.g. 0.1157\pm0.005\pm0.014
+> 
+> Fig 3: again the wrongly abbreviated d2sigma/dpt dy why the ',' after
+>        CMS inconsistent usage of 'c' (cf Fig5, where pT is given in
+>        GeV)
+> 
+> Fig 4: why the '-' after CMS
+>        You do not say that the events are
+>        weighted. Are they? If yes, you should say so. (We assume they
+>        are weighed because the leftmost entry in the top left figure
+>        is not at 1.)
+>  
+>        From the right-most point in the lower left figure we would
+>        expect to see another non-zero entry in the top-left figure (at
+>        l = 1.8). It is not visible. Why not? The same applies to other
+>        point(s) in the plots on the right.
+> 
+> **Table 6: Again evidence of your flawed systematic error
+>            determination.  Example: 0.0007 -> 0.0120 -> 0.0004!
+> 
+> Table 7 caption: Bu-Bd mixed production: This would be charge
+>         violation and has not been measured by BABAR. BABAR has
+>         measured BuBubar and BdBdbar, but not mixed BuBd.
+> 
+> Fig 5: no chance to read this plot on a b/w copy. Use different line
+>        shapes to better differentiate. Same comment applies to Fig 6.
+>  
+>        "CMS" is missing in the plots also the sqrt{s} = 7 TeV.
+> 
+> eq before L344: you should define precisely what this is. It is more
+>       than the total cross section. Define the visible range and don't
+>       forget that you have multiplied it with the BF.
+> 
+> References: are written inconsistently
+>       - sometimes you have a DOI, sometimes not
+>       - sometimes there is a ',' after the authors, sometimes not
+>       - sometimes you provide the title, sometimes not
+>       - sometimes you properly typeset the Greek letters in the title,
+>         sometimes no (verbatim copy of SPIRES ascii?)

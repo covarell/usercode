@@ -1,0 +1,26 @@
+> I have a few comments on the text, which I list below:
+> 
+> line 93 : for non-expert it is difficult to understand, how this cylinder 
+> is defined
+> line 131: does this have any effect on the bin-to-bin correction ?
+> line 161: why a variation of 20% ?
+> line 322: But MC predictions are also theoretical predictions
+> line 339 ff: I guess it would be good to say a bit more what is included 
+> in the models. One needs to know, that CASCADE uses uPDF and only the CSM.
+> It would be also good to know, which type of CO MEs are included in PYTHIA.
+> One should also say, which PDFs were used for the calcs.
+> The reference to CASCADE should include the new paper release (see below)
+> 
+> Fig 6ff: more a question to me¡Ä.. shouldn't we have CASCADE with higher 
+> statistics to avoid the wiggles ?
+> 
+> Ref 34: should include the new reference, which is accepted for pub in EPJC
+> @Article{Jung:2010si,
+> author = "Jung, H. and others",
+> title = "{The CCFM Monte Carlo generator CASCADE 2.2.0}",
+> year = "2010",
+> eprint = "1008.0152",
+> archivePrefix = "arXiv",
+> primaryClass = "hep-ph",
+> SLACcitation = "%%CITATION = 1008.0152;%%"
+> }
