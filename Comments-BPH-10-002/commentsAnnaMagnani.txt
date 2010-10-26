@@ -1,131 +1,108 @@
-> Dear Authors,
-> 
-> Congratulations on the nice result, and well written paper.
-> 
-> Please find below comments from the Imperial College group, simply given in
-> page order; they are mainly minor typos.
-> 
-> 
+Dear Anne-Marie, 
+
+thanks for your careful reading. 
+
+All the minor typos have been considered in our paper.
+Answers to the non-trivial ones follow.
+ 
 > Abstract
 > ---------
-> Line 1: a measurement -> measurements of
-> Line 8: P_T - should this be written in full? Symbol defined on line 45, but 
-> used already on line 8.
-> Line 10: B-hadron - both B-hadron and b-hadron used eg line 5.
 > Last line: Comment on agreement with models?
 > 
-> -----------
-> Line 20: B-decay -> b-decay to be consistent with B-hadron vs b-hadron 
-> mentionned above ?
-> 
+
+Maybe not here, too detailed for an abstract.
+
 > Line 20-22: is it also relevant for MC tunes ? Are different tunes
 > expected to give different results or are they insensitive to this
 > measurement ?
-> 
-> Line 41: in either -> on either
-> 
-> Line 58: Tracker, ..Muon..luminosity - need to be consistent with use or not 
-> of capitals.
-> 
-> Lines 68-78: past tense -> present tense, need to be consistent with rest 
-> of the text.
-> 
-> Line 71: definition of NRQCD acronym ?
-> 
+
+Since this was not tested, we chose to remove this sentence.
+   
 > Line 88: Say why this choice is made, ie Global Muons are purer.
-> 
-> Line 92: Tracker detector -> Tracker or tracking detector
-> 
-> Fig 1, 2, 4,say L_int, others say just L.
-> 
+
+OK.
+ 
 > Fig 1: add in the text around line 117 what are the processes contributing 
 > to the background ?
-> 
-> Line 126: acceptance A is ->acceptance, A, is
-> 
-> Line 127: pT and rapidity y, -> pT, rapidity y and polarisation lambda_theta,
-> 
+
+It may be added, but it is not really understood. In studies done with 
+Minimum Bias MC, not enough events survive to make a quantitative statements,
+and using di-muon-enriched QCD, the background turns out to be underestimated
+by a factor ~2.
+ 
 > Top of page 5: Acceptance region, any reason why eta used here, but rapidity 
 > in eqn 2 ?
-> 
-> Line 138: PDG: define acronym and add ref[30]
+
+It's not the same quantity. eta is used for muons (which is actually the same
+as y, since muons are almost massless), and y for J/psi.
+ 
 > Why 100 MeV particularly -> corresponds to ~2-3 sigma given in fig 1 ?
-> 
-> Fig. 2 caption: remove 'two-dimensional distribution' ?
->                        And from the -> of the
-> 
+
+Yes.
+ 
 > Line 152: dimuon or the J/psi variables -> dimuon or the generator-level 
 > J/psi variables
-> 
-> Line 155: 'as systematics' given here and on lines 303,306,315 - replace 
-> with 'as a systematic uncertainty' as written elsewhere.
-> 
+
+Yes, this sentence will be changed (see answers to Amnon).
+  
 > Line 150-181, 204, 209, 232,292-315: each time systematics
 > uncertainties are described, sometimes the relative uncertainty is
 > quantified (like lines 156-157, 163, ...) and sometimes not. They vary
 > quite a lot depending on (pT,y) bin, but maybe maximum value should
 > always be given as "ball-park" figure ? Or a range min-max, or an
 > average ?
-> 
-> Line 155: Section, Sec (line 208) and Sect used - stick to one way?
-> 
-> Line 176-177: Remove one of the 'also's.
-> 
-> Line 177: systematics -> systematic error
-> 
-> Line 178: accordingly -> according
-> 
+
+??? Dipende da quello che decidiamo.
+  
 > Line 188: for this momentum range: which one ?
-> 
-> Eq (4): remove last dot
-> 
-> Line 194: add dot to finish sentence.
-> 
-> Line 196 and 213-214: Why the brackets? Other results are given
-> without (line 56, eq.6...) but unit only after the uncertainty.
-> 
+
+A leftover. This will be changed.
+  
 > Line 240: Surely the lumi error needs a reference, especially as it's
 > a significant source of error. Add explicitely that it is included
 > each time a total systematic uncertainty is quoted ?
-> 
-> Line 243: inclusive -> inclusive differential?
-> 
-> Table 3, caption: in each pT bin -> in each (pT,y) bin
-> 
+
+Yes (see answers to Sijin).
+ 
 > Fig 3: is the decreasing of XS expected from 1.5 GeV due to
 >   kinematics ? Add a comment about it in the text ?
-> 
-> Line 253: from displaced -> from other displaced
-> 
-> Line 258+2 : /pT -> /pT^(J/psi)
-> 
-> 
+
+??? Well, not from kinematics because these cross-section are already
+acceptance-corrected. It is the soft-gluon effect... ecc.
+  
 > Line 279: Give functional form?
-> 
-> Line 285: (and maybe before) both cross section and cross-section used in
-> article
-> 
+
+It is quite complicated and, being empirical, does not add so much information,
+but can be added.
+ 
 > Fig 4: add pT and y bin values on plot itself ?
-> 
-> Line 300: a exponential -> an exponential
-> 
-> Line 314: slightly differences between -> "slight differences between" or
-> "slightly different results for"
-> 
+
+No room for that (actually there are opposite complaints about having too
+much information in the plot.)
+ 
 > Table 6 (and elsewhere): size of a given sys error seems to vary a lot from 
 > bin to bin eg 0.0105 -> 0.0015 at end of Resolution model - comment 
 > somewhere that arises from taken the largest variation ?
-> 
-> Line 334-5: is falling..steeper -> falls significantly more steeply
->             represented -> shown ?
-> 
+
+???
+
 > Line 345-346: muon efficiency and luminosity...
-> 
+
+Correct.
+ 
 > Line 347-350: Surely the data-model agreement is much worse for the prompt 
 > than the non-prompt xsects?
 > 
+
+???
+
 > References:
 > -----------
 > Apparently inconsistent use of ',' after 'Collaboration' and quoting of 
 > title or not.
+
+OK.
+
 > Why quote doi or arXiv info for published articles?
+
+OK. That will be removed.

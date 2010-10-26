@@ -1,8 +1,7 @@
-> Dear Editors and Analysis Team!
-> 
-> Congratulations on this nice measurement! The analysis appears sound and 
-> corrent to us and the paper is already very well written
-> 
+Dear Andreas and Kirk, 
+
+thanks for your careful reading. Our replies follow.
+
 > Our single most important general comment is the following:
 > 
 > We have the impression that some of the uncertainties quoted are dominated 
@@ -12,77 +11,132 @@
 > unavoidable.
 > 
 > However, given the qualitative character of the present measurement, 
-> we question the need for the many detailed listings of acceptance and numbers 
-> in tables.
+> we question the need for the many detailed listings of acceptance and 
+> numbers in tables.
 > 
 > We think the paper would overall profit, if tables 1, 2, 3, 5 were removed. 
 > The relevant information from these tables could (and should) be given 
 > in the text.
-> 
-> Apart from this main comment, we have only few small comments as listed below.
-> 
-> We wish you good look for the remaining steps towards the final publication!
+
+??? Potrebbe essere una soluzione... Nei risultati finali, dato che la 
+luminosita' domina, le fluttuazioni non si vedono piu'...
+
 >  
 > Detailed comments
 > 
 > Title: 
 > 
 >     * How about "First Measurement of ..."
-> 
+
+No problem, but we don't know if that would mess up CDS information etc.
+
 > Abstract:
 > 
 >     * Mention that the decay into muons is used for this measurement
-> 
+
+Since we present the result as "Total cross section [...] times the dimuon
+branching fraction", that should be clear. 
+ 
 > Introduction:
 > 
 >     * It is important to say a few words about the issue of polarization, 
 > that it is still unknown, that the measurement of the cross section has a 
 > strong dependence on the assumption of the quarkonium polarization and that 
 > it will be for future analyses to resolve the issue.
+
+OK, we can move here lines 140-147, with a bit of rephrasing.
+
 >     * It may be in order to mention the recent calculations by Kniehl et al 
 > (arXiv:1009.5662) and Ma et al. (arXiv:1009.3655) (see below).
-> 
+
+OK.
+
 > Tables:
 > 
 >     * Suggest to remove tables 1,2,3,5
+
+See above.
+
 >     * Suggest to move tables 4,6,7,8 to the back of the paper.
+
+I don't know which is the convention for EPJ-C. It can certianly be done.
+
 >     * Use references to the tables in the text everywhere.
+
+It seems to us that all Tables are referenced:
+Table 1: line 103
+Table 2: line 226
+Table 3: line 239
+Table 4: line 241
+Table 5: line 287
+Table 6: line 316
+Table 7 and 8: line 319
+
 > 
 > Figures:
 > 
 >     * The labels are generally a bit small
+
+True, but (see answers to other reviewers) this comes from a compromise about
+putting as much information as possible inside the figure. This was explicitly
+requested by Phys-Coord in order to make figures self-explanatory for future
+conference presentations.
+
 > 
 > Figure 1: 
 > 
 >     *  suggest to replace "signal+background" by "fit (signal+bg)"
+
+OK.
+
 >     *  caption: lever arm -> transverse length
 >     *  caption worse => worsening of the
+
+OK./OK.
+
 > 
 > Figure 2:
 > 
 >     *  consider "box" style for better b/w compatibility
+
+As before, we were told not to worry about b/w compatibility.
+
 >     *  caption: "Right: Measured number of muon pairs in bins of pt and |y|.
-> 
-> 
+
+OK.
+ 
+ 
 > Figure 3:
 > 
 >     *  caption: replace "in the null polarization scenario" by 
 > "assuming zero polarization".
-> 
+
+OK.
+ 
 > 
 > Figure 4:
 > 
 >     *  labels are very small.
+
+See above.
+
 >     *  caption: mention that these are distributions two bins selected 
 > as example.
-> 
+
+OK.
+ 
 > Figures: 3,5 and 6:
 > 
 >     *  We understand that the horizontal error bars are the RMS of the 
 > distribution of events in the bin. Since the central values <pt> and RMS 
 > have been determined using an assumption on the distribution of the cross 
 > section inside the bin, it may be more appropriate to plot the uncertainty 
-> on the result of  this bin-center correction, rather than the RMS.
+> on the result of this bin-center correction, rather than the RMS.
+
+We don't understand which assumption you are referring to. 
+The average/RMS is done on the histogram of the observed (reconstructed) pT 
+spectrum. 
+
 > 
 > References:
 > 
@@ -135,34 +189,109 @@
 > [arXiv:hep-ph/0102134].
 > %%CITATION = HEP-PH 0102134;%%
 > %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-> 
+
+Thanks. We will add/change the references.
+ 
 >  
 > 
 > Text:
 > 
 >     * 54: suggest to move to after 57
+
+OK.
+
 >     * 61: filtering -> processing
+
+Do you mean "processing -> filtering"? 
+This sentence will be changed (see answers to Teresa) by mentioning explicitly
+that there is no HLT request.
+
 >     * 65: Anomalous -> non-collision
+
+OK.
+
 >     * 66,67: mention ref [16] only once.
+
+OK.
+
 >     * 69: to -> for
+
+Which one? Can you say "Corrections for the efficiencies" in English?
+
 >     * 92: which two -> which at least two
+
+OK.
+
 >     * 100: is affected by -> has
+
+OK.
+
 >     * 116: and the rest is trk trk ?
+
+Yes (so there is no need to specify a third fraction, since the three add up
+to 100%).
+
 >     * 131/132: move to after line 134
+
+OK.
+
 >     * 138: remove "(unphysical)" as it is not really unphysical, even 
 > though not expected quantitatively.
+
+OK.
+
 >     * 140-148: would be better understandable with a little bit of 
 > introduction in introduction (see our comment above)
+
+OK (see above). So this part will become shorter.
+
 >     * 150 and following: give numbers in the text.
+
+??? Se togliamo tutte le tabelle, per forza.
+
 >     * 155: remove "at"
+
+Correct.
+
 >     * 164: on -> from
+
+There is no "on" at line 164.
+
 >     * 190-191: english ?: "... and so are mapped ..."
+
+This construction was suggested by a native English speaker:
+
+https://hypernews.cern.ch/HyperNews/CMS/get/BPH-10-002/66.html
+
+last comment.
+
 >     * 191: We have not understood the relation between the finite bin 
 > size in pt and eta and the parameter rho.
+
+The efficiencies inside a bin of finite size are estimated by a single 
+efficiency value, obtained as an average over pT-|eta| inside that bin.
+So it is dependent on the distribution of pT-|eta| of the muons inside the 
+bin. While tag-and-probe should give ideally the exact efficiency in a
+pointlike bin, this is not true anymore for finite bins, since the pT-|eta|
+distributions of the "probes" (after requiring a "tag" with strict cuts)
+are not identical to those of the muons used to build J/psi candidates,
+hence the rho factor. See AN for a broader discussion of the effect.
+
 >     * 194: what is RMS ? is RMS representative of the systematic error on 
 > rho ? RMS is likely a statistical uncertainty ?
+
+We were asked by the conveners to add this sentence. Since it only adds a lot
+of confusion, it will be removed.
+
 >     * 320: The numbers for the cross sections 196.7 nb and 53.3 nb add up to 
 > 250.0 nb. However, the inclusive cross section quoted is 251.4 nb. We assume 
 > that the discrepancy is due to numerical issues. If this is true, it may be 
 > useful to state somewhere in the text.
+
+See answers to Ian. Not just numerical issues but also a different
+hypothesis on the B-fraction in the two cases.
+
 >     * 334: We dont understand the statement ".. is likely to depend on pt."
+
+Since the non-direct J/psi could have a different pt spectrum than the 
+direct ones, the contribution of the feed-down is variable over the pT range.
