@@ -18,7 +18,7 @@ OK.
 > - Fig 1's quality was reduced by compression. Please use vector graphics 
 > throughout.
 
-???
+The quality of the figures seems OK to us when the paper is printed.
  
 > - why is "transverse momentum" spelled out throughout? Why not use p_T?
 
@@ -339,10 +339,6 @@ OK.
 
 Should be "spectrum".
 
-> c) this is a run-on sentence
-
-???
-
 > d) shouldn't this be in the present tense?
 
 Yes.
@@ -452,10 +448,6 @@ OK.
 > than predicted by the models presented above."
 
 OK.
-
-> L338 - drop last comma?
-
-???
 
 > L341 - drop "have"
 
