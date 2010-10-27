@@ -160,7 +160,7 @@ Or also changing "mass distributions" to "mass shapes".
 
 > L110/112: "is chosen" --> "is used"
 
-Really? We choose a candidate among two or more, we don't use it..
+We choose a candidate among two or more, we don't use it..
 
 > 
 > Above Eq. 1: is "material budget" clear here? Sounds a bit jargonish.
@@ -170,7 +170,7 @@ Right. This will be changed to "detector material".
 > Above L133: 
 > - should this equation have a number?
 
-OK.
+Not necessarily
 
 > - it's great that you choose to provide the 10\% number, but I think it
 > requires context: how high can this probability go? What's the average
@@ -194,7 +194,7 @@ variables inside the parentheses (pT, y..)
 
 > L142: "we chose"?
 
-Yes, sure. The current form is italianized English...
+Yes, sure. 
 
 > L145: How is BaBar's production relevant here? 
 > The collisions are very too different (e.g. more ISR --> less 
