@@ -71,7 +71,7 @@ OK.
 > L99: Why bother mentioning a cut chi2/dof < 20, which must be VERY
 >      loose?
 
-Because it is applied. And it is surely very loose, but there are global
+It is surely very loose, but there are global
 muons in data where this value goes up to 100.
  
 > L102: 'expected ' -> why no PDG reference here?
@@ -81,7 +81,7 @@ It will be put.
 > Table 1: two numbers do not make a table! Put the numbers into the
 >      text instead.
 
-No problem.
+No problem. See also answers to Marco.
 
 > L113: Is there no explicit pT cut on the muons?
 
@@ -122,7 +122,7 @@ We have verified that, but we can remove the sentence.
 >       the displayed equations?
 > 
 
-???
+It is the normal LateX \quad command used in these cases.
 
 > L140: Our native English speakers suggest replacing "cause" with
 >       "have"
@@ -135,7 +135,7 @@ Have???
 
 It's not easy to explain because it is obtained as the sum of many decays,
 both inclusive and exclusive. We use the prediction of a MC description, 
-rather than the error to compare, because the measured value by Babar is
+rather than the error, to compare, because the measured value by Babar is
 not necessarily the best estimate (Bs and LambdaB contributions are missing).
 
 > L155: typo "is at on" -> "is on"
@@ -151,7 +151,7 @@ OK.
 >        you determine it, it is not clear that the systematic error
 >        should be smaller than 1.65%.
 
-It's 0.165%, not 1.65% (therefore negligible).
+It's 0.16%, not 1.6% (therefore negligible).
  
 > L205: Move this paragraph after L194
 
@@ -199,7 +199,7 @@ General concern, being discussed in detail with the ARC.
 > 
 > eq (6): for which polarization is this BF*x-section given?
 
-null
+null.
 
 > table 4 caption: We suggest quoting the original references for the CS
 >      and HX frames
@@ -225,37 +225,40 @@ OK.
 >        is not at 1.)
 
 If you don't like ',' or '-', you should tell us which spacer to use...
-Clearly we cannot write "CMS sqrt(s) = ..."
+Clearly we cannot write "CMS sqrt(s) = 7 TeV" as a single equation...
 
 The entries are not weighted. The bin size varies over the plot, so 
-the bin heights (not entries) are adjusted by RooFit so that bin (width*height)
-is proportional to the number of entries.
+the bin heights are adjusted by RooFit so that (width*height)
+is proportional to the number of entries to directly compare with PDFs.
 
 >        From the right-most point in the lower left figure we would
 >        expect to see another non-zero entry in the top-left figure (at
 >        l = 1.8). It is not visible. Why not? The same applies to other
 >        point(s) in the plots on the right.
 
-They are cut by the choice of the minimum of the log scale.
+They are probably cut by the choice of the minimum of the log scale. To be
+checked and modified. Thanks.
 
-> **Table 6: Again evidence of your flawed systematic error
->            determination.  Example: 0.0007 -> 0.0120 -> 0.0004!
-> 
 > Table 7 caption: Bu-Bd mixed production: This would be charge
 >         violation and has not been measured by BABAR. BABAR has
 >         measured BuBubar and BdBdbar, but not mixed BuBd.
 
-OK. Mixed is not the proper word.
+The point is taken. Mixed is not the proper word.
 
 > 
 > Fig 5: no chance to read this plot on a b/w copy. Use different line
 >        shapes to better differentiate. Same comment applies to Fig 6.
 >  
 >        "CMS" is missing in the plots also the sqrt{s} = 7 TeV.
-> 
+
+We will try to make them more evident.
+ 
 > eq before L344: you should define precisely what this is. It is more
 >       than the total cross section. Define the visible range and don't
 >       forget that you have multiplied it with the BF.
+
+OK.
+
 > 
 > References: are written inconsistently
 >       - sometimes you have a DOI, sometimes not
@@ -263,3 +266,5 @@ OK. Mixed is not the proper word.
 >       - sometimes you provide the title, sometimes not
 >       - sometimes you properly typeset the Greek letters in the title,
 >         sometimes no (verbatim copy of SPIRES ascii?)
+
+Yes, all the references will be reviewed.

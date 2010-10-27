@@ -1,24 +1,53 @@
-> OVERALL COMMENT
-> Unanimously, we think that the paper reads quite nicely, the data analysis is thorough and the results interesting.
-> In the following there is some redundancy in the comments. We thought it was better to let it in, because it helps to increase their significance.
-> Comments to the figures are all grouped at the end, just before those to references.
-> 
+Dear Marco and Bologna group,
+
+thanks for the careful reading of the paper.
+
+Please find below replies to the general comments and some of the specific
+ones. Most of the other specific comments (on grammar aand style) will be
+considered and introduced in the next draft version.
+
 > GENERAL COMMENTS
 > -- One could improve the Introduction and or the Conclusions adding some physics statements which could expand the paper significance beyond a comparison of the data with some theoretical Monte Carlo models.
-> 
+
+Yes, although it's clear from the discussions in the paper (e.g. the
+big polarization uncertainty, the 11% luminosity error...) that accurate
+data-theory speculations must be left to a future write-up.
+
+What we can surely claim is only that theory is not 30 times off the
+measured rates, as it happened in the '90s at TeVatron and that *somehow*
+there is an evidence that pT spectra are falling steeper than expected by
+most theories at 7 TeV.
+
 > -- there are too many tables, the paper would benefit if the results were summarized in the text or, were applicable, with a figure and then put a reference where one could collect all the details.
-> 
+
+Table 1 will probably removed.
+We would like to keep Tables 2 and 5, even if the result contained there 
+is not the final one, since they are important steps of the analysis.
+Tables 3 and 6 could be resized a lot, it's under discussion now.
+
 > -- the amount of work is impressive as testified by the mega-tables, however sometimes not much it is said where the reader would expect more, as for instance in section 7.
 > In section 4.1 about the polarization if J/psi's from B decays (lines 144-145) no information is given but the BaBar reference.
+
+OK.
+
 > For formula (7) there is a reference to a ALEPH work, which, when looking at, does not provide more information: maybe there is a better reference o maybe one can simply say something more.
-> 
+
+OK. We will try to improve on these two things.
+
 > -- the repeated reference to PAS for some basic information like: vertex definition, Tracker Muon, Tag &probe are very annoying and derating the paper readability and impact. As noted in the detailed comments, it would be sufficient to insert a short description of the subject before referencing to the PAS.
-> 
-> -- Numbers are often given with decimal values that are not significant or warranted by the corresponding errors. Errors are frequently reported with three significant digits. In addition, sometimes the best values are reported with a number of significant digits that does not correspond to the error (see e.g Table 4, last column: (9.14 +- 1.3) (35 +- 5.3) ¡Ä.). See also specific comments.
-> 
+
+We will see where/how we can improve that following your specific 
+comments. In general, we would like to leave things which are not 
+analysis-specific (e.g. muon reconstruction or PV finding) outside the
+scope of this paper.
+
+> -- Numbers are often given with decimal values that are not significant or warranted by the corresponding errors. Errors are frequently reported with three significant digits. In addition, sometimes the best values are reported with a number of significant digits that does not correspond to the error (see e.g Table 4, last column: (9.14 +- 1.3) (35 +- 5.3) ??). See also specific comments.
+
+This will be fixed throughout.
+
 > -- in table 6 the systematic errors should have a significant statistical component, because there are clear fluctuations between contiguous bins.
 > For instance, in the section for 1.6 < y < 2.4, in the "vertex estimation" column in the 3 consecutive bins in pT of lines from 3 to 5, one reads : 85, 4, 43;
 > in the next column "background fit", the lines from 2 to 5 read : 11, 168, 1, 27
 > 
-> 
-> SPECIFIC COMMENTS are in the attached pdf file
+
+General concern, being discussed with the ARC.
