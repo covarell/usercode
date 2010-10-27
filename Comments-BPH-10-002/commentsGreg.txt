@@ -1,0 +1,32 @@
+> PHYSICS COMMENTS:
+> 
+> 1) You use the unphysical, null polarization scenario as the default when quoting efficiencies (e.g., Fig. 2, Table 2). Is it really a common thing to do? Why no chose one of more realistic scenarios, e.g. left or right helicity?
+> 
+> 2) LL111-113: given that on average as many as 7% of the events has more than one J/psi, what's the rational of choosing the one with the largest p_T? This does bias your differential cross section measurement toward higher p_T's. Should not you use all the combinations instead of one per event?
+> 
+> 3) P5, unnumbered lines at the top: since the muon detectability depends mostly on p, not p_T, what's the rational of making rapidity-dependent p_T cuts, instead of a single cut on the momentum ~4 GeV?
+> 
+> 4) L167: you call the effect "negligible"; yet you quote per mil effects numerically in other bullets; I am surprised that the effect of the primary vertex position on the acceptance has such a small effect. Is it really below per mil?
+> 
+> STYLE COMMENTS:
+> 
+> 0) General: the paper uses a mixture of tenses and styles, which is not really warranted. The abstract is written in active voice ("We present ..."), contrary to the CMS style recommendations. Most of the paper follows passive voice, but in some cases you switch to the active one (e.g., L207: "Hence we reweighted ..."), which should be avoided. Finally, there are at least three tenses used: present (e.g., L54, "J/psi's are reconstructed ..."), past (L68, "Simulated events were used..."), and past perfect (L101, "has then been performed..."). Please, use one (present) or at most two (present and past) tenses.
+> 
+> 1) Abstract: L2: CMS experiment AT THE LHC; L8: pT differential cross section -> differential cross section in pT; L11: remove "and". In general abstract is really long. You can shorten it by removing the cross section number and compressing first two sentences in a a single shorter one (sufficient to quote the luminosity, no need to say "collected during first months of LHC operation"), etc.
+> 
+> 2) Section 1, L15: define NLO here; L16: results -> calculations; L20: B-decays; L31: B-hadron decays; L32: remove "some".
+> 
+> 3) Section 2, footnote 1, L2: along the COUNTERCLOCKWISE beam; L47: the INTERACTION vertex.
+> 
+> 4) Section 3, L58: remove "measurement" (measurement detector sounds funny); L60: no comma after "trigger"; L62: add a comma after "CSC"; L71: define NRQCD; L76: real -> collision; L77: as well as the EFFECTS OF finite precision; L78: cosmic-muon events; L96: to -> with; third line after L99: add a comma after "misalignment"; L101: has then been -> is (or was); L103: colon -> semicolon; L109: add a comma before "or"; L116: Same-sign dimuons; Fig. 1 caption, L1: windows -> ranges; L2: add a comma before "and".
+> 
+> 5) Section 4, L125: a MINIMUM momentum threshold; P5, second line: lie -> be; L135: dimuon variables reconstructed in the Monte Carlo; L137: prompt COMPONENT computed; L154: remove "generated"; L157: add a comma before "and"; L163: "per mil" is usually used; L177: also -> lead to; systematics -> systematic effect; L184: Tag-and-Probe; also here I'd add a sentence or two explaining the basic idea of the T-n-P method; L199: Tag-and-Probe.
+> 
+> 6) Section 5: L213: ratio -> fraction; Table 2 caption, L2: null-polarization scenario; L234: add a comma after "effect"; Table 3 caption, L3: error -> uncertainty.
+> 
+> 7) Section 6: Table 4 caption, LL4,5: error -> uncertainty (in two places); Fig. 3: it looks rather poor in B&W; suggest more contrast color scheme and bigger markers; also nb^-1 in the legend could use a space between the "nb" and "-1"; Table 7 caption, L2: error -> uncertainty.
+> 
+> 8) Section 7: Table 8 caption, L4: error -> uncertainty; LL351-352: a standard acknowledgement paragraph needs to be added after the sentence thanking the theorists.
+> 
+> 9) References: mixture of styles is used here: some refs. have title, some do not. Ref. [8] should really give a title rather than "Preliminary Result"
+> 

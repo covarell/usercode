@@ -1,16 +1,20 @@
-> We have read your paper draft informally at PSI. We think that the
-> systematic error determination is flawed in such a way that it should
-> be changed before publication. The manuscript needs to be revised
-> substantially before publication.
-> 
+Dear Urs and PSI team,
+
+thanks for the careful reading of the paper. Our replies follow.
+
 > Please find our comments below:
 > 
 > L3: It is not good style at all to abbreviate J/\psi's. Use J/\psi
 >     mesons instead. This applies to many places in your text
-> 
+
+OK.
+
 > L9: [6] hardly qualifies as a polarization measurement at the
 > Tevatron.
-> 
+
+Right. The sentence should be "generally fail [6] to describe ...
+
+
 > L14: You are inconsistent in your usage of roman or italic fonts for
 >      particles. Compare pp here and \bbbar and pp on L 164. This
 >      inconsistency remark applies to many places.
