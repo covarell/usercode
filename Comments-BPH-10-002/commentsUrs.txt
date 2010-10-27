@@ -12,61 +12,101 @@ OK.
 > L9: [6] hardly qualifies as a polarization measurement at the
 > Tevatron.
 
-Right. The sentence should be "generally fail [6] to describe ...
-
+Right. The sentence should be "... generally fail [6] to describe 
+simultaneously ... and the polarization measurements [7-8] ... "
 
 > L14: You are inconsistent in your usage of roman or italic fonts for
 >      particles. Compare pp here and \bbbar and pp on L 164. This
 >      inconsistency remark applies to many places.
-> 
+
+OK.
+
 > L18: b -> J/psi is not fragmentation. b -> B is fragmentation. B ->
 > J/psi is a decay
-> 
+
+Correct, but we think the message is clear.
+
 > L21: No measurement of J/psi production will ever (in)validate QCD. It
 >      might at most invalidate certain approximations/approaches. QCD
 >      as a theory of the strong interaction will not be touched.
-> 
+
+This sentence will be removed (see answers to Teresa/Amnon).
+ 
 > L23: a/bc is an abbreviation for a/b*c. You should not abbreviate
 >      d2sigma/dpt deta like this.
-> 
+
+OK. We will change "dpT dy" -> "(dpT dy)"
+ 
 > L41: two forward disks ON either side ...
 > 
 > L43: nine forward disks ON either side ...
 > 
 > L47: add 'primary' in front of vertex
-> 
+
+Ok./Ok./Ok.
+
 > L53: "is" is an inconsistent tense to the rest of the paragraph
-> 
+
+There are a few such occurrences. We will try to be uniform.
+ 
 > L58: Do not capitalize Tracker or Muon and use non-CMS-jargon terms
 >      instead (e.g. add "systems" behind them)
-> 
+
+OK.
+
 > L60: Of course this will not be the last J/psi from CMS, but "The
 >      current" would be better phrased as "This"
-> 
+
+OK. 
+
 > L62: Consider removing the last sentence of this paragraph. It is
 >      useless.
-> 
+
+Well, we have to specify that we do not require any pT threshold at L1.
+ 
 > L69: Add 'color' in front of 'singlet'
-> 
+
+OK. 
+
 > L99: Why bother mentioning a cut chi2/dof < 20, which must be VERY
 >      loose?
-> 
+
+Because it is applied. And it is surely very loose, but there are global
+muons in data where this value goes up to 100.
+ 
 > L102: 'expected ' -> why no PDG reference here?
-> 
+
+It will be put.
+
 > Table 1: two numbers do not make a table! Put the numbers into the
 >      text instead.
-> 
+
+No problem.
+
 > L113: Is there no explicit pT cut on the muons?
-> 
+
+No, there isn't.
+ 
 > L116: Explicitly mention that the rest is tracker muon - tracker muon
-> 
+
+OK.
+
 > L117: Do you use this like-sign background anywhere in the analysis
 >       later? If not, then remove the sentence.
-> 
-> Fig 1: Aesthetics: The ordinate-0 and abscissa-2.6 touch Do you use
+
+Right.
+
+> Fig 1: Aesthetics: The ordinate-0 and abscissa-2.6 touch 
+
+Surely can be changed, but this is the approved CMS TDR style.
+
+>                    Do you use
 >                    the J/psi mass to cut on the rapidity of a dimuon
 >                    with m = 3.4 or do you use the dimuon mass? The
 >                    label on the plot would suggest m(J/psi)?!
+
+This seems really a minor detail.
+
 > 
 > *Fig 1 caption: The forward muons are affected by more material than
 >                 the barrel muons. This will also deteriorate the
@@ -74,39 +114,64 @@ Right. The sentence should be "generally fail [6] to describe ...
 >                 about the lever arm is in fact true? How much more
 >                 important than the increased material is the lever
 >                 arm? We suggest removing this sentence.
+
+We have verified that, but we can remove the sentence.
+
 > 
 > L132: Why do you have such large white space before the ',' and '.' in
 >       the displayed equations?
 > 
+
+???
+
 > L140: Our native English speakers suggest replacing "cause" with
 >       "have"
-> 
+
+Have???
+
 > *L146: Why don't you use the (total) error of the BABAR measurement
 >        for this systematic error? It is completely unclear from the
 >        text what the 'prediction' of EvtGen is.
-> 
+
+It's not easy to explain because it is obtained as the sum of many decays,
+both inclusive and exclusive. We use the prediction of a MC description, 
+rather than the error to compare, because the measured value by Babar is
+not necessarily the best estimate (Bs and LambdaB contributions are missing).
+
 > L155: typo "is at on" -> "is on"
-> 
+
+OK.
+ 
 > *L176-L181: Nobody in our group understood what is really done. This
 >        paragraph should be rephrased.
-> 
-> eq(4): Why the large white space before the '.'?
-> 
+
+OK.
+
 > *L196: Do you have a systematic error for eps_vertex? From the way how
 >        you determine it, it is not clear that the systematic error
 >        should be smaller than 1.65%.
-> 
+
+It's 0.165%, not 1.65% (therefore negligible).
+ 
 > L205: Move this paragraph after L194
-> 
+
+OK.
+
 > L211: Why is 'acceptance' missing?
-> 
+
+A typo, will correct.
+
 > L225: The CB function also takes into account bremsstrahlung in the
 >       detector (which may or may not be what you mean with detector
 >       resolution)
-> 
+
+We will remove "internal", so both contributions are included.
+
 > Table 2 caption: should mention explicitly that the errors are
 >       statistical only
-> 
+
+OK.
+
 > **table 3: You systematic error determination is *flawed* and very
 >   strongly affected by a statistical component. Some of your
 >   systematic errors are plainly "random numbers", e.g. in the fwd bin
@@ -128,36 +193,60 @@ Right. The sentence should be "generally fail [6] to describe ...
 >   (external/detector) bremsstrahlung; that component is included in
 >   the fit function (which indeed is larger in the fwd as expected). Is
 >   our understanding correct?
+
+General concern, being discussed in detail with the ARC.
+
 > 
 > eq (6): for which polarization is this BF*x-section given?
-> 
+
+null
+
 > table 4 caption: We suggest quoting the original references for the CS
 >      and HX frames
-> 
+
+It can be done.
+
 > table 4: inconsistent number of (significant) digits in some places,
 >       e.g. 0.1157\pm0.005\pm0.014
-> 
-> Fig 3: again the wrongly abbreviated d2sigma/dpt dy why the ',' after
+
+Yes, formatting problem. Will be changed.
+
+> Fig 3: again the wrongly abbreviated d2sigma/dpt dy 
+>        why the ',' after
 >        CMS inconsistent usage of 'c' (cf Fig5, where pT is given in
 >        GeV)
-> 
+
+OK.
+ 
 > Fig 4: why the '-' after CMS
 >        You do not say that the events are
 >        weighted. Are they? If yes, you should say so. (We assume they
 >        are weighed because the leftmost entry in the top left figure
 >        is not at 1.)
->  
+
+If you don't like ',' or '-', you should tell us which spacer to use...
+Clearly we cannot write "CMS sqrt(s) = ..."
+
+The entries are not weighted. The bin size varies over the plot, so 
+the bin heights (not entries) are adjusted by RooFit so that bin (width*height)
+is proportional to the number of entries.
+
 >        From the right-most point in the lower left figure we would
 >        expect to see another non-zero entry in the top-left figure (at
 >        l = 1.8). It is not visible. Why not? The same applies to other
 >        point(s) in the plots on the right.
-> 
+
+They are cut by the choice of the minimum of the log scale.
+
 > **Table 6: Again evidence of your flawed systematic error
 >            determination.  Example: 0.0007 -> 0.0120 -> 0.0004!
 > 
 > Table 7 caption: Bu-Bd mixed production: This would be charge
 >         violation and has not been measured by BABAR. BABAR has
 >         measured BuBubar and BdBdbar, but not mixed BuBd.
+
+OK. Mixed is not the proper word.
+
 > 
 > Fig 5: no chance to read this plot on a b/w copy. Use different line
 >        shapes to better differentiate. Same comment applies to Fig 6.
