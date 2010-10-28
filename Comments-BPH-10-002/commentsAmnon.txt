@@ -13,7 +13,7 @@ is correct for a publication. Final reading will probably set this issue.
  
 > - related - inconsist use of "italics" fonts for particle names.
 
-OK.
+OK. *done* (FL) 
  
 > - Fig 1's quality was reduced by compression. Please use vector graphics 
 > throughout.
@@ -33,11 +33,11 @@ A mixture of the two is present. That should be fine in our opinion.
 > There's also a tendency not to use "we" when it is called for, e.g. in 
 > Line 108, wouldn't "We use" be better?
 
-OK. We will go through the paper checking this.
+OK. We will go through the paper checking this. 
  
 > L6: this is nice text, but the paragraph reads fine without it.
 
-Right. We will remove it.
+Right. We will remove it.  *done* (FL)
 
 > L9-12: there's a tense problem here (what Greg calls "breaking casuality"
 > I think): you haven't presented your analysis yet, so from the reader's
@@ -52,7 +52,7 @@ Right. We will remove it.
 > at a higher energy and in a wider rapidity range than was previously 
 > possible."
 
-We will take the alternative form.
+We will take the alternative form.  *done FL*
   
 > L14: a "historical discrepancy" sounds like this was big enough to 
 > make the history books. How about:
