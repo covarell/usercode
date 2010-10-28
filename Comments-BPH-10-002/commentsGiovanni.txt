@@ -47,7 +47,7 @@ acceptance (before any analysis cut).
 > Another consequence of this remodulation is that you must eliminate the
 > last sentence in the paragraph (lines 134-135).
 
-We can move this information before.
+We can move this information before. *not done*
 
 > 
 > Line 138: "unphysical" is somewhat disturbing in a physics paper. I would 
@@ -59,7 +59,7 @@ We can move this information before.
 > (\lambda_\theta = -1) and null polarization. Then, the paragraph in
 > lines 140-147 can be moved before presenting Fig. 2.
 
-Yes. We can remove "unphysical" and re-arrange the two paragraphs.
+Yes. We can remove "unphysical" and re-arrange the two paragraphs. *partially done* 
  
 > Figure 2: in my opinion is quite less informative than others. It could be
 > eliminated, too. Please take this as an option in case the paper length
@@ -83,22 +83,22 @@ In the last case (EvtGen vs. Babar measurement).
 > Line 151: Add the acronym (used later) "due to final state radiation 
 > (FSR).
 
-OK. 
+OK *done*. 
 
 > Line 155: "is at on" --> "is on"
 
-OK.
+OK. *done*
 
 > 
 > Line 156: "middle rapidity" --> "middle rapidity range"
 
-OK.
+OK. *done*
 
 > Line 185: I must confess I didn't understand. What is "muon 
 > identification"?
 > Do you mean "muon identification efficiency"?
 
-Yes. Thanks for spotting this. 
+Yes. Thanks for spotting this. *done*
 
 > Line 194: the average value of \rho is well consistent with zero. 
 > Is it 
