@@ -44,12 +44,12 @@ branching fraction", that should be clear.
 > strong dependence on the assumption of the quarkonium polarization and that 
 > it will be for future analyses to resolve the issue.
 
-OK, we can move here lines 140-147, with a bit of rephrasing.
+OK, we can move here lines 140-147, with a bit of rephrasing. *NOT DONE*
 
 >     * It may be in order to mention the recent calculations by Kniehl et al 
 > (arXiv:1009.5662) and Ma et al. (arXiv:1009.3655) (see below).
 
-OK.
+OK. *not done yet*
 
 > Tables:
 > 
@@ -190,7 +190,7 @@ spectrum.
 > %%CITATION = HEP-PH 0102134;%%
 > %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Thanks. We will add/change the references.
+Thanks. We will add/change the references.*not done yet*
  
 >  
 > 
@@ -238,12 +238,12 @@ OK.
 >     * 138: remove "(unphysical)" as it is not really unphysical, even 
 > though not expected quantitatively.
 
-OK.
+OK. *done*
 
 >     * 140-148: would be better understandable with a little bit of 
 > introduction in introduction (see our comment above)
 
-OK (see above). So this part will become shorter.
+OK (see above). So this part will become shorter. *not done* 
 
 >     * 150 and following: give numbers in the text.
 
@@ -281,7 +281,7 @@ hence the rho factor. See AN for a broader discussion of the effect.
 > rho ? RMS is likely a statistical uncertainty ?
 
 We were asked by the conveners to add this sentence. Since it only adds a lot
-of confusion, it will be removed.
+of confusion, it will be removed. *done*
 
 >     * 320: The numbers for the cross sections 196.7 nb and 53.3 nb add up to 
 > 250.0 nb. However, the inclusive cross section quoted is 251.4 nb. We assume 
