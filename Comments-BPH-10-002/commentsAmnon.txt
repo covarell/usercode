@@ -83,7 +83,7 @@ OK.
 > in the rest of the paper? Do the comparisons to theory depend on the
 > accuracy of the MC simulation?
 
-This sentence will be removed (see answers to Teresa).
+This sentence will be removed (see answers to Teresa). *done* FL
 
 > Line 34: CMS was spelled out earlier, in line 25, why repeat it?
 
@@ -239,7 +239,7 @@ with respect to the J/psi momentum in the b rest frame."
 > stressing "generated" for the di-muons when it applies equally
 > well to the J/psi.
 
-True. We will change to "At generator level, the dimuon momentum ... etc."
+True. We will change to "At generator level, the dimuon momentum ... etc."*done*
  
 > 
 > L155, 303, 306, 315: "systematics" --> "source of systematic uncertainty" 
@@ -247,7 +247,7 @@ True. We will change to "At generator level, the dimuon momentum ... etc."
 > "systematic uncertainty" depending on context
 > (systematics as a shortform for systematic uncertainty is HEP-EX jargon)
 
-Yes.
+Yes. 
 
 > L161: is this 20% relative or absolute? That is, would you change a 
 > simulated
@@ -257,12 +257,12 @@ To 20-30% (so it's relative).
 
 > L164: pp is italicized, unlike in the rest of the text.
 
-OK.
+OK. *done*
 
 > L170: Doesn't this correction also apply to MC? 
 > "The reconstructed muon p_T was calibrations..."
 
-We will remove "in data".
+We will remove "in data". *done*
  
 > L171: residual bias where? In data? In MC? In both? On the difference?
 > The current text implies the answer is "In data", but what about
@@ -274,7 +274,7 @@ determine acceptance from MC and use it in data, we estimate this uncertainty.
 > L172: Remove "below" (right now you're saying the maximum is below 0.05%,
 > like you want to keep the actual maximum a secret).
 
-OK.
+OK.*done*
 
 > L172-175: very wordy. How about:
 > 
@@ -291,7 +291,7 @@ difference in acceptance is taken as systematics.
  
 > L176-177: Remove the first "also". "give a systematics on" --> "bias".
 
-OK./OK.
+OK./OK. *done*
 
 > L150-176: 
 > - what are the sizes of these uncertainties? Which ones are important?
@@ -306,7 +306,7 @@ These are efficiency effects, not acceptance. So they are measured from data
  
 > L188: "and varies only slightly"
 
-Right.
+Right.*done*
 
 > L194: Is the 0.11 used in the systematic uncertainties?
 
@@ -333,11 +333,11 @@ difference between two distributions is? I mean, it's not a single number...
 
 > 207-210: a) You varied by reweighting, these are not separate actions.
 
-OK.
+OK. *done* 
 
 > b) why the plural "spectra"?
 
-Should be "spectrum".
+Should be "spectrum". *done*
 
 > d) shouldn't this be in the present tense?
 
