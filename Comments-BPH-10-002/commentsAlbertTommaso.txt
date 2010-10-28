@@ -4,6 +4,8 @@
 >We extract the numbers and show the comparisons with some models with only minimal or no physics discussion.
 >
 >Specifically:
+
+*************************
 >- I am not sure we need lines 330-335 to explain why we do NOT
 >show something. I am sure there are even more models we do
 >NOT show (eg the Durham group made some calcualtions), to
@@ -12,23 +14,17 @@
 >which include the feed down of ......etc
 >However, we could add instead more info on the models we
 >actually compare with, by eg
+*********************************
+
+************************
 >- giving some elements of the physics of these models so readers
 >can judge what we can learn from this a comparison. Eg. are the
 >normalizations of these models to be taken seriously or do these
 >have significant uncertainties?
+****************************************
+
 >- we do see deviations in fig 5/6 with the data eg the left/bottom.
 >What do we learn from that?
->- The best is of course to compare data with data. The Tevaron has
->beautiful J/psi measurements
->Why don't we comment sqt{s} dependence or the b-fraction
->versus pt for these experiments?
->I saw interesting figures (from CarlosL) on B fraction in the
->different experiments which would be well suited in this paper.
->
->A detail
->- line 22. The statements there are not necessarily obvious, eg that
->J/psi's in pp constrain the PDFs (better than other processes?). if
->true, can you add a reference?
 
 >In figures 5 and 6 there is a display of the differential cross sections, 
 >for which a binning is used with horizontal error bars presumably calculated 
@@ -38,3 +34,22 @@
 >comparison with different shapes, at least in principle. Or am I missing 
 >something ?
 >
+
+*******************************
+>- The best is of course to compare data with data. The Tevaron has
+>beautiful J/psi measurements
+>Why don't we comment sqt{s} dependence or the b-fraction
+>versus pt for these experiments?
+>I saw interesting figures (from CarlosL) on B fraction in the
+>different experiments which would be well suited in this paper.
+>
+********************************************
+
+********************************************
+>A detail
+>- line 22. The statements there are not necessarily obvious, eg that
+>J/psi's in pp constrain the PDFs (better than other processes?). if
+>true, can you add a reference?
+********************************************
+
+
