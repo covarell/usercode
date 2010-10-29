@@ -122,14 +122,14 @@ full difference of the two.
 > cross section and the polarization; would suggest that the authors consult with the people listed
 > in the Acknowledgments.
 
-??? 
+The statement will be made less strong.
 
 > The paper would emphasize that J/psi production has TWO main divisions: prompt and nonprompt.
 > Prompt production includes feed-downs from the psi(2S) and chi states, but these have
 > extremely short lifetimes and do not lead to secondary vertices. In the color octet and
 > evaporation models there is a similar feed-down mechanism.
 
-?????
+OK.
 
 > Figure 1: The font is really tiny, especially the subscript in the legend defining rapidity range.
 > Also, is the dotted line the exponential background fit? Or is it the same-sign background? If so,
@@ -204,3 +204,19 @@ idea of thevarying resolution) than 33 figures (i.e. one per bin).
 > Fig. 2. Are these truly available as fully corrected quantities? Expect people to ask for them.
 
 No, they aren't. Signal yields are only calculated in the binning of Table 2.
+
+> Questions about floating and fixed parameters and fit validations.
+
+In the Crystal Ball fits all paramters are floating, including n and alpha.
+This leads to no 'left tail problem' in our case (see Fig. 1) probably 
+because the background shape is very simple. When analyses will be performed
+with e.g. trigger cuts in the dimuon mass, this will need to be changed.
+The fits have been found to be unbiased in MC.
+
+In the paper there is no space to explain exactly which parameters are floated
+or fixed at a certain fitting step (there are many of them: 4 for signal
+mass shapes, 1 for background shape, 6 for lifetime resolution, 3 slopes,
+n fractions), nor to fully discuss the result of the toy MC validation.
+More details (including all fits) are given in the Analysis Note.  
+
+ 
