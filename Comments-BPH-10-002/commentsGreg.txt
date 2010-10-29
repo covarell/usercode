@@ -20,7 +20,14 @@
 > 
 > 4) Section 3, L58: remove "measurement" (measurement detector sounds funny); L60: no comma after "trigger"; L62: add a comma after "CSC"; L71: define NRQCD; L76: real -> collision; L77: as well as the EFFECTS OF finite precision; L78: cosmic-muon events; L96: to -> with; third line after L99: add a comma after "misalignment"; L101: has then been -> is (or was); L103: colon -> semicolon; L109: add a comma before "or"; L116: Same-sign dimuons; Fig. 1 caption, L1: windows -> ranges; L2: add a comma before "and".
 > 
-> 5) Section 4, L125: a MINIMUM momentum threshold; P5, second line: lie -> be; L135: dimuon variables reconstructed in the Monte Carlo; L137: prompt COMPONENT computed; L154: remove "generated"; L157: add a comma before "and"; L163: "per mil" is usually used; L177: also -> lead to; systematics -> systematic effect; L184: Tag-and-Probe; also here I'd add a sentence or two explaining the basic idea of the T-n-P method; L199: Tag-and-Probe.
+> 5) Section 4, L125: a MINIMUM momentum threshold; 
+
+?  non è nella definizione di threshold?
+
+P5, second line: lie -> be; L135: dimuon variables reconstructed in the Monte Carlo; L137: prompt COMPONENT computed; L154: remove "generated"; L157: add a comma before "and"; L163: "per mil" is usually used; L177: also -> lead to; systematics -> systematic effect; L184: Tag-and-Probe; also here I'd add a sentence or two explaining the basic idea of the T-n-P method; L199: Tag-and-Probe.
+
+*not yet done* FL
+
 > 
 > 6) Section 5: L213: ratio -> fraction; Table 2 caption, L2: null-polarization scenario; L234: add a comma after "effect"; Table 3 caption, L3: error -> uncertainty.
 > 
