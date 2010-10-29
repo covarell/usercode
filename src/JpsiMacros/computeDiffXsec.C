@@ -12,10 +12,13 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) { 
+void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaBfrac = false) { 
 
   static const unsigned int smallBins = 33;
   static const unsigned int largeBins = 15;
+  static const unsigned int largeBins0 = 3;
+  static const unsigned int largeBins1 = 4;
+  static const unsigned int largeBins2 = 8;
   static const unsigned int highPtLargeBins = 3;
 
   int howManyBins[largeBins] = {2,2,2,2,2,2,1,4,3,3,3,2,2,2,1};
@@ -25,6 +28,18 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
 				 1.5,2.,20.};
   double binWidths2[largeBins] = {2.,3.5,20.,2.5,2.,3.5,20.,1.25,0.75,
 				  0.75,0.75,1.,2.,3.5,20.};
+  double binAverages0[largeBins0] = {5.46,8.14,13.50};
+  double binAverages1[largeBins1] = {3.27,5.48,7.89,12.96};
+  double binAverages2[largeBins2] = {0.79,1.60,2.35,3.10,3.96,5.35,7.86,13.11};
+  double binRMS0[largeBins0] = {0.56,0.97,3.53};
+  double binRMS1[largeBins1] = {0.75,0.55,0.93,3.06};
+  double binRMS2[largeBins2] = {0.29,0.21,0.22,0.21,0.29,0.57,0.97,3.23};
+  double Bfracs0[largeBins0] = {0.,0.,0.};
+  double Bfracs1[largeBins1] = {0.,0.,0.,0.};
+  double Bfracs2[largeBins2] = {0.,0.,0.,0.,0.,0.,0.,0.};
+  double Bfracerrs0[largeBins0] = {0.,0.,0.};
+  double Bfracerrs1[largeBins1] = {0.,0.,0.,0.};
+  double Bfracerrs2[largeBins2] = {0.,0.,0.,0.,0.,0.,0.,0.};
 
   double ybinWidths[3] = {2.4,0.8,1.6};
   if (!isDoubleDiff) {
@@ -47,11 +62,11 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
 				 3.75,9.46,11.54,13.77,12.55,13.39,
 				 9.96,10.89,8.06,6.28,5.47,4.76,
 				 3.69,2.75,1.83,1.09,0.61,0.263,0.066,0.007};
-  double errsycXsec[smallBins] = {1.72,1.12,0.89,0.36,0.132,0.013,
-				 8.16,5.40,3.54,1.86,0.85,0.31,0.020,
-				 4.61,11.74,12.15,15.47,17.01,16.66,
-				 14.18,14.66,11.13,10.94,8.91,8.16,
-				 7.39,6.10,4.39,2.94,1.49,0.69,0.272,0.018};
+  double errsycXsec[smallBins] = {1.73,1.15,0.90,0.37,0.137,0.013,
+				 8.37,5.42,3.56,1.88,0.85,0.31,0.020,
+				 4.64,12.0,12.4,15.9,17.5,17.3,
+				 14.8,15.2,11.5,11.4,9.24,8.83,
+				 8.01,6.5,4.7,3.1,1.54,0.70,0.276,0.018};
 
   // POLARIZATION FROM FILE
   double mixpol[smallBins];
@@ -231,8 +246,9 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
 
     cout << "Prompt : $" << promptXsec[0] << " \\pm " << prompttoXsec[0] << " (\\pm " << promptstXsec[0] << "_{\\mathrm{stat.}} \\pm " << promptsyXsec[0] << "_{\\mathrm{syst.}})$ & $" << promptXsec[1] << " \\pm " << prompttoXsec[1] << "$ & $" << promptXsec[2] << " \\pm " << prompttoXsec[2] << "$ & $" << promptXsec[3] << " \\pm " << prompttoXsec[3] << "$ & $" << promptXsec[4] << " \\pm " << prompttoXsec[4] << "$" << endl;
     cout << "Non-prompt : $" << bXsec[0] << " \\pm " << btoXsec[0] << " (\\pm " << bstXsec[0] << "_{\\mathrm{stat.}} \\pm " << bsyXsec[0] << "_{\\mathrm{syst.}})$" << endl;
-    if (plotDellaMinchia) {
-      double BfracCorr = bXsec[0]/(promptXsec[0]+bXsec[0]);
+    double BfracCorr = bXsec[0]/(promptXsec[0]+bXsec[0]);
+    double totErr = sqrt(pow(errstBfrac[i]*(BfracCorr/Bfrac[i]),2) + pow(errsyBfrac[i]*(BfracCorr/Bfrac[i]),2));
+    if (plotDellaBfrac) {
       cout << "Corrected B-fraction : $" << BfracCorr << " \\pm " << errstBfrac[i]*(BfracCorr/Bfrac[i]) << "_{\\mathrm{stat.}} \\pm " << errsyBfrac[i]*(BfracCorr/Bfrac[i]) << "_{\\mathrm{syst.}})$" << endl; 
     }
     
@@ -257,7 +273,17 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
       errsyctotpr += promptsycXsec[0]*binWidths2[i]*ybinWidths[0];
       errsyctotb += bsycXsec[0]*binWidths2[i]*ybinWidths[0];
 
+      if (plotDellaBfrac) {
+	Bfracs0[i] = BfracCorr;
+        Bfracerrs0[i] = totErr;
+      }
+
     } 
+
+    if (i > 2 && i < 7 && plotDellaBfrac) {
+      Bfracs1[i-3] = BfracCorr;
+      Bfracerrs1[i-3] = totErr;
+    }
 
     if (i > 3 && i < 7) {
 
@@ -281,6 +307,11 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
       errsyctotb += bsycXsec[0]*binWidths2[i]*ybinWidths[1];
 
     } 
+
+    if (i > 6 && plotDellaBfrac) {
+      Bfracs2[i-7] = BfracCorr;
+      Bfracerrs2[i-7] = totErr;
+    }
 
     if (i > 11) {
 
@@ -340,6 +371,65 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaMinchia = false) {
   cout << endl;
   cout << "TOTAL PROMPT: $" << totpr << " \\pm " << sqrt(errsttotpr) << " \\pm " << sqrt(errsytotpr) << " (\\pm " << sqrt(errsttotpr+errsytotpr) << ")$" << endl;
   cout << "TOTAL NON-PROMPT: $" << totb << " \\pm " << sqrt(errsttotb) << " \\pm " << sqrt(errsytotb) << " (\\pm " << sqrt(errsttotb+errsytotb) << ")$" << endl;
+  if (plotDellaBfrac) {
 
+    gROOT->ProcessLine(".L tdrstyle.C");
+    gROOT->ProcessLine("setTDRStyle()");
+
+    TGraphAsymmErrors *o_al_y0 = new TGraphAsymmErrors(largeBins0, binAverages0, Bfracs0, binRMS0, binRMS0, Bfracerrs0, Bfracerrs0);
+    TGraphAsymmErrors *o_al_y1 = new TGraphAsymmErrors(largeBins1, binAverages1, Bfracs1, binRMS1, binRMS1, Bfracerrs1, Bfracerrs1);
+    TGraphAsymmErrors *o_al_y2 = new TGraphAsymmErrors(largeBins2, binAverages2, Bfracs2, binRMS2, binRMS2, Bfracerrs2, Bfracerrs2);
+
+    o_al_y0->SetLineColor(kBlack);
+    o_al_y0->SetMarkerStyle(21);
+    o_al_y0->SetMarkerColor(kBlack);
+    o_al_y1->SetLineColor(kBlue);
+    o_al_y1->SetMarkerStyle(23);
+    o_al_y1->SetMarkerColor(kBlue);
+    o_al_y2->SetLineColor(kRed);
+    o_al_y2->SetMarkerStyle(25);
+    o_al_y2->SetMarkerColor(kRed);
+    
+    TMultiGraph *mg = new TMultiGraph("mg","mg");
+    mg->Add(o_al_y0);
+    mg->Add(o_al_y1);
+    mg->Add(o_al_y2);
+    
+    TCanvas *d1 = new TCanvas("d1", "d1",600,600);
+    // d1->cd(1)->SetLogy();
+    d1->SetLeftMargin(0.15);
+    mg->Draw("AP");
+    o_al_y2->Draw("P");
+    o_al_y1->Draw("P");
+    o_al_y0->Draw("P");
+    d1->Update();
+
+    TH1F *hist=mg->GetHistogram();
+    hist->SetXTitle("p_{T}^{J/#psi} (GeV/c)");
+    hist->SetYTitle("b-fraction");
+    
+    TLatex * t = new TLatex();
+    t->SetNDC();
+    t->SetTextAlign(13);
+    t->SetTextFont(63);
+    t->SetTextSizePixels(20);
+    char lumi[100];
+    sprintf(lumi, "CMS - #sqrt{s} = 7 TeV - L = 314 nb^{-1}");
+    t->DrawLatex(0.48,0.4,lumi);
+    
+    TLegend *leg_a = new TLegend(0.66,0.16,0.92,0.35);
+    o_al_y0->SetName("o_al_y0");
+    o_al_y1->SetName("o_al_y1");
+    o_al_y2->SetName("o_al_y2");
+    leg_a->AddEntry("o_al_y0","|y|<1.2","p");
+    leg_a->AddEntry("o_al_y1","1.2<|y|<1.6","p");
+    leg_a->AddEntry("o_al_y2","1.6<|y|<2.4","p");
+    leg_a->SetFillColor(0);
+    leg_a->SetShadowColor(0);
+    leg_a->SetLineColor(0);
+    leg_a->Draw();
+    
+    d1->Print("allBfrac.pdf");
+  }
   return;
 }
