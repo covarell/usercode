@@ -1,13 +1,28 @@
 > PHYSICS COMMENTS:
 > 
 > 1) You use the unphysical, null polarization scenario as the default when quoting efficiencies (e.g., Fig. 2, Table 2). Is it really a common thing to do? Why no chose one of more realistic scenarios, e.g. left or right helicity?
-> 
+
+Well the fully transverse assumption you mention is as good as the other 
+ones, since at present theory calculation do not really agree with the
+measured ones. This is why we choose to give the result in 5 scenarios and
+take, let's say, the "average" one (lambda_theta = 0)
+ 
 > 2) LL111-113: given that on average as many as 7% of the events has more than one J/psi, what's the rational of choosing the one with the largest p_T? This does bias your differential cross section measurement toward higher p_T's. Should not you use all the combinations instead of one per event?
-> 
+
+See answers to Anne-Marie. The purity criterion comes before the pT 
+criterion, which is only used in a minimal fraction of events (<< 7%).
+ 
 > 3) P5, unnumbered lines at the top: since the muon detectability depends mostly on p, not p_T, what's the rational of making rapidity-dependent p_T cuts, instead of a single cut on the momentum ~4 GeV?
-> 
+
+It's not really true, as you can see from the figures in the AN, because 
+the material traversed by the muon varies with the polar angle. The best 
+choice we found to correctly describe the acceptance is the mixture of p 
+and pT.
+ 
 > 4) L167: you call the effect "negligible"; yet you quote per mil effects numerically in other bullets; I am surprised that the effect of the primary vertex position on the acceptance has such a small effect. Is it really below per mil?
-> 
+
+Yes, it is (if we believe in our simulation).
+
 > STYLE COMMENTS:
 > 
 > 0) General: the paper uses a mixture of tenses and styles, which is not really warranted. The abstract is written in active voice ("We present ..."), contrary to the CMS style recommendations. Most of the paper follows passive voice, but in some cases you switch to the active one (e.g., L207: "Hence we reweighted ..."), which should be avoided. Finally, there are at least three tenses used: present (e.g., L54, "J/psi's are reconstructed ..."), past (L68, "Simulated events were used..."), and past perfect (L101, "has then been performed..."). Please, use one (present) or at most two (present and past) tenses.
