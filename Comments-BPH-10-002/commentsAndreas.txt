@@ -18,8 +18,8 @@ thanks for your careful reading. Our replies follow.
 > The relevant information from these tables could (and should) be given 
 > in the text.
 
-??? Potrebbe essere una soluzione... Nei risultati finali, dato che la 
-luminosita' domina, le fluttuazioni non si vedono piu'...
+We have removed table 1 and most numbers from Tables 3 and 6. 5 might be
+substituted by a figure, still under discussion for the final reading.
 
 >  
 > Detailed comments
@@ -99,7 +99,7 @@ OK./OK.
 > 
 >     *  consider "box" style for better b/w compatibility
 
-As before, we were told not to worry about b/w compatibility.
+As before, we were told not to worry too much about b/w compatibility.
 
 >     *  caption: "Right: Measured number of muon pairs in bins of pt and |y|.
 
@@ -132,10 +132,11 @@ OK.
 > have been determined using an assumption on the distribution of the cross 
 > section inside the bin, it may be more appropriate to plot the uncertainty 
 > on the result of this bin-center correction, rather than the RMS.
-
-We don't understand which assumption you are referring to. 
+ 
 The average/RMS is done on the histogram of the observed (reconstructed) pT 
-spectrum. 
+spectrum, because several predictions are overlaid in the same plot and 
+therefore several bin-center corrections should be considered at the 
+same time... 
 
 > 
 > References:
@@ -228,8 +229,7 @@ OK.
 
 >     * 116: and the rest is trk trk ?
 
-Yes (so there is no need to specify a third fraction, since the three add up
-to 100%).
+Yes, now we specify.
 
 >     * 131/132: move to after line 134
 
@@ -238,16 +238,16 @@ OK.
 >     * 138: remove "(unphysical)" as it is not really unphysical, even 
 > though not expected quantitatively.
 
-OK. *done*
+OK. 
 
 >     * 140-148: would be better understandable with a little bit of 
 > introduction in introduction (see our comment above)
 
-OK (see above). So this part will become shorter. *not done* 
+OK (see above). So this part will become shorter. *done* 
 
 >     * 150 and following: give numbers in the text.
 
-??? Se togliamo tutte le tabelle, per forza.
+See new paper layout.
 
 >     * 155: remove "at"
 

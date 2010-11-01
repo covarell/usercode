@@ -101,10 +101,6 @@ This part has been changed in the new draft.
 
 Because of a typo, now corrected. See also answer above on momentum scale.
 
-> Line 161: What is the motivation for the choice of 20%? Maybe a reference?
-
-
-
 > Line 199-204: please quote the order of magnitude of the tag selection bias.
 
 It is quantified by rho (notice that the corresponding sentence has been

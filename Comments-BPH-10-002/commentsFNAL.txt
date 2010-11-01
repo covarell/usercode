@@ -11,7 +11,7 @@ account and will be implemented in the next paper version.
 > variation in these models would produce major differences in the results if these were included in
 > the simulation.
 
-This will be changed (see answers to Andreas).*not done*
+This will be changed (see answers to Andreas).*now done*
  
 > b) A lot of the systematic errors as given in the tables fluctuate a lot. Have these been checked
 > carefully or just came out of the program? Is this just due to statistical fluctuation in the
@@ -40,7 +40,9 @@ with the correct proportion of Global and Tracker muons.
  
 > e) Luminosity is the single biggest source of systematic uncertainty. There should be some
 > discussion about this.
-> 
+
+A reference to the PAS is added.
+
 > f) The systematics are significantly smaller for lambda=-1. Which one of the individual
 > contributions is affected so much by the polarization? Please mention this in the text.
 
@@ -51,7 +53,7 @@ No, they are not, if you consider the fractional uncertainty.
 > individual efficiency from the two muons which is not correct.
 
 The trigger is a double-muon trigger, so what we say is correct (at least in
-principle). Detector-related effects are corrected by the rho factor. 
+principle). Correlation effects are corrected by the rho factor. 
  
 > h) Selecting the right J/psi: on average, there are 1.07 J/psi candidates per selected event. There
 > is a prescription of how to pick the correct J/psi. From Monte Carlo studies, how often this
@@ -68,8 +70,8 @@ the correct candidate in almost 100% of the cases in prompt signal MC.
 
 If we add different parameters for prompt and non-prompt resolution the fit
 does not converge at all. The correct thing to do to take into account 
-additional dependencies (e.g. number of tracks in the event) is to use the
-per-event ct error, which will be done in the next paper.
+such dependencies is to use the per-event ct error, which will be done in 
+the next paper.
  
 > j) Comparison of the prompt J/psi data with model: A statement should be made that none of the
 > model describe the prompt data.
@@ -93,7 +95,7 @@ pT-|y| region that is harder to compare with theory (see comments to Giovanni).
 > variation of which is then is used as an estimate for the systematic error. How does this relates to
 > the RMS mentioned above?
 
-See answers to most reviewers. All this part will be removed as the RMS is
+See answers to most reviewers. This part will be changed as the RMS is
 ill-defined.
  
 > m) primary vertex estimation, line 306: why would the difference of two methods be a good
@@ -152,17 +154,20 @@ irrelevant).
 > make the negative a -log(|negative value|)?
 
 We tried to do less bins (the fit is unbinned, so the result does not change),
-but in this way the upper figures become ugly...
+see new figure.
 
 > Figure 5 & 6: The data is plotted at the center of the bin, although the bin centroid is to the left of
 > that. There is a famous paper by Terry Wyatt on how to do this right.
 
-No, they are not. We use average and RMS pT in the bin from table 5.
+No, they are not. We use average and RMS pT in the bin from table 5. The method
+by Wyatt is appropriate when comparing to one, well-known theoretical 
+prediction: given the qualitative comparison done here and the multiple theory
+curves in each plot, we think this approximation is sufficient.
 
 > Figure 5 & 6: the CASCADE wiggles are unphysical and ugly. Shouldnât you run more MC, or
 > smooth or something?
 
-General concern, an answer will be posted in HN. 
+General concern, more CASCADE MC is being produced.
  
 > Line 12: Just a comment -- It would be great if we could advertise better results at high Pt but I
 > am not sure that is really true. Our highest bin extends from 10-30 but with a mean Pt of only 13.
@@ -198,7 +203,8 @@ some.
 > unimportant
 
 No real reason, but we think three figures are more compact (and give a better
-idea of thevarying resolution) than 33 figures (i.e. one per bin).
+idea of the varying resolution) than 33 figures (i.e. one per bin) or some
+sample bins.
 
 > Line 220-22: this means that cross sections are available (corrected??) over the whole grid of
 > Fig. 2. Are these truly available as fully corrected quantities? Expect people to ask for them.

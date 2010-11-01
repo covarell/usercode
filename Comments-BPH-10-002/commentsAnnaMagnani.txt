@@ -52,7 +52,7 @@ Yes, this sentence will be changed (see answers to Amnon).
 > always be given as "ball-park" figure ? Or a range min-max, or an
 > average ?
 
-??? Dipende da quello che decidiamo.
+See new paper layout, table content has changed significantly.
   
 > Line 188: for this momentum range: which one ?
 
@@ -67,13 +67,14 @@ Yes (see answers to Sijin).
 > Fig 3: is the decreasing of XS expected from 1.5 GeV due to
 >   kinematics ? Add a comment about it in the text ?
 
-??? Well, not from kinematics because these cross-section are already
-acceptance-corrected. It is the soft-gluon effect... ecc.
+Well, not from kinematics because these cross-section are already
+acceptance-corrected. It is the cross-section suppression due to 
+soft gluon emission, seen in many other QCD processes.
   
 > Line 279: Give functional form?
 
 It is quite complicated and, being empirical, does not add so much information,
-but can be added.
+but will be added.
  
 > Fig 4: add pT and y bin values on plot itself ?
 
@@ -84,7 +85,7 @@ much information in the plot.)
 > bin to bin eg 0.0105 -> 0.0015 at end of Resolution model - comment 
 > somewhere that arises from taken the largest variation ?
 
-???
+See above.
 
 > Line 345-346: muon efficiency and luminosity...
 
@@ -94,7 +95,7 @@ Correct.
 > than the non-prompt xsects?
 > 
 
-???
+The comparison paragraph has changed.
 
 > References:
 > -----------
