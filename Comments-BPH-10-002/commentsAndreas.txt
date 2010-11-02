@@ -49,7 +49,7 @@ OK, we can move here lines 140-147, with a bit of rephrasing. *NOT DONE*
 >     * It may be in order to mention the recent calculations by Kniehl et al 
 > (arXiv:1009.5662) and Ma et al. (arXiv:1009.3655) (see below).
 
-OK. *not done yet*
+Not done yet.
 
 > Tables:
 > 
