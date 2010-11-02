@@ -13,7 +13,7 @@ is correct for a publication. Final reading will probably set this issue.
  
 > - related - inconsist use of "italics" fonts for particle names.
 
-OK. *done* (FL) 
+OK. 
  
 > - Fig 1's quality was reduced by compression. Please use vector graphics 
 > throughout.
@@ -37,7 +37,7 @@ OK. We will go through the paper checking this.
  
 > L6: this is nice text, but the paragraph reads fine without it.
 
-Right. We will remove it.  *done* (FL)
+Right. We will remove it. 
 
 > L9-12: there's a tense problem here (what Greg calls "breaking casuality"
 > I think): you haven't presented your analysis yet, so from the reader's
@@ -52,7 +52,7 @@ Right. We will remove it.  *done* (FL)
 > at a higher energy and in a wider rapidity range than was previously 
 > possible."
 
-We will take the alternative form.  *done FL*
+We will take the alternative form. 
   
 > L14: a "historical discrepancy" sounds like this was big enough to 
 > make the history books. How about:
@@ -83,7 +83,7 @@ OK.
 > in the rest of the paper? Do the comparisons to theory depend on the
 > accuracy of the MC simulation?
 
-This sentence will be removed (see answers to Teresa). *done* FL
+This sentence will be removed (see answers to Teresa).
 
 > Line 34: CMS was spelled out earlier, in line 25, why repeat it?
 
@@ -447,7 +447,10 @@ OK.
 > "The differential cross decreases as a function of p_T more rapidly
 > than predicted by the models presented above."
 
-OK.
+Ok, we changed it to:
+
+"The differential cross decreases as a function of p_T more rapidly
+than predicted by the models investigated."
 
 > L341 - drop "have"
 

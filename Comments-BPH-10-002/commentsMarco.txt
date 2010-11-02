@@ -51,3 +51,23 @@ This will be fixed throughout.
 > 
 
 General concern, being discussed with the ARC.
+
+> l.330¡¾335 The logical flow would be to swap the last sentence 
+> "The differential cross section.." at the beginning of the paragraph (or at 
+> the end of the previous one) with the explanation concerning the Colour 
+> Singlet Model and the NRQCD model, as it refers to the comparisons of our 
+> data to the calculations described before.
+
+Ok we changed it a bit to make the flow better.
+
+> In addition this single sentence seems really too little. For example, given that we have also PYTHIA as a curve in every plot, we should include a sentence on the comparison of PYTHIA with the data. It would say something clear, like "PYTHIA generally overshoots the data, except at the lowest p_T values".page 16 lines 334¡¾335: " The differential cross section is falling significantly steeper than expected in the models represented.." apart for the last point (highest Pt bin) the agreement seems pretty good to me. No evidence for "falling significantly steeper..."
+
+Ok., we changed the sentence
+
+> l.336¡¾9 I would add a couple of sentences here: ¡¾ The data pT shape seems softer than the prediction here too, isn't it ? We could state it. ¡¾ PYTHIA does not agree with the data at low pT. This is clear and could be said.
+
+All models aren't great, at low Pt (<3 GeV) PYTHIA is actually the best, the others are even lower... We prefer to leave the interpretation to the reader and not add an extra phrase. 
+
+> By the way I notice that the comparison of PYTHIA for prompt/non¡¾prompt J/psi seems correlated: the ones agree where the others disagree with data. This hints a suspicion that maybe the data used to tune the MC models in PYTHIA were not separated as well as ours, or at least not in a way consistent with our data.
+
+Yes, it is hard to say what's the exact reason. Concerning the tuning, the prompt J/psi generation in PYTHIA has been tuned to Tevatron observations (the differential cross section). For non-prompt J/psi's we are not aware of a dedicated tune to Tevatron data. 
