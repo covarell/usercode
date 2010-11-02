@@ -6,16 +6,21 @@ thanks for your careful reading of the paper. Replies follow.
 > Line 56-57: while interesting piece of information, we don't see how
 > relevant it is that there were 1.6 collisions per crossing.
 
+
 It is, in the sense that if this number was >> 1 the primary vertex 
 misassignment based on the closest vertex in z (Section 6) could have been
 a serious effect. In this case the 3rd Gaussian fixed from simulation does
 the job.
 
+
 > Line 58: "good quality data" is not immediately clear, would suggest to
 > replace with something like "Tracker, the Muon and the luminosity
 > measurement detectors were fully operational".
 
-OK.
+Checking for good data to be delivered, implies that the detector is also operational (even not totally, just the 
+part that guarantees a good quality data to be reconstructed )
+
+
 
 > Line 60: what is the motivation for using only a double-muon trigger?
 
@@ -24,6 +29,7 @@ a mixture of triggers with different prescale factors makes this method fail.
 In the ICHEP analysis, a single muon trigger was used in some bins, but in 
 this larger dataset the lowest unprescaled threshold is 5 GeV at HLT, which is
 significantly less efficient than the double muon.
+
 
 > Line 68-74: It is not clear for a non-expert if the MC generators listed
 > here have all the improvements listed on lines 15-19. It would be nice to
@@ -34,20 +40,28 @@ In the acceptance determination, possible pT spectrum variations due to the
 presence/absence of these improvements have been taken as a systematic
 uncertainty.
 
+
 > Line 84: define "central" and "forward" in terms of (pseudo)rapidity.
 
+
+
 OK.
+
 
 > Line 91: would recommend changing "cuts are applied" to e.g.: "To
 > reduce backgrounds from fake muons ..., muon tracks are required to pass
 > the following requirements".
 
+
 OK.
+
 
 > Line 92: we guess it is at least two tracks in the pixel layer, not
 > exactly two?
 
+
 Yes, this is a typo.
+
 
 > Line 99-103 and Table 1: The purpose of this part and some details are a
 > little unclear. Is the correction derived using the J/psi peak also (and
@@ -60,19 +74,25 @@ result, when compared to other systematics (see Table 2 in the NEW draft,
 a typo was there in the old one, as you also noticed in your comments
 below).
 
+
 > Line 111: Why do you choose the largest pt muon pair? Does this affect the
 > kinematics of the non-prompt J/Psi?
+
+This has the least effect - compared for instance to the choice of the closest mass. The effect
+to the momentum spectrum is small, given the small amount of events.
 
 See answers to FNAL. The purity is the real discriminating variable when 
 two pairs are there, this choice is made only when two pairs with the SAME
 purity are found, i.e. in much less than 7% of the events, making the effect
 negligible.
 
+
 > Page 3-4: what is the reason for suddenly switching from pseudo-rapidity
 > to rapidity?
 
-There is no switch. For J/psi we use always y, for single muons always eta
-(which equals y, since the muons are almost massless).
+we have used pseudorapidity for detector related objects such as the muons, while the Jpsi has its properties
+described by the physics
+
 
 > Line 144-147: this section needs a little clarification: what is the
 > polarization "predicted by EvtGen"? How were the events with
@@ -108,6 +128,9 @@ changed now, indicating the range, not the average).
 
 > Line 222-223: Does the fine-grained binning help to determine better
 > center of mass, or what is otherwise its advantage?
+<<<<<<< commentsPiotr.txt
+The advantage is to better determine the average (efficiency * acceptance) product, with the smallest sensiticity to any variation 
+of the acceptance and efficiency per bin.
 
 To avoid 'rho-like' effects also in the acceptance determination due to the
 different MC/data spectra. Since we have large MC samples, this can be done,
