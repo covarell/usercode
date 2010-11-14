@@ -375,6 +375,8 @@ void computeDiffXsec(bool isDoubleDiff = false, bool plotDellaBfrac = false) {
 
     gROOT->ProcessLine(".L tdrstyle.C");
     gROOT->ProcessLine("setTDRStyle()");
+    // gStyle->SetStripDecimals(kFALSE);
+    // gStyle->SetNdivisions(1020,"XYZ");
 
     TGraphAsymmErrors *o_al_y0 = new TGraphAsymmErrors(largeBins0, binAverages0, Bfracs0, binRMS0, binRMS0, Bfracerrs0, Bfracerrs0);
     TGraphAsymmErrors *o_al_y1 = new TGraphAsymmErrors(largeBins1, binAverages1, Bfracs1, binRMS1, binRMS1, Bfracerrs1, Bfracerrs1);

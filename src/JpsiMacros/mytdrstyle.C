@@ -93,8 +93,8 @@ void setTDRStyle() {
   // gStyle->SetStatY(Float_t y = 0);
 
 // Margins:
-  gStyle->SetPadTopMargin(0.05);
-  gStyle->SetPadBottomMargin(0.13);
+  gStyle->SetPadTopMargin(0.02);
+  gStyle->SetPadBottomMargin(0.23);
   gStyle->SetPadLeftMargin(0.13);
   gStyle->SetPadRightMargin(0.05);
 
@@ -109,6 +109,10 @@ void setTDRStyle() {
 
 // For the axis:
 
+  gStyle->SetTitleFont(42, "XYZ");
+  gStyle->SetLabelFont(42, "XYZ");
+  gStyle->SetLabelOffset(0.007, "XYZ");
+  // gStyle->SetTitleSize(0.06, "XYZ");
   gStyle->SetAxisColor(1, "XYZ");
   gStyle->SetTitleYOffset(1.5);
   gStyle->SetStripDecimals(kTRUE);
