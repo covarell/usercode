@@ -1,0 +1,133 @@
+> However, the analysis procedure has one critical point that has
+> influence on all presented results. On the one hand the efficiencies
+> for the track finding and muon identification are determined from data
+> to be independent from the MC simulation, on the other hand a large
+> correction of up to 30%  is applied for correlations between the
+> efficiencies of the two muons which is determined from the MC, without
+> any possibility to cross check it in data. You claim that this is due
+> to the bin size in which the efficiency is determined. Since no
+> correlations between the efficiencies of the two muons are expected
+> if they are determined as a function of the relevant variables, this
+> means that the bin sizes for the muon efficiencies are too large and
+> that you have a strong variation within some of the bins. Looking at
+> reference [23] I see that the muon efficiencies are determined
+> with a limited statistics sample in a binning that has only 1 to 3 bins
+> in the threshold region (if these are not the relevant plots for this
+> analysis, you should provide the relevant ones). On the other hand you
+> have a very fine binning for the pt dependence of the J/psi cross
+> section.
+> I see several possibilities how to avoid this problem:
+> - you could cut out the threshold region and start only at higher
+>  muon pt. Then you probably need to adjust your analysis region
+>  accordingly
+> - you could use a smooth function, determined from a finer binning in
+>  the threshold region, for the correction
+> - you could adjust the MC to describe the data, using a smooth
+>  function
+> In any case the large correlation between the two muons is unphysical
+> and should disappear.     
+> 
+> 
+> In addition I have a number of smaller comments:
+> 
+> page 3, first paragraph: please add a short explanation of what the two
+> different muon reconstruction algorithms are so the reader doesn't have to
+> look this up in ref [23]. Especially since this reference is not a
+> publication.
+> 
+> figure 1: since the fit parameters are not quoted it is hard to judge,
+> but my impression is that the radiative tail increases from the central
+> to the forward region. If so, what is the reason for this?
+> 
+> section 4: it is not really clear to me if a bin-by-bin correction or
+> a matrix unfolding is used. If it is a bin-by-bin correction, some
+> information about the bin purity and a comparison of the MC used for the
+> correction with the data would be interesting. On page 5 it is stated
+> that the spectra of other theoretical predictions are used to determine
+> the systematic uncertainty, but from figure 6 it is obvious that none of
+> them describes the pt distribution in the forward direction of the data.
+> This means that the systematics might be under- or overestimated.
+> 
+> page 5, systematic uncertainty due to b-fraction: why don't you use your
+> own measurement (section 6) and it's uncertainty?
+> 
+> page 6, systematic uncertainty on rho: concerning the reweighting to the
+> different theoretical predictions, the same applies as above.
+> 
+> table 1: what is the uncertainty quoted for the average acceptance
+> times efficiency?
+> 
+> table 3: how are the <pt> values determined?
+> 
+> section 6.1: it is not clear to me what are the free parameters of the
+> fit. Obviously the fractions f_Sig and f_B, but also the f_i of the
+> background? and why are the lambda_i fixed in the separate fit although
+> you use the full mass spectrum and the signal and background shapes in
+> the fit (especially since, in the forward bin, the signal extends into
+> your sidebands)?
+> 
+> page 12, background shape: are all three 'long-lived' components needed?
+> CDF states that the sources for the negative and the symmetric
+> contribution are unknown, so a bit more information about them would
+> be helpful.
+> 
+> figure 4: why does the total fit change curvature at large positive
+> l_Jpsi?
+> 
+> table 4: how is the average pt determined? and what is the rms supposed
+> to tell the reader?
+> 
+> page 15, section 7: please add a short statement on the model
+> implemented in CASCADE (colour singlet, kt-unintegrated PDF)
+> 
+> page 15, section 7: I agree with you that for the CSM with higher order
+> corrections not all contributions are available, but LO NRQCD
+> predictions including feed-down from chi_c exist (see for example
+> hep-ph/0003142). In fact, you probably use the colour-octet matrix
+> elements in Pythia. So why do you not show the calculations?
+> 
+> page 16, discussion of figure 7: the statement on the good agreement of
+> the calculations with the data seems too positive for Pythia in the
+> forward direction.
+> 
+> figures 6 and 7: why do you use Pythia to calculate the abscissa
+> although it does not describe the data in some regions? showing data
+> and predictions in the same bins would avoid this problem.
+> 
+> figure 6: showing the different contributions in Pythia (feed-down,
+> colour singlet, colour octet) might enhance the physics message.
+> 
+> figures: please use the same abbreviation BR as in the text
+> 
+> references: many references are CMS notes. They are available also to
+> external people, but they are not journal publications. So if the
+> information is really important for the analysis you should include it
+> in the paper so a referee has a chance to comment on them.
+
+> There is a preponderance of results in the list of references, namely 14, 15, 23, 25 and 29 that have not been considered worthy of a proper publication by CMS and hence have not been peer reviewed. Yet several analysis aspects for this report are directly drawn from the notes with little further explanation. Reference [23] is based on much smaller statistics than this paper and yet drives the systematic uncertainty. The analysis introduces formally a correlation rho, which seems to be driven by a binning artifact rather than adequate analysis of the full data. This is one example where it would be much preferable to see the relevant assessment of the data carried out for and in the publication.
+> 
+> In general references to notes should be avoided. Please review the references and modify the text or list according to the following priority list:
+> 1) If at all possible such references should be replaced by references in a refereed journal or should be avoided altogether.
+> 2) If such a reference does not exist and the reference is vital for the paper consider publishing the reference first.
+> 3) If you do not want to publish the note in a refereed journal first explain the core context of the measurement in this publication and mention the quantitative result, which should be made plausible. The unpublished note could be referenced as supportive material for the interested reader and should be indicated as such. The paper must however be understandable and trustworthy without the note.
+> 
+> Case 3 is certainly discouraged.
+> 
+> Further observations on the reference list are indicated below and should be addressed.
+> 
+> [1] provide a link
+> [2] add doi:10.1142/S0217751X06033180
+> [9] misspelling in title: heavy flavor -> heavy-flavour 
+> [10] misspelling in title: heavy flavor -> heavy-flavour 
+> [11] misspelling in title: heavy flavor -> heavy flavour 
+> [14] CMS PAS EWK-10-004 is an unpublished and unrefereed note. It does not have an author nor an address. There is only an email address
+> [15] CMS-PAS-TRK-10-005 (2010)  is an unpublished and unrefereed note. It does not have an author nor an address. There is only an email address
+> [17] misspelling in title:  perspectives at LHC ->  perspectives at LHC(b). Please provide a link to the cds server. This is an unpublished and unrefereed note.
+> [21] misquote in titlte: G4 -> GEANT4
+> [23] CMS-PAS-MUO-10-002 (2010)  is an unpublished and unrefereed note. It does not have an author nor an address. There is only an email address
+> [25] CMS-PAS-TRK-10-003 (2010)  is an unpublished and unrefereed note. It does not have an author nor an address. There is only an email address
+> [28] misquote in title: in B decay -> in B decays
+> [29] CMS-PAS-TRK-10-00 (2010) does not exist
+> [34] add doi:10.1016/S0010-4655(01)00438-6
+> [36] misquote in title: flavors -> flavours
+> [45] wrong doi: use doi:10.1103/PhysRevD.53.6203
