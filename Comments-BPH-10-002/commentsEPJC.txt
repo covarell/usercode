@@ -38,7 +38,9 @@
 > figure 1: since the fit parameters are not quoted it is hard to judge,
 > but my impression is that the radiative tail increases from the central
 > to the forward region. If so, what is the reason for this?
-> 
+ 
+Yes your impression is right and the radiative tail increase in the forward region. In particular in the forward region we are able to reconstruct muons that have lost a considerable amount of energy irradiating photons, these muons populate the low energy tail of the Crystal Ball function. In the barrel region there is an intrinsic pT cut in recostructing muons due to the structure of CMS: the high bending power of the magnetic field and the presence of the magnet and the iron yoke material make possible to recostruct muons with a pT > 3.5 GeV in the barrel. It is then more likely to "lose"  muons that have irradiated a huge amount of energy in photons in the barrel than in the forward, where we can reconstruct muons with a very low pT.
+
 > section 4: it is not really clear to me if a bin-by-bin correction or
 > a matrix unfolding is used. If it is a bin-by-bin correction, some
 > information about the bin purity and a comparison of the MC used for the
@@ -58,6 +60,9 @@
 > times efficiency?
 > 
 > table 3: how are the <pt> values determined?
+
+It is the mean pt of events in an invariant mass region of +/- 100 MeV/c^2 around the J/psi peak value
+
 > 
 > section 6.1: it is not clear to me what are the free parameters of the
 > fit. Obviously the fractions f_Sig and f_B, but also the f_i of the
