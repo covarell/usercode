@@ -39,7 +39,16 @@
 > but my impression is that the radiative tail increases from the central
 > to the forward region. If so, what is the reason for this?
  
-Yes your impression is right and the radiative tail increase in the forward region. In particular in the forward region we are able to reconstruct muons that have lost a considerable amount of energy irradiating photons, these muons populate the low energy tail of the Crystal Ball function. In the barrel region there is an intrinsic pT cut in recostructing muons due to the structure of CMS: the high bending power of the magnetic field and the presence of the magnet and the iron yoke material make possible to recostruct muons with a pT > 3.5 GeV in the barrel. It is then more likely to "lose"  muons that have irradiated a huge amount of energy in photons in the barrel than in the forward, where we can reconstruct muons with a very low pT.
+Yes your impression is right and the radiative tail increase in the forward 
+region. In particular in the forward region we are able to reconstruct muons 
+that have lost a considerable amount of energy radiating photons, these muons 
+populate the low energy tail of the Crystal Ball function. In the barrel 
+region there is an intrinsic pT cut in recostructing muons due to the 
+structure of CMS: the high bending power of the magnetic field and the 
+presence of the magnet and the iron yoke material make possible to recostruct 
+muons with a pT > 3.5 GeV in the barrel. It is then more likely to "lose" 
+muons that have radiated a huge amount of energy in photons in the barrel than
+in the forward, where we can reconstruct muons with a very low pT.
 
 > section 4: it is not really clear to me if a bin-by-bin correction or
 > a matrix unfolding is used. If it is a bin-by-bin correction, some
@@ -52,7 +61,11 @@ Yes your impression is right and the radiative tail increase in the forward regi
 > 
 > page 5, systematic uncertainty due to b-fraction: why don't you use your
 > own measurement (section 6) and it's uncertainty?
-> 
+
+*** TO BE EXPANDED
+This is what is being done. The 20% is an average of the b-fraction 
+uncertainties.
+ 
 > page 6, systematic uncertainty on rho: concerning the reweighting to the
 > different theoretical predictions, the same applies as above.
 > 
@@ -70,40 +83,103 @@ It is the mean pt of events in an invariant mass region of +/- 100 MeV/c^2 aroun
 > you use the full mass spectrum and the signal and background shapes in
 > the fit (especially since, in the forward bin, the signal extends into
 > your sidebands)?
-> 
+
+Yes, also the f_i of the background are floated. Fixing lambda_i ensures fit
+convergence in some bins where the fit is more critical (low pT, with poorer
+resolution and higher background), so we adopted this as a general fit
+strategy. 
+The lambda_i values are varied by +/-1sigma (statistical uncertainty in the
+sideband-only fit) as a separate test, and the change in the b fraction is
+found to be negligible: this part is not detailed in the paper.
+ 
 > page 12, background shape: are all three 'long-lived' components needed?
 > CDF states that the sources for the negative and the symmetric
 > contribution are unknown, so a bit more information about them would
 > be helpful.
-> 
+
+We found a much better fit quality with three long-lived components than with
+two. Assessing the source of the three components exactly is not easy 
+because it would need a huge amount of MC events and, also, we found fake 
+muons at low pT not to be reproduced very well in the simulation.
+ 
+Naively, background is made of are random particle pairs that usually do not
+come from a single decay: one of the two tracks (the more "precise" in term
+of number of hits, chi2 etc.) "drives" the secondary vertex position. So
+you may have three cases:
+- in most cases, the driving track is a real muon from a b, c (or even K, pi)
+decay and this gives the positive component
+- in much less cases, the driving track is the fake, so pushing the lifetime
+estimate in the other direction
+- in some other cases, the two tracks have the same weight in the vertex 
+determination, so the displaced position can end up on either side of the
+primary vertex 
+
 > figure 4: why does the total fit change curvature at large positive
 > l_Jpsi?
-> 
-> table 4: how is the average pt determined? and what is the rms supposed
+
+As explained in the text, the non-prompt component is given by a 
+MC template, extracted from a finite-size samples. Oscillations in the few 
+MC entries at very large l_Jpsi cause the curvature change. From the number
+of data entries in the corresponding bins and the pull plots, one can infer
+that this is irrelevant for the fit result.
+ 
+> table 4: how is the average pt determined? 
+
+See above.
+
+> and what is the rms supposed
 > to tell the reader?
-> 
+
+We removed the RMS column.
+ 
 > page 15, section 7: please add a short statement on the model
 > implemented in CASCADE (colour singlet, kt-unintegrated PDF)
-> 
+
+Ok no problem.
+
 > page 15, section 7: I agree with you that for the CSM with higher order
 > corrections not all contributions are available, but LO NRQCD
 > predictions including feed-down from chi_c exist (see for example
 > hep-ph/0003142). In fact, you probably use the colour-octet matrix
 > elements in Pythia. So why do you not show the calculations?
-> 
+
+This matrix elements that are reported in this publication (Table 13) and 
+the references are indeed what PYTHIA is based on. But this is not the same 
+as what Pierre Artoisenet was calculating for us, he said he could only make 
+predictions for direct production and based his calculations on MadOnia.
+See: 
+http://www.physics.ohio-state.edu/~partois/DirectJpsi_LHC.pdf 
+So, if we want to display predictions as given in hep-ph/0003142, perhaps we 
+should have contacted different authors, but we think people like Pierre 
+Artoisenet or Jean-Philippe are the most active these past years, so were 
+the right ones to ask.
+
 > page 16, discussion of figure 7: the statement on the good agreement of
 > the calculations with the data seems too positive for Pythia in the
 > forward direction.
-> 
+
+Ok. We will change that.
+
 > figures 6 and 7: why do you use Pythia to calculate the abscissa
 > although it does not describe the data in some regions? showing data
 > and predictions in the same bins would avoid this problem.
-> 
+
+???
+ 
 > figure 6: showing the different contributions in Pythia (feed-down,
 > colour singlet, colour octet) might enhance the physics message.
-> 
+
+The implementation of direct vs indirect production in PYTHIA doesn't make 
+so much sense, we know it doesn't agree with CDF data. So why display 
+something we do not believe in.... 
+In fact, CASCADE and CEM are more serious predictions, but since we are not 
+dealing with measuring direct vs indirect prediction, displaying just the sum 
+should be ok. 
+ 
 > figures: please use the same abbreviation BR as in the text
-> 
+
+OK.
+
 > references: many references are CMS notes. They are available also to
 > external people, but they are not journal publications. So if the
 > information is really important for the analysis you should include it
@@ -136,3 +212,5 @@ It is the mean pt of events in an invariant mass region of +/- 100 MeV/c^2 aroun
 > [34] add doi:10.1016/S0010-4655(01)00438-6
 > [36] misquote in title: flavors -> flavours
 > [45] wrong doi: use doi:10.1103/PhysRevD.53.6203
+
+PhysCoord taking care of that.
