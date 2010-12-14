@@ -105,8 +105,7 @@ an ansatz, but this is equivalent to use the MC to predict the rho. In fact
 > to the forward region. If so, what is the reason for this?
  
 Yes your impression is right and the radiative tail increase in the forward 
-region. In particular in the forward region we are able to reconstruct muons 
-that have lost a considerable amount of energy radiating photons, these muons 
+region. There two main reasons for that that I explain in the following. First of all we measure the pT in the inner tracker of CMS, and the material budget for this subdetector is concentrated in the forward region as you can see by the two plots attached showing the distributions of photon conversions and nuclear interactions as a function of eta for the tracker. Secondly, in the forward region we are able to reconstruct muons that have lost a considerable amount of energy radiating photons, these muons 
 populate the low energy tail of the Crystal Ball function. In the barrel 
 region there is an intrinsic pT cut in recostructing muons due to the 
 structure of CMS: the high bending power of the magnetic field and the 
