@@ -126,22 +126,8 @@ Ok, we will add that.
 > but my impression is that the radiative tail increases from the central
 > to the forward region. If so, what is the reason for this?
  
-*** CHECK WITH TRUE MC!
-Yes your impression is right and the radiative tail increase in the forward 
-region. There two main reasons for that that I explain in the following. First
-of all we measure the pT in the inner tracker of CMS, and the material budget 
-for this subdetector is concentrated in the forward region as you can see by 
-the two plots attached showing the distributions of photon conversions and 
-nuclear interactions as a function of eta for the tracker. Secondly, in the 
-forward region we are able to reconstruct muons that have lost a considerable 
-amount of energy radiating photons, these muons populate the low energy tail 
-of the Crystal Ball function. In the barrel region there is an intrinsic pT 
-cut in recostructing muons due to the structure of CMS: the high bending 
-power of the magnetic field and the presence of the magnet and the iron yoke 
-material make possible to reconstruct muons with a pT > 3.5 GeV in the barrel. 
-It is then more likely to "lose"  muons that have radiated a huge amount of 
-energy in photons in the barrel than in the forward, where we can reconstruct 
-muons with a very low pT.
+Your impression is right as you can see in figure radiativeTailsData.png, where the percentage of events in the low mass tail of the J/psi peack is plotted for the different rapidity regions considered in the analysis. The effect however is small, at the % level. The same behavior is also visible in the generated mass of the J/psi taking into account FSR radiation, as you can see in figure radiativeTailsMC.png, in the forward region the FSR radiation is enanched. This is due to the harder momentum spectrum of muons in the forward region (see figure MCradiativeTailsP.png): if we suppose that the photons in average take the same muon momentum fraction in the three rapidity regions, in the forward part they have, on average, an higher energy. 
+
 
 > section 4: it is not really clear to me if a bin-by-bin correction or
 > a matrix unfolding is used. If it is a bin-by-bin correction, some
