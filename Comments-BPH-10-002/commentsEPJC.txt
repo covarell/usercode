@@ -27,20 +27,9 @@
 > In any case the large correlation between the two muons is unphysical
 > and should disappear.     
 
-The rho factor (correlation term in your wordings) arises in fact from the 
-fact that the bins chosen to describe the muon tagging and trigger efficiencies
-are too wide to properly account for their variation within the bin itself. 
-This is shown in the figure attached (Fig. 1). On the  left hand side it 
-shows 1+rho in Monte Carlo for the bin sizes as in the paper.
-On the right hand side for the fine bin choice:  
+We spent quite a lot of time on understanding the effect of the correlation and we believe it is very well under control. 
 
-MUON ETA BINS = 0., .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4 
-MUON PT BINS = .1, .2, .3, .4, .5, .6, .7, .8, .9, 1., 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.2, 3.4, 3.6, 3.8, 4., 4.25, 4.5, 4.75, 5., 6., 30.
-
-As it could be seen, the second - fine - binning completely decorrelates 
-the two efficiencies.
-
-The data sample that we have used in the data to compute the efficiencies 
+First, to avoid any misunderstaning, the data sample that we have used in the data to compute the efficiencies 
 with the Tag and Probe (T&P) method are somewhat different with respect to 
 those quoted in Reference 23. In fact the muon tagging efficiency has
 been measured using a sample of 3 pb-1 data, which includes the period of the 
@@ -58,59 +47,74 @@ the tagging efficiency - the trends are also very well reproduced. We believe
 that taking the correction from the MC can be then justified by this very 
 nice agreement.
 
-Actually, Figure 1 also shows that only very few bins suffer from the rho 
-being radically different from zero. The table below shows the values of 1+rho 
-for the different polarizations. You could see that the variations due to the 
-polarization in some cases are enough to justify a value of rho different from
-zero.
+Also notice that the variation of the efficiency as a function of pt is a steep function for low pT, given that most of the muons are in the turn-on trigger  and tagging efficiency.
+The statistics does not allow to have both very small eta and pt bins of the muons (we in fact can afford 10 bins in pT and 5 in eta), otherwise the statistical error would be dominant.
 
-|y|     * Pt (GeV) * unpol   * l_CS    * t_CS    * l_HX    * t_HX    *
-0-1.2   * 6.5-8    * 1.09376 * 1.0481  * 1.11056 * 1.10616 * 1.08249 *
-        * 8-10     * 1.09104 * 1.08161 * 1.09452 * 1.10837 * 1.07562 *
-        * 10-12    * 1.14797 * 1.13619 * 1.15235 * 1.1705  * 1.12876 *
-        * 12-30    * 1.08305 * 1.06576 * 1.08981 * 1.10632 * 1.06488 *
-1.2-1.6 * 2-3.5    * 0.81059 * 0.80445 * 0.81620 * 0.81890 * 0.80327 *
-        * 3.5-4.5  * 0.82738 * 0.82672 * 0.82789 * 0.85093 * 0.80731 *
-        * 4.5-5.5  * 0.94004 * 0.90889 * 0.95856 * 0.97166 * 0.91278 *
-        * 5.5-6.5  * 1.02722 * 0.97029 * 1.05555 * 1.06454 * 0.99543 *
-        * 6.5-8    * 1.05687 * 0.98731 * 1.08868 * 1.09883 * 1.02231 *
-        * 8-10     * 1.07303 * 1.01655 * 1.09779 * 1.11908 * 1.03695 *
-        * 10-30    * 1.09313 * 1.04225 * 1.1151  * 1.13693 * 1.06182 *
-1.6-2.4 * 0-0.5    * 1.19536 * 1.21184 * 1.18026 * 1.21209 * 1.18014 *
-        * 0.5-0.75 * 1.28921 * 1.30602 * 1.27376 * 1.30512 * 1.27489 *
-        * 0.75-1   * 1.30491 * 1.32126 * 1.2899  * 1.31994 * 1.29165 *
-        * 1-1.25   * 1.25457 * 1.27029 * 1.24013 * 1.26646 * 1.2443  *
-        * 1.25-1.5 * 1.27258 * 1.28952 * 1.25705 * 1.28509 * 1.26202 *
-        * 1.5-1.75 * 1.25726 * 1.27453 * 1.24148 * 1.2742  * 1.24336 *
-        * 1.75-2   * 1.19224 * 1.20861 * 1.17735 * 1.21497 * 1.17404 *
-        * 2-2.25   * 1.13701 * 1.15338 * 1.1222  * 1.16819 * 1.11254 *
-        * 2.25-2.5 * 1.1164  * 1.13473 * 1.10001 * 1.15138 * 1.08927 *
-        * 2.5-2.75 * 1.10054 * 1.11845 * 1.08467 * 1.14238 * 1.06844 *
-        * 2.75-3   * 1.08003 * 1.09914 * 1.06331 * 1.12315 * 1.0472  *
-        * 3-3.25   * 1.0696  * 1.08697 * 1.05459 * 1.11724 * 1.03361 *
-        * 3.25-3.5 * 1.05849 * 1.07752 * 1.04233 * 1.10814 * 1.02135 *
-        * 3.5-4    * 1.04465 * 1.06232 * 1.02997 * 1.10028 * 1.00368 *
-        * 4-4.5    * 1.03183 * 1.04575 * 1.0207  * 1.09269 * 0.98785 *
-        * 4.5-5.5  * 1.0317  * 1.03863 * 1.02654 * 1.09675 * 0.98576 *
-        * 5.5-6.5  * 1.02799 * 1.02375 * 1.03073 * 1.09656 * 0.98097 *
-        * 6.5-8    * 1.04145 * 1.02163 * 1.05266 * 1.10795 * 0.99709 *
-        * 8-10     * 1.02577 * 0.98808 * 1.04527 * 1.09169 * 0.98290 *
-        * 10-30    * 1.02241 * 0.97838 * 1.0439  * 1.07738 * 0.98867 *
+Actually, Figure 1 also shows that only very few bins suffer from the rho 
+being radically different from zero. The table below shows the values of 1+rho :
+ in some cases are enough to justify a value of rho different from
+zero. (the typical error is of the order of 2-3%)
+|y|     * Pt (GeV) * 
+0-1.2   * 6.5-8    * 1.09
+        * 8-10     * 1.09
+        * 10-12    * 1.15
+        * 12-30    * 1.08
+1.2-1.6 * 2-3.5    * 0.81
+        * 3.5-4.5  * 0.83
+        * 4.5-5.5  * 0.94
+        * 5.5-6.5  * 1.023
+        * 6.5-8    * 1.06
+        * 8-10     * 1.07
+        * 10-30    * 1.09
+1.6-2.4 * 0-0.5    * 1.120
+        * 0.5-0.75 * 1.29
+        * 0.75-1   * 1.30
+        * 1-1.25   * 1.25
+        * 1.25-1.5 * 1.27
+        * 1.5-1.75 * 1.26 
+        * 1.75-2   * 1.19
+        * 2-2.25   * 1.14
+        * 2.25-2.5 * 1.12
+        * 2.5-2.75 * 1.10
+        * 2.75-3   * 1.08 
+        * 3-3.25   * 1.07  
+        * 3.25-3.5 * 1.06
+        * 3.5-4    * 1.04
+        * 4-4.5    * 1.03
+        * 4.5-5.5  * 1.03
+        * 5.5-6.5  * 1.03
+        * 6.5-8    * 1.04
+        * 8-10     * 1.03
+        * 10-30    * 1.02
 
 To model the effect of the generator we have in fact accounted for the 
-variation of the spectrum using different predictions. Given that the three 
+variation of the spectrum using different theory predictions. Given that the three 
 models have different behaviours in the low pt end and since we always took 
 the largest variation of the three we believe that our estimate is a 
 conservative one, even in the problematic bins.
 
-We have already tried to model the pt and eta dependence of the muon 
-efficiencies by smoothing the measured values. In the case of the pT, we got 
-no big difference wrt the case of the unsmoothed distribution. In fact the 
-variation in pT is very well tracked by the fine pT binning. The rapid 
-variation of the efficiency as a function of eta cannot be tracked by using 
-only the 5 bins chosen in the data T&P. What we could have done is to smooth 
-the function taking the high-statistics MC sample as an ansatz, but this 
-is equivalent to use the MC to predict the rho. 
+
+The rho factor (correlation term in your wordings) arises in fact from the 
+fact that the bins chosen to describe the muon tagging and trigger efficiencies
+are too wide to properly account for their variation within the bin itself. 
+This is shown in the figure attached (Fig. 1). On the  left hand side it 
+shows 1+rho in Monte Carlo for the bin sizes as in the paper.
+On the right hand side for the fine bin choice:  
+
+MUON ETA BINS = 0., .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4 
+MUON PT BINS = .1, .2, .3, .4, .5, .6, .7, .8, .9, 1., 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.2, 3.4, 3.6, 3.8, 4., 4.25, 4.5, 4.75, 5., 6., 30.
+
+As it could be seen, the second - fine - binning completely decorrelates 
+the two efficiencies. Having very fine grained bins is not affordable with the statistics used in the article. (in the example it is 1000 bins against 50)
+
+Yet another way to show this is to plot the variation of the trigger and taggin efficiency as a function of eta for different muon pt bins - using a high statistics (2 Million Jpsi) MC sample. Figs. 5 show for instance that  
+the efficiencies in the bin between 3 and 6 GeV vary only slightly (10%) as a function of eta. On the contrary, the bins at lower pt (between  1 and 2 GeV) vary a lot (between 30 and 60%, roughly, in the bin between 1 and 1.6 in eta).
+Notice that the muons pt-eta bins which populate mostly the bins with low rho value (or close to zero) are those for which the efficiencies are not varying very much as a function of eta, while those which have a large value of rho, have the largest 
+sample of muons coming from the regions where the variation as a function of eta is the largest.
+This effect is the responsible of the "correlation". As said before, having more statistics in data , we could have afforded to model it  more precisely. 
+It is impossible to correclty smooth the efficiency using 5 bins only in eta. The other possibility, which is to use a smoothing function by taking the high-statistics MC sample as an ansatz, would be 
+totally equivalent to use the MC to predict the rho. 
+
 
 > In addition I have a number of smaller comments:
 > 
@@ -164,7 +168,7 @@ See above.
 > table 1: what is the uncertainty quoted for the average acceptance
 > times efficiency?
 
-Luca?
+The error is the total one (stat + syst )
 
 > table 3: how are the <pt> values determined?
 
@@ -226,7 +230,7 @@ See above.
 
 > and what is the rms supposed to tell the reader?
 
-We can remove the RMS column.
+The RMS is intended to give the second moment of the distribuition of the pt. If you really insist we could remove it.
  
 > page 15, section 7: please add a short statement on the model
 > implemented in CASCADE (colour singlet, kt-unintegrated PDF)
