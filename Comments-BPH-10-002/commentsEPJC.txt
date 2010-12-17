@@ -109,7 +109,7 @@ the two efficiencies. Having very fine grained bins is not affordable with the s
 
 Yet another way to show this is to plot the variation of the trigger and taggin efficiency as a function of eta for different muon pt bins - using a high statistics (2 Million Jpsi) MC sample. Figs. 5 show for instance that  
 the efficiencies in the bin between 3 and 6 GeV vary only slightly (10%) as a function of eta. On the contrary, the bins at lower pt (between  1 and 2 GeV) vary a lot (between 30 and 60%, roughly, in the bin between 1 and 1.6 in eta).
-Notice that the muons pt-eta bins which populate mostly the bins with low rho value (or close to zero) are those for which the efficiencies are not varying very much as a function of eta, while those which have a large value of rho, have the largest 
+Notice that the muons pt-eta bins which populate mostly the Jpsi bins with low rho value (or close to zero) are those for which the efficiencies are not varying very much as a function of eta, while those which have a large value of rho, have the largest 
 sample of muons coming from the regions where the variation as a function of eta is the largest.
 This effect is the responsible of the "correlation". As said before, having more statistics in data , we could have afforded to model it  more precisely. 
 It is impossible to correclty smooth the efficiency using 5 bins only in eta. The other possibility, which is to use a smoothing function by taking the high-statistics MC sample as an ansatz, would be 
