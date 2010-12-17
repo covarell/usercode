@@ -192,23 +192,24 @@ muons at low pT not to be reproduced very well in the simulation.
 Naively, background is made of are random particle pairs that usually do not
 come from a single decay: one of the two tracks (the more "precise" in term
 of number of hits, chi2 etc.) "drives" the secondary vertex position. So
-you may have three cases:
+you may have different cases:
 - in most cases, the driving track is a real muon from a b, c (or even K, pi)
 decay and this gives the positive component
-- in much less cases, the driving track is the fake, so pushing the lifetime
-estimate in the other direction
 - in some other cases, the two tracks have the same weight in the vertex 
 determination, so the displaced position can end up on either side of the
 primary vertex 
+- the choice of the negative component is only made based on an improved 
+description of the negative part of the background lifetime
 
 > figure 4: why does the total fit change curvature at large positive
 > l_Jpsi?
 
 As explained in the text, the non-prompt component is given by a 
 MC template, extracted from a finite-size samples. Oscillations in the few 
-MC entries at very large l_Jpsi cause the curvature change. From the number
-of data entries in the corresponding bins and the pull plots, one can infer
-that this is irrelevant for the fit result.
+MC entries at very large l_Jpsi cause the curvature change. One can infer
+the relevance for the fit result is small judging from the size of the
+"B-lifetime model" systematic uncertainty, which instead makes use of
+smooth analytical functions with no curvature changes.
  
 > table 4: how is the average pt determined? 
 
@@ -216,12 +217,12 @@ See above.
 
 > and what is the rms supposed to tell the reader?
 
-We removed the RMS column.
+We can remove the RMS column.
  
 > page 15, section 7: please add a short statement on the model
 > implemented in CASCADE (colour singlet, kt-unintegrated PDF)
 
-Ok no problem.
+Ok, no problem.
 
 > page 15, section 7: I agree with you that for the CSM with higher order
 > corrections not all contributions are available, but LO NRQCD
