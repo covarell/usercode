@@ -126,7 +126,16 @@ Ok, we will add that.
 > but my impression is that the radiative tail increases from the central
 > to the forward region. If so, what is the reason for this?
  
-Your impression is right as you can see in figure radiativeTailsData.png, where the percentage of events in the low mass tail of the J/psi peack is plotted for the different rapidity regions considered in the analysis. The effect however is small, at the % level. The same behavior is also visible in the generated mass of the J/psi taking into account FSR radiation, as you can see in figure radiativeTailsMC.png, in the forward region the FSR radiation is enanched. This is due to the harder momentum spectrum of muons in the forward region (see figure MCmuonsP.png): if we suppose that the photons in average take the same muon momentum fraction in the three rapidity regions, in the forward part they have, on average, an higher energy. 
+Your impression is right as you can see in figure radiativeTailsData.png, 
+where the percentage of events in the low mass tail of the J/psi peack is 
+plotted for the different rapidity regions considered in the analysis. 
+The effect however is small, at the % level. The same behavior is also 
+visible in the generated mass of the J/psi taking into account FSR radiation, 
+as you can see in figure radiativeTailsMC.png, in the forward region the FSR 
+radiation is enanched. This is due to the harder momentum spectrum of muons 
+in the forward region (see figure MCmuonsP.png): if we suppose that the 
+photons in average take the same muon momentum fraction in the three 
+rapidity regions, in the forward part they have, on average, an higher energy. 
 
 
 > section 4: it is not really clear to me if a bin-by-bin correction or
