@@ -167,7 +167,7 @@ See above.
 > table 1: what is the uncertainty quoted for the average acceptance
 > times efficiency?
 
-The error is the total one (stat + syst )
+The error is the total error (stat + syst) - where the systematics of course does not include those from the fit function and the luminosity. The error on the yield is only statistical.
 
 > table 3: how are the <pt> values determined?
 
