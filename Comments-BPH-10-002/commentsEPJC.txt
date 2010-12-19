@@ -35,13 +35,13 @@ those quoted in Reference 23. In fact the muon tagging efficiency has
 been measured using a sample of 3 pb-1 data, which includes the period of the 
 300 nb-1 used for the analysis, in which the detector behaved in a very 
 stable way, so we could assume that the reconstruction efficiencies did not 
-vary over time. This is shown in Fig. 2 and 3, that show the data to data 
-comparison for the two periods (in a smaller binning), and  the data to MC 
-comparison of the muon tagging efficiency for the 3 pb-1 period, respectively. 
+vary over time. This is shown in Fig. tag_effi_300nb_vs_later.png, that show the data to data 
+comparison for the two periods (in a smaller binning), and  in Fig. tag_effi_3pb1_vs_MC.png, that show the data to MC 
+comparison of the muon tagging efficiency for the 3 pb-1 period . 
 As you could see, there are differences in the values of the efficiency 
 between the data and the simulation, but the trend as a function of pT and 
 eta is reproduced. As for the trigger we have used the 300 nb-1 data only, 
-since the trigger menu changed after that. Fig. 4 shows the data to MC 
+since the trigger menu changed after that. Fig.  trig_effi_3pb1_vs_MC.png shows the data to MC 
 comparison for the trigger efficiency and - despite the larger error wrt 
 the tagging efficiency - the trends are also very well reproduced. We believe 
 that taking the correction from the MC can be then justified by this very 
@@ -50,11 +50,11 @@ nice agreement.
 Also notice that the variation of the efficiency as a function of pt is a steep function for low pT, given that most of the muons are in the turn-on trigger  and tagging efficiency.
 The statistics does not allow to have both very small eta and pt bins of the muons (we in fact can afford 10 bins in pT and 5 in eta), otherwise the statistical error would be dominant.
 
-Actually, Figure 1 also shows that only very few bins suffer from the rho 
+Actually, the Table below shows that only very few bins suffer from the rho 
 being radically different from zero. The table below shows the values of 1+rho :
  in some cases are enough to justify a value of rho different from
 zero. (the typical error is of the order of 2-3%)
-|y|     * Pt (GeV) * 
+|y|     * Pt (GeV) * 1+rho
 0-1.2   * 6.5-8    * 1.09
         * 8-10     * 1.09
         * 10-12    * 1.15
@@ -97,9 +97,8 @@ conservative one, even in the problematic bins.
 The rho factor (correlation term in your wordings) arises in fact from the 
 fact that the bins chosen to describe the muon tagging and trigger efficiencies
 are too wide to properly account for their variation within the bin itself. 
-This is shown in the figure attached (Fig. 1). On the  left hand side it 
-shows 1+rho in Monte Carlo for the bin sizes as in the paper.
-On the right hand side for the fine bin choice:  
+This is shown in the figure rho_bin_larghi.png which
+shows 1+rho in Monte Carlo for the bin sizes as in the paper, and rho_bin_stretti.png, for the fine bin choice:  
 
 MUON ETA BINS = 0., .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4 
 MUON PT BINS = .1, .2, .3, .4, .5, .6, .7, .8, .9, 1., 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.2, 3.4, 3.6, 3.8, 4., 4.25, 4.5, 4.75, 5., 6., 30.
@@ -264,7 +263,7 @@ Ok. We will change that.
 > although it does not describe the data in some regions? showing data
 > and predictions in the same bins would avoid this problem.
 
-Aafke ?
+We have checked that using the other curves instead of Pythia give very similar results, and visually there is no difference among the three.
  
 > figure 6: showing the different contributions in Pythia (feed-down,
 > colour singlet, colour octet) might enhance the physics message.
@@ -272,7 +271,7 @@ Aafke ?
 The implementation of direct vs indirect production in PYTHIA doesn't make 
 so much sense, we know it doesn't agree with CDF data. So why display 
 something we do not believe in.... 
-In fact, CASCADE and CEM are more serious predictions, but since we are not 
+In fact, CASCADE and CEM are more solid predictions, but since we are not 
 dealing with measuring direct vs indirect prediction, displaying just the sum 
 should be ok. 
  
