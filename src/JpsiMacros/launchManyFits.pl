@@ -2,9 +2,9 @@
 
 # Launch many fits
 
-$fitcommand = "FindMeans -f datasets/DataSet_314nb_PV.root -t 0";
+# $fitcommand = "FindMeans -f datasets/DataSet_314nb_PV.root -t 0";
 # $fitcommand = "Fit2DDataSyst -f datasets/DataSet_314nb_PV.root -m datasets/totalDataSet_allTriggers_05pb.root -t 0 -u -b -c -s 1";
-# $fitcommand = "Fit2DDataRange -f datasets/DataSet_314nb_PV.root -m datasets/totalDataSet_allTriggers_05pb.root -t 3 -u -b -c";
+$fitcommand = "Fit2DDataRange -m datasets/MCFall10_jpsi_DMu0.root -u -b -c";
 $ptfile = $ARGV[0];
 $etafile = $ARGV[1];
 
@@ -23,9 +23,10 @@ foreach $line2 (@log2) {
 	chomp($line);
         @splitline = split(/ +/, $line);
 	chomp($line2);
+        @splitline2 = split(/ +/, $line2);
 
-        # my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] .' -e ' . $line2;
-         my $currentfit = $fitcommand . ' -p ' . $splitline[0] .' -e ' . $line2;
+        my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] .' -e ' . $splitline2[0] .' -f datasets/Data2010_rap' . $splitline2[1] . '.root';
+        # my $currentfit = $fitcommand . ' -p ' . $splitline[0] .' -e ' . $line2;
         print "${currentfit} \n";
 	system("${currentfit}");
     }

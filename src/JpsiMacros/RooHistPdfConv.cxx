@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.7 2010/03/26 10:03:36 covarell Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.8 2010/09/22 13:22:32 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -54,7 +54,7 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   ssf("ssf","Sigma Scale Factor",this,(RooAbsReal&)RooRealConstant::value(1))
 {  
   _histpdf = new RooDataHist(datahist);
-  _variableName = "JpsictTrue";
+  _variableName = "Jpsi_CtTrue";
   init();
 }
 
@@ -72,7 +72,7 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   ssf("ssf","Sigma Scale Factor",this,_msSF)
 {
   _histpdf = new RooDataHist(datahist);
-  _variableName = "JpsictTrue";
+  _variableName = "Jpsi_CtTrue";
   init();
 }
 
@@ -91,7 +91,7 @@ RooHistPdfConv::RooHistPdfConv(const char *name, const char *title, RooAbsReal& 
   ssf("ssf","Sigma Scale Factor",this,_sigmaSF)
 {   
   _histpdf = new RooDataHist(datahist); 
-  _variableName = "JpsictTrue";
+  _variableName = "Jpsi_CtTrue";
   init();
 }   
 

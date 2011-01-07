@@ -67,8 +67,8 @@ RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
 ## JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
 ##	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
-## JPsiFitApp:  $(INCLUDEDIR)JPsiFitApp.C $(OUTLIB)JPsiTreeBase.o  
-##	$(CXX) $(CXXFLAGS) -o JPsiFitApp $(OUTLIB)/*.o $(GLIBS) $ $<
+TreeToDat:  $(INCLUDEDIR)tree_to_datasets.cxx  
+	$(CXX) $(CXXFLAGS) -o TreeToDat $(GLIBS) $ $<
 
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(GLIBS) $ $<
