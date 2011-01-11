@@ -57,6 +57,11 @@ the target directory in the MakeFile)
 - Fit2D[Data]Range <options>
 Options can be found in the main() method of the classes. Briefly:
   -f <your total RooDataSet>: input file is always needed
+  -p <pTrange>: must be in the format pTmin-pTmax
+  -e <absyrange>: must be in the format absymin-absymax
+  -l <lrange>: range of decay length (always needed). Notice the special format:     
+     lmin-lmax means the fit is performed between MINUS lmin and lmax, e.g.:
+     -l 1.0-2.0 means between -1.0 and 2.0 mm
   -g 0 (global-tracker muon pairs) or 1 (global-global muon pairs) or nothing 
 (all muon pairs) 
   -p <pTrange>: must be in the format pTmin-pTmax
