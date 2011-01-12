@@ -539,13 +539,16 @@ int main(int argc, char* argv[]) {
     titlestr = "Prompt resolution fit for" + partTit + "muons (mass projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
     tframePR->SetTitle(titlestr.c_str());
     
-    bindataPR->plotOn(tframePR,DataError(RooAbsData::SumW2));
-    ws->pdf("sigPR")->plotOn(tframePR,LineColor(kBlue),Normalization(bindataPR->numEntries(),RooAbsReal::NumEvent));
+    bindataPR->plotOn(tframePR,DataError(RooAbsData::SumW2),Binning(rb2));
+    ws->pdf("sigPR")->plotOn(tframePR,LineColor(kBlue),Normalization(bindataPR->sumEntries(),RooAbsReal::NumEvent));
 
     TCanvas c00;  
     // c00.SetLogy(1);
     c00.cd();tframePR->Draw();
     titlestr = "pictures/test/2D_" + partFile + "resofit_pT" + prange + "_y" + yrange + "_Lin.gif";
+    c00.SaveAs(titlestr.c_str());
+    c00.SetLogy(1); tframePR->Draw();
+    titlestr = "pictures/test/2D_" + partFile + "resofit_pT" + prange + "_y" + yrange + "_Log.gif";
     c00.SaveAs(titlestr.c_str());
 
     if (ws->var("fracRes2")) ws->var("fracRes2")->setConstant(kTRUE);
