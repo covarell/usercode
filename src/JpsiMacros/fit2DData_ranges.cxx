@@ -98,9 +98,9 @@ void defineCTResol(RooWorkspace *ws)
 void defineCTBackground(RooWorkspace *ws)
 {
  
-  ws->factory("Decay::bkg2(Jpsi_Ct,lambdap[0.42,0.05,1.5],sigPR,RooDecay::SingleSided");
-  ws->factory("Decay::bkg3(Jpsi_Ct,lambdam[0.79,0.02,1.5],sigPR,RooDecay::Flipped");
-  ws->factory("Decay::bkg4(Jpsi_Ct,lambdasym[0.69,0.02,5.0],sigPR,RooDecay::DoubleSided");
+  ws->factory("Decay::bkg2(Jpsi_Ct,lambdap[0.42,0.05,1.5],sigPR,RooDecay::SingleSided)");
+  ws->factory("Decay::bkg3(Jpsi_Ct,lambdam[0.79,0.02,1.5],sigPR,RooDecay::Flipped)");
+  ws->factory("Decay::bkg4(Jpsi_Ct,lambdasym[0.69,0.02,5.0],sigPR,RooDecay::DoubleSided)");
 
   // ws->factory("Decay::bkg2(Jpsi_Ct,lambdap[1.4,0.1,5.],resbkg,RooDecay::SingleSided");
   // ws->factory("Decay::bkg3(Jpsi_Ct,lambdam[1.88,0.1,5.],resbkg,RooDecay::Flipped");
@@ -540,7 +540,7 @@ int main(int argc, char* argv[]) {
     tframePR->SetTitle(titlestr.c_str());
     
     bindataPR->plotOn(tframePR,DataError(RooAbsData::SumW2));
-    ws->pdf("sigPR")->plotOn(tframePR,LineColor(kBlue)/*,Normalization(bindataPR->sumEntries(),RooAbsReal::NumEvent)*/);
+    ws->pdf("sigPR")->plotOn(tframePR,LineColor(kBlue),Normalization(bindataPR->numEntries(),RooAbsReal::NumEvent));
 
     TCanvas c00;  
     // c00.SetLogy(1);
@@ -615,7 +615,7 @@ int main(int argc, char* argv[]) {
   int nFitPar;
 
   if(prefitMass) {
-    RooFitResult *rfr =ws->pdf("totPDF")->fitTo(*bindata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
+    RooFitResult *rfr =ws->pdf("totPDF")->fitTo(*bindata,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     // RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*reddata1,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(4));
     nFitPar = rfr->floatParsFinal().getSize();  
     Bfrac_static = ws->var("Bfrac")->getVal();
