@@ -100,13 +100,14 @@ int main(int argc, char* argv[]) {
   const double JpsiCtMax = 3.5;
   
   char fileName[100];
+  int doMerge = 0;
   
-  if ( argc < 2 ){
-    cout << "missing argument: insert inputFile" << endl; 
+  if ( argc < 3 ){
+    cout << "missing arguments: insert inputFile and mergePsiPrime" << endl; 
     return 1;
   }
   strcpy(fileName,argv[1]);
-
+  doMerge = atoi(argv[2]);
 
   TFile *file= TFile::Open(fileName);
   TTree * Tree=(TTree*)file->Get("data");
@@ -129,18 +130,27 @@ int main(int argc, char* argv[]) {
   RooRealVar* Jpsi_CtErr;
   RooRealVar* Jpsi_Y;
   RooCategory* Jpsi_Type;
+  RooCategory* Jpsi_PsiP;
 
   Jpsi_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",JpsiMassMin,3.5,"GeV/c^{2}");
-  Psip_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",3.3,JpsiMassMax,"GeV/c^{2}");
+  if (doMerge) {
+    Psip_Mass = new RooRealVar("PsiP_Mass","psi' mass",3.3,JpsiMassMax,"GeV/c^{2}");
+  } else {
+    Psip_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",3.3,JpsiMassMax,"GeV/c^{2}");
+  }
   Jpsi_Pt = new RooRealVar("Jpsi_Pt","J/psi pt",JpsiPtMin,JpsiPtMax,"GeV/c");
   Jpsi_Y = new RooRealVar("Jpsi_Y","J/psi y",-JpsiYMax,JpsiYMax);
   Jpsi_Type = new RooCategory("Jpsi_Type","Category of Jpsi");
+  Jpsi_PsiP = new RooCategory("Jpsi_PsiP","Jpsi or psiPrime");
   Jpsi_Ct = new RooRealVar("Jpsi_Ct","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
   Jpsi_CtErr = new RooRealVar("Jpsi_CtErr","J/psi ctau error",-1.,1.,"mm");
 
   Jpsi_Type->defineType("GG",0);
   Jpsi_Type->defineType("GT",1);
   Jpsi_Type->defineType("TT",2);
+
+  Jpsi_PsiP->defineType("J",0);
+  Jpsi_PsiP->defineType("P",1);
 
   Tree->SetBranchAddress("JpsiP", &JP);
   Tree->SetBranchAddress("muPosP", &m1P);
@@ -155,10 +165,15 @@ int main(int argc, char* argv[]) {
 
   RooArgList varlist(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
   RooArgList varlist2(*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
+  RooArgList varlist3(*Jpsi_Mass,*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_PsiP);
     
   for (unsigned int i = 0; i < rapRegions; i++) {
-    dataJpsi[i] = new RooDataSet("dataJpsi","A sample",varlist);
-    dataPsip[i] = new RooDataSet("dataPsip","A sample",varlist2);
+    if (doMerge) {
+      dataJpsi[i] = new RooDataSet("dataAll","A sample",varlist3);
+    } else {
+      dataJpsi[i] = new RooDataSet("dataJpsi","A sample",varlist);
+      dataPsip[i] = new RooDataSet("dataPsip","A sample",varlist2);
+    }
   }
 
   int n = Tree->GetEntries();
@@ -204,12 +219,26 @@ int main(int argc, char* argv[]) {
       Jpsi_CtErr->setVal(theCtErr);
       Jpsi_Type->setIndex(theCat,kTRUE);
       //cout << "Category " << theCat << endl;
+
       RooArgList varlist_tmp(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
       RooArgList varlist2_tmp(*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
+      RooArgList varlist3_tmp(*Jpsi_Mass,*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_PsiP);
+
       for (unsigned int i = 0; i < rapRegions; i++) {
 	if (fabs(theRapidity) < rapLimits[i+1] && fabs(theRapidity) > rapLimits[i]) {
-	  if (theMass < 3.5) dataJpsi[i]->add(varlist_tmp);
-          if (theMass > 3.3) dataPsip[i]->add(varlist2_tmp);
+	  if (doMerge) {
+	    if (theMass <= 3.3) {
+	      Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	    } else if (theMass > 3.3 && theMass < 3.5) {
+	      Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	      Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	    } else {
+	      Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	    }
+	  } else {
+	    if (theMass < 3.5) dataJpsi[i]->add(varlist_tmp);
+	    if (theMass > 3.3) dataPsip[i]->add(varlist2_tmp);
+	  }
 	}
       }
     }
@@ -222,7 +251,7 @@ int main(int argc, char* argv[]) {
     Out[i] = new TFile(namefile,"RECREATE");
     Out[i]->cd();
     dataJpsi[i]->Write();
-    dataPsip[i]->Write();
+    if (!doMerge) dataPsip[i]->Write();
     Out[i]->Close();
   }
 

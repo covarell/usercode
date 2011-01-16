@@ -1,3 +1,5 @@
+// 2D fit for the J/psi only
+
 // C++ includes
 #include <iostream>
 #include <stdio.h>
