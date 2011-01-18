@@ -1,0 +1,10 @@
+<use name=FWCore/Utilities>
+<use name=boost>
+<use name=hepmc>
+<flags EDM_PLUGIN=1>
+
+<library file=HTauTauGenAnalyzer.cc name=HTauTauGenAnalyzer>
+  <use name=root>
+  <use name=FWCore/Framework>
+  <use name=SimDataFormats/GeneratorProducts>
+</library>
