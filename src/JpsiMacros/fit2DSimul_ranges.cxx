@@ -230,9 +230,9 @@ RooBinning setMyBinning(float lmin, float lmax){
     rb2.addBoundary(-0.5);
     rb2.addUniform(9,-0.5,-0.2);
     rb2.addUniform(40,-0.2,0.2);
-    rb2.addUniform(12,0.2,0.5);
-    rb2.addUniform(10,0.5,1.0);
-    rb2.addUniform(4,1.0,lmax);
+    rb2.addUniform(16,0.2,0.5);
+    rb2.addUniform(15,0.5,1.0);
+    rb2.addUniform(8,1.0,lmax);
   }
 
   return rb2;
@@ -638,7 +638,7 @@ int main(int argc, char* argv[]) {
     ws->var("fpmP")->setConstant(kTRUE);
     ws->var("fLivingP")->setConstant(kTRUE);
     ws->var("fracResBkg")->setConstant(kTRUE);
-    ws->var("sigmaResBkgW")->setConstant(kTRUE);
+    ws->var("sigmaResBkgN")->setConstant(kTRUE);
     ws->var("sigmaResBkgW")->setConstant(kTRUE);
     ws->var("lambdap")->setConstant(kTRUE);
     ws->var("lambdam")->setConstant(kTRUE);
