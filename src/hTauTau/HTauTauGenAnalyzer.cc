@@ -34,8 +34,8 @@ void HTauTauGenAnalyzer::beginJob()
    
    hTauStatus = new TH1D( "hTauStatus","Status of tau",  5, -0.5, 4.5) ;
    hTauIdDaugs = new TH1D( "hTauIdDaugs","LundIDs of tau daughters",  50, -500., 500.) ;
-   hPtHiggs = new TH1D( "hPtHiggs", "Pt Higgs", 50,  0., 150. ) ;
-   hPtTau = new TH1D( "hPtTau", "Pt Tau", 50,  0., 150. ) ;
+   hPtHiggs = new TH1D( "hPtHiggs", "Pt Higgs", 50,  0., 170. ) ;
+   hPtTau = new TH1D( "hPtTau", "Pt Tau", 50,  0., 170. ) ;
    hPtMu = new TH1D( "hPtMu", "Pt Mu", 50,  0., 100. ) ;
    hPtEle = new TH1D( "hPtEle", "Pt Ele", 50,  0., 100. ) ;
    hEtaHiggs = new TH1D( "hEtaHiggs", "Eta Higgs", 50,  -7.0, 7.0 ) ;
@@ -44,25 +44,30 @@ void HTauTauGenAnalyzer::beginJob()
    hEtaEle = new TH1D( "hEtaEle", "Eta Ele", 50,  -7.0, 7.0 ) ;
    hCosAngMuTau = new TH1D( "hCosAngMuTau", "cos(#theta_{#tau#mu})", 50,  0.7, 1.0 ) ;
    hCosAngEleTau = new TH1D( "hCosAngEleTau", "cos(#theta_{#tau e})", 50,  0.7, 1.0 ) ;
-   hEtMiss = new TH1D( "hEtMiss", "Missing Et", 50,  0., 150. ) ;
-   hMtMEtMu = new TH1D( "hMtMEtMu", "Mt EtMiss + Mu", 50,  0., 150. ) ;
-   hMtMEtEle = new TH1D( "hMtMEtEle", "Mt EtMiss + Ele", 50,  0., 150. ) ;
-   hMassMuEle = new TH1D( "hMassMuEle", "Mass Ele + Mu", 50,  0., 150. ) ;
-   hVisibleMass = new TH1D( "hVisibleMass", "Visible Mass", 50,  0., 150. ) ;
-   hBersaniMass = new TH1D( "hBersaniMass", "Bersani Mass", 50,  0., 150. ) ;
-   hSelMtMEtMu = new TH1D( "hSelMtMEtMu", "Mt EtMiss + Mu", 50,  0., 150. ) ;
-   hSelMtMEtEle = new TH1D( "hSelMtMEtEle", "Mt EtMiss + Ele", 50,  0., 150. ) ;
-   hSelMassMuEle = new TH1D( "hSelMassMuEle", "Mass Ele + Mu", 50,  0., 150. ) ;
-   hSelVisibleMass = new TH1D( "hSelVisibleMass", "Visible Mass", 50,  0., 150. ) ;
-   hSelBersaniMass = new TH1D( "hSelBersaniMass", "Bersani Mass", 50,  0., 150. ) ;
+   hEtMiss = new TH1D( "hEtMiss", "Missing Et", 50,  0., 170. ) ;
+   hMtMEtMu = new TH1D( "hMtMEtMu", "Mt EtMiss + Mu", 50,  0., 170. ) ;
+   hMtMEtEle = new TH1D( "hMtMEtEle", "Mt EtMiss + Ele", 50,  0., 170. ) ;
+   hMassMuEle = new TH1D( "hMassMuEle", "Mass Ele + Mu", 50,  0., 170. ) ;
+   hVisibleMass = new TH1D( "hVisibleMass", "Visible Mass", 50,  0., 170. ) ;
+   hBersaniMass = new TH1D( "hBersaniMass", "Bersani Mass", 50,  0., 170. ) ;
+   hBersaniMassMod = new TH1D( "hBersaniMassMod", "Bersani Mass modified", 50,  0., 170. ) ;
+   hSelMtMEtMu = new TH1D( "hSelMtMEtMu", "Mt EtMiss + Mu", 50,  0., 170. ) ;
+   hSelMtMEtEle = new TH1D( "hSelMtMEtEle", "Mt EtMiss + Ele", 50,  0., 170. ) ;
+   hSelMassMuEle = new TH1D( "hSelMassMuEle", "Mass Ele + Mu", 50,  0., 170. ) ;
+   hSelVisibleMass = new TH1D( "hSelVisibleMass", "Visible Mass", 50,  0., 170. ) ;
+   hSelBersaniMass = new TH1D( "hSelBersaniMass", "Bersani Mass", 50,  0., 170. ) ;
+   hSelBersaniMassMod = new TH1D( "hSelBersaniMassMod", "Bersani Mass modified", 50,  0., 170. ) ;
    hCosHelAngEle = new TH1D( "hCosHelAngEle", "Ele helicity angle", 50,  -1., 1. ) ;     
    hCosHelAngMu = new TH1D( "hCosHelAngMu", "Mu helicity angle", 50,  -1., 1. ) ;     	     
-   hCosHelAngTau = new TH1D( "hCosHelAngTau", "Tau helicity angle", 50,  -1., 1. ) ; 
+   hCosHelAngTau = new TH1D( "hCosHelAngTau", "Tau helicity angle", 50,  -1., 1. ) ;
+   hSelCosHelAngTau = new TH1D( "hSelCosHelAngTau", "Tau helicity angle", 50,  -1., 1. ) ;
    hTransvCosHelAngTau = new TH1D( "hTransvCosHelAngTau", "Transverse tau helicity angle", 50,  -1., 1. ) ; 
-   hApproxCosHelAngEle = new TH1D( "hApproxCosHelAngEle", "Ele approximated helicity angle", 50,  -1., 1. ) ;     
-   hApproxCosHelAngMu = new TH1D( "hApproxCosHelAngMu", "Mu approximated helicity angle", 50,  -1., 1. ) ;
-   hTransvCosHelAngEle = new TH1D( "hTransvCosHelAngEle", "Ele transverse helicity angle", 50,  -1., 1. ) ;
-   hTransvCosHelAngMu = new TH1D( "hTransvCosHelAngMu", "Mu transverse helicity angle", 50,  -1., 1. ) ;
+   hApproxCosHelAngEle = new TH1D( "hApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hApproxCosHelAngMu = new TH1D( "hApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
+   hApproxCosHelAngEle = new TH1D( "hApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hApproxCosHelAngMu = new TH1D( "hApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
+   hSelApproxCosHelAngEle = new TH1D( "hSelApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hSelApproxCosHelAngMu = new TH1D( "hSelApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
 
    decayed = new ofstream("decayed.txt") ;
    undecayed = new ofstream("undecayed.txt") ;
@@ -93,10 +98,7 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
       
    Handle< HepMCProduct > EvtHandle ;
    
-   // find initial HepMCProduct by its label - source
-   // OR
-   // find HepMCProduct after evtgenlhc by its label - evtgenproducer, that is
-   // 
+   // find initial HepMCProduct by its label
    e.getByLabel( theSrc , EvtHandle ) ;
    
    const GenEvent* Evt = EvtHandle->GetEvent() ;
@@ -123,11 +125,11 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 			       (*p)->momentum().e());
 	 TVector3 boosterH = - ( phiggs.BoostVector() );
 
-	 TLorentzVector truepthiggs((*p)->momentum().px(), 
-				    (*p)->momentum().py(), 0., 
-				    sqrt(8281. + pow((*p)->momentum().px(),2) 
-					 + pow((*p)->momentum().py(),2)));
-	 TVector3 boosterHt = - ( truepthiggs.BoostVector() );
+	 TLorentzVector pthiggs((*p)->momentum().px(), 
+				(*p)->momentum().py(), 0., 
+				sqrt(8315.61 + pow((*p)->momentum().px(),2) 
+				     + pow((*p)->momentum().py(),2)));
+	 TVector3 boosterHt = - ( pthiggs.BoostVector() );
 
 	 hPtHiggs->Fill((*p)->momentum().perp());
 	 hEtaHiggs->Fill((*p)->momentum().pseudoRapidity());
@@ -137,6 +139,7 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 	 TLorentzVector pmiss;
 	 TLorentzVector pmu;
 	 TLorentzVector pele;
+	 float theTrueHelAngle = 0.;
 
 	 for ( GenVertex::particles_out_const_iterator ap = endvert->particles_out_const_begin(); ap != endvert->particles_out_const_end(); ++ap ) {
 	   if (abs((*ap)->pdg_id()) == 15) { 
@@ -150,14 +153,15 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 				(*ap)->momentum().py(),
 				(*ap)->momentum().pz(), 
 				(*ap)->momentum().e());
-	     TLorentzVector trueptta((*ap)->momentum().px(), 
-				      (*ap)->momentum().py(), 0., 
-				      sqrt(2.89 + pow((*p)->momentum().px(),2) 
-					   + pow((*p)->momentum().py(),2)));
+	     TLorentzVector ptta((*ap)->momentum().px(), 
+				 (*ap)->momentum().py(), 0., 
+				 sqrt(3.1577 + pow((*p)->momentum().px(),2) 
+				      + pow((*p)->momentum().py(),2)));
 	     pta.Boost( boosterH );
-	     hCosHelAngTau->Fill( cos( pta.Vect().Angle(phiggs.Vect())) );
-	     trueptta.Boost( boosterHt );
-	     hTransvCosHelAngTau->Fill( cos( trueptta.Vect().Angle(truepthiggs.Vect())) );
+	     theTrueHelAngle = cos( pta.Vect().Angle(phiggs.Vect()));
+	     hCosHelAngTau->Fill( theTrueHelAngle );
+	     ptta.Boost( boosterHt );
+	     hTransvCosHelAngTau->Fill( cos( ptta.Vect().Angle(pthiggs.Vect())) );
 	     
 	     int tauVertId = trueVertex(Evt, *ap);  
 	    
@@ -203,11 +207,8 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 		 hEtaEle->Fill((*cp)->momentum().pseudoRapidity());     
 		 hCosAngEleTau->Fill( cos( pl.Vect().Angle(pta.Vect())));
 		 // own frames
-		 TLorentzVector ptemp = pl;
 		 pl.Boost( boosterTa );
 		 hCosHelAngEle->Fill( cos( pl.Vect().Angle(pta.Vect())) );
-		 ptemp.Boost( boosterH );
-		 hApproxCosHelAngEle->Fill( cos( ptemp.Vect().Angle(phiggs.Vect())) );
 	       } else if (abs((*cp)->pdg_id()) == 13) {  // mu
 		 pmu = pl;
 		 // lab frame
@@ -215,12 +216,8 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 		 hEtaMu->Fill((*cp)->momentum().pseudoRapidity());
 		 hCosAngMuTau->Fill( cos( pl.Vect().Angle(pta.Vect()))) ;
 		 // own frames
-		  // own frames
-		 TLorentzVector ptemp = pl;
 		 pl.Boost( boosterTa );
 		 hCosHelAngMu->Fill( cos( pl.Vect().Angle(pta.Vect())) );
-		 ptemp.Boost( boosterH );
-		 hApproxCosHelAngMu->Fill( cos( ptemp.Vect().Angle(phiggs.Vect())) );
 	       } else {   // neutrinos
 		 pmiss += pl;
 	       }
@@ -231,46 +228,64 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 	 hEtMiss->Fill(pmiss.Perp());
 
          // Calculate h -> tau tau observables
-	 TLorentzVector ptele(pele.X(),pele.Y(),
+	 TLorentzVector pteleEst(pele.X(),pele.Y(),
 			      0.,sqrt(pow(pele.X(),2) + pow(pele.Y(),2)));
-	 TLorentzVector ptmu(pmu.X(),pmu.Y(),
+	 TLorentzVector ptmuEst(pmu.X(),pmu.Y(),
 			      0.,sqrt(pow(pmu.X(),2) + pow(pmu.Y(),2)));
-	 TLorentzVector ptmiss(pmiss.X(),pmiss.Y(),
+	 TLorentzVector ptmissEst(pmiss.X(),pmiss.Y(),
 			      0.,sqrt(pow(pmiss.X(),2) + pow(pmiss.Y(),2)));
-	 TLorentzVector emet = ptele + ptmiss;
-	 TLorentzVector mumet = ptmu + ptmiss;
+	 TLorentzVector emetEst = pteleEst + ptmissEst;
+	 TLorentzVector mumetEst = ptmuEst + ptmissEst;
 	 TLorentzVector emu = pele + pmu;
-	 TLorentzVector emumiss = emu + ptmiss;
-         TLorentzVector pthiggs = ptele + ptmu + ptmiss;
+	 TLorentzVector emumissEst = emu + ptmissEst;
+         TLorentzVector pthiggsEst = pteleEst + ptmuEst + ptmissEst;
 
-	 // test: force Z mass
-	 pthiggs.SetE(sqrt(8281. + pow(pthiggs.X(),2) + pow(pthiggs.Y(),2)));
-
-	 float xtau1 = (pele.X()*pmu.Y() - pele.Y()*pmu.X())/(pthiggs.X()*pmu.Y() - pthiggs.Y()*pmu.X());
-	 float xtau2 = (pele.Y()*pmu.X() - pele.X()*pmu.Y())/(pthiggs.X()*pele.Y() - pthiggs.Y()*pele.X());
+	 // Bersani calculation
+	 float xtaue = (pele.X()*pmu.Y() - pele.Y()*pmu.X())/(pthiggs.X()*pmu.Y() - pthiggs.Y()*pmu.X());
+	 float xtaumu = (pele.Y()*pmu.X() - pele.X()*pmu.Y())/(pthiggs.X()*pele.Y() - pthiggs.Y()*pele.X());
 	 // cout << xtau1 << " " << xtau2 << endl;
 
-	 hMtMEtEle->Fill(emet.Perp());
-	 hMtMEtMu->Fill(mumet.Perp());
-	 hMassMuEle->Fill(emu.M());
-	 hVisibleMass->Fill(emumiss.M());
-	 hBersaniMass->Fill(emu.M()/sqrt(xtau1*xtau2));
-
-         TVector3 TransvBooster = - ( pthiggs.BoostVector() );
-	 ptele.Boost( TransvBooster );
-	 ptmu.Boost( TransvBooster );
-	 hTransvCosHelAngEle->Fill( cos( ptele.Vect().Angle(pthiggs.Vect())) );
-	 hTransvCosHelAngMu->Fill( cos( ptmu.Vect().Angle(pthiggs.Vect())) );
-
-	 // Reasonable offline cuts
-	 if (pmu.Perp() > 10 && pele.Perp() > 15) {
-	   hSelMtMEtEle->Fill(emet.Perp());
-	   hSelMtMEtMu->Fill(mumet.Perp());
-	   hSelMassMuEle->Fill(emu.M());
-	   hSelVisibleMass->Fill(emumiss.M());
-	   hSelBersaniMass->Fill(emu.M()/sqrt(xtau1*xtau2));
+         if (xtaue*xtaumu < 0. || fabs(xtaue) > 2. || fabs(xtaumu) > 2.) {
+	   cout << endl << "Estimated tau momentum fraction is negative or much greater than 1." << endl;
+	   cout << "x_taue = " << xtaue << " x_taumu = " << xtaumu << endl;
+	   cout << "Skipping ... " << endl;
+	   continue;
 	 }
 
+	 TLorentzVector ptaueEst = pele*(1./xtaue);
+         TLorentzVector ptaumuEst = pmu*(1./xtaumu);
+	 // force tau mass - probably not useful
+	 ptaueEst.SetE(sqrt(3.1577 + pow(ptaueEst.X(),2) + 
+			    pow(ptaueEst.Y(),2) + pow(ptaueEst.Z(),2)) );
+	 ptaumuEst.SetE(sqrt(3.1577 + pow(ptaumuEst.X(),2) + 
+			     pow(ptaumuEst.Y(),2) + pow(ptaumuEst.Z(),2)) );
+	 TLorentzVector phiggsEst = ptaueEst + ptaumuEst;
+         TVector3 boosterHEst = - ( phiggsEst.BoostVector() );
+	 
+	 hMtMEtEle->Fill(emetEst.Perp());
+	 hMtMEtMu->Fill(mumetEst.Perp());
+	 hMassMuEle->Fill(emu.M());
+	 hVisibleMass->Fill(emumissEst.M());
+	 hBersaniMass->Fill(emu.M()/sqrt(xtaue*xtaumu));
+	 hBersaniMassMod->Fill(phiggsEst.M());    
+	 ptaueEst.Boost( boosterHEst );
+	 ptaumuEst.Boost( boosterHEst );
+	 hApproxCosHelAngEle->Fill( cos( ptaueEst.Vect().Angle(phiggsEst.Vect())) );
+	 hApproxCosHelAngMu->Fill( cos( ptaumuEst.Vect().Angle(phiggsEst.Vect())) );
+	 
+	 // Reasonable offline cuts
+	 if (pmu.Perp() > 10 && pele.Perp() > 15) {
+	   hSelCosHelAngTau->Fill( theTrueHelAngle );
+	   hSelMtMEtEle->Fill(emetEst.Perp());
+	   hSelMtMEtMu->Fill(mumetEst.Perp());
+	   hSelMassMuEle->Fill(emu.M());
+	   hSelVisibleMass->Fill(emumissEst.M());
+	   hSelBersaniMass->Fill(emu.M()/sqrt(xtaue*xtaumu));
+	   hSelBersaniMassMod->Fill(phiggsEst.M());
+	   hSelApproxCosHelAngEle->Fill( cos( ptaueEst.Vect().Angle(pthiggsEst.Vect())) );
+	   hSelApproxCosHelAngMu->Fill( cos( ptaumuEst.Vect().Angle(pthiggsEst.Vect())) );
+
+	 }
        }
      }
    }
@@ -299,19 +314,22 @@ void HTauTauGenAnalyzer::endJob()
   Hlist.Add(hMassMuEle);
   Hlist.Add(hVisibleMass);
   Hlist.Add(hBersaniMass);
+  Hlist.Add(hBersaniMassMod);
   Hlist.Add(hSelMtMEtMu); 
   Hlist.Add(hSelMtMEtEle);
   Hlist.Add(hSelMassMuEle);
   Hlist.Add(hSelVisibleMass);
   Hlist.Add(hSelBersaniMass);
+  Hlist.Add(hSelBersaniMassMod);
   Hlist.Add(hCosHelAngEle) ;       
   Hlist.Add(hCosHelAngMu) ;	     
   Hlist.Add(hCosHelAngTau) ;  
+  Hlist.Add(hSelCosHelAngTau) ;  
   Hlist.Add(hTransvCosHelAngTau) ;
   Hlist.Add(hApproxCosHelAngEle) ;
   Hlist.Add(hApproxCosHelAngMu) ;
-  Hlist.Add(hTransvCosHelAngEle) ;
-  Hlist.Add(hTransvCosHelAngMu) ;
+  Hlist.Add(hSelApproxCosHelAngEle) ;
+  Hlist.Add(hSelApproxCosHelAngMu) ;
 
   Hlist.Write() ;
   fOutputFile->Close() ;

@@ -1,93 +1,341 @@
-#ifndef HTauTauGenAnalyzer_H
-#define HTauTauGenAnalyzer_H
+// -*- C++ -*-
+//
+// Package:    GeneratorInterface
+// Class:      HTauTauGenAnalyzer
+// 
+//
+// Description: Module to analyze Pythia-EvtGen HepMCproducts
+//
+//
+// Original Author:  Roberto Covarelli
+//         Created:  April 26, 2007
+//
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "GeneratorInterface/ExternalDecays/test/HTauTauGenAnalyzer.h"
 
-#include <iostream>
-#include <fstream>
+using namespace edm;
+using namespace std;
+using namespace HepMC;
  
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
- 
-// essentials !!!
-#include "FWCore/Framework/interface/Event.h"
-#include "DataFormats/Common/interface/Handle.h"
- 
-#include "TFile.h"
-#include "TH1.h"
-#include "TF1.h"
-#include "TLorentzVector.h"
-#include "TVector3.h"
-#include "TObjArray.h"
- 
-#include "FWCore/Framework/interface/MakerMacros.h"
-
-
-// forward declarations
-class TFile;
-class TH1D;
-
-class HTauTauGenAnalyzer : public edm::EDAnalyzer
+HTauTauGenAnalyzer::HTauTauGenAnalyzer( const ParameterSet& pset )
+   : fOutputFileName( pset.getUntrackedParameter<string>("HistOutFile",std::string("TestBs.root")) ),
+     theSrc( pset.getUntrackedParameter<string>("theSrc",std::string("source")) ), 
+     fOutputFile(0)
 {
+}
 
-   public:
+void HTauTauGenAnalyzer::beginJob()
+{
+ 
+   nevent = 0;
+   nHiggs = 0;
+
+   fOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
    
-      //
-      explicit HTauTauGenAnalyzer( const edm::ParameterSet& ) ;
-      virtual ~HTauTauGenAnalyzer() {} // no need to delete ROOT stuff
-                               // as it'll be deleted upon closing TFile
+   hTauStatus = new TH1D( "hTauStatus","Status of tau",  5, -0.5, 4.5) ;
+   hTauIdDaugs = new TH1D( "hTauIdDaugs","LundIDs of tau daughters",  50, -500., 500.) ;
+   hPtHiggs = new TH1D( "hPtHiggs", "Pt Higgs", 50,  0., 170. ) ;
+   hPtTau = new TH1D( "hPtTau", "Pt Tau", 50,  0., 170. ) ;
+   hPtMu = new TH1D( "hPtMu", "Pt Mu", 50,  0., 100. ) ;
+   hPtEle = new TH1D( "hPtEle", "Pt Ele", 50,  0., 100. ) ;
+   hEtaHiggs = new TH1D( "hEtaHiggs", "Eta Higgs", 50,  -7.0, 7.0 ) ;
+   hEtaTau = new TH1D( "hEtaTau", "Eta Tau", 50,  -7.0, 7.0 ) ;
+   hEtaMu = new TH1D( "hEtaMu", "Eta Mu", 50,  -7.0, 7.0 ) ;
+   hEtaEle = new TH1D( "hEtaEle", "Eta Ele", 50,  -7.0, 7.0 ) ;
+   hCosAngMuTau = new TH1D( "hCosAngMuTau", "cos(#theta_{#tau#mu})", 50,  0.7, 1.0 ) ;
+   hCosAngEleTau = new TH1D( "hCosAngEleTau", "cos(#theta_{#tau e})", 50,  0.7, 1.0 ) ;
+   hEtMiss = new TH1D( "hEtMiss", "Missing Et", 50,  0., 170. ) ;
+   hMtMEtMu = new TH1D( "hMtMEtMu", "Mt EtMiss + Mu", 50,  0., 170. ) ;
+   hMtMEtEle = new TH1D( "hMtMEtEle", "Mt EtMiss + Ele", 50,  0., 170. ) ;
+   hMassMuEle = new TH1D( "hMassMuEle", "Mass Ele + Mu", 50,  0., 170. ) ;
+   hVisibleMass = new TH1D( "hVisibleMass", "Visible Mass", 50,  0., 170. ) ;
+   hBersaniMass = new TH1D( "hBersaniMass", "Bersani Mass", 50,  0., 170. ) ;
+   hBersaniMassMod = new TH1D( "hBersaniMassMod", "Bersani Mass modified", 50,  0., 170. ) ;
+   hSelMtMEtMu = new TH1D( "hSelMtMEtMu", "Mt EtMiss + Mu", 50,  0., 170. ) ;
+   hSelMtMEtEle = new TH1D( "hSelMtMEtEle", "Mt EtMiss + Ele", 50,  0., 170. ) ;
+   hSelMassMuEle = new TH1D( "hSelMassMuEle", "Mass Ele + Mu", 50,  0., 170. ) ;
+   hSelVisibleMass = new TH1D( "hSelVisibleMass", "Visible Mass", 50,  0., 170. ) ;
+   hSelBersaniMass = new TH1D( "hSelBersaniMass", "Bersani Mass", 50,  0., 170. ) ;
+   hSelBersaniMassMod = new TH1D( "hSelBersaniMassMod", "Bersani Mass modified", 50,  0., 170. ) ;
+   hCosHelAngEle = new TH1D( "hCosHelAngEle", "Ele helicity angle", 50,  -1., 1. ) ;     
+   hCosHelAngMu = new TH1D( "hCosHelAngMu", "Mu helicity angle", 50,  -1., 1. ) ;     	     
+   hCosHelAngTau = new TH1D( "hCosHelAngTau", "Tau helicity angle", 50,  -1., 1. ) ;
+   hSelCosHelAngTau = new TH1D( "hSelCosHelAngTau", "Tau helicity angle", 50,  -1., 1. ) ;
+   hTransvCosHelAngTau = new TH1D( "hTransvCosHelAngTau", "Transverse tau helicity angle", 50,  -1., 1. ) ; 
+   hApproxCosHelAngEle = new TH1D( "hApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hApproxCosHelAngMu = new TH1D( "hApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
+   hApproxCosHelAngEle = new TH1D( "hApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hApproxCosHelAngMu = new TH1D( "hApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
+   hSelApproxCosHelAngEle = new TH1D( "hSelApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
+   hSelApproxCosHelAngMu = new TH1D( "hSelApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
+
+   decayed = new ofstream("decayed.txt") ;
+   undecayed = new ofstream("undecayed.txt") ;
+   return ;
+}
+ 
+int HTauTauGenAnalyzer::trueVertex(const GenEvent* Evt, const GenParticle *aPart) {
+
+  // Get rid of fake tau -> tau (gamma) vertices generated by Tauola
+  int tauVertId = aPart->end_vertex()->barcode();  
+  bool goodTau = false;
+  while (!goodTau) {
+    goodTau = true;
+    const GenVertex* tauvert = Evt->barcode_to_vertex(tauVertId);
+    for ( GenVertex::particles_out_const_iterator bp = tauvert->particles_out_const_begin(); bp != tauvert->particles_out_const_end(); ++bp ) {
+      if (abs((*bp)->pdg_id()) == 15) {  
+	goodTau = false;
+	tauVertId = (*bp)->end_vertex()->barcode();
+      }
+    }
+  }
+  return tauVertId;
+
+}
+
+void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
+{
       
-      virtual void analyze( const edm::Event&, const edm::EventSetup& ) ;
-      virtual void beginJob() ;
-      virtual void endJob() ;
-      int trueVertex(const HepMC::GenEvent* Evt, 
-		     const HepMC::GenParticle *aPart);
-
-   private:
+   Handle< HepMCProduct > EvtHandle ;
    
-     //
-     std::string fOutputFileName ;
-     std::string theSrc ;
-     TFile*      fOutputFile ;
-     TH1D*       hTauStatus ;	   
-     TH1D*       hTauIdDaugs ;
-     TH1D*       hPtHiggs ;
-     TH1D*       hEtaHiggs ;
-     TH1D*       hPtTau ;
-     TH1D*       hEtaTau ;
-     TH1D*       hPtMu ;
-     TH1D*       hEtaMu ;
-     TH1D*       hPtEle ;
-     TH1D*       hEtaEle ;
-     TH1D*       hCosAngEleTau ;
-     TH1D*       hCosAngMuTau ; 
-     TH1D*       hEtMiss;
+   // find initial HepMCProduct by its label
+   e.getByLabel( theSrc , EvtHandle ) ;
+   
+   const GenEvent* Evt = EvtHandle->GetEvent() ;
+   if (Evt) nevent++;
 
-     // masses
-     TH1D*	 hMtMEtMu ;
-     TH1D*	 hMtMEtEle ;
-     TH1D*	 hMassMuEle ;
-     TH1D*	 hVisibleMass ;
-     TH1D*	 hBersaniMass ;
-     TH1D*	 hSelMtMEtMu ;
-     TH1D*	 hSelMtMEtEle ;
-     TH1D*	 hSelMassMuEle ;
-     TH1D*	 hSelVisibleMass ;
-     TH1D*	 hSelBersaniMass ;
-     
-     // spins
-     TH1D*	 hCosHelAngEle ;     
-     TH1D*	 hCosHelAngMu ;	     
-     TH1D*	 hCosHelAngTau ;
-     TH1D*	 hTransvCosHelAngTau ;
-     TH1D*	 hApproxCosHelAngEle ;
-     TH1D*	 hApproxCosHelAngMu ;
-     TH1D*	 hTransvCosHelAngEle ;
-     TH1D*	 hTransvCosHelAngMu ;
+   for ( GenEvent::particle_const_iterator p = Evt->particles_begin(); p != Evt->particles_end(); ++p ) {
 
-     ofstream*   decayed; 
-     ofstream*   undecayed; 
-     int         nevent, nHiggs;
-     
-};
+     // look for a Higgs     
+     // if ( (*p)->pdg_id() == 25 )  {  // Higgs or Z
+     if ( abs((*p)->pdg_id()) > 0 )  {  // any particle  
+       GenVertex* endvert = (*p)->end_vertex();
+       if (endvert) {
 
-#endif
+         unsigned int nTau = 0;
+	 for ( GenVertex::particles_out_const_iterator ap = endvert->particles_out_const_begin(); ap != endvert->particles_out_const_end(); ++ap ) {
+	   if (abs((*ap)->pdg_id()) == 15) nTau++;
+	 } 
+
+	 if (nTau != 2) continue;
+
+	 TLorentzVector phiggs((*p)->momentum().px(), 
+			       (*p)->momentum().py(),
+			       (*p)->momentum().pz(), 
+			       (*p)->momentum().e());
+	 TVector3 boosterH = - ( phiggs.BoostVector() );
+
+	 TLorentzVector pthiggs((*p)->momentum().px(), 
+				(*p)->momentum().py(), 0., 
+				sqrt(8315.61 + pow((*p)->momentum().px(),2) 
+				     + pow((*p)->momentum().py(),2)));
+	 TVector3 boosterHt = - ( pthiggs.BoostVector() );
+
+	 hPtHiggs->Fill((*p)->momentum().perp());
+	 hEtaHiggs->Fill((*p)->momentum().pseudoRapidity());
+
+	 // loop 1 --> look for H -> tau tau -> e mu 
+	 int theCodeProduct = 1;
+	 TLorentzVector pmiss;
+	 TLorentzVector pmu;
+	 TLorentzVector pele;
+	 float theTrueHelAngle = 0.;
+
+	 for ( GenVertex::particles_out_const_iterator ap = endvert->particles_out_const_begin(); ap != endvert->particles_out_const_end(); ++ap ) {
+	   if (abs((*ap)->pdg_id()) == 15) { 
+
+	     hPtTau->Fill((*ap)->momentum().perp());
+	     hTauStatus->Fill((*ap)->status());
+	     hEtaTau->Fill((*ap)->momentum().pseudoRapidity());
+	     *decayed << (*ap)->pdg_id() << " --> ";
+
+	     TLorentzVector pta((*ap)->momentum().px(), 
+				(*ap)->momentum().py(),
+				(*ap)->momentum().pz(), 
+				(*ap)->momentum().e());
+	     TLorentzVector ptta((*ap)->momentum().px(), 
+				 (*ap)->momentum().py(), 0., 
+				 sqrt(3.1577 + pow((*p)->momentum().px(),2) 
+				      + pow((*p)->momentum().py(),2)));
+	     pta.Boost( boosterH );
+	     theTrueHelAngle = cos( pta.Vect().Angle(phiggs.Vect()));
+	     hCosHelAngTau->Fill( theTrueHelAngle );
+	     ptta.Boost( boosterHt );
+	     hTransvCosHelAngTau->Fill( cos( ptta.Vect().Angle(pthiggs.Vect())) );
+	     
+	     int tauVertId = trueVertex(Evt, *ap);  
+	    
+             const GenVertex* tauvert2 = Evt->barcode_to_vertex(tauVertId);
+	     for ( GenVertex::particles_out_const_iterator cp = tauvert2->particles_out_const_begin(); cp != tauvert2->particles_out_const_end(); ++cp ) {
+	       
+	       hTauIdDaugs->Fill((*cp)->pdg_id());
+	       *decayed << (*cp)->pdg_id() << " ";
+	       if (abs((*cp)->pdg_id()) == 11 || abs((*cp)->pdg_id()) == 13) 
+		 theCodeProduct *= (*cp)->pdg_id();
+	     }
+	     *decayed << "\n";
+	   }
+	 }
+
+	 if (theCodeProduct != -143) continue; // only e-mu opposite sign 
+	                                       // -(13*11) = -143
+	 
+	 nHiggs++;
+       
+	 // loop 2 --> fill e mu quantities 
+	 for ( GenVertex::particles_out_const_iterator ap = endvert->particles_out_const_begin(); ap != endvert->particles_out_const_end(); ++ap ) {
+	   if (abs((*ap)->pdg_id()) == 15) {
+	      
+	     int tauVertId = trueVertex(Evt, *ap);
+
+             const GenVertex* tauvert2 = Evt->barcode_to_vertex(tauVertId);
+	     for ( GenVertex::particles_out_const_iterator cp = tauvert2->particles_out_const_begin(); cp != tauvert2->particles_out_const_end(); ++cp ) {
+
+	       TLorentzVector pta((*ap)->momentum().px(), 
+				  (*ap)->momentum().py(),
+				  (*ap)->momentum().pz(), 
+				  (*ap)->momentum().e());
+	       TVector3 boosterTa = - ( pta.BoostVector() );
+	       TLorentzVector pl((*cp)->momentum().px(), 
+				 (*cp)->momentum().py(),
+				 (*cp)->momentum().pz(), 
+				 (*cp)->momentum().e());
+	       if (abs((*cp)->pdg_id()) == 11) {  // e
+		 pele = pl;
+		 // lab frame
+		 hPtEle->Fill((*cp)->momentum().perp());
+		 hEtaEle->Fill((*cp)->momentum().pseudoRapidity());     
+		 hCosAngEleTau->Fill( cos( pl.Vect().Angle(pta.Vect())));
+		 // own frames
+		 pl.Boost( boosterTa );
+		 hCosHelAngEle->Fill( cos( pl.Vect().Angle(pta.Vect())) );
+	       } else if (abs((*cp)->pdg_id()) == 13) {  // mu
+		 pmu = pl;
+		 // lab frame
+		 hPtMu->Fill((*cp)->momentum().perp());
+		 hEtaMu->Fill((*cp)->momentum().pseudoRapidity());
+		 hCosAngMuTau->Fill( cos( pl.Vect().Angle(pta.Vect()))) ;
+		 // own frames
+		 pl.Boost( boosterTa );
+		 hCosHelAngMu->Fill( cos( pl.Vect().Angle(pta.Vect())) );
+	       } else {   // neutrinos
+		 pmiss += pl;
+	       }
+	     }
+	   }
+	 }
+	 
+	 hEtMiss->Fill(pmiss.Perp());
+
+         // Calculate h -> tau tau observables
+	 TLorentzVector pteleEst(pele.X(),pele.Y(),
+			      0.,sqrt(pow(pele.X(),2) + pow(pele.Y(),2)));
+	 TLorentzVector ptmuEst(pmu.X(),pmu.Y(),
+			      0.,sqrt(pow(pmu.X(),2) + pow(pmu.Y(),2)));
+	 TLorentzVector ptmissEst(pmiss.X(),pmiss.Y(),
+			      0.,sqrt(pow(pmiss.X(),2) + pow(pmiss.Y(),2)));
+	 TLorentzVector emetEst = pteleEst + ptmissEst;
+	 TLorentzVector mumetEst = ptmuEst + ptmissEst;
+	 TLorentzVector emu = pele + pmu;
+	 TLorentzVector emumissEst = emu + ptmissEst;
+         TLorentzVector pthiggsEst = pteleEst + ptmuEst + ptmissEst;
+
+	 // Bersani calculation
+	 float xtaue = (pele.X()*pmu.Y() - pele.Y()*pmu.X())/(pthiggs.X()*pmu.Y() - pthiggs.Y()*pmu.X());
+	 float xtaumu = (pele.Y()*pmu.X() - pele.X()*pmu.Y())/(pthiggs.X()*pele.Y() - pthiggs.Y()*pele.X());
+	 // cout << xtau1 << " " << xtau2 << endl;
+
+         if (xtaue*xtaumu < 0. || fabs(xtaue) > 2. || fabs(xtaumu) > 2.) {
+	   cout << endl << "Estimated tau momentum fraction is negative or much greater than 1." << endl;
+	   cout << "x_taue = " << xtaue << " x_taumu = " << xtaumu << endl;
+	   cout << "Skipping ... " << endl;
+	   continue;
+	 }
+
+	 TLorentzVector ptaueEst = pele*(1./xtaue);
+         TLorentzVector ptaumuEst = pmu*(1./xtaumu);
+	 // force tau mass - probably not useful
+	 ptaueEst.SetE(sqrt(3.1577 + pow(ptaueEst.X(),2) + 
+			    pow(ptaueEst.Y(),2) + pow(ptaueEst.Z(),2)) );
+	 ptaumuEst.SetE(sqrt(3.1577 + pow(ptaumuEst.X(),2) + 
+			     pow(ptaumuEst.Y(),2) + pow(ptaumuEst.Z(),2)) );
+	 TLorentzVector phiggsEst = ptaueEst + ptaumuEst;
+         TVector3 boosterHEst = - ( phiggsEst.BoostVector() );
+	 
+	 hMtMEtEle->Fill(emetEst.Perp());
+	 hMtMEtMu->Fill(mumetEst.Perp());
+	 hMassMuEle->Fill(emu.M());
+	 hVisibleMass->Fill(emumissEst.M());
+	 hBersaniMass->Fill(emu.M()/sqrt(xtaue*xtaumu));
+	 hBersaniMassMod->Fill(phiggsEst.M());    
+	 ptaueEst.Boost( boosterHEst );
+	 ptaumuEst.Boost( boosterHEst );
+	 hApproxCosHelAngEle->Fill( cos( ptaueEst.Vect().Angle(phiggsEst.Vect())) );
+	 hApproxCosHelAngMu->Fill( cos( ptaumuEst.Vect().Angle(phiggsEst.Vect())) );
+	 
+	 // Reasonable offline cuts
+	 if (pmu.Perp() > 10 && pele.Perp() > 15) {
+	   hSelCosHelAngTau->Fill( theTrueHelAngle );
+	   hSelMtMEtEle->Fill(emetEst.Perp());
+	   hSelMtMEtMu->Fill(mumetEst.Perp());
+	   hSelMassMuEle->Fill(emu.M());
+	   hSelVisibleMass->Fill(emumissEst.M());
+	   hSelBersaniMass->Fill(emu.M()/sqrt(xtaue*xtaumu));
+	   hSelBersaniMassMod->Fill(phiggsEst.M());
+	   hSelApproxCosHelAngEle->Fill( cos( ptaueEst.Vect().Angle(pthiggsEst.Vect())) );
+	   hSelApproxCosHelAngMu->Fill( cos( ptaumuEst.Vect().Angle(pthiggsEst.Vect())) );
+
+	 }
+       }
+     }
+   }
+
+   return ;   
+}
+
+void HTauTauGenAnalyzer::endJob()
+{
+  TObjArray Hlist(0);
+  Hlist.Add(hTauStatus) ;	   
+  Hlist.Add(hTauIdDaugs) ;
+  Hlist.Add(hPtHiggs) ;
+  Hlist.Add(hEtaHiggs) ;
+  Hlist.Add(hPtTau) ;
+  Hlist.Add(hEtaTau) ;
+  Hlist.Add(hPtMu) ;
+  Hlist.Add(hEtaMu) ;
+  Hlist.Add(hPtEle) ;
+  Hlist.Add(hEtaEle) ;
+  Hlist.Add(hCosAngMuTau) ;
+  Hlist.Add(hCosAngEleTau) ;
+  Hlist.Add(hEtMiss);
+  Hlist.Add(hMtMEtMu); 
+  Hlist.Add(hMtMEtEle);
+  Hlist.Add(hMassMuEle);
+  Hlist.Add(hVisibleMass);
+  Hlist.Add(hBersaniMass);
+  Hlist.Add(hBersaniMassMod);
+  Hlist.Add(hSelMtMEtMu); 
+  Hlist.Add(hSelMtMEtEle);
+  Hlist.Add(hSelMassMuEle);
+  Hlist.Add(hSelVisibleMass);
+  Hlist.Add(hSelBersaniMass);
+  Hlist.Add(hSelBersaniMassMod);
+  Hlist.Add(hCosHelAngEle) ;       
+  Hlist.Add(hCosHelAngMu) ;	     
+  Hlist.Add(hCosHelAngTau) ;  
+  Hlist.Add(hSelCosHelAngTau) ;  
+  Hlist.Add(hTransvCosHelAngTau) ;
+  Hlist.Add(hApproxCosHelAngEle) ;
+  Hlist.Add(hApproxCosHelAngMu) ;
+  Hlist.Add(hSelApproxCosHelAngEle) ;
+  Hlist.Add(hSelApproxCosHelAngMu) ;
+
+  Hlist.Write() ;
+  fOutputFile->Close() ;
+  cout << "N_events = " << nevent << "\n";
+  cout << "N(H -> tau tau -> e mu) = " << nHiggs << "\n"; 
+  return ;
+}
+ 
+DEFINE_FWK_MODULE(HTauTauGenAnalyzer);
