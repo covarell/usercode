@@ -11,7 +11,16 @@
 //         Created:  April 26, 2007
 //
 
-#include "GeneratorInterface/ExternalDecays/test/HTauTauGenAnalyzer.h"
+//#include "GeneratorInterface/ExternalDecays/test/HTauTauGenAnalyzer.h"
+#include "UserCode/Covarell/test/HTauTauGenAnalyzer.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+#include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+//#include "RecoParticleFlow/PFProducer/interface/Utils.h"
+#include "DataFormats/METReco/interface/PFMETCollection.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+
 
 using namespace edm;
 using namespace std;
@@ -69,6 +78,27 @@ void HTauTauGenAnalyzer::beginJob()
    hSelApproxCosHelAngEle = new TH1D( "hSelApproxCosHelAngEle", "Tau -> Ele approximated helicity angle", 50,  -1., 1. ) ;     
    hSelApproxCosHelAngMu = new TH1D( "hSelApproxCosHelAngMu", "Tau -> Mu approximated helicity angle", 50,  -1., 1. ) ;
 
+      //Add RecoQuantities electrons/muons/pfmet
+   hEtaRecoEle = new TH1D( "hEtaRecoEle", "Eta Reco Ele", 50,  -4.0, 4.0 ) ;
+   hPtRecoEle = new TH1D( "hPtRecoEle", "Pt Reco Ele",  50,  0., 100. ) ;
+   hDEtoEtEle = new TH1D( "hDEtoEtEle", "Resol Reco Ele",  50,  -0.5, 0.5 ) ;
+   hMvaRecoEle = new TH1D( "hMvaRecoEle", "Resol Reco Ele",  50,  -1., 1. ) ;
+   hEtaRecoMu = new TH1D( "hEtaRecoMu", "Eta Reco Mu", 50,  -4.0, 4.0 ) ;
+   hPtRecoMu = new TH1D( "hPtRecoMu", "Pt Reco Mu",  50,  0., 100. ) ;
+   hDEtoEtMu = new TH1D( "hDEtoEtMu", "Resol Reco Mu",  50,  -0.5, 0.5 ) ;
+
+   // reco pfMET
+   hpfMet = new TH1D( "hpfMet", " pf MET ",  50,  0., 100. ) ;
+   hPhipfMet = new TH1D( "hPhipfMet", " Phi pf MET ",  50,  -3.2, 3.2 ) ;
+   hpfMetoGenMet = new TH1D( "hpfMetoGenMet", "Resol PFMET ",  50,  -1., 1. ) ;
+   hpfMet_vs_Dr = new TH2D( "hpfMet_vs_Dr", " PF MET  vs dphi",  50,  0, 3.2, 50, 0., 100. ) ;
+
+   // reco Masses
+   hBersaniRecoMass  = new TH1D( "hBersaniRecoMass", "Bersani Reco Mass", 50,  0., 170. ) ;
+   hSelBersaniRecoMass  = new TH1D( "hSelBersaniRecoMass", "Bersani Reco Mass", 50,  0., 170. ) ;
+   hBersaniRecoMassMod  = new TH1D( "hBersaniRecoMassMod", "Bersani Reco Mass", 50,  0., 170. ) ;
+   hSelBersaniRecoMassMod  = new TH1D( "hSelBersaniRecoMassMod", "Bersani Reco Mass", 50,  0., 170. ) ;
+
    decayed = new ofstream("decayed.txt") ;
    undecayed = new ofstream("undecayed.txt") ;
    return ;
@@ -103,6 +133,19 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
    
    const GenEvent* Evt = EvtHandle->GetEvent() ;
    if (Evt) nevent++;
+
+
+   // Reco collections
+   Handle<reco::PFCandidateCollection> collection;
+   InputTag label("particleFlow"); 
+   //InputTag label("particleFlow","electrons");  // <- Special electron coll. 
+   e.getByLabel(label, collection);
+   std::vector<reco::PFCandidate> candidates = (*collection.product());
+
+   Handle<reco::PFMETCollection> pfMETcollection;
+   InputTag labelMET("pfMet"); 
+   e.getByLabel(labelMET, pfMETcollection);
+
 
    for ( GenEvent::particle_const_iterator p = Evt->particles_begin(); p != Evt->particles_end(); ++p ) {
 
@@ -140,6 +183,12 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 	 TLorentzVector pmu;
 	 TLorentzVector pele;
 	 float theTrueHelAngle = 0.;
+
+	 TLorentzVector precomiss;
+	 TLorentzVector precomu;
+	 TLorentzVector precoele;
+	 bool isThereRecoEle = false;
+	 bool isThereRecoMu = false;
 
 	 for ( GenVertex::particles_out_const_iterator ap = endvert->particles_out_const_begin(); ap != endvert->particles_out_const_end(); ++ap ) {
 	   if (abs((*ap)->pdg_id()) == 15) { 
@@ -209,6 +258,52 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 		 // own frames
 		 pl.Boost( boosterTa );
 		 hCosHelAngEle->Fill( cos( pl.Vect().Angle(pta.Vect())) );
+
+		 	 // find the electrons matched to generated.
+		 std::vector<reco::PFCandidate>::iterator it;
+		 for ( it = candidates.begin(); it != candidates.end(); ++it)   {
+		   
+		   reco::PFCandidate::ParticleType type = (*it).particleId();
+		   if ( type == reco::PFCandidate::e) {
+		     GsfTrackRef refGsf = (*it).gsfTrackRef();
+		     unsigned int nLostHits = 
+		       refGsf->trackerExpectedHitsInner().numberOfLostHits();
+		     // reject conversions
+		     
+
+		     if(nLostHits == 0) {
+		       // compute electron isolation
+		       float pxcand = (*it).px();
+		       float pycand = (*it).py();
+		       float pzcand = (*it).pz();
+		       float enecand =  (*it).energy();
+		       
+		       TLorentzVector cand_ele;
+		       cand_ele.SetPxPyPzE(pxcand,pycand,pzcand,enecand);
+		       
+		       float deta = fabs(cand_ele.Eta() - pele.Eta());
+		       float dphi =  fabs(cand_ele.Phi() - pele.Phi());
+		       if (dphi>TMath::Pi()) dphi-= TMath::TwoPi();
+		       float dR = sqrt(deta*deta +
+				       dphi*dphi);
+		       if(dR < 0.1) {
+			 hPtRecoEle->Fill(cand_ele.Perp());   
+ 			 hEtaRecoEle->Fill(cand_ele.Eta());   
+			 float DEtoEt =  (cand_ele.Perp() - pele.Perp()) / pele.Perp();
+			 hDEtoEtEle->Fill(DEtoEt);
+ 			 hMvaRecoEle->Fill((*it).mva_e_pi());
+			 // add isolation and add GsfElectrons
+			 precoele = cand_ele;
+			 isThereRecoEle = true;
+		       }
+		       
+		     }
+		   }
+		 } // end loop on candidates
+		 
+		 
+
+
 	       } else if (abs((*cp)->pdg_id()) == 13) {  // mu
 		 pmu = pl;
 		 // lab frame
@@ -218,6 +313,40 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 		 // own frames
 		 pl.Boost( boosterTa );
 		 hCosHelAngMu->Fill( cos( pl.Vect().Angle(pta.Vect())) );
+
+		 std::vector<reco::PFCandidate>::iterator it;
+		 for ( it = candidates.begin(); it != candidates.end(); ++it)   {
+		   
+		   reco::PFCandidate::ParticleType type = (*it).particleId();
+		   if ( type == reco::PFCandidate::mu) {
+		     float pxcand = (*it).px();
+		     float pycand = (*it).py();
+		     float pzcand = (*it).pz();
+		     float enecand =  (*it).energy();
+		     
+		     TLorentzVector cand_mu;
+		     cand_mu.SetPxPyPzE(pxcand,pycand,pzcand,enecand);
+		     
+		     float deta = fabs(cand_mu.Eta() - pmu.Eta());
+		     float dphi =  fabs(cand_mu.Phi() - pmu.Phi());
+		     if (dphi>TMath::Pi()) dphi-= TMath::TwoPi();
+		     float dR = sqrt(deta*deta +
+				     dphi*dphi);
+		     if(dR < 0.1) {
+		       hPtRecoMu->Fill(cand_mu.Perp());   
+		       hEtaRecoMu->Fill(cand_mu.Eta());   
+		       float DEtoEt =  (cand_mu.Perp() - pmu.Perp()) / pmu.Perp();
+		       hDEtoEtMu->Fill(DEtoEt);
+		       //  hMvaRecoMu->Fill((*it).mva_e_pi());
+		       // add isolation and add GsfMuctrons
+		       precomu = cand_mu;
+		       isThereRecoMu = true;
+		     }
+		     
+		   }
+		 } // end loop on candidates
+
+
 	       } else {   // neutrinos
 		 pmiss += pl;
 	       }
@@ -286,6 +415,91 @@ void HTauTauGenAnalyzer::analyze( const Event& e, const EventSetup& )
 	   hSelApproxCosHelAngMu->Fill( cos( ptaumuEst.Vect().Angle(pthiggsEst.Vect())) );
 
 	 }
+
+
+
+	 // Do the same with reconstructed variables
+
+
+	 if(isThereRecoEle && isThereRecoMu) {
+	   float pfMet = pfMETcollection->begin()->et();
+	   float pfMet_px = pfMETcollection->begin()->px();
+	   float pfMet_py = pfMETcollection->begin()->py();
+	   float pfMet_phi = pfMETcollection->begin()->phi();
+	   hpfMet->Fill(pfMet);
+	   hPhipfMet->Fill(pfMet_phi);
+	   
+	   //resolution of the pfMET
+	   hpfMetoGenMet->Fill(pfMet);
+	   float lepDphi = fabs(precoele.Phi() - precomu.Phi());
+	   float lepDeta = fabs(precoele.Eta() - precomu.Eta());
+	   if (lepDphi>TMath::Pi()) lepDphi-= TMath::TwoPi();
+	   float lepdR = sqrt(lepDeta*lepDeta +
+			   lepDphi*lepDphi);
+
+	   hpfMet_vs_Dr->Fill(lepdR,pfMet);
+
+
+
+	   if(pfMet > 20) {
+	     
+	     cout << " Gen MET px " << pmiss.X() 
+		  << " Gen MET py " << pmiss.Y() 
+		  << " Gen MET    " << pmiss.Perp() << endl;
+	     
+	     cout << " Reco MET px " <<  pfMet_px
+		  << " Reco MET py " <<  pfMet_py
+		  << " Reco MET    " <<  pfMet   << endl;
+	     
+	     
+	     //	 float ptrecomiss = pfMet;
+	     TLorentzVector ptrecoele(precoele.X(),precoele.Y(),
+				      0.,sqrt(pow(precoele.X(),2) + pow(precoele.Y(),2)));
+	     TLorentzVector ptrecomu(precomu.X(),precomu.Y(),
+				     0.,sqrt(pow(precomu.X(),2) + pow(precomu.Y(),2)));
+	     TLorentzVector ptrecomiss(pfMet_px,pfMet_py,
+				       0.,sqrt(pow(pfMet_px,2) + pow(pfMet_py,2)));
+	     
+	     TLorentzVector recoemu = precoele + precomu;
+	     TLorentzVector ptrecohiggs = ptrecoele + ptrecomu + ptrecomiss;
+	     float xrecotaue = 
+	       (precoele.X()*precomu.Y() - precoele.Y()*precomu.X())/(ptrecohiggs.X()*precomu.Y() - ptrecohiggs.Y()*precomu.X());
+	     float xrecotaumu = 
+	       (precoele.Y()*precomu.X() - precoele.X()*precomu.Y())/(ptrecohiggs.X()*precoele.Y() - ptrecohiggs.Y()*precoele.X());
+
+
+	     if (xrecotaue*xrecotaumu < 0. || fabs(xrecotaue) > 2. || fabs(xrecotaumu) > 2.) {
+	       cout << endl << "Estimated RECO tau momentum fraction is negative or much greater than 1." << endl;
+	       cout << "x_taue = " << xrecotaue << " x_taumu = " << xrecotaumu << endl;
+	       cout << "Skipping RECO... " << endl;
+	       continue;
+	     }
+	     
+	     TLorentzVector precotaueEst = precoele*(1./xrecotaue);
+	     TLorentzVector precotaumuEst = precomu*(1./xrecotaumu);
+	     precotaueEst.SetE(sqrt(3.1577 + pow(precotaueEst.X(),2) + 
+				    pow(precotaueEst.Y(),2) + pow(precotaueEst.Z(),2)) );
+	     precotaumuEst.SetE(sqrt(3.1577 + pow(precotaumuEst.X(),2) + 
+				     pow(precotaumuEst.Y(),2) + pow(precotaumuEst.Z(),2)) );
+	     
+	     TLorentzVector precohiggsEst = precotaueEst + precotaumuEst;
+	     TVector3 boosterRecoHEst = - ( precohiggsEst.BoostVector() );
+	     
+
+
+	     hBersaniRecoMass->Fill(recoemu.M()/sqrt(xrecotaue*xrecotaumu));
+	     hBersaniRecoMassMod->Fill(precohiggsEst.M());
+
+	     if (precomu.Perp() > 10 && precoele.Perp() > 15) {
+	       hSelBersaniRecoMass->Fill(recoemu.M()/sqrt(xrecotaue*xrecotaumu));
+	       hSelBersaniRecoMassMod->Fill(precohiggsEst.M());
+	     }
+
+	     
+
+
+	   }
+	 }
        }
      }
    }
@@ -330,6 +544,23 @@ void HTauTauGenAnalyzer::endJob()
   Hlist.Add(hApproxCosHelAngMu) ;
   Hlist.Add(hSelApproxCosHelAngEle) ;
   Hlist.Add(hSelApproxCosHelAngMu) ;
+  Hlist.Add(hPtRecoEle) ;
+  Hlist.Add(hEtaRecoEle) ;
+  Hlist.Add(hMvaRecoEle) ;
+  Hlist.Add(hDEtoEtEle) ;
+  Hlist.Add(hPtRecoMu) ;
+  Hlist.Add(hEtaRecoMu) ;
+  Hlist.Add(hDEtoEtMu) ;
+  Hlist.Add(hpfMet) ;
+  Hlist.Add(hPhipfMet) ;
+  Hlist.Add(hpfMetoGenMet) ;
+  Hlist.Add(hBersaniRecoMass) ;
+  Hlist.Add(hSelBersaniRecoMass) ;
+  Hlist.Add(hpfMet_vs_Dr) ;
+  Hlist.Add(hBersaniRecoMassMod) ;
+  Hlist.Add(hSelBersaniRecoMassMod) ;
+
+  //  Hlist.Add() ;
 
   Hlist.Write() ;
   fOutputFile->Close() ;

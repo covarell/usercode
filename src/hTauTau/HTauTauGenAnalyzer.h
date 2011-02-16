@@ -1,3 +1,10 @@
+#ifndef HTauTauGenAnalyzer_H
+#define HTauTauGenAnalyzer_H
+
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+
+
 #include <iostream>
 #include <fstream>
  
@@ -10,6 +17,8 @@
 #include "TFile.h"
 #include "TH1.h"
 #include "TF1.h"
+#include "TF1.h"
+#include "TH2.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TObjArray.h"
@@ -20,6 +29,7 @@
 // forward declarations
 class TFile;
 class TH1D;
+class TH2D;
 
 class HTauTauGenAnalyzer : public edm::EDAnalyzer
 {
@@ -81,6 +91,26 @@ class HTauTauGenAnalyzer : public edm::EDAnalyzer
      TH1D*	 hSelCosHelAngTau ;
      TH1D*	 hSelApproxCosHelAngEle ;
      TH1D*	 hSelApproxCosHelAngMu ;
+
+     // reco electrons/muons/met
+     TH1D*       hPtRecoEle ;
+     TH1D*       hEtaRecoEle ;
+     TH1D*       hMvaRecoEle ;
+     TH1D*       hDEtoEtEle ;
+     TH1D*       hPtRecoMu ;
+     TH1D*       hEtaRecoMu ;
+     TH1D*       hDEtoEtMu ;
+     TH1D*       hpfMet ;
+     TH1D*       hPhipfMet ;
+     TH1D*       hpfMetoGenMet ;
+     TH2D*       hpfMet_vs_Dr ;
+
+     // reco masses
+     TH1D*       hBersaniRecoMass ;
+     TH1D*       hSelBersaniRecoMass ;
+     TH1D*       hBersaniRecoMassMod ;
+     TH1D*       hSelBersaniRecoMassMod ;
+
 
      ofstream*   decayed; 
      ofstream*   undecayed; 
