@@ -103,6 +103,9 @@ Fit2DDataRange:    $(INCLUDEDIR)fit2DData_ranges.cxx
 Fit2DDataPsiP:    $(INCLUDEDIR)fit2DData_psip.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DDataPsiP $(OUTLIB)/*.o $(GLIBS) $ $<
 
+Fit2DSimMC:    $(INCLUDEDIR)fit2DSimul_MC.cxx   
+	$(CXX) $(CXXFLAGS) -o Fit2DSimMC $(OUTLIB)/*.o $(GLIBS) $ $<
+
 Fit2DSimRange:    $(INCLUDEDIR)fit2DSimul_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DSimRange $(OUTLIB)/*.o $(GLIBS) $ $<
 

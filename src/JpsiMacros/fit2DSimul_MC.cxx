@@ -32,17 +32,20 @@
 #include "RooHistPdfConv.h"
 
 using namespace RooFit;
-bool superImpose = false;
+float bkgScale = 0.81;
+float bkgScaleP = 0.49;
 
 void defineMassBackground(RooWorkspace *ws)
 {
   //Second order polynomial, the 2nd coefficient is by default set to zero
-  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.05,-1500.,1500.],CoefPol2[-1.,-10.,0.]})");
-  ws->factory("Polynomial::CPolFunctP(PsiP_Mass,{CoefPol1P[-0.05,-1500.,1500.],CoefPol2P[-1.,-10.,0.]})");
+  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.001,-0.1,0.1]})");
+  ws->factory("Polynomial::CPolFunctP(PsiP_Mass,{CoefPol1P[-0.001,-0.1,0.1.]})");
+  ws->factory("Polynomial::CPolFunctA(All_Mass,{CoefPol1A[-0.001,-0.1,0.1]})");
 
   //Exponential
-  ws->factory("Exponential::expFunct(Jpsi_Mass,coefExp[-1.,-3.,1.])");
-  ws->factory("Exponential::expFunctP(PsiP_Mass,coefExpP[-1.,-3.,1.])");
+  ws->factory("Exponential::expFunct(Jpsi_Mass,coefExp[-0.1,-1.,1.])");
+  ws->factory("Exponential::expFunctP(PsiP_Mass,coefExpP[-0.1,-1.,1.])");
+  ws->factory("Exponential::expFunctA(All_Mass,coefExpA[-0.1,-1.,1.])");
 
   return;
 }
@@ -67,9 +70,9 @@ void defineMassSignal(RooWorkspace *ws)
   ws->factory("Gaussian::signalG2OneMeanP(PsiP_Mass,meanSig1P,sigmaSig2P)");
 
   //Crystall Ball
-  ws->factory("CBShape::sigCB(Jpsi_Mass,meanSig1,sigmaSig1,alpha[0.5,0.,3.],enne[5.,1.,30.])");
+  ws->factory("CBShape::sigCB(Jpsi_Mass,meanSig1,sigmaSig2,alpha[0.5,0.,3.],enne[5.,1.,30.])");
   // Same tail parameters!
-  ws->factory("CBShape::sigCBP(PsiP_Mass,meanSig1P,sigmaSig1P,alpha,enne");
+  ws->factory("CBShape::sigCBP(PsiP_Mass,meanSig1P,sigmaSig2P,alpha,enne");
 
   //SUM OF SIGNAL FUNCTIONS
 
@@ -105,7 +108,8 @@ void defineCTResol(RooWorkspace *ws)
   // ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.,0.5]})");
   // ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.01,0.5],fracRes2[0.02,0.0,0.30],fracRes3[0.1,0.001,0.5]})");
   ws->factory("AddModel::sigPR({resGW,resGO,resGM,resGN},{fracRes[0.2,0.01,0.9],fracRes2[0.02,0.0,0.25],fracRes3[0.1,0.0,0.5]})");
-  ws->factory("AddModel::sigPRP({resGW,resGO,resGM,resGNP},{fracResP[0.2,0.01,0.9],fracRes2,fracRes3})");
+  // ws->factory("AddModel::sigPRP({resGW,resGO,resGM,resGNP},{fracResP[0.2,0.01,0.9],fracRes2,fracRes3})");
+  ws->factory("AddModel::sigPRP({resGW,resGO,resGM,resGNP},{fracRes,fracRes2,fracRes3})");
 
   // ANOTHER RESOLUTION FUNCTION
   ws->factory("GaussModel::resbkgGW(Jpsi_Ct,meanResBkgW[0.,-0.1,0.1],sigmaResBkgW[0.05,0.005,0.5])");
@@ -120,7 +124,7 @@ void defineCTBackground(RooWorkspace *ws)
  
   // Jpsi
   ws->factory("Decay::bkg2(Jpsi_Ct,lambdap[0.42,0.05,1.5],resbkg,RooDecay::SingleSided)");
-  ws->factory("Decay::bkg3(Jpsi_Ct,lambdam[0.79,0.02,1.5],resbkg,RooDecay::Flipped)");
+  ws->factory("Decay::bkg3(Jpsi_Ct,lambdam[0.79,0.002,1.5],resbkg,RooDecay::Flipped)");
   ws->factory("Decay::bkg4(Jpsi_Ct,lambdasym[0.69,0.02,5.0],resbkg,RooDecay::DoubleSided)");
 
   ws->factory("SUM::bkgPart1(fpm[0.5,0.,1.]*bkg2,bkg3)");
@@ -130,7 +134,7 @@ void defineCTBackground(RooWorkspace *ws)
   //psi' 
 
   ws->factory("Decay::bkg2P(Jpsi_Ct,lambdapP[0.42,0.05,1.5],resbkg,RooDecay::SingleSided)");
-  ws->factory("Decay::bkg3P(Jpsi_Ct,lambdamP[0.79,0.02,1.5],resbkg,RooDecay::Flipped)");
+  ws->factory("Decay::bkg3P(Jpsi_Ct,lambdamP[0.79,0.002,1.5],resbkg,RooDecay::Flipped)");
   ws->factory("Decay::bkg4P(Jpsi_Ct,lambdasymP[0.69,0.02,5.0],resbkg,RooDecay::DoubleSided)");
 
   ws->factory("SUM::bkgPart1P(fpmP[0.5,0.,1.]*bkg2P,bkg3P)");
@@ -160,7 +164,8 @@ void defineCTSignal(RooWorkspace *ws,
   RooHistPdfConv sigNPMP("sigNPMP","Non-prompt signal with mastodontic gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigM")),*reducedNPP);  ws->import(sigNPMP);
   RooHistPdfConv sigNPNP("sigNPNP","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigWP")),*(ws->var("sigmaResSigNP")),*reducedNPP);   ws->import(sigNPNP);
 
-  RooAddPdf sigNPP("sigNPP","Non-prompt signal 2",RooArgSet(*(ws->pdf("sigNPWP")),*(ws->pdf("sigNPOP")),*(ws->pdf("sigNPMP")),*(ws->pdf("sigNPNP"))),RooArgSet(*(ws->var("fracResP")),*(ws->var("fracRes2")),*(ws->var("fracRes3"))));  ws->import(sigNPP); 
+  // RooAddPdf sigNPP("sigNPP","Non-prompt signal 2",RooArgSet(*(ws->pdf("sigNPWP")),*(ws->pdf("sigNPOP")),*(ws->pdf("sigNPMP")),*(ws->pdf("sigNPNP"))),RooArgSet(*(ws->var("fracResP")),*(ws->var("fracRes2")),*(ws->var("fracRes3"))));  ws->import(sigNPP); 
+  RooAddPdf sigNPP("sigNPP","Non-prompt signal 2",RooArgSet(*(ws->pdf("sigNPWP")),*(ws->pdf("sigNPOP")),*(ws->pdf("sigNPMP")),*(ws->pdf("sigNPNP"))),RooArgSet(*(ws->var("fracRes")),*(ws->var("fracRes2")),*(ws->var("fracRes3"))));  ws->import(sigNPP); 
 
   return;
 }
@@ -175,13 +180,13 @@ void getrange(string &varRange, float *varmin, float *varmax)
  return;
 }
 
-void setRanges(RooWorkspace *ws, float lmin, float lmax){
+void setRanges(RooWorkspace *ws){
 
   const float JpsiMassMin = 2.6;
   const float JpsiMassMax = 3.5;
 
   ws->var("Jpsi_CtTrue")->setRange(0.0,4.0);
-  ws->var("Jpsi_Ct")->setRange(-lmin,lmax);
+  ws->var("Jpsi_Ct")->setRange(-1.5,2.7);
 
   //ws->var("Jpsi_Mass")->setRange("all",JpsiMassMin,JpsiMassMax);
   //ws->var("Jpsi_Mass")->setRange("left",JpsiMassMin,2.9);
@@ -197,44 +202,25 @@ void setRanges(RooWorkspace *ws, float lmin, float lmax){
   return;
 }
 
-RooBinning setMyBinning(float lmin, float lmax){
+RooBinning setMyBinning(float lmin, float lmax, bool large){
 
   RooBinning rb2(-lmin,lmax);
+  if (!large) rb2.setRange(-lmin,lmax-0.5);
 
-  if (lmax+lmin > 4.9) {
-    rb2.addBoundary(-1.5);
-    rb2.addBoundary(-1.0);
-    rb2.addBoundary(-0.8);
-    rb2.addBoundary(-0.6);
-    rb2.addBoundary(-0.5);
-    rb2.addUniform(6,-0.5,-0.2);
-    rb2.addUniform(18,-0.2,0.2);
-    rb2.addUniform(9,0.2,0.5);
-    rb2.addUniform(5,0.5,1.0);
-    rb2.addUniform(15,1.0,lmax);
-  } else if (lmax+lmin > 4.4) {
-    rb2.addBoundary(-1.5);
-    rb2.addBoundary(-1.0);
-    rb2.addBoundary(-0.8);
-    rb2.addBoundary(-0.6);
-    rb2.addBoundary(-0.5);
-    rb2.addUniform(9,-0.5,-0.2);
-    rb2.addUniform(36,-0.2,0.2);
-    rb2.addUniform(12,0.2,0.5);
-    rb2.addUniform(5,0.5,1.0);
-    rb2.addUniform(5,1.0,lmax);
-  } else {
-    // rb2.addBoundary(-1.5);
-    if (lmin < 1.0) rb2.addBoundary(-1.0);
-    if (lmin < 0.7) rb2.addBoundary(-0.7);
-    if (lmin < 0.6) rb2.addBoundary(-0.6);
-    if (lmin < 0.5) rb2.addBoundary(-0.5);
-    if (lmin < 0.5) lmin = 0.5;
-    rb2.addUniform(9,-lmin,-0.2);
-    rb2.addUniform(40,-0.2,0.2);
-    rb2.addUniform(16,0.2,0.5);
-    rb2.addUniform(21,0.5,1.2);
+  // rb2.addBoundary(-1.5);
+  if (lmin < 1.0) rb2.addBoundary(-1.0);
+  if (lmin < 0.7) rb2.addBoundary(-0.7);
+  if (lmin < 0.6) rb2.addBoundary(-0.6);
+  if (lmin < 0.5) rb2.addBoundary(-0.5);
+  if (lmin < 0.5) lmin = 0.5;
+  rb2.addUniform(9,-lmin,-0.2);
+  rb2.addUniform(40,-0.2,0.2);
+  rb2.addUniform(16,0.2,0.5);
+  rb2.addUniform(21,0.5,1.2);
+  if (large) {
     rb2.addUniform(8,1.2,lmax);
+  } else {
+    rb2.addUniform(6,1.2,lmax-0.5);
   }
 
   return rb2;
@@ -244,7 +230,7 @@ int main(int argc, char* argv[]) {
 
   gROOT->SetStyle("Plain");
 
-  char *filename, *filenameMC, *filenameMC2;
+  char *filename, *filenameMC, *filenameMC2, *filenameD;
   int isGG = 2;
   string prange;
   string yrange;
@@ -265,7 +251,12 @@ int main(int argc, char* argv[]) {
 
       case 'f':
         filename = argv[i+1];
-        cout << "File name for fitted data is " << filename << endl;
+        cout << "File name for background is " << filename << endl;
+        break;
+
+      case 'd':
+        filenameD = argv[i+1];
+        cout << "File name for data sidebands is " << filenameD << endl;
         break;
 
       case 'g':
@@ -338,10 +329,15 @@ int main(int argc, char* argv[]) {
   RooDataSet *dataMC2 = (RooDataSet*)f3In.Get("dataPsip");
   dataMC2->SetName("dataMC2");
 
+  TFile fInD(filenameD);
+  fInD.cd();
+  RooDataSet *data = (RooDataSet*)fInD.Get("dataAll");
+  data->SetName("data");
+
   TFile fIn(filename);
   fIn.cd();
-  RooDataSet *data = (RooDataSet*)fIn.Get("dataAll");
-  data->SetName("data");
+  RooDataSet *dataBkg = (RooDataSet*)fIn.Get("dataAll");
+  dataBkg->SetName("dataBkg");
 
   float pmin, pmax; 
   float ymin, ymax;
@@ -356,9 +352,9 @@ int main(int argc, char* argv[]) {
 
   char reducestr[300];
   // if {
-  sprintf(reducestr,"Jpsi_Pt < %f && Jpsi_Pt > %f && abs(Jpsi_Y) < %f && abs(Jpsi_Y) > %f", pmax,pmin,ymax,ymin);
+  //sprintf(reducestr,"Jpsi_Pt < %f && Jpsi_Pt > %f && abs(Jpsi_Y) < %f && abs(Jpsi_Y) > %f", pmax,pmin,ymax,ymin);
   // } else {
-  // sprintf(reducestr,"Jpsi_Pt < %f && Jpsi_Pt > %f && abs(Jpsi_Y) < %f && abs(Jpsi_Y) > %f && Jpsi_Ct < %f && Jpsi_Ct > %f", pmax,pmin,ymax,ymin,lmax,-lmin);
+    sprintf(reducestr,"Jpsi_Pt < %f && Jpsi_Pt > %f && abs(Jpsi_Y) < %f && abs(Jpsi_Y) > %f && Jpsi_Ct < %f && Jpsi_Ct > %f", pmax,pmin,ymax,ymin,lmax,-lmin);
     // }
 
   RooDataSet *reddataMC = (RooDataSet*)dataMC->reduce(reducestr);
@@ -370,7 +366,10 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddata = (RooDataSet*)data->reduce(reducestr);
   ws->import(*reddata);
 
-  setRanges(ws,lmin,lmax);
+  RooDataSet *reddataBkg = (RooDataSet*)dataBkg->reduce(reducestr);
+  ws->import(*reddataBkg);
+
+  setRanges(ws);
 
   string titlestr;
   gROOT->ProcessLine(".L mytdrstyle.C");
@@ -380,20 +379,12 @@ int main(int argc, char* argv[]) {
   ws->var("Jpsi_Ct")->SetTitle("#font[12]{l}_{J/#psi}");
   
   // *** test True Lifetimes
-  ws->var("Jpsi_CtTrue")->setBins(2000);
-  RooPlot *trueframe = ws->var("Jpsi_CtTrue")->frame();
-  ws->data("dataMC")->plotOn(trueframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP"));
-  ws->data("dataMC2")->plotOn(trueframe,DataError(RooAbsData::SumW2),Cut("MCType == MCType::NP"),LineColor(kRed),MarkerColor(kRed));
-
-  TCanvas c0;
-  c0.cd(); trueframe->Draw();
-  titlestr = "pictures/testTrueLife_Lin.gif";
-  c0.SaveAs(titlestr.c_str());
   // *** end test True Lifetimes
 
    // define binning for masses
   ws->var("Jpsi_Mass")->setBins(60);
   ws->var("PsiP_Mass")->setBins(60);
+  ws->var("All_Mass")->setBins(30);
   // ws->var("Jpsi_Ct")->setBins(45);
 
   // define binning for true lifetime
@@ -406,7 +397,7 @@ int main(int argc, char* argv[]) {
   ws->var("Jpsi_CtTrue")->setBinning(rb);
 
   // define binning for lifetime
-  RooBinning rb2 = setMyBinning(lmin,lmax);
+  RooBinning rb2 = setMyBinning(lmin,lmax,true);
   ws->var("Jpsi_Ct")->setBinning(rb2);
 
   RooDataSet *reddata1;
@@ -424,30 +415,19 @@ int main(int argc, char* argv[]) {
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Ct < 600000.");  // i.e. all
   }
 
-   RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->cat("Jpsi_PsiP"))),*reddata1);
-
-  RooDataSet *reddataJ = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
-  RooDataSet *reddataP = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
-  RooDataHist *bindataJ = new RooDataHist("bindataJ","bindataJ",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddataJ);
-  RooDataHist *bindataP = new RooDataHist("bindataP","bindataP",RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct"))),*reddataP);
-
-  cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
+  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
 
   // Get subdatasets. Some of them are useful. Some, however, not
   RooDataSet *reddataTr = (RooDataSet*) reddataMC->reduce(aLongString.c_str());
+  RooDataSet *reddataTrForFit = (RooDataSet*) reddataTr->reduce(SelectVars(RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("PsiP_Mass")))));
 
   RooDataSet *reddataPR = (RooDataSet*) reddataTr->reduce("MCType == MCType::PR");
   RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce("MCType == MCType::NP");
   RooDataSet *reddataTrP = (RooDataSet*) reddataMC2->reduce(aLongString.c_str());
+  RooDataSet *reddataTrPForFit = (RooDataSet*) reddataTrP->reduce(SelectVars(RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("PsiP_Mass")))));
   RooDataSet *reddataPRP = (RooDataSet*) reddataTrP->reduce("MCType == MCType::PR");
   RooDataSet *reddataNPP = (RooDataSet*) reddataTrP->reduce("MCType == MCType::NP");
 
-  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
-
-  RooDataSet *reddataSBJ = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
-  RooDataSet *reddataSBP = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
-  
-  cout << "Number of true events to fit  = " << reddataTr->sumEntries() << endl; 
   RooDataHist* bindataPR = new RooDataHist("bindataPR","MC distribution for PR signal",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddataPR);
   RooDataHist* bindataPRP = new RooDataHist("bindataPRP","MC distribution for PR signal",RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct"))),*reddataPRP);
   
@@ -457,8 +437,6 @@ int main(int argc, char* argv[]) {
   RooDataHist* redMCNPP = new RooDataHist("redMCNPP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNPP); 
 
   // RooDataHist* bindataBK = new RooDataHist("bindataBK","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddataBK);
-
-  RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->cat("Jpsi_PsiP"))),*reddataSB);
 
   //JPSI MASS PARAMETRIZATION
 
@@ -480,24 +458,234 @@ int main(int argc, char* argv[]) {
   defineCTSignal(ws,redMCNP,redMCNPP);
 
   //putting all together
-  ws->factory("PROD::totBKG(expFunct,bkgctauTOT)");
-  ws->factory("PROD::totBKGP(expFunctP,bkgctauTOTP)");
+  ws->factory("PROD::totBKG(CPolFunct,bkgctauTOT)");
+  ws->factory("PROD::totBKGP(CPolFunctP,bkgctauTOTP)");
 
+  
   string partTit, partFile;
   if (isGG == 0) { partTit = " glb-glb "; partFile = "GG"; }
   else if (isGG == 1) { partTit = " glb-trk "; partFile = "GT"; }
   else { partTit = " all "; partFile = "ALL"; }
 
+  // BUILD THE DATASET!
+
+  // Background mass shape from MC
+  ws->pdf("CPolFunctA")->fitTo(*reddataBkg,SumW2Error(kTRUE));
+  float bc = ws->var("CoefPol1A")->getVal();
+  ws->var("CoefPol1")->setVal(bc);
+  ws->var("CoefPol1P")->setVal(bc);
+
+  // Background lifetime shape from data
+  if(prefitSignalCTau){
+    ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE));   
+    ws->var("sigmaResSigW")->setConstant(kTRUE);
+    ws->var("meanResSigW")->setConstant(kTRUE);
+    if (ws->var("fracRes2")) ws->var("fracRes2")->setConstant(kTRUE);
+    if (ws->var("sigmaResSigO")) ws->var("sigmaResSigO")->setConstant(kTRUE);
+    if (ws->var("fracRes3")) ws->var("fracRes3")->setConstant(kTRUE);
+    if (ws->var("sigmaResSigM")) ws->var("sigmaResSigM")->setConstant(kTRUE);
+
+    ws->pdf("sigPRP")->fitTo(*bindataPRP,SumW2Error(kTRUE));
+    ws->var("sigmaResSigW")->setConstant(kFALSE);  
+
+    // Jpsi plot
+    RooPlot *tframePR = ws->var("Jpsi_Ct")->frame();
+
+    titlestr = "Prompt resolution fit for" + partTit + "muons (mass projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
+    tframePR->SetTitle(titlestr.c_str());
+    
+    bindataPR->plotOn(tframePR,DataError(RooAbsData::SumW2),Binning(rb2));
+    ws->pdf("sigPRP")->plotOn(tframePR,LineColor(kBlue),Normalization(bindataPR->sumEntries(),RooAbsReal::NumEvent));
+
+    TCanvas c00;  
+    // c00.SetLogy(1);
+    c00.cd();tframePR->Draw();
+    titlestr = "pictures/MCnewbins/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    c00.SaveAs(titlestr.c_str());
+    c00.SetLogy(1); tframePR->Draw();
+    titlestr = "pictures/MCnewbins/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    c00.SaveAs(titlestr.c_str());
+   
+    // psi' plot (to check)
+    RooPlot *tframePRP = ws->var("Jpsi_Ct")->frame();
+
+    titlestr = "Prompt resolution fit for" + partTit + "muons (J/ #psi), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
+    tframePRP->SetTitle(titlestr.c_str());
+    
+    bindataPRP->plotOn(tframePRP,DataError(RooAbsData::SumW2),Binning(rb2));
+    ws->pdf("sigPRP")->plotOn(tframePRP,LineColor(kBlue),Normalization(bindataPRP->sumEntries(),RooAbsReal::NumEvent));
+
+    TCanvas c00P;  
+    // c00.SetLogy(1);
+    c00P.cd();tframePRP->Draw();
+    titlestr = "pictures/MCnewbins/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+    c00P.SaveAs(titlestr.c_str());
+    c00P.SetLogy(1); tframePRP->Draw();
+    titlestr = "pictures/MCnewbins/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+    c00P.SaveAs(titlestr.c_str());
+
+    // ws->var("fracRes")->setConstant(kTRUE);
+    
+    // ws->var("sigmaResSigW")->setConstant(kTRUE);
+    // ws->var("sigmaResSigN")->setConstant(kTRUE);
+    // ws->var("meanResSigW")->setConstant(kTRUE);
+
+    // ws->pdf("sigNP")->fitTo(*bindataNP,SumW2Error(kTRUE));
+    // ws->var("NpPrRatio")->setConstant(kTRUE);
+
+    // ws->var("fracRes")->setConstant(kFALSE);
+    // ws->var("sigmaResSigW")->setConstant(kFALSE);
+    // ws->var("sigmaResSigN")->setConstant(kFALSE);
+    // ws->var("meanResSigW")->setConstant(kFALSE);
+  }
+
+  if(prefitSignalCTau){
+    ws->var("meanResSigW")->setConstant(kTRUE);
+    ws->var("sigmaResBkgW")->setVal(ws->var("sigmaResSigW")->getVal());
+    ws->var("sigmaResBkgN")->setVal(ws->var("sigmaResSigN")->getVal());
+    //ws->var("sigmaResSigN")->setConstant(kTRUE);
+    //ws->var("sigmaResSigW")->setConstant(kTRUE);
+  }
+
+  // ws->var("fpm")->setConstant(kTRUE);
+  // ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE));
+  RooSimultaneous bkgSim("bkgSim","sideband ctau simultaneous PDF",RooArgList(*(ws->pdf("bkgctauTOT")),*(ws->pdf("bkgctauTOTP"))),*(ws->cat("Jpsi_PsiP")));
+  ws->import(bkgSim);
+  // if (pmin > 3. && pmin < 4.) ws->pdf("bkgSim")->fitTo(*bindataSB,SumW2Error(kTRUE),Minos(0),NumCPU(2)); 
+  // else  
+  ws->pdf("bkgSim")->fitTo(*reddataSB,SumW2Error(kTRUE),Minos(0),NumCPU(2));
+ 
+  // NOW GENERATE AND MERGE
+  cout << "Generating ... " << endl;
+  // How many events?
+  int Neventb = (int)(bkgScale*reddataSB->sumEntries()*(exp(2.6*bc)-exp(3.6*bc))/(exp(2.6*bc)-exp(2.9*bc)+exp(3.3*bc)-exp(3.6*bc)));
+  int NeventbP = (int)(bkgScaleP*reddataSB->sumEntries()*(exp(3.3*bc)-exp(4.2*bc))/(exp(3.3*bc)-exp(3.45*bc)+exp(3.85*bc)-exp(4.2*bc)));
+
+  RooDataSet *theGenBkg = ws->pdf("totBKG")->generate(RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),Extended(),Name("theGenBkg"),NumEvents(Neventb));
+  RooDataSet *theGenBkgP = ws->pdf("totBKGP")->generate(RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct"))),Extended(),Name("theGenBkgP"),NumEvents(NeventbP)); 
+  
+  cout << "Merging ... " << endl;
+  
+  ws->var("Jpsi_Mass")->setVal(3.);
+  ws->var("PsiP_Mass")->setVal(4.);
+  RooRealVar* MCweightAdd = new RooRealVar("MCWeight","Monte Carlo Weight",0.,1000.);
+  MCweightAdd->setVal(1.);
+  ws->cat("Jpsi_PsiP")->setIndex(0,kTRUE);
+
+  const RooArgSet* thisRow = (RooArgSet*)theGenBkg->get(0); 
+  RooArgSet* newRow = new RooArgSet(*thisRow);
+  newRow->add(*(ws->var("PsiP_Mass"))); newRow->add(*MCweightAdd); 
+  RooDataSet* dataJpsiTot = new RooDataSet("dataJpsiTot","new data",*newRow);
+      
+  for (Int_t iSamp = 0; iSamp < theGenBkg->numEntries(); iSamp++) {
+  
+    thisRow = (RooArgSet*)theGenBkg->get(iSamp);
+    RooArgSet* tempRow = new RooArgSet(*thisRow);
+    tempRow->add(*(ws->var("PsiP_Mass")));   tempRow->add(*MCweightAdd);
+    dataJpsiTot->add(*tempRow);
+
+  }
+
+  for (Int_t iSamp = 0; iSamp < reddataTrForFit->numEntries(); iSamp++) {
+  
+    thisRow = (RooArgSet*)reddataTrForFit->get(iSamp);
+    // cout << reddataTrForFit->weight() << endl;
+    MCweightAdd->setVal(reddataTrForFit->weight());
+    RooArgSet* tempRow = new RooArgSet(*thisRow);
+    tempRow->add(*MCweightAdd);
+    dataJpsiTot->add(*tempRow);
+
+  }
+  
+  // INCREDIBLE, THIS DOES NOT WORK!!!
+  // dataJpsiTot->append(*reddataTrForFit);
+
+  RooDataSet* addVars = new RooDataSet("addVars","Category",
+				       RooArgList(*(ws->cat("Jpsi_PsiP"))));
+
+  for (Int_t iSamp = 0; iSamp < dataJpsiTot->numEntries(); iSamp++) {
+    addVars->add(RooArgSet(*(ws->cat("Jpsi_PsiP"))));
+  }
+  dataJpsiTot->merge(addVars);
+
+  MCweightAdd->setVal(1.);
+  ws->cat("Jpsi_PsiP")->setIndex(1,kTRUE);
+
+  RooArgSet* thisRowP = (RooArgSet*)theGenBkgP->get(0); 
+  RooArgSet* newRowP = new RooArgSet(*thisRowP);
+  newRowP->add(*(ws->var("Jpsi_Mass"))); newRowP->add(*MCweightAdd); 
+  RooDataSet* dataPsipTot = new RooDataSet("dataPsipTot","new data",*newRowP);
+      
+  for (Int_t iSamp = 0; iSamp < theGenBkgP->numEntries(); iSamp++) {
+  
+    thisRowP = (RooArgSet*)theGenBkgP->get(iSamp);
+    RooArgSet* tempRow = new RooArgSet(*thisRowP);
+    tempRow->add(*(ws->var("Jpsi_Mass")));   tempRow->add(*MCweightAdd);
+    dataPsipTot->add(*tempRow);
+
+  }
+
+  for (Int_t iSamp = 0; iSamp < reddataTrPForFit->numEntries(); iSamp++) {
+  
+    thisRowP = (RooArgSet*)reddataTrPForFit->get(iSamp);
+    // cout << reddataTrPForFit->weight() << endl;
+    MCweightAdd->setVal(reddataTrPForFit->weight());
+    RooArgSet* tempRow = new RooArgSet(*thisRowP);
+    tempRow->add(*MCweightAdd);
+    dataPsipTot->add(*tempRow);
+
+  }
+  
+  // INCREDIBLE, THIS DOES NOT WORK!!!
+  // dataPsipTot->append(*reddataTrPForFit);
+
+  RooDataSet* addVarsP = new RooDataSet("addVarsP","Category",
+					RooArgList(*(ws->cat("Jpsi_PsiP"))));
+
+  for (Int_t iSamp = 0; iSamp < dataPsipTot->numEntries(); iSamp++) {
+    addVarsP->add(RooArgSet(*(ws->cat("Jpsi_PsiP"))));
+  }
+  dataPsipTot->merge(addVarsP);
+  dataJpsiTot->append(*dataPsipTot);
+
+  RooArgSet* thisRowTot = (RooArgSet*)dataJpsiTot->get(0); 
+  RooDataSet* dataTot = new RooDataSet("dataTot","MC dataset",*thisRowTot,WeightVar("MCWeight"),Import(*dataJpsiTot)); 
+  dataTot->Print("v");
+
+  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->cat("Jpsi_PsiP"))),*dataTot);
+
+  RooDataSet *reddataJ = (RooDataSet*) dataTot->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
+  RooDataSet *reddataP = (RooDataSet*) dataTot->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
+  RooDataHist *bindataJ = new RooDataHist("bindataJ","bindataJ",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddataJ);
+  ws->var("Jpsi_Ct")->setRange(-lmin,lmax-0.5);
+  RooBinning rb3 = setMyBinning(lmin,lmax,false);
+  ws->var("Jpsi_Ct")->setBinning(rb3);
+  RooDataHist *bindataP = new RooDataHist("bindataP","bindataP",RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct"))),*reddataP);
+
+  cout << "Number of events to fit  = " << dataTot->sumEntries() << " of which: " << endl; 
+  cout << "   " << reddataTrForFit->sumEntries() << " true Jpsi" << endl;
+  cout << "   " << reddataTrPForFit->sumEntries() << " true psi prime" << endl;
+  cout << "   " << theGenBkg->sumEntries() << " Jpsi background" << endl;
+  cout << "   " << theGenBkgP->sumEntries() << " psi prime background" << endl;
+
+  RooDataSet *reddataSBTot = (RooDataSet*) dataTot->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
+  
+  RooDataSet *reddataSBJ = (RooDataSet*) reddataSBTot->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
+  RooDataSet *reddataSBP = (RooDataSet*) reddataSBTot->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
+ 
+
+  RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->cat("Jpsi_PsiP"))),*reddataSBTot);
+
   if (prefitMass){
 
-    // ws->pdf("expFunct")->fitTo(*reddata1,Range("left,right"),SumW2Error(kTRUE));
-    // ws->var("coefExp")->setConstant(kTRUE);
+    // ws->pdf("CPolFunct")->fitTo(*reddata1,Range("left,right"),SumW2Error(kTRUE));
+    // ws->var("CoefPol1")->setConstant(kTRUE);
     // ws->pdf("sigCBGaussOneMean")->fitTo(*bindataTr,SumW2Error(kTRUE));
     // ws->var("enne")->setConstant(kTRUE);
     // ws->var("alpha")->setConstant(kTRUE);
 
-    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
-    ws->factory("SUM::massPDFP(NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkgP[2000.,10.,10000000.]*expFunctP)");
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*CPolFunct)");
+    ws->factory("SUM::massPDFP(NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkgP[2000.,10.,10000000.]*CPolFunctP)");
     RooSimultaneous massSim("massSim","mass simultaneous PDF",RooArgList(*(ws->pdf("massPDF")),*(ws->pdf("massPDFP"))),*(ws->cat("Jpsi_PsiP")));
     ws->import(massSim);
     ws->pdf("massSim")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2));
@@ -554,70 +742,8 @@ int main(int argc, char* argv[]) {
 
   }
 
-  if(prefitSignalCTau){
-    ws->pdf("sigPR")->fitTo(*bindataPR,SumW2Error(kTRUE));   
-    ws->var("sigmaResSigW")->setConstant(kTRUE);
-    if (ws->var("fracRes2")) ws->var("fracRes2")->setConstant(kTRUE);
-    if (ws->var("sigmaResSigO")) ws->var("sigmaResSigO")->setConstant(kTRUE);
-    if (ws->var("fracRes3")) ws->var("fracRes3")->setConstant(kTRUE);
-    if (ws->var("sigmaResSigM")) ws->var("sigmaResSigM")->setConstant(kTRUE);
-
-    ws->pdf("sigPRP")->fitTo(*bindataPRP,SumW2Error(kTRUE));
-    ws->var("sigmaResSigW")->setConstant(kFALSE);  
-
-    // Jpsi plot
-    RooPlot *tframePR = ws->var("Jpsi_Ct")->frame();
-
-    titlestr = "Prompt resolution fit for" + partTit + "muons (mass projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
-    tframePR->SetTitle(titlestr.c_str());
-    
-    bindataPR->plotOn(tframePR,DataError(RooAbsData::SumW2),Binning(rb2));
-    ws->pdf("sigPRP")->plotOn(tframePR,LineColor(kBlue),Normalization(bindataPR->sumEntries(),RooAbsReal::NumEvent));
-
-    TCanvas c00;  
-    // c00.SetLogy(1);
-    c00.cd();tframePR->Draw();
-    titlestr = "pictures/diffmeanNew/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
-    c00.SaveAs(titlestr.c_str());
-    c00.SetLogy(1); tframePR->Draw();
-    titlestr = "pictures/diffmeanNew/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
-    c00.SaveAs(titlestr.c_str());
-   
-    // psi' plot (to check)
-    RooPlot *tframePRP = ws->var("Jpsi_Ct")->frame();
-
-    titlestr = "Prompt resolution fit for" + partTit + "muons (J/ #psi), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
-    tframePRP->SetTitle(titlestr.c_str());
-    
-    bindataPRP->plotOn(tframePRP,DataError(RooAbsData::SumW2),Binning(rb2));
-    ws->pdf("sigPRP")->plotOn(tframePRP,LineColor(kBlue),Normalization(bindataPRP->sumEntries(),RooAbsReal::NumEvent));
-
-    TCanvas c00P;  
-    // c00.SetLogy(1);
-    c00P.cd();tframePRP->Draw();
-    titlestr = "pictures/diffmeanNew/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
-    c00P.SaveAs(titlestr.c_str());
-    c00P.SetLogy(1); tframePRP->Draw();
-    titlestr = "pictures/diffmeanNew/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
-    c00P.SaveAs(titlestr.c_str());
-
-    // ws->var("fracRes")->setConstant(kTRUE);
-    
-    // ws->var("sigmaResSigW")->setConstant(kTRUE);
-    // ws->var("sigmaResSigN")->setConstant(kTRUE);
-    // ws->var("meanResSigW")->setConstant(kTRUE);
-
-    // ws->pdf("sigNP")->fitTo(*bindataNP,SumW2Error(kTRUE));
-    // ws->var("NpPrRatio")->setConstant(kTRUE);
-
-    // ws->var("fracRes")->setConstant(kFALSE);
-    // ws->var("sigmaResSigW")->setConstant(kFALSE);
-    // ws->var("sigmaResSigN")->setConstant(kFALSE);
-    // ws->var("meanResSigW")->setConstant(kFALSE);
-  }
-
   if(prefitBackground){
-    cout << "Prefitting background on " << reddataSB->sumEntries() << " MC events " << endl;
+    cout << "Prefitting background on " << reddataSBTot->sumEntries() << " MC events " << endl;
 
     if(prefitSignalCTau){
       ws->var("meanResSigW")->setConstant(kTRUE);
@@ -629,11 +755,9 @@ int main(int argc, char* argv[]) {
 
     // ws->var("fpm")->setConstant(kTRUE);
     // ws->pdf("bkgctauTOT")->fitTo(*bindataSB,SumW2Error(kTRUE));
-    RooSimultaneous bkgSim("bkgSim","sideband ctau simultaneous PDF",RooArgList(*(ws->pdf("bkgctauTOT")),*(ws->pdf("bkgctauTOTP"))),*(ws->cat("Jpsi_PsiP")));
-    ws->import(bkgSim);
     // if (pmin > 3. && pmin < 4.) ws->pdf("bkgSim")->fitTo(*bindataSB,SumW2Error(kTRUE),Minos(0),NumCPU(2)); 
     // else  
-    ws->pdf("bkgSim")->fitTo(*reddataSB,SumW2Error(kTRUE),Minos(0),NumCPU(2));
+    // ws->pdf("bkgSim")->fitTo(*reddataSBTot,SumW2Error(kTRUE),Minos(0),NumCPU(2));
     ws->var("fpm")->setConstant(kTRUE);
     ws->var("fLiving")->setConstant(kTRUE);
     ws->var("fpmP")->setConstant(kTRUE);
@@ -664,7 +788,7 @@ int main(int argc, char* argv[]) {
   ws->var("fLiving")->setConstant(kTRUE);
   ws->var("fpmP")->setConstant(kTRUE);
   ws->var("fLivingP")->setConstant(kTRUE);
-
+  
   Double_t NBkg_static[2]; 
   NBkg_static[0] = ws->var("NBkg")->getVal();
   NBkg_static[1] = ws->var("NBkgP")->getVal();
@@ -675,8 +799,9 @@ int main(int argc, char* argv[]) {
 
   Double_t Bfrac_static[2];
   Double_t BfracErr_static[2];  
-
+  
   int nFitPar;
+  
   // RooSimultaneous totSim("totSim","ctau simultaneous PDF",RooArgList(*(ws->pdf("totPDF")),*(ws->pdf("totPDFP"))),*(ws->cat("Jpsi_PsiP")));
   // ws->import(totSim);
 
@@ -686,6 +811,7 @@ int main(int argc, char* argv[]) {
     RooFitResult *rfr = ws->pdf("totPDF")->fitTo(*bindataJ,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
     // ws->var("sigmaResSigN")->setConstant(kTRUE);
     ws->var("fracRes")->setConstant(kTRUE);
+    // ws->var("fracResP")->setConstant(kTRUE);
     ws->var("sigmaResSigW")->setConstant(kTRUE);
     ws->var("meanResSigW")->setConstant(kTRUE);
     // RooFitResult *rfr2 = ws->pdf("totPDFP")->fitTo(*reddataP,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(2));
@@ -723,14 +849,17 @@ int main(int argc, char* argv[]) {
     }
   }
 
+ 
   const double coeffGauss = ws->var("fracRes")->getVal();
-  const double coeffGaussP = ws->var("fracResP")->getVal();
+  // const double coeffGaussP = ws->var("fracResP")->getVal();
+  const double coeffGaussP = ws->var("fracRes")->getVal();
   const double sigmaSig1 = ws->var("sigmaResSigW")->getVal();
   const double sigmaSig2 = ws->var("sigmaResSigN")->getVal();
   const double sigmaSig2P = ws->var("sigmaResSigNP")->getVal();
   double ecoeffGauss = ws->var("fracRes")->getError();
   if (ecoeffGauss > 0.3*coeffGauss) ecoeffGauss = 0.;
-  double ecoeffGaussP = ws->var("fracResP")->getError();
+  // double ecoeffGaussP = ws->var("fracResP")->getError();
+  double ecoeffGaussP = ws->var("fracRes")->getError();
   if (ecoeffGaussP > 0.3*coeffGaussP) ecoeffGaussP = 0.;
   const double esigmaSig1 = ws->var("sigmaResSigW")->getError();
   const double esigmaSig2 = ws->var("sigmaResSigN")->getError();
@@ -741,7 +870,7 @@ int main(int argc, char* argv[]) {
   float resolP = sqrt(coeffGaussP*sigmaSig1*sigmaSig1 + (1-coeffGaussP)*sigmaSig2P*sigmaSig2P);
   float errresolP = (0.5/resolP)*sqrt(pow(sigmaSig1*coeffGaussP*esigmaSig1,2) + pow(sigmaSig2P*(1-coeffGaussP)*esigmaSig2P,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2P*sigmaSig2P)*ecoeffGaussP,2));	
 
-			 
+  		 
   RooRealVar tempVar1("tempVar1","tempVar1",NSigNP_static[0]);
   RooRealVar tempVar2("tempVar2","tempVar2",NBkg_static[0]);
   RooRealVar tempVar3("tempVar3","tempVar3",NSigNP_static[1]);
@@ -758,8 +887,8 @@ int main(int argc, char* argv[]) {
   reddataJ->plotOn(mframe,DataError(RooAbsData::SumW2));
 
   if (prefitMass) {
-    ws->pdf("massPDF")->plotOn(mframe,Components("expFunct"),LineColor(kBlue),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent));
-    RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
+    ws->pdf("massPDF")->plotOn(mframe,Components("CPolFunct"),LineColor(kBlue),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent));
+    RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("CPolFunct"))),RooArgList(tempVar1,tempVar2));
     tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent));
     ws->pdf("massPDF")->plotOn(mframe,LineColor(kBlack),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent));
   } else {
@@ -770,7 +899,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   // b) psi(2S) mass
@@ -782,8 +911,8 @@ int main(int argc, char* argv[]) {
   reddataP->plotOn(mPframe,DataError(RooAbsData::SumW2));
 
   if (prefitMass) {
-    ws->pdf("massPDFP")->plotOn(mPframe,Components("expFunctP"),LineColor(kBlue),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
-    RooAddPdf tempPDFP("tempPDFP","tempPDFP",RooArgList(*(ws->pdf("sigCBGaussOneMeanP")),*(ws->pdf("expFunctP"))),RooArgList(tempVar3,tempVar4));
+    ws->pdf("massPDFP")->plotOn(mPframe,Components("CPolFunctP"),LineColor(kBlue),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
+    RooAddPdf tempPDFP("tempPDFP","tempPDFP",RooArgList(*(ws->pdf("sigCBGaussOneMeanP")),*(ws->pdf("CPolFunctP"))),RooArgList(tempVar3,tempVar4));
     tempPDFP.plotOn(mPframe,LineColor(kRed),Normalization(NSigNP_static[1] + NBkg_static[1],RooAbsReal::NumEvent));
     ws->pdf("massPDFP")->plotOn(mPframe,LineColor(kBlack),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
   } else {
@@ -794,7 +923,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1P;
   c1P.cd();mPframe->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
   c1P.SaveAs(titlestr.c_str());
   
   // c) Jpsi time
@@ -818,13 +947,8 @@ int main(int argc, char* argv[]) {
     hresid->SetName("hresid");
     // chi2 = tframe->chiSquare(nFitPar);
     ws->pdf("totPDF")->plotOn(tframe,Components("bkgctauTOT"),LineColor(kBlue),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDotted));
-    if (superImpose) {
-      RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
-      tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent),LineStyle(kDashed));
-    } else {
-      ws->pdf("totPDF")->plotOn(tframe,Components("sigNP"),LineColor(kRed),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDashed));
-      ws->pdf("totPDF")->plotOn(tframe,Components("sigPR"),LineColor(kGreen),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDashDotted));
-    }
+    RooAddPdf tempPDF2("tempPDF2","tempPDF2",RooArgList(*(ws->pdf("sigNP")),*(ws->pdf("bkgctauTOT"))),RooArgList(tempVar1,tempVar2));
+    tempPDF2.plotOn(tframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent),LineStyle(kDashed));
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent));
   } else {
     ws->pdf("totPDF")->plotOn(tframe,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -892,10 +1016,6 @@ int main(int argc, char* argv[]) {
   hfake3.SetLineColor(kRed);
   hfake3.SetLineStyle(kDashed);
   hfake3.SetLineWidth(2);
-  TH1F hfake4 = TH1F("hfake4","hfake4",100,200,300);
-  hfake4.SetLineColor(kGreen);
-  hfake4.SetLineStyle(kDashDotted);
-  hfake4.SetLineWidth(2);
 
   TLegend * leg = new TLegend(0.58,0.64,0.94,0.855,NULL,"brNDC");
   leg->SetFillStyle(0);
@@ -903,12 +1023,7 @@ int main(int argc, char* argv[]) {
   leg->SetShadowColor(0);
   leg->AddEntry(gfake,"data","le1p");
   leg->AddEntry(&hfake2,"total fit","L");
-  if (superImpose) {
-    leg->AddEntry(&hfake3,"bkgd + non-prompt","L");
-  } else {
-    leg->AddEntry(&hfake4,"prompt","L");
-    leg->AddEntry(&hfake3,"non-prompt","L");
-  }
+  leg->AddEntry(&hfake3,"bkgd + non-prompt","L"); 
   leg->AddEntry(&hfake1,"bkgd","L");
   leg->Draw("same"); 
 
@@ -943,9 +1058,9 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2->SaveAs(titlestr.c_str());
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -967,12 +1082,7 @@ int main(int argc, char* argv[]) {
     leg2->SetBorderSize(0);
     leg2->SetShadowColor(0);
     leg2->AddEntry(&hfake2,"total fit","L");
-    if (superImpose) {
-      leg2->AddEntry(&hfake3,"bkgd + non-prompt","L");
-    } else {
-      leg2->AddEntry(&hfake4,"prompt","L");
-      leg2->AddEntry(&hfake3,"non-prompt","L");
-    }
+    leg2->AddEntry(&hfake3,"background + non-prompt","L"); 
     leg2->AddEntry(&hfake1,"background","L");
     leg2->Draw("same");
   } else {
@@ -991,9 +1101,9 @@ int main(int argc, char* argv[]) {
   
   c2a->Update();
 
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   c2a->SaveAs(titlestr.c_str());
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   RooPlot *tframe1 = ws->var("Jpsi_Ct")->frame();
@@ -1008,11 +1118,11 @@ int main(int argc, char* argv[]) {
   TCanvas c3;
   c3.cd();
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
   c3.SaveAs(titlestr.c_str());
   c3.SetLogy(1);
   c3.cd();tframe1->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   c3.SaveAs(titlestr.c_str()); 
 
   // d) psi(2S) time
@@ -1034,13 +1144,8 @@ int main(int argc, char* argv[]) {
     hresidP->SetName("hresidP");
     // chi2 = tframeP->chiSquare(nFitPar);
     ws->pdf("totPDFP")->plotOn(tframeP,Components("bkgctauTOTP"),LineColor(kBlue),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDotted));
-    if (superImpose) {
-      RooAddPdf tempPDFP2("tempPDFP2","tempPDFP2",RooArgList(*(ws->pdf("sigNPP")),*(ws->pdf("bkgctauTOTP"))),RooArgList(tempVar3,tempVar4));
-      tempPDFP2.plotOn(tframeP,LineColor(kRed),Normalization(NSigNP_static[1] + NBkg_static[1],RooAbsReal::NumEvent),LineStyle(kDashed));
-    } else {
-      ws->pdf("totPDFP")->plotOn(tframeP,Components("sigNPP"),LineColor(kRed),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDashed));
-      ws->pdf("totPDFP")->plotOn(tframeP,Components("sigPRP"),LineColor(kGreen),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent),LineStyle(kDashDotted));
-    }
+    RooAddPdf tempPDFP2("tempPDFP2","tempPDFP2",RooArgList(*(ws->pdf("sigNPP")),*(ws->pdf("bkgctauTOTP"))),RooArgList(tempVar3,tempVar4));
+    tempPDFP2.plotOn(tframeP,LineColor(kRed),Normalization(NSigNP_static[1] + NBkg_static[1],RooAbsReal::NumEvent),LineStyle(kDashed));
     ws->pdf("totPDFP")->plotOn(tframeP,LineColor(kBlack),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
   } else {
     ws->pdf("totPDFP")->plotOn(tframeP,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -1108,9 +1213,9 @@ int main(int argc, char* argv[]) {
   
   c2P->Update();
 
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2P->SaveAs(titlestr.c_str());
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2P->SaveAs(titlestr.c_str());
 
   TCanvas* c2aP = new TCanvas("c2aP","The Canvas",200,10,600,880);
@@ -1132,12 +1237,7 @@ int main(int argc, char* argv[]) {
     leg2->SetBorderSize(0);
     leg2->SetShadowColor(0);
     leg2->AddEntry(&hfake2,"total fit","L");
-    if (superImpose) {
-      leg2->AddEntry(&hfake3,"bkgd + non-prompt","L");
-    } else {
-      leg2->AddEntry(&hfake4,"prompt","L");
-      leg2->AddEntry(&hfake3,"non-prompt","L");
-    } 
+    leg2->AddEntry(&hfake3,"background + non-prompt","L"); 
     leg2->AddEntry(&hfake1,"background","L");
     leg2->Draw("same");
   } else {
@@ -1156,9 +1256,9 @@ int main(int argc, char* argv[]) {
   
   c2aP->Update();
 
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
   c2aP->SaveAs(titlestr.c_str());
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2aP->SaveAs(titlestr.c_str());
 
   RooPlot *tframeP1 = ws->var("Jpsi_Ct")->frame();
@@ -1173,34 +1273,39 @@ int main(int argc, char* argv[]) {
   TCanvas c3P;
   c3P.cd();
   c3P.cd();tframeP1->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
   c3P.SaveAs(titlestr.c_str());
   c3P.SetLogy(1);
   c3P.cd();tframeP1->Draw();
-  titlestr = "pictures/diffmeanNew/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/MCnewbins/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
   c3P.SaveAs(titlestr.c_str()); 
 
   cout << endl << "J/psi yields:" << endl;
-  cout << "PROMPT Jpsi       : Fit : " << NSigPR_static[0] << " +/- " << ErrPR_static[0] << endl;
-  cout << "NON-PROMPT Jpsi   : Fit : " << NSigNP_static[0] << " +/- " << ErrNP_static[0] << endl;
-  cout << "B fraction Jpsi   : Fit : " << Bfrac_static[0] << " +/- " << BfracErr_static[0] << endl;
+  cout << "TOTAL Jpsi        : True : " << reddataTr->sumEntries() << " Fit : " << NSig_static[0] << " +/- " << Err_static[0] << endl;
+  cout << "PROMPT Jpsi       : True : " << reddataPR->sumEntries() << " Fit : " << NSigPR_static[0] << " +/- " << ErrPR_static[0] << endl;
+  cout << "NON-PROMPT Jpsi   : True : " << reddataNP->sumEntries() << " Fit : " << NSigNP_static[0] << " +/- " << ErrNP_static[0] << endl;
+  cout << "B fraction Jpsi   : True : " << reddataNP->sumEntries()/reddataTr->sumEntries() << " Fit : " << Bfrac_static[0] << " +/- " << BfracErr_static[0] << endl;
   cout << endl << "psi(2S) yields:" << endl;
-  cout << "PROMPT psi(2S)    : Fit : " << NSigPR_static[1] << " +/- " << ErrPR_static[1] << endl;
-  cout << "NON-PROMPT psi(2S): Fit : " << NSigNP_static[1] << " +/- " << ErrNP_static[1] << endl;
-  cout << "B fraction psi(2S): Fit : " << Bfrac_static[1] << " +/- " << BfracErr_static[1] << endl;
+  cout << "TOTAL psi(2S)     : True : " << reddataTrP->sumEntries() << " Fit : " << NSig_static[1] << " +/- " << Err_static[1] << endl;
+  cout << "PROMPT psi(2S)    : True : " << reddataPRP->sumEntries() << " Fit : " << NSigPR_static[1] << " +/- " << ErrPR_static[1] << endl;
+  cout << "NON-PROMPT psi(2S): True : " << reddataNPP->sumEntries() << " Fit : " << NSigNP_static[1] << " +/- " << ErrNP_static[1] << endl;
+  cout << "B fraction psi(2S): True : " << reddataNPP->sumEntries()/reddataTrP->sumEntries() << " Fit : " << Bfrac_static[1] << " +/- " << BfracErr_static[1] << endl;
   cout << endl << "Resolution Jpsi   : Fit : " << resol*1000. << " +/- " << errresol*1000. << " mum" << endl;
   cout << "Resolution psi(2S): Fit : " << resolP*1000. << " +/- " << errresolP*1000. << " mum" << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/diffmeanNew/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/MCnewbins/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
-  outputFile << "PJ " << 0. << " " << NSigPR_static[0] << " " << ErrPR_static[0] << endl;
-  outputFile << "NJ " << 0. << " " << NSigNP_static[0] << " " << ErrNP_static[0] << endl;
-  outputFile << "BJ " << 0. << " " << Bfrac_static[0] << " " << BfracErr_static[0] << endl;
-  outputFile << "PP " << 0. << " " << NSigPR_static[1] << " " << ErrPR_static[1] << endl;
-  outputFile << "NP " << 0. << " " << NSigNP_static[1] << " " << ErrNP_static[1] << endl;
-  outputFile << "BP " << 0. << " " << Bfrac_static[1] << " " << BfracErr_static[1] << endl;
+  outputFile << "TJ " << reddataTr->sumEntries() << " " << NSig_static[0] << " " << Err_static[0] << endl;
+  outputFile << "NJ " << reddataNP->sumEntries()  << " " << NSigNP_static[0] << " " << ErrNP_static[0] << endl;
+  outputFile << "PJ " << reddataPR->sumEntries() << " " << NSigPR_static[0] << " " << ErrPR_static[0] << endl;
+  outputFile << "NJ " << reddataNP->sumEntries()  << " " << NSigNP_static[0] << " " << ErrNP_static[0] << endl;
+  outputFile << "BJ " << reddataNP->sumEntries()/reddataTr->sumEntries() << " " << Bfrac_static[0] << " " << BfracErr_static[0] << endl;
+  outputFile << "TP " << reddataTrP->sumEntries() << " " << NSig_static[1] << " " << Err_static[1] << endl;
+  outputFile << "PP " << reddataPRP->sumEntries() << " " << NSigPR_static[1] << " " << ErrPR_static[1] << endl;
+  outputFile << "NP " << reddataNPP->sumEntries() << " " << NSigNP_static[1] << " " << ErrNP_static[1] << endl;
+  outputFile << "BP " << reddataNPP->sumEntries()/reddataTrP->sumEntries() << " " << Bfrac_static[1] << " " << BfracErr_static[1] << endl;
   outputFile << endl;
 
   return 1;

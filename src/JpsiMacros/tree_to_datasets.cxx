@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
   const double JpsiPtMax=50;
   const double JpsiYMin=0;
   const double JpsiYMax=2.4;
-  const double JpsiCtMin = -1.0;
+  const double JpsiCtMin = -2.0;
   const double JpsiCtMax = 3.5;
   
   char fileName[100];
