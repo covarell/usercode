@@ -2,8 +2,9 @@
 
 # Launch many fits
 
-$fitcommand = "Fit2DSimMC -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -f datasets/MCFall10_QCD_DMu0.root -u -b -s";
+# $fitcommand = "Fit2DSimMC -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -f datasets/MCFall10_QCD_DMu0.root -u -b -s";
 # $fitcommand = "Fit2DSimRange -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
+$fitcommand = "FitMassSim -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
 
 $ptfile = $ARGV[0];
 $etafile = $ARGV[1];
@@ -25,7 +26,6 @@ foreach $line2 (@log2) {
 	chomp($line2);
         @splitline2 = split(/ +/, $line2);
 
-        # my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] .' -y ' . $splitline2[0] .' -f datasets/Data2010_rap' . $splitline2[1] . '.root';
 	my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] .' -y ' . $splitline2[0] .' -d datasets/Data2010_rap' . $splitline2[1] . '.root';
         # my $currentfit = $fitcommand . ' -p ' . $splitline[0] .' -e ' . $line2;
         print "${currentfit} \n";

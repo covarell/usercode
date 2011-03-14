@@ -12,16 +12,26 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
+void do2DResultPlots(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", string fileNameBase = "results") {
 
-  static const unsigned int nbinspt = 4;
+  double ybinlimits[4] = {0.0,1.2,1.6,2.4};
 
-  double ptbincenters[nbinspt+1] = {0.0,2.0,5.0,8.0,20.0};
-  double ybincenters[3] = {0.0,1.4,2.4};
+  static const unsigned int nbinspt1 = 6;
+  static const unsigned int nbinspt2 = 4;
+  static const unsigned int nbinspt3 = 6;
+
+  double pt1binlimits[nbinspt1+1] = {6.5,8.,9.,10.,12.,15.,30.};
+  double pt2binlimits[nbinspt2+1] = {5.5,6.5,8.,10.,30.};
+  double pt3binlimits[nbinspt3+1] = {4.5,5.5,6.5,8.,10.,12.,30.};
   
-  TH2F histRes("histRes","histRes",2,ybincenters,nbinspt,ptbincenters);
-  TH2F histErr("histErr","histErr",2,ybincenters,nbinspt,ptbincenters);
-  TH2F histPul("histPul","histPul",2,ybincenters,nbinspt,ptbincenters);
+  TH2F histBfracJpsi00_12("histBfracJpsi00_12","histBfracJpsi",3,ybinlimits,nbinspt1,pt1binlimits);
+  TH2F histBfracJpsi12_16("histBfracJpsi12_16","histBfracJpsi",3,ybinlimits,nbinspt2,pt2binlimits);
+  TH2F histBfracJpsi16_24("histBfracJpsi16_24","histBfracJpsi",3,ybinlimits,nbinspt3,pt3binlimits);
+  TH2F histBfracPsip00_12("histBfracPsip00_12","histBfracPsip",3,ybinlimits,nbinspt1,pt1binlimits);
+  TH2F histBfracPsip12_16("histBfracPsip12_16","histBfracPsip",3,ybinlimits,nbinspt2,pt2binlimits);
+  TH2F histBfracPsip16_24("histBfracPsip16_24","histBfracPsip",3,ybinlimits,nbinspt3,pt3binlimits);
+  // TH2F histErr("histErr","histErr",2,ybinlimits,nbinspt,ptbinlimits);
+  // TH2F histPul("histPul","histPul",2,ybinlimits,nbinspt,ptbinlimits);
 
   gROOT->ProcessLine(".! rm -f lista");
   char theCommand[200];
@@ -38,33 +48,63 @@ void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
   float chi2i = 0.;  
   float theMaximumPt = -1.;
   float theMinimumPt = 9000000.;
-
+  int theBin = 0;
   // Inizia
 
   while (lista >> fileName) {
 
-    cutstring = "results/" + fileNameBase + "_pT%f-%f_eta%f-%f.txt"; 
+    cutstring = "results/" + fileNameBase + "_pT%f-%f_y%f-%f.txt"; 
     if (strstr(fileName,fileNameBase.c_str()) && sscanf(fileName, cutstring.c_str(), &ptmin, &ptmax, &etamin, &etamax) != 0) {
 
       ifstream theFile(fileName);
 	
       while (theFile >> theType >> trueMC >> fitted >> error) {
 	
-	if (!strcmp(theType,whichType.c_str())) {
+	if (!strcmp(theType,whichTypeJpsi.c_str())) {
 	  
-	  float ptbincenter = (ptmax + ptmin)/2. ;
+	  float ptbincenter = (ptmax + ptmin + 0.01)/2. ;
 	  float ybincenter = (etamax + etamin)/2. ; 
           cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
-	  int theBin = histRes.FindBin(ybincenter,ptbincenter);
-	  if (fitted > 20.) {
-	    histRes.SetBinContent(theBin,fitted);
-	    histRes.SetBinError(theBin,error);
-	    histErr.SetBinContent(theBin,error);
-	    histPul.SetBinContent(theBin,(fitted-trueMC)/error);
-	    chi2i += pow((fitted-trueMC)/error,2);
-	    i++;
+	  if (fabs(ybincenter-0.6) < 0.01 ) {
+	    theBin = histBfracJpsi00_12.FindBin(ybincenter,ptbincenter);
+	    histBfracJpsi00_12.SetBinContent(theBin,fitted);
+	    histBfracJpsi00_12.SetBinError(theBin,error);
+	  } else if (fabs(ybincenter-1.4) < 0.01 ) {
+	    theBin = histBfracJpsi12_16.FindBin(ybincenter,ptbincenter);
+	    histBfracJpsi12_16.SetBinContent(theBin,fitted);
+	    histBfracJpsi12_16.SetBinError(theBin,error);  
+	  } else {
+	    theBin = histBfracJpsi16_24.FindBin(ybincenter,ptbincenter);
+	    histBfracJpsi16_24.SetBinContent(theBin,fitted);
+	    histBfracJpsi16_24.SetBinError(theBin,error); 
+	    // histErr.SetBinContent(theBin,error);
+	    // histPul.SetBinContent(theBin,(fitted-trueMC)/error);
+	    // chi2i += pow((fitted-trueMC)/error,2);
 	  }
+	  i++;
 	  
+	} else if (!strcmp(theType,whichTypePsip.c_str())) {
+	  
+	  float ptbincenter = (ptmax + ptmin + 0.01)/2. ;
+	  float ybincenter = (etamax + etamin)/2. ; 
+          cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
+	  if (fabs(ybincenter-0.6) < 0.01 ) {
+	    theBin = histBfracPsip00_12.FindBin(ybincenter,ptbincenter);
+	    histBfracPsip00_12.SetBinContent(theBin,fitted);
+	    histBfracPsip00_12.SetBinError(theBin,error);
+	  } else if (fabs(ybincenter-1.4) < 0.01 ) {
+	    theBin = histBfracPsip12_16.FindBin(ybincenter,ptbincenter);
+	    histBfracPsip12_16.SetBinContent(theBin,fitted);
+	    histBfracPsip12_16.SetBinError(theBin,error);  
+	  } else {
+	    theBin = histBfracPsip16_24.FindBin(ybincenter,ptbincenter);
+	    histBfracPsip16_24.SetBinContent(theBin,fitted);
+	    histBfracPsip16_24.SetBinError(theBin,error); 
+	    // histErr.SetBinContent(theBin,error);
+	    // histPul.SetBinContent(theBin,(fitted-trueMC)/error);
+	    // chi2i += pow((fitted-trueMC)/error,2);
+	  }
+	  i++;
 	}
       }  
 
@@ -74,11 +114,14 @@ void do2DResultPlots(string whichType = "GG", string fileNameBase = "results") {
 
   lista.close();
 
-  cutstring = "pictures/" + fileNameBase + whichType + "_results.root"; 
+  cutstring = "pictures/" + fileNameBase + whichTypeJpsi + whichTypePsip + "_results.root"; 
   TFile f55(cutstring.c_str(),"RECREATE");  
-  histRes.Write();
-  histErr.Write();
-  histPul.Write();
+  histBfracJpsi00_12.Write();
+  histBfracJpsi12_16.Write();
+  histBfracJpsi16_24.Write();
+  histBfracPsip00_12.Write();
+  histBfracPsip12_16.Write();
+  histBfracPsip16_24.Write();
   f55.Close();   
   cout << "chi2 = " << chi2i/6. << endl;
 

@@ -13,9 +13,13 @@
 
 void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fileNameBase = "results", float minMax = 500., float minMaxPull = 10.) {
 
-  static const unsigned int nbinspt1 = 5;
-  static const unsigned int nbinspt2 = 4;
-  static const unsigned int nbinspt3 = 8;
+  static const unsigned int nbinspt1 = 6;  //6
+  static const unsigned int nbinspt2 = 3;  //4
+  static const unsigned int nbinspt3 = 6;  //8
+
+  const float ptmin1 = 6.4;
+  const float ptmin2 = 5.4;
+  const float ptmin3 = 4.4;
 
   double ptbincenters1[nbinspt1] = {nbinspt1*20.};
   double ptbinerrors1[nbinspt1] = {nbinspt1*0.};
@@ -77,12 +81,15 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
     cutstring = "results/" + fileNameBase + "_pT%f-%f_y%f-%f.txt"; 
     if (strstr(fileName,fileNameBase.c_str()) && sscanf(fileName, cutstring.c_str(), &ptmin, &ptmax, &etamin, &etamax) != 0) {
 
+      cout << "BIN " << ptmin << "-" << ptmax << " " << etamin << "-" << etamax << endl;
+
       ifstream theFile(fileName);
       if (fabs(etamin) < 0.001) {
 	
 	while (theFile >> theType >> trueMC >> fitted >> error) {
-	
-	  if (!strcmp(theType,whichJpsi.c_str())) {
+
+	  if (error < 0.000001) error = 0.000001;
+	  if (ptmin > ptmin1 && !strcmp(theType,whichJpsi.c_str())) {
 
             if (ptmax > theMaximumPt1) theMaximumPt1 = ptmax;
             if (ptmin < theMinimumPt1) theMinimumPt1 = ptmin;
@@ -95,7 +102,7 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
             chi2i += pow(ycenters1[i]/yerrors1[i],2);
 	    pullJpsi->Fill(pcenters1[i]);
 	    
-	  } else if (!strcmp(theType,whichPsip.c_str())) {
+	  } else if (ptmin > ptmin1 && !strcmp(theType,whichPsip.c_str())) {
 
 	    ypcenters1[i] = fitted - trueMC;
 	    yperrors1[i] = error;
@@ -110,7 +117,8 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
 	
 	while (theFile >> theType >> trueMC >> fitted >> error) {
 	
-	  if (!strcmp(theType,whichJpsi.c_str())) {
+	  if (error < 0.000001) error = 0.000001;
+	  if (ptmin > ptmin2 && !strcmp(theType,whichJpsi.c_str())) {
 
             if (ptmax > theMaximumPt2) theMaximumPt2 = ptmax;
             if (ptmin < theMinimumPt2) theMinimumPt2 = ptmin;
@@ -121,15 +129,15 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
             pcenters2[j] = ycenters2[j]/yerrors2[j];
             perrors2[j] = 1.0;
             chi2j += pow(ycenters2[j]/yerrors2[j],2);
-	    if (ptmin > 4.8) pullJpsi->Fill(pcenters2[j]);
+	    pullJpsi->Fill(pcenters2[j]);
 	    
-	  } else if (!strcmp(theType,whichPsip.c_str())) {
+	  } else if (ptmin > ptmin2 && !strcmp(theType,whichPsip.c_str())) {
 
 	    ypcenters2[j] = fitted - trueMC;
 	    yperrors2[j] = error;
             ppcenters2[j] = ypcenters2[j]/yperrors2[j];
             chi2j += pow(ypcenters2[j]/yperrors2[j],2);
-	    if (ptmin > 4.8) pullPsip->Fill(ppcenters2[j]);
+	    pullPsip->Fill(ppcenters2[j]);
 	    j++;
 	    
 	  }
@@ -138,7 +146,8 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
 	
 	while (theFile >> theType >> trueMC >> fitted >> error) {
 	
-	  if (!strcmp(theType,whichJpsi.c_str())) {
+	  if (error < 0.000001) error = 0.000001;
+	  if (ptmin > ptmin3 && !strcmp(theType,whichJpsi.c_str())) {
 
             if (ptmax > theMaximumPt3) theMaximumPt3 = ptmax;
             if (ptmin < theMinimumPt3) theMinimumPt3 = ptmin;
@@ -151,7 +160,7 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
             chi2k += pow(ycenters3[k]/yerrors3[k],2);
 	    pullJpsi->Fill(pcenters3[k]);
 	    
-	  } else if (!strcmp(theType,whichPsip.c_str())) {
+	  } else if (ptmin > ptmin3 && !strcmp(theType,whichPsip.c_str())) {
 
 	    ypcenters3[k] = fitted - trueMC;
 	    yperrors3[k] = error;
@@ -334,10 +343,10 @@ void doDeviationPlot(string whichJpsi = "BJ", string whichPsip = "BP", string fi
   // Istogramma pull
   TCanvas c5("c5","c5",10,10,600,400);
   c5.cd();
-  pullJpsi->Fit("gaus","","e1");
   pullPsip->SetLineColor(kRed);
   pullPsip->SetMarkerColor(kRed);
-  pullPsip->Fit("gaus","","e1same");
+  pullPsip->Fit("gaus","","e1");
+  pullJpsi->Fit("gaus","","e1same");
 
   cutstring = "pictures/" + fileNameBase + "_" + whichJpsi + "pullHist.gif";
   c5.SaveAs(cutstring.c_str());

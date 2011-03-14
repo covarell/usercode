@@ -88,7 +88,7 @@ FitMassSmall:  $(INCLUDEDIR)fitMassSmall.cxx
 FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassRange $(GLIBS) $ $<
 
-FitMassSim:  $(INCLUDEDIR)fitMass_simul.cxx
+FitMassSim:  $(INCLUDEDIR)fitMassSimul_ranges.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSim $(GLIBS) $ $<
 
 Fit2D:    $(INCLUDEDIR)fit2D.cxx   
