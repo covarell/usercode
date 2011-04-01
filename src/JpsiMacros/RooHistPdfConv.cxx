@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: RooFit                                                           *
  * Package: RooFitModels                                                     *
- * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.8 2010/09/22 13:22:32 covarell Exp $
+ * @(#)root/roofit:$Id: RooHistPdfConv.cxx,v 1.9 2011/01/07 14:36:29 covarell Exp $
  * Authors:                                                                  *
  *   WV, Wouter Verkerke, UC Santa Barbara, verkerke@slac.stanford.edu       *
  *   DK, David Kirkby,    UC Irvine,         dkirkby@uci.edu                 *
@@ -36,7 +36,7 @@
 //ClassImp(RooHistPdfConv);
 
 static const Double_t root2(sqrt(2.));
-static const Double_t pi2(sqrt(acos(-1.)));
+static const Double_t rootpi(sqrt(acos(-1.)));
 static unsigned int nbins;
 static std::vector<Double_t> halfBinWidths;
 static std::vector<Double_t> weights;
@@ -172,7 +172,6 @@ Int_t RooHistPdfConv::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analV
   return 0 ;
 }
 
-
 //_____________________________________________________________________________
 Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) const 
 {
@@ -197,14 +196,47 @@ Double_t RooHistPdfConv::cerfInt(Double_t xi) const
   const Double_t xmax = xIn.max();
 
   const Double_t a = -1./(root2*sigma*ssf);
-  const Double_t b = (xi + mean*ssf)/(root2*sigma*ssf);
+  const Double_t b = (xi + mean*msf)/(root2*sigma*ssf);
 
-  const Double_t maxInt = -b/a*TMath::Erf(b+a*xmax) + xmax*TMath::Erfc(b+a*xmax) - exp(-b*b-2*a*b*xmax-a*a*xmax*xmax)/(pi2*a);
-  const Double_t minInt = -b/a*TMath::Erf(b+a*xmin) + xmin*TMath::Erfc(b+a*xmin) - exp(-b*b-2*a*b*xmin-a*a*xmin*xmin)/(pi2*a);
+  const Double_t maxInt = -b/a*TMath::Erf(b+a*xmax) + xmax*TMath::Erfc(b+a*xmax) - exp(-b*b-2*a*b*xmax-a*a*xmax*xmax)/(rootpi*a);
+  const Double_t minInt = -b/a*TMath::Erf(b+a*xmin) + xmin*TMath::Erfc(b+a*xmin) - exp(-b*b-2*a*b*xmin-a*a*xmin*xmin)/(rootpi*a);
 
   return maxInt - minInt;
 }
 
+//_____________________________________________________________________________
+/* Double_t RooHistPdfConv::analyticalIntegral(Int_t code, const char* rangeName) const 
+{
+
+  Double_t result(0.);
+
+  const Double_t xmin = xIn.min();
+  const Double_t xmax = xIn.max();
+  const Double_t a = 1./(root2*sigma*ssf);
+
+  for (unsigned int i=0; i<nbins; i++) {
+    
+    Double_t halfBinSize = halfBinWidths[i];
+    Double_t center = centers[i];
+    Double_t weight = weights[i];
+
+    Double_t tmax1 = a*(center - halfBinSize - xmin + (mean*msf));
+    Double_t tmin1 = a*(center - halfBinSize - xmax + (mean*msf));
+    Double_t tmax2 = a*(center + halfBinSize - xmin + (mean*msf));
+    Double_t tmin2 = a*(center + halfBinSize - xmax + (mean*msf));
+
+    result += 0.5*weight*a*(cerfInt(tmax1) - cerfInt(tmin1) + cerfInt(tmax2) - cerfInt(tmin2));
+  }
+  
+  return fabs(result);
+}
+
+
+Double_t RooHistPdfConv::cerfInt(Double_t xi) const
+{
+  return xi*TMath::Erfc(xi) - (1./rootpi)*exp(-xi*xi);
+}
+*/
 
 //_____________________________________________________________________________
 /* Int_t RooHistPdfConv::getGenerator(const RooArgSet& directVars, RooArgSet &generateVars, Bool_t staticInitOK) const

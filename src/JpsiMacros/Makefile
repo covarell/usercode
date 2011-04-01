@@ -106,6 +106,9 @@ Fit2DDataPsiP:    $(INCLUDEDIR)fit2DData_psip.cxx
 Fit2DSimMC:    $(INCLUDEDIR)fit2DSimul_MC.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DSimMC $(OUTLIB)/*.o $(GLIBS) $ $<
 
+Fit2DSimPEE:    $(INCLUDEDIR)fit2DSimul_PEE.cxx   
+	$(CXX) $(CXXFLAGS) -o Fit2DSimPEE $(OUTLIB)/*.o $(GLIBS) $ $<
+
 Fit2DSimRange:    $(INCLUDEDIR)fit2DSimul_ranges.cxx   
 	$(CXX) $(CXXFLAGS) -o Fit2DSimRange $(OUTLIB)/*.o $(GLIBS) $ $<
 

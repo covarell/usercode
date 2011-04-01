@@ -26,6 +26,9 @@
 using namespace RooFit;
 using namespace std;
 
+bool Cowboy(int mu1_charge, TLorentzVector* mu1, TLorentzVector *mu2){
+  return (mu1_charge * mu1->DeltaPhi(*mu2) >0.);
+} 
 
 bool isAccept(const TLorentzVector* aMuon) {
    // *USE* muon kinematical cuts (eta dependent momentum / pT cuts )
@@ -143,7 +146,7 @@ int main(int argc, char* argv[]) {
   Jpsi_Type = new RooCategory("Jpsi_Type","Category of Jpsi");
   Jpsi_PsiP = new RooCategory("Jpsi_PsiP","Jpsi or psiPrime");
   Jpsi_Ct = new RooRealVar("Jpsi_Ct","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
-  Jpsi_CtErr = new RooRealVar("Jpsi_CtErr","J/psi ctau error",-1.,1.,"mm");
+  Jpsi_CtErr = new RooRealVar("Jpsi_CtErr","J/psi ctau error",0.,4.,"mm");
 
   Jpsi_Type->defineType("GG",0);
   Jpsi_Type->defineType("GT",1);
@@ -200,6 +203,9 @@ int main(int argc, char* argv[]) {
     bool ok1=isAccept(m1P);
     bool ok2=isAccept(m2P);
     
+    // COWBOY CUT!
+    if (Cowboy(1,m1P,m2P) && (fabs(m1P->Eta()) > 1.6) && (fabs(m2P->Eta()) > 1.6) && m1P->DeltaR(*m2P) < 1.5)  continue; 
+
     //cout << "Accepted1 " << ok1 << "  Accepted2 " << ok2 << endl;
     if (theMass > JpsiMassMin && theMass < JpsiMassMax && 
 	theCt > JpsiCtMin && theCt < JpsiCtMax && 
