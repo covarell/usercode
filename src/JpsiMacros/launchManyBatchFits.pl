@@ -4,12 +4,13 @@
 
 # $fitcommand = "./Fit2DSimMC -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -f datasets/MCFall10_QCD_DMu0.root -u -b -s";
 # $fitcommand = "./Fit2DSimRange -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
-$fitcommand = "./Fit2DSimPEE -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
+# $fitcommand = "./Fit2DSimPEE -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
+$fitcommand = "./Fit2DJpsiPEE -m datasets/MCFall10_jpsi_DMu0.root -u -b -s";
 # $fitcommand = "./FitMassSim -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
 
 $ptfile = $ARGV[0];
 $etafile = $ARGV[1];
-$thequeue = "1nh";
+$thequeue = "8nh";
 
 open(INFILE,${ptfile}) or die "cannot open ${ptfile}";;
 @log=<INFILE>;
