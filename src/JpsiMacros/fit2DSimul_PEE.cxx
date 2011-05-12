@@ -38,12 +38,23 @@ using namespace RooFit;
 bool superImpose = false;
 bool analyticBlifetime = true;
 
-void getMCTrueLifetime(RooWorkspace *ws, RooDataHist *reducedNP, float *bgmcVal, float *bctauVal) {
+void getMCTrueLifetime(RooWorkspace *ws, RooDataSet *reducedNP, float *bgmcVal, float *bctauVal) {
 
   ws->pdf("bMCTrue")->fitTo(*reducedNP,Minos(0),SumW2Error(kTRUE),NumCPU(2));
 
   *bgmcVal = ws->var("Gmc")->getVal();
   *bctauVal = ws->var("bTau")->getVal();
+
+  // *** test True Lifetime fit
+  RooPlot *trueframef = ws->var("Jpsi_CtTrue")->frame();
+  reducedNP->plotOn(trueframef);
+  ws->pdf("bMCTrue")->plotOn(trueframef,LineColor(kBlue),Normalization(reducedNP->sumEntries(),RooAbsReal::NumEvent));
+
+  TCanvas c0f;
+  c0f.cd(); trueframef->Draw();
+  c0f.SaveAs("pictures/testTrueLifeFit_Lin.gif");
+  // *** end test True Lifetimes
+
   return ;
 }
 
@@ -146,7 +157,7 @@ void defineCTBackground(RooWorkspace *ws)
 }
 
 void defineCTSignal(RooWorkspace *ws, 
-		    RooDataHist *reducedNP, RooDataHist *reducedNPP)
+		    RooDataSet *reddataNP, RooDataSet *reddataNPP)
 {
 
   if (analyticBlifetime) {
@@ -156,7 +167,7 @@ void defineCTSignal(RooWorkspace *ws,
     ws->factory("GaussModel::bresGTrue(Jpsi_CtTrue,mean[0.0],Gmc[0.002,0.00001,0.02])");
     ws->factory("Decay::bMCTrue(Jpsi_CtTrue,bTau[0.04,0.01,1.0],bresGTrue,RooDecay::SingleSided)");
 
-    getMCTrueLifetime(ws, reducedNP, &GmcVal, &bTauVal);
+    getMCTrueLifetime(ws, reddataNP, &GmcVal, &bTauVal);
     RooRealVar gmc("gmc","Sigma of MC Gaussian",GmcVal);
     RooRealVar btauFix("btauFix","Slope of MC exponential",bTauVal);   ws->import(btauFix);
     RooFormulaVar bResSigN("bResSigN", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigN")), *(ws->var("Jpsi_CtErr")),gmc));  ws->import(bResSigN);
@@ -169,7 +180,7 @@ void defineCTSignal(RooWorkspace *ws,
     // float tau_B
     ws->factory("Decay::sigNP(Jpsi_Ct,bTau,bresG,RooDecay::SingleSided)");
 
-    getMCTrueLifetime(ws, reducedNPP, &GmcVal, &bTauVal);
+    getMCTrueLifetime(ws, reddataNPP, &GmcVal, &bTauVal);
     RooRealVar gmcP("gmcP","Sigma of MC Gaussian",GmcVal);
     RooRealVar btauFixP("btauFixP","Slope of MC exponential",bTauVal);  ws->import(btauFixP);
     RooFormulaVar bResSigNP("bResSigNP", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigN")), *(ws->var("Jpsi_CtErr")),gmcP));  ws->import(bResSigNP);
@@ -184,6 +195,9 @@ void defineCTSignal(RooWorkspace *ws,
     
   } else {
 
+    RooDataHist* reducedNP = new RooDataHist("reducedNP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNP);
+    RooDataHist* reducedNPP = new RooDataHist("reducedNPP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNPP);
+    
     RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPW);
     RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPN);
     RooAddPdf sigNP("sigNP","Non-prompt signal",RooArgSet(*(ws->pdf("sigNPW")),*(ws->pdf("sigNPN"))),RooArgSet(*(ws->var("fracRes"))));  ws->import(sigNP); 
@@ -213,7 +227,7 @@ void setRanges(RooWorkspace *ws, float lmin, float lmax, float errmin, float err
 
   ws->var("Jpsi_Ct")->setRange("promptfit",minRangeForPF,4*errmax);
   // ws->var("Jpsi_Ct")->setRange("psipfit",-lmin-0.3,lmax-0.3);
-  ws->var("Jpsi_CtTrue")->setRange(0.0,4.0);
+  ws->var("Jpsi_CtTrue")->setRange(-0.1,4.0);
   ws->var("Jpsi_CtErr")->setRange(errmin,errmax);
   ws->var("Jpsi_Ct")->setRange(-lmin,lmax);
 
@@ -459,13 +473,17 @@ int main(int argc, char* argv[]) {
   ws->var("Jpsi_CtErr")->setBins(25);
 
   // define binning for true lifetime
-  RooBinning rb(0.0001,4.0);
-  // rb.addBoundary(-0.01);
-  rb.addUniform(100,0.0001,0.5);
+  RooBinning rb(-0.1,4.0);
+  rb.addUniform(5,-0.1,0.0);
+  rb.addUniform(100,0.0,0.5);
   rb.addUniform(15,0.5,1.0);
   rb.addUniform(20,1.0,2.5);
   rb.addUniform(5,2.5,4.0);
-  ws->var("Jpsi_CtTrue")->setBinning(rb);
+  if (analyticBlifetime) {
+    ws->var("Jpsi_CtTrue")->setBins(200);
+  } else {
+    ws->var("Jpsi_CtTrue")->setBinning(rb);
+  }
 
   // define binning for lifetime
   RooBinning rb2 = setMyBinning(lmin,lmax);
@@ -476,13 +494,13 @@ int main(int argc, char* argv[]) {
   // DATASETS
   string aLongString;
   if(isGG == 0) {
-    aLongString = "Jpsi_Type == Jpsi_Type::GG && (MCType != MCType::NP || Jpsi_CtTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
+    aLongString = "Jpsi_Type == Jpsi_Type::GG && (MCType != MCType::NP || abs(Jpsi_CtTrue) > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Type == Jpsi_Type::GG");
   } else if (isGG == 1) {
-    aLongString = "(Jpsi_Type == Jpsi_Type::GT || Jpsi_Type == Jpsi_Type::GG) && (MCType != MCType::NP || Jpsi_CtTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
+    aLongString = "(Jpsi_Type == Jpsi_Type::GT || Jpsi_Type == Jpsi_Type::GG) && (MCType != MCType::NP || abs(Jpsi_CtTrue) > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Type == Jpsi_Type::GT || Jpsi_Type == Jpsi_Type::GG");
   } else {
-    aLongString = "(MCType != MCType::NP || Jpsi_CtTrue > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
+    aLongString = "(MCType != MCType::NP || abs(Jpsi_CtTrue) > 0.0001) && (MCType == MCType::PR || MCType == MCType::NP)";
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Ct < 600000.");  // i.e. all
   }
 
@@ -503,10 +521,10 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddataTr = (RooDataSet*) reddataMC->reduce(aLongString.c_str());
 
   RooDataSet *reddataPR = (RooDataSet*) reddataTr->reduce("MCType == MCType::PR");
-  RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce("MCType == MCType::NP");
+  RooDataSet *reddataNP = (RooDataSet*) reddataTr->reduce(RooArgSet(*(ws->var("Jpsi_CtTrue"))),"MCType == MCType::NP");
   RooDataSet *reddataTrP = (RooDataSet*) reddataMC2->reduce(aLongString.c_str());
   RooDataSet *reddataPRP = (RooDataSet*) reddataTrP->reduce("MCType == MCType::PR");
-  RooDataSet *reddataNPP = (RooDataSet*) reddataTrP->reduce("MCType == MCType::NP");
+  RooDataSet *reddataNPP = (RooDataSet*) reddataTrP->reduce(RooArgSet(*(ws->var("Jpsi_CtTrue"))),"MCType == MCType::NP");
 
   RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
 
@@ -520,8 +538,8 @@ int main(int argc, char* argv[]) {
   
   // RooDataHist* bindataNP = new RooDataHist("bindataNP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddataNP);
 
-  RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNP); 
-  RooDataHist* redMCNPP = new RooDataHist("redMCNPP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNPP); 
+  // RooDataHist* redMCNP = new RooDataHist("redMCNP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNP); 
+  // RooDataHist* redMCNPP = new RooDataHist("redMCNPP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNPP); 
 
   // RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr")),*(ws->cat("Jpsi_PsiP"))),*reddataSB);
   
@@ -561,7 +579,7 @@ int main(int argc, char* argv[]) {
   defineCTBackground(ws);
 
   //signal
-  defineCTSignal(ws,redMCNP,redMCNPP);
+  defineCTSignal(ws,reddataNP,reddataNPP);
 
   //putting all together
   RooProdPdf bkgctauTOT_PEE("bkgctauTOT_PEE","PDF with PEE", 

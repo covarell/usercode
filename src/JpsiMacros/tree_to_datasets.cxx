@@ -31,11 +31,16 @@ bool Cowboy(int mu1_charge, TLorentzVector* mu1, TLorentzVector *mu2){
 } 
 
 bool isAccept(const TLorentzVector* aMuon) {
-   // *USE* muon kinematical cuts (eta dependent momentum / pT cuts )
+   // use *OLD* muon kinematical cuts (eta dependent momentum / pT cuts )
+   // return (fabs(aMuon->Eta()) < 2.4 &&
+   //        ((fabs(aMuon->Eta()) < 1.3 && aMuon->Pt() > 3.3) ||
+   //        (fabs(aMuon->Eta()) > 1.3 && fabs(aMuon->Eta()) < 2.2 && aMuon->P() > 2.9) ||
+   //        (fabs(aMuon->Eta()) > 2.2 && aMuon->Pt() > 0.8)));
+
+   // use *NEW* muon kinematical cuts (eta dependent momentum / pT cuts )
    return (fabs(aMuon->Eta()) < 2.4 &&
-           ((fabs(aMuon->Eta()) < 1.3 && aMuon->Pt() > 3.3) ||
-           (fabs(aMuon->Eta()) > 1.3 && fabs(aMuon->Eta()) < 2.2 && aMuon->P() > 2.9) ||
-           (fabs(aMuon->Eta()) > 2.2 && aMuon->Pt() > 0.8)));
+           ((fabs(aMuon->Eta()) < 1.2 && aMuon->Pt() > 4.0) ||
+	    (fabs(aMuon->Eta()) > 1.2 && aMuon->Pt() > 3.3)));
 
    // *REMOVE* muon kinematical cuts (eta dependent momentum / pT cuts )
    // by just returning TRUE
@@ -93,24 +98,26 @@ double CorrectMass(const TLorentzVector* mu1,const TLorentzVector* mu2, int mode
 
 int main(int argc, char* argv[]) {
   
-  const double JpsiMassMin=2.6;
-  const double JpsiMassMax=4.2;
-  const double JpsiPtMin=0;
-  const double JpsiPtMax=50;
-  const double JpsiYMin=0;
-  const double JpsiYMax=2.4;
+  double JpsiMassMin = 2.6;
+  double JpsiMassMax = 4.2;
+  const double JpsiPtMin = 0;
+  const double JpsiPtMax = 100;
+  const double JpsiYMin =0;
+  const double JpsiYMax = 2.4;
   const double JpsiCtMin = -2.0;
   const double JpsiCtMax = 3.5;
   
   char fileName[100];
   int doMerge = 0;
+  int doWideRange = 0;
   
-  if ( argc < 3 ){
+  if ( argc < 4 ){
     cout << "missing arguments: insert inputFile and mergePsiPrime" << endl; 
     return 1;
   }
   strcpy(fileName,argv[1]);
   doMerge = atoi(argv[2]);
+  doWideRange = atoi(argv[3]);
 
   TFile *file= TFile::Open(fileName);
   TTree * Tree=(TTree*)file->Get("data");
@@ -135,7 +142,13 @@ int main(int argc, char* argv[]) {
   RooCategory* Jpsi_Type;
   RooCategory* Jpsi_PsiP;
 
-  Jpsi_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",JpsiMassMin,3.5,"GeV/c^{2}");
+  if (doWideRange) {
+    JpsiMassMin -= 0.1;
+    JpsiMassMax += 0.5;
+    Jpsi_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
+  } else {
+    Jpsi_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",JpsiMassMin,3.5,"GeV/c^{2}");
+  }
   if (doMerge) {
     Psip_Mass = new RooRealVar("PsiP_Mass","psi' mass",3.3,JpsiMassMax,"GeV/c^{2}");
   } else {
@@ -203,8 +216,10 @@ int main(int argc, char* argv[]) {
     bool ok1=isAccept(m1P);
     bool ok2=isAccept(m2P);
     
-    // COWBOY CUT!
-    if (Cowboy(1,m1P,m2P) && (fabs(m1P->Eta()) > 1.6) && (fabs(m2P->Eta()) > 1.6) && m1P->DeltaR(*m2P) < 1.5)  continue; 
+    // COWBOY CUTS!
+    if (Cowboy(1,m1P,m2P) && fabs(JP->Rapidity()) > 1.6) continue;
+    // if (Cowboy(1,m1P,m2P)) continue;
+    // if (!Cowboy(1,m1P,m2P)) continue;
 
     //cout << "Accepted1 " << ok1 << "  Accepted2 " << ok2 << endl;
     if (theMass > JpsiMassMin && theMass < JpsiMassMax && 
@@ -213,7 +228,7 @@ int main(int argc, char* argv[]) {
 	fabs(theRapidity) > JpsiYMin && fabs(theRapidity) < JpsiYMax &&
 	ok2 && ok1 &&
 	(trig == 1 || trig2 == 1) &&
-	vprob >0.001 &&
+	vprob >0.01 &&
 	Jq == 0){
       
       //cout << Jq << endl;
@@ -233,13 +248,17 @@ int main(int argc, char* argv[]) {
       for (unsigned int i = 0; i < rapRegions; i++) {
 	if (fabs(theRapidity) < rapLimits[i+1] && fabs(theRapidity) > rapLimits[i]) {
 	  if (doMerge) {
-	    if (theMass <= 3.3) {
-	      Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
-	    } else if (theMass > 3.3 && theMass < 3.5) {
-	      Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
-	      Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	    if (doWideRange) {
+	      dataJpsi[i]->add(varlist_tmp);
 	    } else {
-	      Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	      if (theMass <= 3.3) {
+		Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	      } else if (theMass > 3.3 && theMass < 3.5) {
+		Jpsi_PsiP->setIndex(0,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+		Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	      } else {
+		Jpsi_PsiP->setIndex(1,kTRUE); dataJpsi[i]->add(varlist3_tmp);
+	      }
 	    }
 	  } else {
 	    if (theMass < 3.5) dataJpsi[i]->add(varlist_tmp);
@@ -253,7 +272,13 @@ int main(int argc, char* argv[]) {
   TFile* Out[rapRegions];
   char namefile[200];
   for (unsigned int i = 0; i < rapRegions; i++) {
-    sprintf(namefile,"datasets/Data2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+    if (doMerge && !doWideRange) {
+      sprintf(namefile,"datasets/DataMerged2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+    } else if (doMerge && doWideRange) {
+      sprintf(namefile,"datasets/DataMergedWide2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10)); 
+    } else {
+      sprintf(namefile,"datasets/Data2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+    }
     Out[i] = new TFile(namefile,"RECREATE");
     Out[i]->cd();
     dataJpsi[i]->Write();

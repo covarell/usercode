@@ -70,6 +70,9 @@ RooHistPdfConv.o: $(INCLUDEDIR)/RooHistPdfConv.cxx
 TreeToDat:  $(INCLUDEDIR)tree_to_datasets.cxx  
 	$(CXX) $(CXXFLAGS) -o TreeToDat $(GLIBS) $ $<
 
+FitEff:  $(INCLUDEDIR)fitEffNonMuon.cxx  
+	$(CXX) $(CXXFLAGS) -o FitEff $(GLIBS) $ $<
+
 FitMass:  $(INCLUDEDIR)fitMass.cxx
 	$(CXX) $(CXXFLAGS) -o FitMass $(GLIBS) $ $<
 
