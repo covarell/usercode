@@ -38,7 +38,7 @@ foreach $line2 (@log2) {
 #BSUB -C 0
 cd /afs/cern.ch/user/c/covarell/scratch0/quarkonia/CMSSW_3_8_6/roofit/UserCode/Covarell/src/JpsiMacros
 export SCRAM_ARCH=slc5_ia32_gcc434
-cmsenv
+eval `scramv1 runtime -sh`
 ${currentfit}
 ";
 

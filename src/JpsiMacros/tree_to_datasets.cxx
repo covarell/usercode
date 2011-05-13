@@ -98,7 +98,7 @@ double CorrectMass(const TLorentzVector* mu1,const TLorentzVector* mu2, int mode
 
 int main(int argc, char* argv[]) {
   
-  double JpsiMassMin = 2.6;
+  double JpsiMassMin = 2.5;
   double JpsiMassMax = 4.2;
   const double JpsiPtMin = 0;
   const double JpsiPtMax = 100;
@@ -143,7 +143,6 @@ int main(int argc, char* argv[]) {
   RooCategory* Jpsi_PsiP;
 
   if (doWideRange) {
-    JpsiMassMin -= 0.1;
     JpsiMassMax += 0.5;
     Jpsi_Mass = new RooRealVar("Jpsi_Mass","J/psi mass",JpsiMassMin,JpsiMassMax,"GeV/c^{2}");
   } else {

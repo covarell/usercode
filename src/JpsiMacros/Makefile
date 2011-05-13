@@ -88,8 +88,8 @@ FitMassData2S:  $(INCLUDEDIR)fitMassDataPsi2S.cxx
 FitMassSmall:  $(INCLUDEDIR)fitMassSmall.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSmall $(GLIBS) $ $< 
 
-FitMassRange:  $(INCLUDEDIR)fitMass_ranges.cxx
-	$(CXX) $(CXXFLAGS) -o FitMassRange $(GLIBS) $ $<
+FitMassJpsi:  $(INCLUDEDIR)fitMassJpsi_ranges.cxx
+	$(CXX) $(CXXFLAGS) -o FitMassJpsi $(GLIBS) $ $<
 
 FitMassSim:  $(INCLUDEDIR)fitMassSimul_ranges.cxx
 	$(CXX) $(CXXFLAGS) -o FitMassSim $(GLIBS) $ $<

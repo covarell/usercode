@@ -182,8 +182,8 @@ void getrange(string &varRange, float *varmin, float *varmax)
 
 void setRanges(RooWorkspace *ws, float lmin, float lmax){
 
-  const float JpsiMassMin = 2.6;
-  const float JpsiMassMax = 4.7;
+  const float JpsiMassMin = 2.5;
+  const float JpsiMassMax = 3.5;
 
   // ws->var("Jpsi_CtTrue")->setRange(0.0,4.0);
   // ws->var("Jpsi_Ct")->setRange(-lmin,lmax);
@@ -386,7 +386,7 @@ int main(int argc, char* argv[]) {
   ws->var("Jpsi_Ct")->SetTitle("#font[12]{l}_{J/#psi}");
   
    // define binning for masses
-  ws->var("Jpsi_Mass")->setBins(110);
+  ws->var("Jpsi_Mass")->setBins(60);
   // ws->var("PsiP_Mass")->setBins(60);
   // ws->var("Jpsi_Ct")->setBins(45);
 
@@ -430,7 +430,7 @@ int main(int argc, char* argv[]) {
   // Get subdatasets. Some of them are useful. Some, however, not  
 
   // RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
-  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("Jpsi_Mass < 2.9 || (Jpsi_Mass > 3.3 && Jpsi_Mass < 3.45) || Jpsi_Mass > 3.85");
+  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3");
 
   // RooDataSet *reddataSBJ = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   // RooDataSet *reddataSBP = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
@@ -489,12 +489,12 @@ int main(int argc, char* argv[]) {
   // RooSimultaneous massSim("massSim","mass simultaneous PDF",RooArgList(*(ws->pdf("massPDF")),*(ws->pdf("massPDFP"))),*(ws->cat("Jpsi_PsiP")));
   // ws->import(massSim);
   // ws->pdf("massSim")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2));
-  ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkg[2000.,10.,10000000.]*totMassBkgExp)");
+  ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
   RooFitResult* rfrmass = ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
   nFitPar = rfrmass->floatParsFinal().getSize() - 1;
   
   Double_t a = ws->var("NSig")->getVal();
-  Double_t b = ws->var("NSigP")->getVal();
+  Double_t b = 0;
   const Double_t NSig_static[2] = {a,b}; 
    
   a = ws->var("NSig")->getError();  
@@ -760,7 +760,7 @@ int main(int argc, char* argv[]) {
   // outputFile << "PJ " << 0. << " " << NSigPR_static[0] << " " << ErrPR_static[0] << endl;
   // outputFile << "NJ " << 0. << " " << NSigNP_static[0] << " " << ErrNP_static[0] << endl;
   // outputFile << "BJ " << 0. << " " << Bfrac_static[0] << " " << BfracErr_static[0] << endl;
-  outputFile << "TP " << 0. << " " << NSig_static[1] << " " << Err_static[1] << endl;
+  // outputFile << "TP " << 0. << " " << NSig_static[1] << " " << Err_static[1] << endl;
   // outputFile << "PP " << 0. << " " << NSigPR_static[1] << " " << ErrPR_static[1] << endl;
   // outputFile << "NP " << 0. << " " << NSigNP_static[1] << " " << ErrNP_static[1] << endl;
   // outputFile << "BP " << 0. << " " << Bfrac_static[1] << " " << BfracErr_static[1] << endl;
@@ -780,7 +780,7 @@ int main(int argc, char* argv[]) {
 
   reddata1->plotOn(mframe,DataError(RooAbsData::SumW2));
 
-  ws->pdf("massPDF")->plotOn(mframe,Components("totMassBkgExp"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  ws->pdf("massPDF")->plotOn(mframe,Components("expFunct"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
   // RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
   // tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent));
   ws->pdf("massPDF")->plotOn(mframe,LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
