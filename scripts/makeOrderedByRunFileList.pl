@@ -6,6 +6,7 @@ $workdir = ".";
 $thisdata = $ARGV[0];
 $textfilename = $ARGV[1];
 $forpython = $ARGV[2];
+$filesperline = $ARGV[3];
 
 if (!($forpython == 1 || $forpython == 2)) { 
   print("Argument n. 3 must be: 1 (a simple list) or 2 (a list for the PoolSource in a python cfg) \n");
@@ -23,9 +24,12 @@ open(INFILE,"tmpfile") or die "cannot open tmpfile";;
 @log=<INFILE>;
 close(INFILE);
 
+my $correctpath = '';
 open(MYFILE,">${textfilename}");;
 
 my $ilines = 0;
+my $totfilename = '';
+
 foreach $line (@log) {
    my $dirname = find_dir_in_line($line);
    # print "dirname $dirname \n";
@@ -53,17 +57,22 @@ foreach $line (@log) {
 	   close(UTFILE);
 	   foreach $utline (@util) {
 	       chomp($utline);
-	       my $correctpath = $utline;
+	       # print "utline $utline \n";
+	       $correctpath = $utline;
 	   }
 	   foreach $line4 (@log4) {
 	       my $filename = find_file_in_line($line4);
 	       # print "filename $filename \n";
 	       if ($forpython == 1) {
-		   $filename = $correctpath . "/" . $filename;
+		   $totfilename = $correctpath . "/" . $filename;
 	       } else {
-		   $filename = "\'" . $correctpath . "/" . $filename . "\',"; 
+		   $totfilename = $totfilename . "\'" . $correctpath . "/" . $filename . "\',"; 
 	       }
-	       print MYFILE "$filename \n";    
+	       $ilines = $ilines + 1;
+	       if ($ilines % $filesperline == 0) {
+		   print MYFILE "$totfilename \n";    
+		   $totfilename = '';
+	       }
 	   }
 	   system("rm -f tmpfile4");
        }
