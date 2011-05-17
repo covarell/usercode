@@ -1,0 +1,2 @@
+setenv STAGE_HOST castorcms
+setenv STAGE_SVCCLASS cmst3

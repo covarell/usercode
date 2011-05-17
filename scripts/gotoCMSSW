@@ -1,0 +1,18 @@
+set version = {$1}
+
+# For users at CERN
+
+cd CMSSW_{$version}/src
+echo "Using CMSSW" {$version}
+if ($version == '1_2_0') then 
+ source patchScramRuntime.csh 
+else
+ eval `scramv1 runtime -csh`  
+endif  
+echo "PWD is now: " 
+pwd
+echo "Done eval scramv1 runtime -csh" 
+
+## project CMSSW
+echo "CVSROOT is now:"
+echo $CVSROOT
