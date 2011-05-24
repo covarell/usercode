@@ -4,9 +4,10 @@
 
 # $fitcommand = "./Fit2DSimMC -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -f datasets/MCFall10_QCD_DMu0.root -u -b -s";
 # $fitcommand = "./Fit2DSimRange -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
-# $fitcommand = "./Fit2DSimPEE -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
+$fitcommand = "./Fit2DSimPEE -m datasets/MCFall10_jpsi_DMu0.root -c datasets/MCFall10_psip_DMu0.root -u -b -s";
 # $fitcommand = "./Fit2DJpsiPEE -m datasets/MCFall10_jpsi_DMu0.root -u -b -s";
-$fitcommand = "./FitMassSim";
+# $fitcommand = "./FitMassSim";
+# $fitcommand = "./FitMassJpsi";
 
 $ptfile = $ARGV[0];
 $etafile = $ARGV[1];
@@ -30,7 +31,10 @@ foreach $line2 (@log2) {
         @splitline2 = split(/ +/, $line2);
 
 	# my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] . ' -r ' . $splitline[2] . ' -y ' . $splitline2[0] .' -d datasets/Data2010_rap' . $splitline2[1] . '.root';
-        my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -y ' . $splitline2[0] .' -d datasets/DataMergedWide2010_rap' . $splitline2[1] . '.root';
+	my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -l ' . $splitline[1] . ' -r ' . $splitline[2] . ' -y ' . $splitline2[0] .' -d datasets/DataMerged2010CurlGeom_rap' . $splitline2[1] . '.root';
+        # my $currentfit = $fitcommand . ' -s 2 -p ' . $splitline[0] . ' -y ' . $splitline2[0] .' -d datasets/DataMergedWide2010_rap' . $splitline2[1] . '.root';
+	# my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -a ' . $splitline[1] . ' -y ' . $splitline2[0] .' -d datasets/DataMergedWide2010_rap' . $splitline2[1] . '.root';
+	# my $currentfit = $fitcommand . ' -p ' . $splitline[0] . ' -y ' . $splitline2[0] .' -d datasets/Data2010_rap' . $splitline2[1] . '.root';
 
         print "SUBMITTING ${currentfit} ... \n";
 	$subjob="#!/bin/zsh 

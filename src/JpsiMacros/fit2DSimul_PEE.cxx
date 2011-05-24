@@ -37,6 +37,8 @@
 using namespace RooFit;
 bool superImpose = false;
 bool analyticBlifetime = true;
+bool narrowSideband = false;
+bool oneGaussianResol = false;
 
 void getMCTrueLifetime(RooWorkspace *ws, RooDataSet *reducedNP, float *bgmcVal, float *bctauVal) {
 
@@ -119,14 +121,18 @@ void defineCTResol(RooWorkspace *ws)
 {
 
   // PEE RESOLUTION FUNCTION
-  ws->factory("GaussModel::resGW(Jpsi_Ct,meanResSigW[0.,-0.01,0.01],sigmaResSigW[2.3,1.3,3.5],one[1.0],Jpsi_CtErr)");
-  ws->factory("GaussModel::resGN(Jpsi_Ct,meanResSigW,sigmaResSigN[0.8,0.6,1.1],one,Jpsi_CtErr)");
-  ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.001,0.3]})");
+  if (oneGaussianResol) {
+    ws->factory("GaussModel::sigPR(Jpsi_Ct,meanResSigW[0.,-0.01,0.01],sigmaResSigN[0.8,0.6,2.0],one[1.0],Jpsi_CtErr)");
+  } else {
+    ws->factory("GaussModel::resGW(Jpsi_Ct,meanResSigW[0.,-0.01,0.01],sigmaResSigW[2.3,1.3,3.5],one[1.0],Jpsi_CtErr)");
+    ws->factory("GaussModel::resGN(Jpsi_Ct,meanResSigW,sigmaResSigN[0.8,0.6,1.1],one,Jpsi_CtErr)");
+    ws->factory("AddModel::sigPR({resGW,resGN},{fracRes[0.05,0.001,0.3]})");
+  }
 
   // PEE RESOLUTION FUNCTION BKG
-  ws->factory("GaussModel::resbkgGW(Jpsi_Ct,meanResBkgW[0.,-0.01,0.01],sigmaResBkgW[2.3,1.3,3.5],one,Jpsi_CtErr)");
-  ws->factory("GaussModel::resbkgGN(Jpsi_Ct,meanResBkgW,sigmaResBkgN[0.8,0.6,1.1],one,Jpsi_CtErr)");
-  ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracRes})");
+  // ws->factory("GaussModel::resbkgGW(Jpsi_Ct,meanResBkgW[0.,-0.01,0.01],sigmaResBkgW[2.3,1.3,3.5],one,Jpsi_CtErr)");
+  // ws->factory("GaussModel::resbkgGN(Jpsi_Ct,meanResBkgW,sigmaResBkgN[0.8,0.6,1.1],one,Jpsi_CtErr)");
+  // ws->factory("AddModel::resbkg({resbkgGW,resbkgGN},{fracRes})");
 
   return;
 }
@@ -171,10 +177,15 @@ void defineCTSignal(RooWorkspace *ws,
     RooRealVar gmc("gmc","Sigma of MC Gaussian",GmcVal);
     RooRealVar btauFix("btauFix","Slope of MC exponential",bTauVal);   ws->import(btauFix);
     RooFormulaVar bResSigN("bResSigN", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigN")), *(ws->var("Jpsi_CtErr")),gmc));  ws->import(bResSigN);
-    RooFormulaVar bResSigW("bResSigW", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigW")), *(ws->var("Jpsi_CtErr")),gmc));  ws->import(bResSigW);
-    ws->factory("GaussModel::bresGN(Jpsi_Ct,meanResSigW,bResSigN)");
-    ws->factory("GaussModel::bresGW(Jpsi_Ct,meanResSigW,bResSigW)");
-    ws->factory("AddModel::bresG({bresGW,bresGN},{fracRes})");
+    if (oneGaussianResol) {
+      ws->factory("GaussModel::bresG(Jpsi_Ct,meanResSigW,bResSigN)");
+    } else {
+      RooFormulaVar bResSigW("bResSigW", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigW")), *(ws->var("Jpsi_CtErr")),gmc));  ws->import(bResSigW);
+      
+      ws->factory("GaussModel::bresGN(Jpsi_Ct,meanResSigW,bResSigN)");
+      ws->factory("GaussModel::bresGW(Jpsi_Ct,meanResSigW,bResSigW)");
+      ws->factory("AddModel::bresG({bresGW,bresGN},{fracRes})");
+    }
     // fix tau_B
     // ws->factory("Decay::sigNP(Jpsi_Ct,btauFix,bresG,RooDecay::SingleSided)");
     // float tau_B
@@ -184,10 +195,17 @@ void defineCTSignal(RooWorkspace *ws,
     RooRealVar gmcP("gmcP","Sigma of MC Gaussian",GmcVal);
     RooRealVar btauFixP("btauFixP","Slope of MC exponential",bTauVal);  ws->import(btauFixP);
     RooFormulaVar bResSigNP("bResSigNP", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigN")), *(ws->var("Jpsi_CtErr")),gmcP));  ws->import(bResSigNP);
-    RooFormulaVar bResSigWP("bResSigWP", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigW")), *(ws->var("Jpsi_CtErr")),gmcP));  ws->import(bResSigWP);
-    ws->factory("GaussModel::bresGNP(Jpsi_Ct,meanResSigW,bResSigNP)");
-    ws->factory("GaussModel::bresGWP(Jpsi_Ct,meanResSigW,bResSigWP)");
-    ws->factory("AddModel::bresGP({bresGWP,bresGNP},{fracRes})");
+
+    if (oneGaussianResol) {
+      ws->factory("GaussModel::bresGP(Jpsi_Ct,meanResSigW,bResSigN)");
+    } else {
+      RooFormulaVar bResSigWP("bResSigWP", "sqrt((@0*@1)**2+(@2)**2)", RooArgList(*(ws->var("sigmaResSigW")), *(ws->var("Jpsi_CtErr")),gmcP));  ws->import(bResSigWP);
+      
+      ws->factory("GaussModel::bresGNP(Jpsi_Ct,meanResSigW,bResSigNP)");
+      ws->factory("GaussModel::bresGWP(Jpsi_Ct,meanResSigW,bResSigWP)");
+      ws->factory("AddModel::bresGP({bresGWP,bresGNP},{fracRes})");
+    }
+
     // fix tau_B
     // ws->factory("Decay::sigNPP(Jpsi_Ct,btauFixP,bresGP,RooDecay::SingleSided)");
     // float tau_B
@@ -198,13 +216,19 @@ void defineCTSignal(RooWorkspace *ws,
     RooDataHist* reducedNP = new RooDataHist("reducedNP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNP);
     RooDataHist* reducedNPP = new RooDataHist("reducedNPP","MC distribution for NP signal",RooArgSet(*(ws->var("Jpsi_CtTrue"))),*reddataNPP);
     
-    RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPW);
-    RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPN);
-    RooAddPdf sigNP("sigNP","Non-prompt signal",RooArgSet(*(ws->pdf("sigNPW")),*(ws->pdf("sigNPN"))),RooArgSet(*(ws->var("fracRes"))));  ws->import(sigNP); 
-    
-    RooHistPdfConv sigNPWP("sigNPWP","Non-prompt signal with wide gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNPP);  ws->import(sigNPWP);
-    RooHistPdfConv sigNPNP("sigNPNP","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNPP);  ws->import(sigNPNP);
-    RooAddPdf sigNPP("sigNPP","Non-prompt signal 2",RooArgSet(*(ws->pdf("sigNPWP")),*(ws->pdf("sigNPNP"))),RooArgSet(*(ws->var("fracRes"))));  ws->import(sigNPP);
+    if (oneGaussianResol) {
+      RooHistPdfConv sigNP("sigNP","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNP);
+      
+      RooHistPdfConv sigNPP("sigNPP","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPP);
+    } else {
+      RooHistPdfConv sigNPW("sigNPW","Non-prompt signal with wide gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPW);
+      RooHistPdfConv sigNPN("sigNPN","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNP);  ws->import(sigNPN);
+      RooAddPdf sigNP("sigNP","Non-prompt signal",RooArgSet(*(ws->pdf("sigNPW")),*(ws->pdf("sigNPN"))),RooArgSet(*(ws->var("fracRes"))));  ws->import(sigNP); 
+      
+      RooHistPdfConv sigNPWP("sigNPWP","Non-prompt signal with wide gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigW")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNPP);  ws->import(sigNPWP);
+      RooHistPdfConv sigNPNP("sigNPNP","Non-prompt signal with narrow gaussian",*(ws->var("Jpsi_Ct")),*(ws->var("meanResSigW")),*(ws->var("sigmaResSigN")),*(ws->var("one")),*(ws->var("Jpsi_CtErr")),*reducedNPP);  ws->import(sigNPNP);
+      RooAddPdf sigNPP("sigNPP","Non-prompt signal 2",RooArgSet(*(ws->pdf("sigNPWP")),*(ws->pdf("sigNPNP"))),RooArgSet(*(ws->var("fracRes"))));  ws->import(sigNPP);
+    }
   }
   
   return;
@@ -526,7 +550,12 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddataPRP = (RooDataSet*) reddataTrP->reduce("MCType == MCType::PR");
   RooDataSet *reddataNPP = (RooDataSet*) reddataTrP->reduce(RooArgSet(*(ws->var("Jpsi_CtTrue"))),"MCType == MCType::NP");
 
-  RooDataSet *reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
+  RooDataSet *reddataSB;
+  if (narrowSideband) {
+    reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.8 || Jpsi_Mass > 3.4)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.35 || PsiP_Mass > 3.95))");
+  } else {
+    reddataSB = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass < 3.45 || PsiP_Mass > 3.85))");
+  }
 
   RooDataSet *reddataSBJ = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   RooDataSet *reddataSBP = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
@@ -555,10 +584,10 @@ int main(int argc, char* argv[]) {
 
   TCanvas ctest2;
   ctest2.cd(); errframe2->Draw();
-  titlestr = "pictures/peeAnaly/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBothAliCurl/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
   ctest2.SaveAs(titlestr.c_str());
   ctest2.SetLogy(1); errframe2->Draw();
-  titlestr = "pictures/peeAnaly/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracBothAliCurl/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
   ctest2.SaveAs(titlestr.c_str());
   // **
 
@@ -709,10 +738,10 @@ int main(int argc, char* argv[]) {
     
     TCanvas ctest3;
     ctest3.cd(); errframe3->Draw();
-    titlestr = "pictures/peeAnaly/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
     ctest3.SaveAs(titlestr.c_str());
     ctest3.SetLogy(1); errframe3->Draw();
-    titlestr = "pictures/peeAnaly/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
     ctest3.SaveAs(titlestr.c_str());
    
     RooPlot *errframe4 = ws->var("Jpsi_CtErr")->frame();
@@ -721,10 +750,10 @@ int main(int argc, char* argv[]) {
     
     TCanvas ctest4;
     ctest4.cd(); errframe4->Draw();
-    titlestr = "pictures/peeAnaly/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Lin.gif";
     ctest4.SaveAs(titlestr.c_str());
     ctest4.SetLogy(1); errframe4->Draw();
-    titlestr = "pictures/peeAnaly/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Log.gif";
     ctest4.SaveAs(titlestr.c_str());
     // **
 
@@ -749,7 +778,7 @@ int main(int argc, char* argv[]) {
 					       RooArgList(*(ws->var("Jpsi_Ct")))));  ws->import(sigPR_PEE);
     
     ws->pdf("sigPR_PEE")->fitTo(*reddataPR,Range("promptfit"),SumW2Error(kTRUE),ConditionalObservables(RooArgSet(*(ws->var("Jpsi_CtErr")))));   
-    ws->var("sigmaResSigW")->setConstant(kTRUE);
+    if (ws->var("sigmaResSigW")) ws->var("sigmaResSigW")->setConstant(kTRUE);
     ws->var("meanResSigW")->setConstant(kTRUE);
 
     // Jpsi plot
@@ -774,9 +803,13 @@ int main(int argc, char* argv[]) {
       
     }
 
-    ws->factory("Gaussian::tempresGW(CtWeighted,meanResSigW,sigmaResSigW)");
-    ws->factory("Gaussian::tempresGN(CtWeighted,meanResSigW,sigmaResSigN)");
-    ws->factory("SUM::tempsigPR(fracRes*tempresGW,tempresGN)");
+    if (oneGaussianResol) {
+      ws->factory("Gaussian::tempsigPR(CtWeighted,meanResSigW,sigmaResSigN)");
+    } else {
+      ws->factory("Gaussian::tempresGW(CtWeighted,meanResSigW,sigmaResSigW)");
+      ws->factory("Gaussian::tempresGN(CtWeighted,meanResSigW,sigmaResSigN)");
+      ws->factory("SUM::tempsigPR(fracRes*tempresGW,tempresGN)");
+    }  
   
     RooPlot *tframePR = ws->var("CtWeighted")->frame();
     tframePR->SetTitle(titlestr.c_str());
@@ -787,14 +820,14 @@ int main(int argc, char* argv[]) {
     TCanvas c00;  
     // c00.SetLogy(1);
     c00.cd();tframePR->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c00.SaveAs(titlestr.c_str());
     c00.SetLogy(1); tframePR->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c00.SaveAs(titlestr.c_str());
     
     // ws->pdf("sigPR")->fitTo(*bindataPRP,SumW2Error(kTRUE));
-    ws->var("sigmaResSigW")->setConstant(kFALSE);
+    if (ws->var("sigmaResSigW")) ws->var("sigmaResSigW")->setConstant(kFALSE);
     ws->var("meanResSigW")->setConstant(kFALSE);
 
     // psi' plot (to check)
@@ -830,10 +863,10 @@ int main(int argc, char* argv[]) {
     TCanvas c00P;  
     // c00.SetLogy(1);
     c00P.cd();tframePRP->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
     c00P.SaveAs(titlestr.c_str());
     c00P.SetLogy(1); tframePRP->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
     c00P.SaveAs(titlestr.c_str());
 
   }
@@ -845,7 +878,7 @@ int main(int argc, char* argv[]) {
     ws->var("fpmP")->setConstant(kTRUE);
     if (ymin > 1.4) ws->var("fLivingP")->setConstant(kTRUE);
     if(prefitSignalCTau){
-      ws->var("fracRes")->setConstant(kTRUE);
+      if (ws->var("fracRes")) ws->var("fracRes")->setConstant(kTRUE);
       ws->var("meanResSigW")->setConstant(kTRUE);
       if (ws->var("sigmaResBkgW")) ws->var("sigmaResBkgW")->setVal(ws->var("sigmaResSigW")->getVal());
       if (ws->var("sigmaResBkgN")) ws->var("sigmaResBkgN")->setVal(ws->var("sigmaResSigN")->getVal());
@@ -873,7 +906,7 @@ int main(int argc, char* argv[]) {
     ws->var("lambdasymP")->setConstant(kTRUE);
 
     if(prefitSignalCTau){
-      ws->var("fracRes")->setConstant(kFALSE);
+      if (ws->var("fracRes")) ws->var("fracRes")->setConstant(kFALSE);
       //ws->var("meanResSigN")->setConstant(kFALSE);
       ws->var("meanResSigW")->setConstant(kFALSE);
       //ws->var("sigmaResSigN")->setConstant(kFALSE);
@@ -892,11 +925,11 @@ int main(int argc, char* argv[]) {
     TCanvas c3;
     c3.cd();
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c3.SaveAs(titlestr.c_str());
     c3.SetLogy(1);
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c3.SaveAs(titlestr.c_str()); 
 
     RooPlot *tframeP1 = ws->var("Jpsi_Ct")->frame();
@@ -911,11 +944,11 @@ int main(int argc, char* argv[]) {
     TCanvas c3P;
     c3P.cd();
     c3P.cd();tframeP1->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
     c3P.SaveAs(titlestr.c_str());
     c3P.SetLogy(1);
     c3P.cd();tframeP1->Draw();
-    titlestr = "pictures/peeAnaly/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
     c3P.SaveAs(titlestr.c_str()); 
     
   }
@@ -950,11 +983,14 @@ int main(int argc, char* argv[]) {
     nFitPar = rfr->floatParsFinal().getSize();
     Bfrac_static[0] = ws->var("Bfrac")->getVal();
     BfracErr_static[0] = ws->var("Bfrac")->getError();
+
     // ws->var("sigmaResSigN")->setConstant(kTRUE);
     // ws->var("sigmaResSigW")->setConstant(kTRUE);
-    ws->var("fracRes")->setConstant(kTRUE);
+    if (ws->var("fracRes")) ws->var("fracRes")->setConstant(kTRUE);
+    if (ws->var("bTau") && ymin > 1.5) ws->var("bTau")->setConstant(kTRUE);
     ws->var("meanResSigW")->setConstant(kTRUE);
     // ws->var("Bfrac")->setConstant(kTRUE);
+
     NSigNP_static[0] = NSig_static[0]*Bfrac_static[0];
     NSigPR_static[0] = NSig_static[0]*(1-Bfrac_static[0]);
     ErrNP_static[0] = NSigNP_static[0]*sqrt(pow(Err_static[0]/NSig_static[0],2) + pow(BfracErr_static[0]/Bfrac_static[0],2));
@@ -1026,7 +1062,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   // b) Jpsi time
@@ -1108,7 +1144,7 @@ int main(int argc, char* argv[]) {
   t->SetTextSize(0.035);
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.88,"L = 40 pb^{-1}"); 
+  t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}"); 
 
   Double_t fx[2], fy[2], fex[2], fey[2];
   TGraphErrors *gfake = new TGraphErrors(2,fx,fy,fex,fey);
@@ -1175,9 +1211,9 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2->SaveAs(titlestr.c_str());
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -1193,7 +1229,7 @@ int main(int argc, char* argv[]) {
   if (ymin > 1.4 && pmin < 2.5) {
     t->DrawLatex(0.52,0.51,"CMS -");
     t->DrawLatex(0.52,0.45,"#sqrt{s} = 7 TeV"); 
-    t->DrawLatex(0.52,0.39,"L = 40 pb^{-1}"); 
+    t->DrawLatex(0.52,0.39,"L = 36.7 pb^{-1}"); 
     TLegend * leg2 = new TLegend(0.35,0.15,0.74,0.365,NULL,"brNDC");
     leg2->SetFillStyle(0);
     leg2->SetBorderSize(0);
@@ -1210,7 +1246,7 @@ int main(int argc, char* argv[]) {
   } else {
     // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
     t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-    t->DrawLatex(0.7,0.88,"L = 40 pb^{-1}");
+    t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}");
     leg->Draw("same"); 
   } 
 
@@ -1223,9 +1259,9 @@ int main(int argc, char* argv[]) {
   
   c2a->Update();
 
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   c2a->SaveAs(titlestr.c_str());
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   // ws->var("Jpsi_Ct")->setRange(-lmin-0.3,lmax-0.3);
@@ -1261,7 +1297,7 @@ int main(int argc, char* argv[]) {
   // cout << "Resolution psi(2S): Fit : " << resolP*1000. << " +/- " << errresolP*1000. << " mum" << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/peeAnaly/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/bfracBothAliCurl/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "TJ " << 0. << " " << NSig_static[0] << " " << Err_static[0] << endl;
@@ -1297,7 +1333,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1P;
   c1P.cd();mPframe->Draw();
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
   c1P.SaveAs(titlestr.c_str());
  
   // d) psi(2S) time
@@ -1372,7 +1408,7 @@ int main(int argc, char* argv[]) {
 
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.88,"L = 40 pb^{-1}"); 
+  t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}"); 
 
   leg->Draw("same"); 
 
@@ -1393,9 +1429,9 @@ int main(int argc, char* argv[]) {
   
   c2P->Update();
 
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2P->SaveAs(titlestr.c_str());
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2P->SaveAs(titlestr.c_str());
 
   TCanvas* c2aP = new TCanvas("c2aP","The Canvas",200,10,600,880);
@@ -1411,7 +1447,7 @@ int main(int argc, char* argv[]) {
   if (ymin > 1.4 && pmin < 2.5) {
     t->DrawLatex(0.52,0.51,"CMS -");
     t->DrawLatex(0.52,0.45,"#sqrt{s} = 7 TeV"); 
-    t->DrawLatex(0.52,0.39,"L = 40 pb^{-1}"); 
+    t->DrawLatex(0.52,0.39,"L = 36.7 pb^{-1}"); 
     TLegend * leg2 = new TLegend(0.35,0.15,0.74,0.365,NULL,"brNDC");
     leg2->SetFillStyle(0);
     leg2->SetBorderSize(0);
@@ -1428,7 +1464,7 @@ int main(int argc, char* argv[]) {
   } else {
     // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
     t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-    t->DrawLatex(0.7,0.88,"L = 40 pb^{-1}");
+    t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}");
     leg->Draw("same"); 
   } 
 
@@ -1441,9 +1477,9 @@ int main(int argc, char* argv[]) {
   
   c2aP->Update();
 
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
   c2aP->SaveAs(titlestr.c_str());
-  titlestr = "pictures/peeAnaly/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2aP->SaveAs(titlestr.c_str());
 
   return 1;

@@ -37,14 +37,15 @@ bool superImpose = false;
 void defineMassBackground(RooWorkspace *ws)
 {
   //Second order polynomial, the 2nd coefficient is by default set to zero
-  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.05,-1500.,1500.],CoefPol2[-1.,-10.,0.]})");
+  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.05,-10.,10.],CoefPol2[1.,0.,10.]})");
   ws->factory("Polynomial::CPolFunctP(Jpsi_Mass,{CoefPol1P[-0.05,-1500.,1500.],CoefPol2P[-1.,-10.,0.]})");
   // ws->factory("SUM::totMassBkgPol(sumPol[0.1,0.,1.]*CPolFunctP,CPolFunct)");
 
   //Exponential
-  ws->factory("Exponential::expFunct(Jpsi_Mass,coefExp[-1.,-3.,1.])");
+  ws->factory("Exponential::expFunct(Jpsi_Mass,coefExp[-1.,-3.,3.])");
   ws->factory("Exponential::expFunctP(Jpsi_Mass,coefExpP[-1.,-3.,3.])");
   ws->factory("SUM::totMassBkgExp(sumExp[0.1,0.,1.]*expFunctP,expFunct)");
+  ws->factory("SUM::totMassBkgExpPol(sumExp*CPolFunct,expFunct)");
 
   return;
 }
@@ -255,10 +256,9 @@ int main(int argc, char* argv[]) {
   string prange;
   string yrange;
   string lrange;
-  bool prefitMass = false;
-  bool prefitSignalCTau = false;
-  bool prefitBackground = false;
-  int theTrigger = -1;
+  float alphaF = 0.0;
+  float enneF = 0.0;
+  int syst = 0;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -287,6 +287,11 @@ int main(int argc, char* argv[]) {
         // cout << "Signal MC mass pre-fitting activated" << endl;
 	// break;
 
+      case 's':
+	syst = atoi(argv[i+1]);
+	cout << "Systematics number " << syst << endl;
+	break;	
+	
       case 'p':
 	prange = argv[i+1];
 	cout << "Range for pT is " << prange << " GeV/c" << endl;
@@ -302,15 +307,15 @@ int main(int argc, char* argv[]) {
         cout << "Range for |y| is " << yrange << endl;
         break;
 
-//      case 's':
-// 	prefitSignalCTau = true;
-// 	cout << "The signal ctau distribution will be prefitted on MC" << endl;
-// 	break;
+      case 'a':
+ 	alphaF = atof(argv[i+1]);
+        cout << "CB alpha is fixed to " << alphaF << endl;
+ 	break;
 
-//       case 'm':
-//         filenameMC = argv[i+1];
-//         cout << "File name for J/psi MC data is " << filenameMC << endl;
-//         break;
+      case 'n':
+ 	enneF = atof(argv[i+1]);
+        cout << "CB n is fixed to " << enneF << endl;
+ 	break;
 
 //       case 'c':
 //         filenameMC2 = argv[i+1];
@@ -418,7 +423,7 @@ int main(int argc, char* argv[]) {
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Ct < 600000.");  // i.e. all
   }
 
-  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddata1);
+  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass"))),*reddata1);
 
 //   RooDataSet *reddataJ = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
 //   RooDataSet *reddataP = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
@@ -456,6 +461,15 @@ int main(int argc, char* argv[]) {
   //signal is the same for prompt and non-prompt
   defineMassSignal(ws);
 
+  if (alphaF > 0.0001) {
+    ws->var("alpha")->setVal(alphaF);
+    ws->var("alpha")->setConstant(kTRUE);
+  }
+  if (enneF > 0.0001) {
+    ws->var("enne")->setVal(enneF);
+    ws->var("enne")->setConstant(kTRUE);
+  }
+
   //JPSI CTAU PARAMETRIZATION
 
   //resolution function
@@ -489,9 +503,53 @@ int main(int argc, char* argv[]) {
   // RooSimultaneous massSim("massSim","mass simultaneous PDF",RooArgList(*(ws->pdf("massPDF")),*(ws->pdf("massPDFP"))),*(ws->cat("Jpsi_PsiP")));
   // ws->import(massSim);
   // ws->pdf("massSim")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2));
-  ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkg[2000.,10.,10000000.]*totMassBkgExp)");
-  RooFitResult* rfrmass = ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
-  nFitPar = rfrmass->floatParsFinal().getSize() - 1;
+
+  if (syst == 1) {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCB,NSigP[5000.,10.,10000000.]*sigCBP,NBkg[2000.,10.,10000000.]*totMassBkgExp)");
+    // Special bins
+    if (fabs(ymin-1.2) < 0.0001 && fabs(pmin-12.0) < 0.0001) {
+      ws->var("enne")->setMin(0.2);
+    }
+  } else if (syst == 2) {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkg[2000.,10.,10000000.]*totMassBkgExpPol)");  
+    // Special bins
+    if (fabs(ymin-1.2) < 0.0001) {
+      if (fabs(pmin-5.5) < 0.0001) {
+	ws->var("alpha")->setVal(0.872);
+	ws->var("enne")->setVal(10.000);
+	ws->var("alpha")->setConstant(kTRUE);
+	ws->var("enne")->setConstant(kTRUE);
+      } else if (fabs(pmin-8.0) < 0.0001) {
+	ws->var("alpha")->setVal(1.656);
+	ws->var("enne")->setVal(1.501);
+	ws->var("alpha")->setConstant(kTRUE);
+	ws->var("enne")->setConstant(kTRUE);
+      } 
+    } else if (fabs(ymin-1.6) < 0.0001) {
+      if (fabs(pmin-5.5) < 0.0001) {
+	ws->var("alpha")->setVal(1.591);
+	ws->var("enne")->setVal(9.969);
+	ws->var("alpha")->setConstant(kTRUE);
+	ws->var("enne")->setConstant(kTRUE);
+      }
+    }
+  } else {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkg[2000.,10.,10000000.]*totMassBkgExp)");
+  }
+  RooFitResult* rfrmass; 
+  if (pmax-pmin < 20.) {
+    ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+    ws->var("alpha")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
+    rfrmass = ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+  } else {
+    ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+    ws->var("alpha")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
+    rfrmass = ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+  }
+      
+  nFitPar = rfrmass->floatParsFinal().getSize();
   
   Double_t a = ws->var("NSig")->getVal();
   Double_t b = ws->var("NSigP")->getVal();
@@ -780,7 +838,11 @@ int main(int argc, char* argv[]) {
 
   reddata1->plotOn(mframe,DataError(RooAbsData::SumW2));
 
-  ws->pdf("massPDF")->plotOn(mframe,Components("totMassBkgExp"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  if (syst == 2) {
+    ws->pdf("massPDF")->plotOn(mframe,Components("totMassBkgExpPol"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("massPDF")->plotOn(mframe,Components("totMassBkgExp"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  }
   // RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
   // tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent));
   ws->pdf("massPDF")->plotOn(mframe,LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));

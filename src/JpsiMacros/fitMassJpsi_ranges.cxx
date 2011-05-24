@@ -1,4 +1,4 @@
-// Simultaneous fit for Jpsi and psi': "P" stands for "prime"
+// fit for Jpsi only
 
 // C++ includes
 #include <iostream>
@@ -37,7 +37,7 @@ bool superImpose = false;
 void defineMassBackground(RooWorkspace *ws)
 {
   //Second order polynomial, the 2nd coefficient is by default set to zero
-  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.05,-1500.,1500.],CoefPol2[-1.,-10.,0.]})");
+  ws->factory("Polynomial::CPolFunct(Jpsi_Mass,{CoefPol1[-0.05,-10.,10.]})");
   ws->factory("Polynomial::CPolFunctP(Jpsi_Mass,{CoefPol1P[-0.05,-1500.,1500.],CoefPol2P[-1.,-10.,0.]})");
   // ws->factory("SUM::totMassBkgPol(sumPol[0.1,0.,1.]*CPolFunctP,CPolFunct)");
 
@@ -256,9 +256,9 @@ int main(int argc, char* argv[]) {
   string yrange;
   string lrange;
   bool prefitMass = false;
-  bool prefitSignalCTau = false;
-  bool prefitBackground = false;
-  int theTrigger = -1;
+  float alphaF = 0.0;
+  float enneF = 0.0;
+  int syst = 0;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -281,6 +281,11 @@ int main(int argc, char* argv[]) {
         else if (isGG == 0) cout << "GG only" << endl;
 	break;
 
+      case 's':
+	syst = atoi(argv[i+1]);
+	cout << "Systematics number " << syst << endl;
+	break;	
+
 	// case 'u':
 	// prefitMass = true;
 	// cout << "Will determine Bfrac, not NsigPR and NsigNP" << endl;
@@ -302,15 +307,15 @@ int main(int argc, char* argv[]) {
         cout << "Range for |y| is " << yrange << endl;
         break;
 
-//      case 's':
-// 	prefitSignalCTau = true;
-// 	cout << "The signal ctau distribution will be prefitted on MC" << endl;
-// 	break;
+      case 'a':
+ 	alphaF = atof(argv[i+1]);
+        cout << "CB alpha is fixed to " << alphaF << endl;
+ 	break;
 
-//       case 'm':
-//         filenameMC = argv[i+1];
-//         cout << "File name for J/psi MC data is " << filenameMC << endl;
-//         break;
+      case 'n':
+ 	enneF = atof(argv[i+1]);
+        cout << "CB n is fixed to " << enneF << endl;
+ 	break;
 
 //       case 'c':
 //         filenameMC2 = argv[i+1];
@@ -346,7 +351,7 @@ int main(int argc, char* argv[]) {
 
   TFile fIn(filename);
   fIn.cd();
-  RooDataSet *data = (RooDataSet*)fIn.Get("dataAll");
+  RooDataSet *data = (RooDataSet*)fIn.Get("dataJpsi");
   data->SetName("data");
 
   float pmin, pmax; 
@@ -418,7 +423,7 @@ int main(int argc, char* argv[]) {
     reddata1 = (RooDataSet*)reddata->reduce("Jpsi_Ct < 600000.");  // i.e. all
   }
 
-  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct"))),*reddata1);
+  RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass"))),*reddata1);
 
 //   RooDataSet *reddataJ = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
 //   RooDataSet *reddataP = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
@@ -456,6 +461,15 @@ int main(int argc, char* argv[]) {
   //signal is the same for prompt and non-prompt
   defineMassSignal(ws);
 
+  if (alphaF > 0.0001) {
+    ws->var("alpha")->setVal(alphaF);
+    ws->var("alpha")->setConstant(kTRUE);
+  }
+  if (enneF > 0.0001) {
+    ws->var("enne")->setVal(enneF);
+    ws->var("enne")->setConstant(kTRUE);
+  }
+
   //JPSI CTAU PARAMETRIZATION
 
   //resolution function
@@ -484,13 +498,34 @@ int main(int argc, char* argv[]) {
   // ws->var("enne")->setConstant(kTRUE);
   // ws->var("alpha")->setConstant(kTRUE);
   
-  // ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
-  // ws->factory("SUM::massPDFP(NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkgP[2000.,10.,10000000.]*expFunctP)");
-  // RooSimultaneous massSim("massSim","mass simultaneous PDF",RooArgList(*(ws->pdf("massPDF")),*(ws->pdf("massPDFP"))),*(ws->cat("Jpsi_PsiP")));
-  // ws->import(massSim);
-  // ws->pdf("massSim")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2));
-  ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
-  RooFitResult* rfrmass = ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+  if (syst == 1) {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*CPolFunct)");
+  } else if (syst == 2) {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCB,NBkg[2000.,10.,10000000.]*expFunct)");
+  } else {
+    ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NBkg[2000.,10.,10000000.]*expFunct)");
+  }
+
+  RooFitResult* rfrmass; 
+  if (pmax-pmin < 20.) {
+    // Special bins
+    if ( fabs(ymin-1.2) < 0.001 ) {
+      if ( fabs(pmin-7.0) < 0.001 || fabs(pmin-12.0) < 0.001 || fabs(pmin-15.0) < 0.001 ) {
+	ws->var("alpha")->setConstant(kTRUE);
+	ws->var("enne")->setConstant(kTRUE);
+	ws->var("sigmaSig1")->setMax(0.7);
+      }
+    }
+    ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+    ws->var("alpha")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
+    rfrmass = ws->pdf("massPDF")->fitTo(*reddata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+  } else {
+    ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+    ws->var("alpha")->setConstant(kTRUE);
+    ws->var("enne")->setConstant(kTRUE);
+    rfrmass = ws->pdf("massPDF")->fitTo(*bindata,Extended(1),Minos(0),SumW2Error(kTRUE),NumCPU(2),Save(1));
+  }
   nFitPar = rfrmass->floatParsFinal().getSize() - 1;
   
   Double_t a = ws->var("NSig")->getVal();
@@ -498,7 +533,6 @@ int main(int argc, char* argv[]) {
   const Double_t NSig_static[2] = {a,b}; 
    
   a = ws->var("NSig")->getError();  
-  b = ws->var("NSigP")->getError();
   const Double_t Err_static[2] = {a,b};
 
   /* if (prefitMass) {
@@ -753,7 +787,7 @@ int main(int argc, char* argv[]) {
   // cout << "Resolution psi(2S): Fit : " << resolP*1000. << " +/- " << errresolP*1000. << " mum" << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/testMassOnly/results%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/massJpsiSystBkg/results%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "TJ " << 0. << " " << NSig_static[0] << " " << Err_static[0] << endl;
@@ -780,7 +814,11 @@ int main(int argc, char* argv[]) {
 
   reddata1->plotOn(mframe,DataError(RooAbsData::SumW2));
 
-  ws->pdf("massPDF")->plotOn(mframe,Components("expFunct"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  if (syst == 2) {
+    ws->pdf("massPDF")->plotOn(mframe,Components("CPolFunct"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  } else {
+    ws->pdf("massPDF")->plotOn(mframe,Components("expFunct"),LineStyle(kDashed),LineColor(kRed),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
+  }
   // RooAddPdf tempPDF("tempPDF","tempPDF",RooArgList(*(ws->pdf("sigCBGaussOneMean")),*(ws->pdf("expFunct"))),RooArgList(tempVar1,tempVar2));
   // tempPDF.plotOn(mframe,LineColor(kRed),Normalization(NSigNP_static[0] + NBkg_static[0],RooAbsReal::NumEvent));
   ws->pdf("massPDF")->plotOn(mframe,LineColor(kBlue),Normalization(reddata1->sumEntries(),RooAbsReal::NumEvent));
@@ -792,7 +830,7 @@ int main(int argc, char* argv[]) {
   // c1.cd();mframe->Draw();
 
   // WITH RESIDUALS
-  TCanvas* c1 = new TCanvas("c1","The Canvas",200,10,880,600);
+  TCanvas* c1 = new TCanvas("c1","The Canvas",200,10,440,600);
   c1->cd();
 
   TPad *pad1 = new TPad("pad1","This is pad1",0.05,0.35,0.95,0.97);
@@ -801,7 +839,7 @@ int main(int argc, char* argv[]) {
   pad2->Draw();
 
   pad1->cd(); 
-  pad1->SetLogy(1); 
+  // pad1->SetLogy(1); 
   mframe->Draw();
 
   TLatex *t = new TLatex();
@@ -809,8 +847,8 @@ int main(int argc, char* argv[]) {
   t->SetTextAlign(22);
   t->SetTextSize(0.035);
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
-  t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}"); 
+  t->DrawLatex(0.35,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
+  t->DrawLatex(0.35,0.88,"L = 36.7 pb^{-1}"); 
 
   Double_t fx[2], fy[2], fex[2], fey[2];
   TGraphErrors *gfake = new TGraphErrors(2,fx,fy,fex,fey);
@@ -823,7 +861,7 @@ int main(int argc, char* argv[]) {
   hfake2.SetLineColor(kBlue);
   hfake2.SetLineWidth(2);
 
-  TLegend * leg = new TLegend(0.58,0.64,0.94,0.855,NULL,"brNDC");
+  TLegend * leg = new TLegend(0.18,0.64,0.54,0.855,NULL,"brNDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetShadowColor(0);
@@ -888,7 +926,7 @@ int main(int argc, char* argv[]) {
   
   c1->Update();
 
-  titlestr = "pictures/testMassOnly/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/massJpsiSystBkg/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1->SaveAs(titlestr.c_str());
 
   // b) psi(2S) mass
@@ -912,7 +950,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1P;
   c1P.cd();mPframe->Draw();
-  titlestr = "pictures/testMassOnly/" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/massJpsiSystBkg/" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
   c1P.SaveAs(titlestr.c_str());
   */  
   /*

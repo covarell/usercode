@@ -272,11 +272,11 @@ int main(int argc, char* argv[]) {
   char namefile[200];
   for (unsigned int i = 0; i < rapRegions; i++) {
     if (doMerge && !doWideRange) {
-      sprintf(namefile,"datasets/DataMerged2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+      sprintf(namefile,"datasets/DataMerged2010AltPV_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
     } else if (doMerge && doWideRange) {
       sprintf(namefile,"datasets/DataMergedWide2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10)); 
     } else {
-      sprintf(namefile,"datasets/Data2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+      sprintf(namefile,"datasets/Data2010AltPV_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
     }
     Out[i] = new TFile(namefile,"RECREATE");
     Out[i]->cd();
