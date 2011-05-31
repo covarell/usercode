@@ -497,10 +497,10 @@ int main(int argc, char* argv[]) {
 
   TCanvas ctest2;
   ctest2.cd(); errframe2->Draw();
-  titlestr = "pictures/bfracJpsiSystResol/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracJpsi/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
   ctest2.SaveAs(titlestr.c_str());
   ctest2.SetLogy(1); errframe2->Draw();
-  titlestr = "pictures/bfracJpsiSystResol/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracJpsi/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
   ctest2.SaveAs(titlestr.c_str());
   // **
 
@@ -613,10 +613,10 @@ int main(int argc, char* argv[]) {
     
     TCanvas ctest3;
     ctest3.cd(); errframe3->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracJpsi/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
     ctest3.SaveAs(titlestr.c_str());
     ctest3.SetLogy(1); errframe3->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracJpsi/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
     ctest3.SaveAs(titlestr.c_str());
    
     // **
@@ -678,10 +678,10 @@ int main(int argc, char* argv[]) {
     TCanvas c00;  
     // c00.SetLogy(1);
     c00.cd();tframePR->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracJpsi/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c00.SaveAs(titlestr.c_str());
     c00.SetLogy(1); tframePR->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracJpsi/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c00.SaveAs(titlestr.c_str());
     
     if (ws->var("sigmaResSigW")) ws->var("sigmaResSigW")->setConstant(kFALSE);
@@ -732,11 +732,11 @@ int main(int argc, char* argv[]) {
     TCanvas c3;
     c3.cd();
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracJpsi/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c3.SaveAs(titlestr.c_str());
     c3.SetLogy(1);
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracJpsi/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c3.SaveAs(titlestr.c_str()); 
     
   }
@@ -865,7 +865,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/bfracJpsi/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   // b) Jpsi time
@@ -876,7 +876,7 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (J/ #psi c  #tau projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
-  // tframe->GetYaxis()->SetTitle("Events / (0.065 mm)");
+  tframe->GetYaxis()->SetTitle("Events / (0.03 mm)");
 
   RooHist *hresid, *hresidP;
   double chi2;
@@ -919,7 +919,7 @@ int main(int argc, char* argv[]) {
   //   hresid->SetPoint(1,-0.6,0.);
   //   hresid->SetPointError(1,0.,0.,0.,0.);
   // }
-  chi2 /= (nFullBins - nFitPar);
+  // chi2 /= (nFullBins - nFitPar);
   for (unsigned int i = 0; i < nBins; i++) {
     if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
   } 
@@ -998,6 +998,7 @@ int main(int argc, char* argv[]) {
   tframeres->SetTitleOffset(0.6,"Y");
   tframeres->SetTitleOffset(1.0,"X");
   tframeres->addPlotable(hresid,"P") ; 
+  tframeres->SetMinimum(-4.); 
   tframeres->SetMaximum(-(tframeres->GetMinimum())); 
 
   pad2->cd(); tframeres->Draw();
@@ -1015,9 +1016,9 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracJpsi/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/bfracJpsi/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
   // c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -1058,15 +1059,15 @@ int main(int argc, char* argv[]) {
 
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   // if (isTheSpecialBin) sprintf(reducestr,"Reduced #chi^{2} = %4.2f",0.86);
-  sprintf(reducestr,"Reduced #chi^{2} = %4.2f",chi2);
-  if (chi2 < 10.) t2->DrawLatex(0.75,0.90,reducestr);
+  sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
   
   c2a->Update();
 
-  titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
-  c2a->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracJpsiSystResol/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  // titlestr = "pictures/bfracJpsi/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   // c2a->SaveAs(titlestr.c_str());
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  c2a->SaveAs(titlestr.c_str());
 
   // ### WRITE RESULTS
   cout << endl << "J/psi yields:" << endl;
@@ -1076,7 +1077,7 @@ int main(int argc, char* argv[]) {
   cout << "B fraction Jpsi   : Fit : " << Bfrac_static << " +/- " << BfracErr_static << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/bfracJpsiSystResol/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/bfracJpsi/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "TJ " << 0. << " " << NSig_static << " " << Err_static << endl;

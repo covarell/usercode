@@ -262,33 +262,11 @@ void setRanges(RooWorkspace *ws, float lmin, float lmax, float errmin, float err
   return;
 }
 
-RooBinning setMyBinning(float lmin, float lmax){
+RooBinning setMyBinning(float lmin, float lmax, bool isJpsi = true){
 
   RooBinning rb2(-lmin,lmax);
 
-  if (lmax+lmin > 4.9) {
-    rb2.addBoundary(-1.5);
-    rb2.addBoundary(-1.0);
-    rb2.addBoundary(-0.8);
-    rb2.addBoundary(-0.6);
-    rb2.addBoundary(-0.5);
-    rb2.addUniform(6,-0.5,-0.2);
-    rb2.addUniform(18,-0.2,0.2);
-    rb2.addUniform(9,0.2,0.5);
-    rb2.addUniform(5,0.5,1.0);
-    rb2.addUniform(15,1.0,lmax);
-  } else if (lmax+lmin > 4.4) {
-    rb2.addBoundary(-1.5);
-    rb2.addBoundary(-1.0);
-    rb2.addBoundary(-0.8);
-    rb2.addBoundary(-0.6);
-    rb2.addBoundary(-0.5);
-    rb2.addUniform(9,-0.5,-0.2);
-    rb2.addUniform(36,-0.2,0.2);
-    rb2.addUniform(12,0.2,0.5);
-    rb2.addUniform(5,0.5,1.0);
-    rb2.addUniform(5,1.0,lmax);
-  } else {
+  if (isJpsi) {
     // rb2.addBoundary(-1.5);
     if (lmin < 1.0) rb2.addBoundary(-1.0);
     if (lmin < 0.7) rb2.addBoundary(-0.7);
@@ -300,7 +278,18 @@ RooBinning setMyBinning(float lmin, float lmax){
     rb2.addUniform(18,0.2,0.5);
     rb2.addUniform(21,0.5,1.2);
     rb2.addUniform(6,1.2,lmax);
-  }
+  } else {
+    // rb2.addBoundary(-1.5);
+    if (lmin < 1.0) rb2.addBoundary(-1.0);
+    if (lmin < 0.7) rb2.addBoundary(-0.7);
+    if (lmin < 0.5) rb2.addBoundary(-0.5);
+    if (lmin < 0.5) lmin = 0.5;
+    rb2.addUniform(3,-lmin,-0.2);
+    rb2.addUniform(25,-0.2,0.2);
+    rb2.addUniform(9,0.2,0.5);
+    rb2.addUniform(11,0.5,1.2);
+    rb2.addUniform(3,1.2,lmax);
+  } 
 
   return rb2;
 }
@@ -510,7 +499,7 @@ int main(int argc, char* argv[]) {
   }
 
   // define binning for lifetime
-  RooBinning rb2 = setMyBinning(lmin,lmax);
+  RooBinning rb2 = setMyBinning(lmin,lmax,true);
   ws->var("Jpsi_Ct")->setBinning(rb2);
 
   RooDataSet *reddata1;
@@ -584,10 +573,10 @@ int main(int argc, char* argv[]) {
 
   TCanvas ctest2;
   ctest2.cd(); errframe2->Draw();
-  titlestr = "pictures/bfracBothAliCurl/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBoth/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Lin.gif";
   ctest2.SaveAs(titlestr.c_str());
   ctest2.SetLogy(1); errframe2->Draw();
-  titlestr = "pictures/bfracBothAliCurl/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracBoth/testErrPdfBkg_pT" + prange + "_y" + yrange + "_Log.gif";
   ctest2.SaveAs(titlestr.c_str());
   // **
 
@@ -738,10 +727,10 @@ int main(int argc, char* argv[]) {
     
     TCanvas ctest3;
     ctest3.cd(); errframe3->Draw();
-    titlestr = "pictures/bfracBothAliCurl/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/testErrPdfSig_pT" + prange + "_y" + yrange + "_Lin.gif";
     ctest3.SaveAs(titlestr.c_str());
     ctest3.SetLogy(1); errframe3->Draw();
-    titlestr = "pictures/bfracBothAliCurl/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/testErrPdfSig_pT" + prange + "_y" + yrange + "_Log.gif";
     ctest3.SaveAs(titlestr.c_str());
    
     RooPlot *errframe4 = ws->var("Jpsi_CtErr")->frame();
@@ -750,10 +739,10 @@ int main(int argc, char* argv[]) {
     
     TCanvas ctest4;
     ctest4.cd(); errframe4->Draw();
-    titlestr = "pictures/bfracBothAliCurl/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Lin.gif";
     ctest4.SaveAs(titlestr.c_str());
     ctest4.SetLogy(1); errframe4->Draw();
-    titlestr = "pictures/bfracBothAliCurl/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/testErrPdfSigP_pT" + prange + "_y" + yrange + "_Log.gif";
     ctest4.SaveAs(titlestr.c_str());
     // **
 
@@ -820,10 +809,10 @@ int main(int argc, char* argv[]) {
     TCanvas c00;  
     // c00.SetLogy(1);
     c00.cd();tframePR->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c00.SaveAs(titlestr.c_str());
     c00.SetLogy(1); tframePR->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "resofitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c00.SaveAs(titlestr.c_str());
     
     // ws->pdf("sigPR")->fitTo(*bindataPRP,SumW2Error(kTRUE));
@@ -863,10 +852,10 @@ int main(int argc, char* argv[]) {
     TCanvas c00P;  
     // c00.SetLogy(1);
     c00P.cd();tframePRP->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
     c00P.SaveAs(titlestr.c_str());
     c00P.SetLogy(1); tframePRP->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "resofitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
     c00P.SaveAs(titlestr.c_str());
 
   }
@@ -925,11 +914,11 @@ int main(int argc, char* argv[]) {
     TCanvas c3;
     c3.cd();
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
     c3.SaveAs(titlestr.c_str());
     c3.SetLogy(1);
     c3.cd();tframe1->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "timesideJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
     c3.SaveAs(titlestr.c_str()); 
 
     RooPlot *tframeP1 = ws->var("Jpsi_Ct")->frame();
@@ -944,11 +933,11 @@ int main(int argc, char* argv[]) {
     TCanvas c3P;
     c3P.cd();
     c3P.cd();tframeP1->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Lin.gif";
     c3P.SaveAs(titlestr.c_str());
     c3P.SetLogy(1);
     c3P.cd();tframeP1->Draw();
-    titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
+    titlestr = "pictures/bfracBoth/2D_" + partFile + "timesidePsip_pT" + prange + "_y" + yrange + "_Log.gif";
     c3P.SaveAs(titlestr.c_str()); 
     
   }
@@ -1062,7 +1051,7 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1;
   c1.cd();mframe->Draw();
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1.SaveAs(titlestr.c_str());
 
   // b) Jpsi time
@@ -1194,6 +1183,7 @@ int main(int argc, char* argv[]) {
   tframeres->SetTitleOffset(0.6,"Y");
   tframeres->SetTitleOffset(1.0,"X");
   tframeres->addPlotable(hresid,"P") ; 
+  tframeres->SetMinimum(-4.); 
   tframeres->SetMaximum(-(tframeres->GetMinimum())); 
 
   pad2->cd(); tframeres->Draw();
@@ -1211,9 +1201,9 @@ int main(int argc, char* argv[]) {
   
   c2->Update();
 
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2->SaveAs(titlestr.c_str());
 
   TCanvas* c2a = new TCanvas("c2a","The Canvas",200,10,600,880);
@@ -1259,9 +1249,9 @@ int main(int argc, char* argv[]) {
   
   c2a->Update();
 
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   c2a->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   // ws->var("Jpsi_Ct")->setRange(-lmin-0.3,lmax-0.3);
@@ -1297,7 +1287,7 @@ int main(int argc, char* argv[]) {
   // cout << "Resolution psi(2S): Fit : " << resolP*1000. << " +/- " << errresolP*1000. << " mum" << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/bfracBothAliCurl/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/bfracBoth/results2D%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "TJ " << 0. << " " << NSig_static[0] << " " << Err_static[0] << endl;
@@ -1333,10 +1323,13 @@ int main(int argc, char* argv[]) {
 
   TCanvas c1P;
   c1P.cd();mPframe->Draw();
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".gif";
   c1P.SaveAs(titlestr.c_str());
  
   // d) psi(2S) time
+   // define binning for lifetime
+  RooBinning rb3 = setMyBinning(lmin,lmax,false);
+  ws->var("Jpsi_Ct")->setBinning(rb3);
   ws->var("Jpsi_Ct")->SetTitle("#font[12]{l}_{#psi(2S)}");
   RooPlot *tframeP = ws->var("Jpsi_Ct")->frame();
   // tframe->SetMinimum(10.);
@@ -1345,9 +1338,9 @@ int main(int argc, char* argv[]) {
   titlestr = "2D fit for" + partTit + "muons (#psi(2S) c  #tau projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
   tframeP->SetTitle(titlestr.c_str());
   // TEMPORARY
-  // tframeP->GetYaxis()->SetTitle("Events / (0.065 mm)");
+  tframeP->GetYaxis()->SetTitle("Events / (0.06 mm)");
 
-  reddataP->plotOn(tframeP,DataError(RooAbsData::SumW2),Binning(rb2));
+  reddataP->plotOn(tframeP,DataError(RooAbsData::SumW2),Binning(rb3));
 
   if (prefitMass) {
     ws->pdf("totPDFP_PEE")->plotOn(tframeP,LineColor(kBlack),ProjWData(RooArgList(*(ws->var("Jpsi_CtErr"))),*bincterrP,kTRUE),NumCPU(2),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
@@ -1373,6 +1366,7 @@ int main(int argc, char* argv[]) {
     ws->pdf("totPDFP")->plotOn(tframeP,LineColor(kBlack),Normalization(1.0,RooAbsReal::RelativeExpected));
   }
 
+  nBins = ws->var("Jpsi_Ct")->getBinning().numBins();
   double *ypullsP = hresidP->GetY();
   for (unsigned int i = 0; i < nBins; i++) {
     cout << "Pull of bin " << i+nBins << " = " << ypullsP[i] << endl;
@@ -1383,7 +1377,7 @@ int main(int argc, char* argv[]) {
   //   hresidP->SetPoint(1,-0.6,0.);
   //   hresidP->SetPointError(1,0.,0.,0.,0.);
   // }
-  chi2 /= (nFullBins - nFitPar);
+  // chi2 /= (nFullBins - nFitPar);
   for (unsigned int i = 0; i < nBins; i++) {
     if (fabs(ypullsP[i]) < 0.0001) ypullsP[i] = 999.; 
   } 
@@ -1419,19 +1413,18 @@ int main(int argc, char* argv[]) {
   tframePres->SetTitleOffset(0.6,"Y");
   tframePres->SetTitleOffset(1.0,"X");
   tframePres->addPlotable(hresidP,"P") ; 
+  tframePres->SetMinimum(-4.); 
   tframePres->SetMaximum(-(tframePres->GetMinimum())); 
 
   pad2P->cd(); tframePres->Draw();
 
   // int nDOF = ws->var("Jpsi_Ct")->getBinning().numBins() - nFitPar;
-  sprintf(reducestr,"Reduced #chi^{2} = %4.2f",chi2);
-  if (chi2 < 10.) t2->DrawLatex(0.75,0.92,reducestr);
   
   c2P->Update();
 
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.gif";
   c2P->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Lin.pdf";
   c2P->SaveAs(titlestr.c_str());
 
   TCanvas* c2aP = new TCanvas("c2aP","The Canvas",200,10,600,880);
@@ -1472,14 +1465,14 @@ int main(int argc, char* argv[]) {
 
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   // if (isTheSpecialBin) sprintf(reducestr,"Reduced #chi^{2} = %4.2f",0.86);
-  sprintf(reducestr,"Reduced #chi^{2} = %4.2f",chi2);
-  if (chi2 < 10.) t2->DrawLatex(0.75,0.90,reducestr);
+  sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
   
   c2aP->Update();
 
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
-  c2aP->SaveAs(titlestr.c_str());
-  titlestr = "pictures/bfracBothAliCurl/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "pictures/bfracBoth/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
+  // c2aP->SaveAs(titlestr.c_str());
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2aP->SaveAs(titlestr.c_str());
 
   return 1;

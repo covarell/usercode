@@ -869,10 +869,10 @@ int main(int argc, char* argv[]) {
   TLatex *t = new TLatex();
   t->SetNDC();
   t->SetTextAlign(22);
-  t->SetTextSize(0.035);
+  t->SetTextSize(0.045);
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
-  t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
-  t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}"); 
+  t->DrawLatex(0.78,0.92,"CMS -  #sqrt{s} = 7 TeV"); 
+  t->DrawLatex(0.78,0.86,"L = 36.7 pb^{-1}"); 
 
   Double_t fx[2], fy[2], fex[2], fey[2];
   TGraphErrors *gfake = new TGraphErrors(2,fx,fy,fex,fey);
@@ -885,7 +885,7 @@ int main(int argc, char* argv[]) {
   hfake2.SetLineColor(kBlue);
   hfake2.SetLineWidth(2);
 
-  TLegend * leg = new TLegend(0.58,0.64,0.94,0.855,NULL,"brNDC");
+  TLegend * leg = new TLegend(0.72,0.68,0.98,0.835,NULL,"brNDC");
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetShadowColor(0);
@@ -913,7 +913,8 @@ int main(int argc, char* argv[]) {
   mframeres->SetTitleSize(0.08,"XYZ");
   mframeres->SetTitleOffset(0.6,"Y");
   mframeres->SetTitleOffset(1.0,"X");
-  mframeres->addPlotable(hresid,"P") ; 
+  mframeres->addPlotable(hresid,"P") ;
+  mframeres->SetMinimum(-4.);
   mframeres->SetMaximum(-(mframeres->GetMinimum())); 
 
   pad2->cd(); mframeres->Draw();
@@ -932,7 +933,7 @@ int main(int argc, char* argv[]) {
   //   hresid->SetPointError(1,0.,0.,0.,0.);
   // }
   cout << chi2 << endl;
-  chi2 /= (nFullBins - nFitPar);
+  // chi2 /= (nFullBins - nFitPar);
   cout << chi2 << endl;
   for (unsigned int i = 0; i < nBins; i++) {
     if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
@@ -945,12 +946,13 @@ int main(int argc, char* argv[]) {
   t2->SetTextSize(0.07);
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   cout << "Reduced chi2 = " << chi2 << endl;
-  sprintf(reducestr,"Reduced #chi^{2} = %4.2f",chi2);
-  if (chi2 < 10.) t2->DrawLatex(0.75,0.92,reducestr);
+  sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
   
   c1->Update();
 
-  titlestr = "pictures/testMassOnly/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".pdf";
+  // titlestr = "pictures/testMassOnly/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1->SaveAs(titlestr.c_str());
 
   // b) psi(2S) mass
