@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
   TLorentzVector* m2P= new TLorentzVector;
   
   double vprob, theCt, theCtErr;
-  int trig,trig2,theCat,Jq;
+  int trig,trig2,theCat,Jq, run, nPriVtx;
 
   static const unsigned int rapRegions = 3;
   float rapLimits[rapRegions+1] = {JpsiYMin,1.2,1.6,JpsiYMax};
@@ -139,8 +139,10 @@ int main(int argc, char* argv[]) {
   RooRealVar* Jpsi_Ct;
   RooRealVar* Jpsi_CtErr;
   RooRealVar* Jpsi_Y;
+  RooRealVar* Jpsi_Vprob; 
   RooCategory* Jpsi_Type;
   RooCategory* Jpsi_PsiP;
+  RooCategory* Jpsi_nPV;
 
   if (doWideRange) {
     JpsiMassMax += 0.5;
@@ -157,8 +159,10 @@ int main(int argc, char* argv[]) {
   Jpsi_Y = new RooRealVar("Jpsi_Y","J/psi y",-JpsiYMax,JpsiYMax);
   Jpsi_Type = new RooCategory("Jpsi_Type","Category of Jpsi");
   Jpsi_PsiP = new RooCategory("Jpsi_PsiP","Jpsi or psiPrime");
+  Jpsi_nPV = new RooCategory("Jpsi_nPV","number of primary vertices");
   Jpsi_Ct = new RooRealVar("Jpsi_Ct","J/psi ctau",JpsiCtMin,JpsiCtMax,"mm");
   Jpsi_CtErr = new RooRealVar("Jpsi_CtErr","J/psi ctau error",0.,4.,"mm");
+  Jpsi_Vprob = new RooRealVar("Jpsi_Vprob","J/psi vertex probability",0.,1.);
 
   Jpsi_Type->defineType("GG",0);
   Jpsi_Type->defineType("GT",1);
@@ -167,6 +171,13 @@ int main(int argc, char* argv[]) {
   Jpsi_PsiP->defineType("J",0);
   Jpsi_PsiP->defineType("P",1);
 
+  Jpsi_nPV->defineType("1P",1);
+  Jpsi_nPV->defineType("2P",2);
+  Jpsi_nPV->defineType("3P",3);
+  Jpsi_nPV->defineType("4P",4);
+
+  Tree->SetBranchAddress("runNb", &run);
+  Tree->SetBranchAddress("nPriVtx", &nPriVtx);
   Tree->SetBranchAddress("JpsiP", &JP);
   Tree->SetBranchAddress("muPosP", &m1P);
   Tree->SetBranchAddress("muNegP", &m2P);
@@ -178,7 +189,7 @@ int main(int argc, char* argv[]) {
   Tree->SetBranchAddress("Jpsict", &theCt);
   Tree->SetBranchAddress("JpsictErr", &theCtErr);
 
-  RooArgList varlist(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
+  RooArgList varlist(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_Vprob,*Jpsi_nPV);
   RooArgList varlist2(*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
   RooArgList varlist3(*Jpsi_Mass,*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_PsiP);
     
@@ -216,19 +227,20 @@ int main(int argc, char* argv[]) {
     bool ok2=isAccept(m2P);
     
     // COWBOY CUTS!
-    if (Cowboy(1,m1P,m2P) && fabs(JP->Rapidity()) > 1.6) continue;
-    // if (Cowboy(1,m1P,m2P)) continue;
-    // if (!Cowboy(1,m1P,m2P)) continue;
+    // if (Cowboy(1,m1P,m2P) && fabs(JP->Rapidity()) > 1.6) continue;
+    if (Cowboy(1,m1P,m2P)) continue;        // SEAGULL
+    // if (!Cowboy(1,m1P,m2P)) continue;    // COWBOY
 
     //cout << "Accepted1 " << ok1 << "  Accepted2 " << ok2 << endl;
     if (theMass > JpsiMassMin && theMass < JpsiMassMax && 
 	theCt > JpsiCtMin && theCt < JpsiCtMax && 
 	thePt > JpsiPtMin && thePt < JpsiPtMax && 
 	fabs(theRapidity) > JpsiYMin && fabs(theRapidity) < JpsiYMax &&
-	ok2 && ok1 &&
+	ok2 && ok1 && 
+	nPriVtx > 0 && nPriVtx < 5 &&
 	(trig == 1 || trig2 == 1) &&
-	vprob >0.01 &&
-	Jq == 0){
+      	// vprob >0.01 &&
+	Jq == 0 && run >= 146513){
       
       //cout << Jq << endl;
       Jpsi_Pt->setVal(thePt); 
@@ -238,9 +250,11 @@ int main(int argc, char* argv[]) {
       Jpsi_Ct->setVal(theCt);
       Jpsi_CtErr->setVal(theCtErr);
       Jpsi_Type->setIndex(theCat,kTRUE);
+      Jpsi_Vprob->setVal(vprob);
+      Jpsi_nPV->setIndex(int(nPriVtx),kTRUE);
       //cout << "Category " << theCat << endl;
 
-      RooArgList varlist_tmp(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
+      RooArgList varlist_tmp(*Jpsi_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_Vprob,*Jpsi_nPV);
       RooArgList varlist2_tmp(*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr);
       RooArgList varlist3_tmp(*Jpsi_Mass,*Psip_Mass,*Jpsi_Pt,*Jpsi_Y,*Jpsi_Type,*Jpsi_Ct,*Jpsi_CtErr,*Jpsi_PsiP);
 
@@ -272,11 +286,11 @@ int main(int argc, char* argv[]) {
   char namefile[200];
   for (unsigned int i = 0; i < rapRegions; i++) {
     if (doMerge && !doWideRange) {
-      sprintf(namefile,"datasets/DataMerged2010AltPV_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+      sprintf(namefile,"datasets/DataMerged2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
     } else if (doMerge && doWideRange) {
-      sprintf(namefile,"datasets/DataMergedWide2010_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10)); 
+      sprintf(namefile,"datasets/DataMergedWide2010SG_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10)); 
     } else {
-      sprintf(namefile,"datasets/Data2010AltPV_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
+      sprintf(namefile,"datasets/Data2010SGnoPVcut_rap%d-%d.root",int(rapLimits[i]*10),int(rapLimits[i+1]*10));
     }
     Out[i] = new TFile(namefile,"RECREATE");
     Out[i]->cd();

@@ -33,6 +33,7 @@
 
 using namespace RooFit;
 bool superImpose = false;
+bool verbose = true;
 
 void defineMassBackground(RooWorkspace *ws)
 {
@@ -535,6 +536,12 @@ int main(int argc, char* argv[]) {
     }
   } else {
     ws->factory("SUM::massPDF(NSig[5000.,10.,10000000.]*sigCBGaussOneMean,NSigP[5000.,10.,10000000.]*sigCBGaussOneMeanP,NBkg[2000.,10.,10000000.]*totMassBkgExp)");
+     if (fabs(pmin-5.5) < 0.0001) {
+        ws->var("alpha")->setVal(1.591);
+        ws->var("enne")->setVal(9.969);
+        ws->var("alpha")->setConstant(kTRUE);
+        ws->var("enne")->setConstant(kTRUE);
+      }
   }
   RooFitResult* rfrmass; 
   if (pmax-pmin < 20.) {
@@ -789,8 +796,15 @@ int main(int argc, char* argv[]) {
   float resol = sqrt(coeffGauss*sigmaSig1*sigmaSig1 + (1-coeffGauss)*sigmaSig2*sigmaSig2);
   float errresol = (0.5/resol)*sqrt(pow(sigmaSig1*coeffGauss*esigmaSig1,2) + pow(sigmaSig2*(1-coeffGauss)*esigmaSig2,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2*sigmaSig2)*ecoeffGauss,2));	
   float resolP = sqrt(coeffGaussP*sigmaSig1*sigmaSig1 + (1-coeffGaussP)*sigmaSig2P*sigmaSig2P);
-  float errresolP = (0.5/resolP)*sqrt(pow(sigmaSig1*coeffGaussP*esigmaSig1,2) + pow(sigmaSig2P*(1-coeffGaussP)*esigmaSig2P,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2P*sigmaSig2P)*ecoeffGaussP,2));	
-			 
+  float errresolP = (0.5/resolP)*sqrt(pow(sigmaSig1*coeffGaussP*esigmaSig1,2) + pow(sigmaSig2P*(1-coeffGaussP)*esigmaSig2P,2) + pow(0.5*(sigmaSig1*sigmaSig1 - sigmaSig2P*sigmaSig2P)*ecoeffGaussP,2));*/
+  float bc = ws->var("coefExp")->getVal();
+  float bcp = ws->var("coefExpP")->getVal();
+  float f = ws->var("sumExp")->getVal();
+  float bSigReg =  ws->var("NBkg")->getVal()*
+    ((1-f)*(exp(3.735*0.02*bc)-exp(3.635*0.02*bc))/bc + f*(exp(3.735*0.02*bcp)-exp(3.635*0.02*bcp))/bcp)/
+    ((1-f)*(exp(4.7*0.02*bc)-exp(2.5*0.02*bc))/bc + f*(exp(4.7*0.02*bcp)-exp(2.5*0.02*bcp))/bcp);
+    // float bSigReg =  ws->var("NBkg")->getVal()/22.0;
+  /*			 
   RooRealVar tempVar1("tempVar1","tempVar1",NSigNP_static[0]);
   RooRealVar tempVar2("tempVar2","tempVar2",NBkg_static[0]);
   RooRealVar tempVar3("tempVar3","tempVar3",NSigNP_static[1]);
@@ -811,7 +825,7 @@ int main(int argc, char* argv[]) {
   // cout << "Resolution psi(2S): Fit : " << resolP*1000. << " +/- " << errresolP*1000. << " mum" << endl;
  
   char oFile[200];
-  sprintf(oFile,"results/testMassOnly/results%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
+  sprintf(oFile,"results/386MassPsipSG/results%s_pT%s_y%s.txt",partFile.c_str(),prange.c_str(),yrange.c_str());
 
   ofstream outputFile(oFile);
   outputFile << "TJ " << 0. << " " << NSig_static[0] << " " << Err_static[0] << endl;
@@ -819,6 +833,8 @@ int main(int argc, char* argv[]) {
   // outputFile << "NJ " << 0. << " " << NSigNP_static[0] << " " << ErrNP_static[0] << endl;
   // outputFile << "BJ " << 0. << " " << Bfrac_static[0] << " " << BfracErr_static[0] << endl;
   outputFile << "TP " << 0. << " " << NSig_static[1] << " " << Err_static[1] << endl;
+  if (verbose) outputFile << "SB " << 0. << " " << NSig_static[1]/bSigReg << endl;
+  
   // outputFile << "PP " << 0. << " " << NSigPR_static[1] << " " << ErrPR_static[1] << endl;
   // outputFile << "NP " << 0. << " " << NSigNP_static[1] << " " << ErrNP_static[1] << endl;
   // outputFile << "BP " << 0. << " " << Bfrac_static[1] << " " << BfracErr_static[1] << endl;

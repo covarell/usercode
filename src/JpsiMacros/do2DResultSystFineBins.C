@@ -12,6 +12,8 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
+bool isEfficiency = true;
+
 void do2DResultSystFineBins(string whichTypeJpsi = "BP", string fileNameBase = "results", string fileNameComp = "results2", int maxBetween = 1, string fileNameComp2 = "none", string fileNameComp3 = "none") {
 
   double ybinlimits[6] = {0.0,0.9,1.2,1.6,2.1,2.4};
@@ -97,6 +99,7 @@ void do2DResultSystFineBins(string whichTypeJpsi = "BP", string fileNameBase = "
 	
 	// scroll lines in the same order
 	theFile2 >> theType2 >> trueMC >> fitted2 >> error2;
+	cout << "TEST : " << theType << " " << trueMC << " " << fitted << " " << fitted2 << " " << error << endl;
 	if (maxBetween >= 2) theFile3 >> theType2 >> trueMC >> fitted3 >> error2;
 	if (maxBetween == 3) theFile4 >> theType2 >> trueMC >> fitted4 >> error2;
 
@@ -104,6 +107,9 @@ void do2DResultSystFineBins(string whichTypeJpsi = "BP", string fileNameBase = "
 	  
 	  float ptbincenter = (ptmax + ptmin + 0.01)/2. ;
 	  float ybincenter = (etamax + etamin)/2. ; 
+          float eff = fitted/fitted2;
+	  if (eff < 0.0) eff = 0.0;   if (eff > 1.0) eff = 1.0;
+	  float efferr = sqrt(eff*(1.0-eff)/fitted2);
 	  float relvar = 100.0*fabs(fitted-fitted2)/fitted2;
 	  if (maxBetween >= 2) {
 	    float relvar2 = 100.0*fabs(fitted2-fitted3)/fitted2;
@@ -117,7 +123,9 @@ void do2DResultSystFineBins(string whichTypeJpsi = "BP", string fileNameBase = "
 	      relvar = relvar3;   fitted = fitted4;
 	    }
 	  }
-          cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << fitted2 << " " << error << endl;
+	  if (isEfficiency) {
+	    fitted = 100.0*eff;    error = 100.0*efferr;
+	  }
 	  if (fabs(ybincenter-0.45) < 0.01 ) {
 	    theBin = histJpsi00_09.FindBin(ybincenter,ptbincenter);
 	    histJpsi00_09.SetBinContent(theBin,fitted);

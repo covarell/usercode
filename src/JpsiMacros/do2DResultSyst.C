@@ -12,6 +12,8 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
+bool doRatio = true;
+
 void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", string fileNameBase = "results", string fileNameComp = "results2", int maxBetween = 1, string fileNameComp2 = "none", string fileNameComp3 = "none") {
 
   double ybinlimits[4] = {0.0,1.2,1.6,2.4};
@@ -27,6 +29,9 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
   TH2F histJpsi00_12("histJpsi00_12","histJpsi",3,ybinlimits,nbinspt1,pt1binlimits);
   TH2F histJpsi12_16("histJpsi12_16","histJpsi",3,ybinlimits,nbinspt2,pt2binlimits);
   TH2F histJpsi16_24("histJpsi16_24","histJpsi",3,ybinlimits,nbinspt3,pt3binlimits);
+  TH2F histRelVarJpsi00_12("histRelVarJpsi00_12","histJpsi - relative variation",3,ybinlimits,nbinspt1,pt1binlimits);
+  TH2F histRelVarJpsi12_16("histRelVarJpsi12_16","histJpsi - relative variation",3,ybinlimits,nbinspt2,pt2binlimits);
+  TH2F histRelVarJpsi16_24("histRelVarJpsi16_24","histJpsi - relative variation",3,ybinlimits,nbinspt3,pt3binlimits);
   TH2F histPsip00_12("histPsip00_12","histPsip",3,ybinlimits,nbinspt1,pt1binlimits);
   TH2F histPsip12_16("histPsip12_16","histPsip",3,ybinlimits,nbinspt2,pt2binlimits);
   TH2F histPsip16_24("histPsip16_24","histPsip",3,ybinlimits,nbinspt3,pt3binlimits);
@@ -110,6 +115,15 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
 	  float ptbincenter = (ptmax + ptmin + 0.01)/2. ;
 	  float ybincenter = (etamax + etamin)/2. ; 
           cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
+	  float relvarJ = 100.0*fabs(fitted-fitted2)/fitted2;
+	  float relvarJerr;
+	  if (doRatio) {
+	    relvarJ = fitted/fitted2;
+	    if (relvarJ > 1.0) relvarJ = 1.0;
+	    relvarJerr = sqrt(relvarJ*(1-relvarJ)/fitted2);
+	    relvarJ *= 100.;  relvarJerr *= 100.;
+	  }
+	  // float relvarJ = fabs(fitted-fitted2)/error;
 	  fittedJ = fitted;   errorJ = error;
 	  fittedJ2 = fitted2;   errorJ2 = error2;
 	  if (maxBetween >= 2) fittedJ3 = fitted3;
@@ -118,14 +132,20 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
 	    theBin = histJpsi00_12.FindBin(ybincenter,ptbincenter);
 	    histJpsi00_12.SetBinContent(theBin,fitted);
 	    histJpsi00_12.SetBinError(theBin,error);
+	    histRelVarJpsi00_12.SetBinContent(theBin,relvarJ);
+	    if (doRatio) histRelVarJpsi00_12.SetBinError(theBin,relvarJerr);
 	  } else if (fabs(ybincenter-1.4) < 0.01 ) {
 	    theBin = histJpsi12_16.FindBin(ybincenter,ptbincenter);
 	    histJpsi12_16.SetBinContent(theBin,fitted);
 	    histJpsi12_16.SetBinError(theBin,error);  
+	    histRelVarJpsi12_16.SetBinContent(theBin,relvarJ);
+	    if (doRatio) histRelVarJpsi12_16.SetBinError(theBin,relvarJerr);
 	  } else {
 	    theBin = histJpsi16_24.FindBin(ybincenter,ptbincenter);
 	    histJpsi16_24.SetBinContent(theBin,fitted);
 	    histJpsi16_24.SetBinError(theBin,error); 
+	    histRelVarJpsi16_24.SetBinContent(theBin,relvarJ);
+	    if (doRatio) histRelVarJpsi16_24.SetBinError(theBin,relvarJerr);
 	    // histErr.SetBinContent(theBin,error);
 	    // histPul.SetBinContent(theBin,(fitted-trueMC)/error);
 	    // chi2i += pow((fitted-trueMC)/error,2);
@@ -138,6 +158,7 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
 	  float ybincenter = (etamax + etamin)/2. ; 
           cout << "TEST : " << ptbincenter << " " << ybincenter << " " << theType << " " << trueMC << " " << fitted << " " << error << endl;
 	  float relvarP = 100.0*fabs(fitted-fitted2)/fitted2;
+	  // float relvarP = fabs(fitted-fitted2)/error;
 	  if (maxBetween >= 2) {
 	    float relvar2P = 100.0*fabs(fitted2-fitted3)/fitted2;
 	    if (relvar2P > relvarP) {
@@ -153,7 +174,7 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
 	  float ratio = fitted/fittedJ;
 	  float errratio = ratio*sqrt(pow(error/fitted,2) + pow(errorJ/fittedJ,2));
 	  float ratio2 = fitted2/fittedJ2;
-	  float relvarR = 100.0*fabs(ratio-ratio2)/ratio2;
+	  float relvarR = 100.0*fabs(ratio-ratio2)/ratio2;	  
 	  if (maxBetween >= 2) {
 	    float ratio3 = fitted3/fittedJ3;
 	    float relvar2R = 100.0*fabs(ratio2-ratio3)/ratio2;
@@ -223,6 +244,9 @@ void do2DResultSyst(string whichTypeJpsi = "BP", string whichTypePsip = "BJ", st
   histRatio00_12.Write();
   histRatio12_16.Write();
   histRatio16_24.Write();
+  histRelVarJpsi00_12.Write();
+  histRelVarJpsi12_16.Write();
+  histRelVarJpsi16_24.Write();
   histRelVarPsip00_12.Write();
   histRelVarPsip12_16.Write();
   histRelVarPsip16_24.Write();
