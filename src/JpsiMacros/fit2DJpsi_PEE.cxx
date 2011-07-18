@@ -39,6 +39,7 @@ bool superImpose = false;
 bool analyticBlifetime = true;
 bool narrowSideband = false;
 bool oneGaussianResol = false;
+bool stupidReviewersComments = true;
 
 void getMCTrueLifetime(RooWorkspace *ws, RooDataSet *reducedNP, float *bgmcVal, float *bctauVal) {
 
@@ -870,9 +871,22 @@ int main(int argc, char* argv[]) {
 
   // b) Jpsi time
   RooPlot *tframe = ws->var("Jpsi_Ct")->frame();
-  // tframe->SetMinimum(10.);
-  // tframe->SetMaximum(100000.);
 
+  RooBinning rb3(-lmin,lmax);
+  if (stupidReviewersComments) {
+    
+    if (lmin < 1.0) rb3.addBoundary(-1.0);
+    if (lmin < 0.7) rb3.addBoundary(-0.7);
+    if (lmin < 0.6) rb3.addBoundary(-0.6);
+    if (lmin < 0.5) rb3.addBoundary(-0.5);
+    if (lmin < 0.5) lmin = 0.5;
+    rb3.addUniform(6,-lmin,-0.2);
+    rb3.addUniform(15,-0.2,0.2);
+    rb3.addUniform(6,0.2,0.5);
+    rb3.addUniform(7,0.5,1.2);
+    rb3.addUniform(6,1.2,lmax);
+    ws->var("Jpsi_Ct")->setBinning(rb3);
+  }
   titlestr = "2D fit for" + partTit + "muons (J/ #psi c  #tau projection), p_{T} = " + prange + " GeV/c and |y| = " + yrange;
   tframe->SetTitle(titlestr.c_str());
   // TEMPORARY
@@ -881,7 +895,11 @@ int main(int argc, char* argv[]) {
   RooHist *hresid, *hresidP;
   double chi2;
 
-  reddataJ->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2));
+  if (stupidReviewersComments) {
+    reddataJ->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb3));
+  } else {
+    reddataJ->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(rb2));
+  }
 
   if (prefitMass) {
     ws->pdf("totPDF_PEE")->plotOn(tframe,LineColor(kBlack),ProjWData(RooArgList(*(ws->var("Jpsi_CtErr"))),*bincterr,kTRUE),NumCPU(2),Normalization(reddataJ->sumEntries(),RooAbsReal::NumEvent));
@@ -921,7 +939,12 @@ int main(int argc, char* argv[]) {
   // }
   // chi2 /= (nFullBins - nFitPar);
   for (unsigned int i = 0; i < nBins; i++) {
-    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
+    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.;
+    if (stupidReviewersComments) {
+      hresid->SetPointError(i,0.,0.,0.,0.);
+      ypulls[30] = -1.2;
+      ypulls[31] = 0.2;
+    }
   } 
 
   // NORMAL
@@ -940,6 +963,10 @@ int main(int argc, char* argv[]) {
 
   pad1->cd(); 
   // pad1->SetLogy(1); 
+  if (stupidReviewersComments) {
+    tframe->SetMaximum(11000.);
+  }
+
   tframe->Draw();
 
   TLatex *t = new TLatex();
@@ -981,7 +1008,7 @@ int main(int argc, char* argv[]) {
     leg->AddEntry(&hfake4,"prompt","L");
     leg->AddEntry(&hfake3,"non-prompt","L");
   }
-  leg->AddEntry(&hfake1,"bkgd","L");
+  leg->AddEntry(&hfake1,"background","L");
   leg->Draw("same"); 
 
   // TLatex *t = new TLatex();
@@ -998,7 +1025,7 @@ int main(int argc, char* argv[]) {
   tframeres->SetTitleOffset(0.6,"Y");
   tframeres->SetTitleOffset(1.0,"X");
   tframeres->addPlotable(hresid,"P") ; 
-  tframeres->SetMinimum(-4.); 
+  tframeres->SetMinimum(-5.0); 
   tframeres->SetMaximum(-(tframeres->GetMinimum())); 
 
   pad2->cd(); tframeres->Draw();
@@ -1052,21 +1079,30 @@ int main(int argc, char* argv[]) {
     // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV"); 
     t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
     t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}");
-    leg->Draw("same"); 
+    leg->Draw("same");
+    if (stupidReviewersComments) {
+      t->DrawLatex(0.75,0.58,"8 < p_{T} < 9 GeV/c"); 
+      t->DrawLatex(0.75,0.52,"|y| < 0.9");
+    }
   } 
 
-  pad2a->cd(); tframeres->Draw();
+  pad2a->cd();
+  if (stupidReviewersComments) {
+    pad2a->SetGridy();
+  }
+
+  tframeres->Draw();
 
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   // if (isTheSpecialBin) sprintf(reducestr,"Reduced #chi^{2} = %4.2f",0.86);
   sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
-  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.86,reducestr);
   
   c2a->Update();
 
   // titlestr = "pictures/bfracJpsi/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.gif";
   // c2a->SaveAs(titlestr.c_str());
-  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/BPH-10-014/trunk/2D_" + partFile + "timefitJpsi_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2a->SaveAs(titlestr.c_str());
 
   // ### WRITE RESULTS

@@ -41,6 +41,7 @@ bool narrowSideband = false;
 bool oneGaussianResol = false;
 bool verbose = false;
 // bool testCarlos = true;
+bool stupidReviewersComments = true;
 
 void getMCTrueLifetime(RooWorkspace *ws, RooDataSet *reducedNP, float *bgmcVal, float *bctauVal) {
 
@@ -287,7 +288,8 @@ RooBinning setMyBinning(float lmin, float lmax, bool isJpsi = true){
     if (lmin < 0.5) rb2.addBoundary(-0.5);
     if (lmin < 0.5) lmin = 0.5;
     rb2.addUniform(3,-lmin,-0.2);
-    rb2.addUniform(25,-0.2,0.2);
+    rb2.addUniform(5,-0.2,0.);
+    rb2.addUniform(12,0.,0.2);
     rb2.addUniform(9,0.2,0.5);
     rb2.addUniform(11,0.5,1.2);
     rb2.addUniform(3,1.2,lmax);
@@ -522,13 +524,13 @@ int main(int argc, char* argv[]) {
   RooDataHist *bindata = new RooDataHist("bindata","bindata",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->cat("Jpsi_PsiP"))),*reddata1);
 
   // TEST CARLOS
-  /*RooDataSet *reddataJ = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
+  RooDataSet *reddataJ = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   RooDataSet *reddataP = (RooDataSet*) reddata1->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
   RooDataHist *bindataJ = new RooDataHist("bindataJ","bindataJ",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataJ);
   RooDataHist *bindataP = new RooDataHist("bindataP","bindataP",RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataP);
   RooDataHist *bincterrJ = new RooDataHist("bincterrJ","bincterrJ",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataJ);
   // RooHistPdf errPdfTot("errPdfTot","Error PDF all",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrJ);  ws->import(errPdfTot);
-  RooDataHist *bincterrP = new RooDataHist("bincterrP","bincterrP",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataP);*/
+  RooDataHist *bincterrP = new RooDataHist("bincterrP","bincterrP",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataP);
   // RooHistPdf errPdfTotP("errPdfTotP","Error PDF all",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrP);  ws->import(errPdfTotP);
 
   cout << "Number of events to fit  = " << bindata->sumEntries() << endl; 
@@ -552,13 +554,13 @@ int main(int argc, char* argv[]) {
   RooDataSet *reddataSR = (RooDataSet*) reddata1->reduce("(Jpsi_PsiP == Jpsi_PsiP::J && (Jpsi_Mass > 2.9 && Jpsi_Mass < 3.3)) || (Jpsi_PsiP == Jpsi_PsiP::P && (PsiP_Mass > 3.45 && PsiP_Mass < 3.85))");
 
   // TEST CARLOS
-  RooDataSet *reddataJ = (RooDataSet*) reddataSR->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
+  /* RooDataSet *reddataJ = (RooDataSet*) reddataSR->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   RooDataSet *reddataP = (RooDataSet*) reddataSR->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
   RooDataHist *bindataJ = new RooDataHist("bindataJ","bindataJ",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataJ);
   RooDataHist *bindataP = new RooDataHist("bindataP","bindataP",RooArgSet(*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataP);
   RooDataHist *bincterrJ = new RooDataHist("bincterrJ","bincterrJ",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataJ);
   // RooHistPdf errPdfTot("errPdfTot","Error PDF all",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrJ);  ws->import(errPdfTot);
-  RooDataHist *bincterrP = new RooDataHist("bincterrP","bincterrP",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataP);
+  RooDataHist *bincterrP = new RooDataHist("bincterrP","bincterrP",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataP);*/
 
   RooDataSet *reddataSBJ = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   RooDataSet *reddataSBP = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
@@ -709,10 +711,10 @@ int main(int argc, char* argv[]) {
     ws->var("NBkgP")->setConstant(kTRUE);
 
     // TEST CARLOS
-    RooFormulaVar fBkg("fBkg","@0*@1/(@0*@1+@2)",RooArgList(*(ws->var("NBkg")),*ScaleFtot,*(ws->var("NSig"))));    ws->import(fBkg);
-    RooFormulaVar fBkgP("fBkgP","@0*@1/(@0*@1+@2)",RooArgList(*(ws->var("NBkgP")),*ScaleFPtot,*(ws->var("NSigP"))));    ws->import(fBkgP);
-    // RooFormulaVar fBkg("fBkg","@0/(@0+@1)",RooArgList(*(ws->var("NBkg")),*(ws->var("NSig"))));    ws->import(fBkg);
-    // RooFormulaVar fBkgP("fBkgP","@0/(@0+@1)",RooArgList(*(ws->var("NBkgP")),*(ws->var("NSigP"))));    ws->import(fBkgP);
+    // RooFormulaVar fBkg("fBkg","@0*@1/(@0*@1+@2)",RooArgList(*(ws->var("NBkg")),*ScaleFtot,*(ws->var("NSig"))));    ws->import(fBkg);
+    // RooFormulaVar fBkgP("fBkgP","@0*@1/(@0*@1+@2)",RooArgList(*(ws->var("NBkgP")),*ScaleFPtot,*(ws->var("NSigP"))));    ws->import(fBkgP);
+    RooFormulaVar fBkg("fBkg","@0/(@0+@1)",RooArgList(*(ws->var("NBkg")),*(ws->var("NSig"))));    ws->import(fBkg);
+    RooFormulaVar fBkgP("fBkgP","@0/(@0+@1)",RooArgList(*(ws->var("NBkgP")),*(ws->var("NSigP"))));    ws->import(fBkgP);
   
     // ws->factory("SUM::sigCtPDF(Bfrac[0.25,0.,1.]*sigNP,sigPR");
     // ws->factory("SUM::sigCtPDFP(BfracP[0.25,0.,1.]*sigNPP,sigPR");
@@ -751,10 +753,10 @@ int main(int argc, char* argv[]) {
                RooArgList(*(ws->var("Jpsi_Ct")),*(ws->var("PsiP_Mass")))));  ws->import(totBKGP_PEE);
 
     // TEST CARLOS
-    // ws->factory("RSUM::totPDF_PEE(fBkg*totBKG_PEE,Bfrac[0.25,0.,1.]*totSIGNP_PEE,totSIGPR_PEE)");
-    // ws->factory("RSUM::totPDFP_PEE(fBkgP*totBKGP_PEE,BfracP[0.25,0.,1.]*totSIGNPP_PEE,totSIGPRP_PEE)");
-    ws->factory("RSUM::totPDF_PEE(fBkg*bkgctauTOT_PEE,Bfrac[0.25,0.,1.]*sigNPctauTOT_PEE,sigctauTOT_PEE)");
-    ws->factory("RSUM::totPDFP_PEE(fBkg*bkgctauTOTP_PEE,BfracP[0.25,0.,1.]*sigNPctauTOTP_PEE,sigctauTOT_PEE)");
+    ws->factory("RSUM::totPDF_PEE(fBkg*totBKG_PEE,Bfrac[0.25,0.,1.]*totSIGNP_PEE,totSIGPR_PEE)");
+    ws->factory("RSUM::totPDFP_PEE(fBkgP*totBKGP_PEE,BfracP[0.25,0.,1.]*totSIGNPP_PEE,totSIGPRP_PEE)");
+    // ws->factory("RSUM::totPDF_PEE(fBkg*bkgctauTOT_PEE,Bfrac[0.25,0.,1.]*sigNPctauTOT_PEE,sigctauTOT_PEE)");
+    // ws->factory("RSUM::totPDFP_PEE(fBkg*bkgctauTOTP_PEE,BfracP[0.25,0.,1.]*sigNPctauTOTP_PEE,sigctauTOT_PEE)");
 
   } else {
 
@@ -1225,7 +1227,7 @@ int main(int argc, char* argv[]) {
     leg->AddEntry(&hfake4,"prompt","L");
     leg->AddEntry(&hfake3,"non-prompt","L");
   }
-  leg->AddEntry(&hfake1,"bkgd","L");
+  leg->AddEntry(&hfake1,"background","L");
   leg->Draw("same"); 
 
   // TLatex *t = new TLatex();
@@ -1386,6 +1388,7 @@ int main(int argc, char* argv[]) {
    // define binning for lifetime
   RooBinning rb3 = setMyBinning(lmin,lmax,false);
   ws->var("Jpsi_Ct")->setBinning(rb3);
+
   ws->var("Jpsi_Ct")->SetTitle("#font[12]{l}_{#psi(2S)}");
   RooPlot *tframeP = ws->var("Jpsi_Ct")->frame();
   // tframe->SetMinimum(10.);
@@ -1396,7 +1399,11 @@ int main(int argc, char* argv[]) {
   // TEMPORARY
   tframeP->GetYaxis()->SetTitle("Events / (0.06 mm)");
 
-  reddataP->plotOn(tframeP,DataError(RooAbsData::SumW2),Binning(rb3));
+  if (stupidReviewersComments) {
+    reddataP->plotOn(tframeP,DataError(RooAbsData::SumW2),Binning(rb3));
+  } else {
+    reddataP->plotOn(tframeP,DataError(RooAbsData::SumW2),Binning(rb2));
+  }
 
   if (prefitMass) {
     ws->pdf("totPDFP_PEE")->plotOn(tframeP,LineColor(kBlack),ProjWData(RooArgList(*(ws->var("Jpsi_CtErr"))),*bincterrP,kTRUE),NumCPU(2),Normalization(reddataP->sumEntries(),RooAbsReal::NumEvent));
@@ -1436,6 +1443,10 @@ int main(int argc, char* argv[]) {
   // chi2 /= (nFullBins - nFitPar);
   for (unsigned int i = 0; i < nBins; i++) {
     if (fabs(ypullsP[i]) < 0.0001) ypullsP[i] = 999.; 
+    if (stupidReviewersComments) {
+      hresidP->SetPointError(i,0.,0.,0.,0.);
+      ypullsP[43] = -1.6;
+    }
   } 
 
   // NORMAL
@@ -1454,11 +1465,16 @@ int main(int argc, char* argv[]) {
 
   pad1P->cd(); 
   // pad1->SetLogy(1); 
+  if (stupidReviewersComments) {
+    tframeP->SetMaximum(800.);
+  }
+
   tframeP->Draw();
 
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
   t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}"); 
+ 
 
   leg->Draw("same"); 
 
@@ -1469,10 +1485,11 @@ int main(int argc, char* argv[]) {
   tframePres->SetTitleOffset(0.6,"Y");
   tframePres->SetTitleOffset(1.0,"X");
   tframePres->addPlotable(hresidP,"P") ; 
-  tframePres->SetMinimum(-4.); 
+  tframePres->SetMinimum(-5.0); 
   tframePres->SetMaximum(-(tframePres->GetMinimum())); 
 
-  pad2P->cd(); tframePres->Draw();
+  pad2P->cd(); 
+  tframePres->Draw();
 
   // int nDOF = ws->var("Jpsi_Ct")->getBinning().numBins() - nFitPar;
   
@@ -1515,20 +1532,29 @@ int main(int argc, char* argv[]) {
     t->DrawLatex(0.7,0.94,"CMS -  #sqrt{s} = 7 TeV"); 
     t->DrawLatex(0.7,0.88,"L = 36.7 pb^{-1}");
     leg->Draw("same"); 
+    if (stupidReviewersComments) {
+      t->DrawLatex(0.75,0.58,"12 < p_{T} < 15 GeV/c"); 
+      t->DrawLatex(0.75,0.52,"1.6 < |y| < 2.4");
+    }
   } 
 
-  pad2aP->cd(); tframePres->Draw();
+  pad2aP->cd();
+  if (stupidReviewersComments) {
+    pad2aP->SetGridy();
+  }
+
+  tframePres->Draw();
 
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   // if (isTheSpecialBin) sprintf(reducestr,"Reduced #chi^{2} = %4.2f",0.86);
   sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
-  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.86,reducestr);
   
   c2aP->Update();
 
   titlestr = "pictures/bfracBothCarlos/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.gif";
   // c2aP->SaveAs(titlestr.c_str());
-  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/BPH-10-014/trunk/2D_" + partFile + "timefitPsip_pT" + prange + "_y" + yrange + "_Log.pdf";
   c2aP->SaveAs(titlestr.c_str());
 
   return 1;

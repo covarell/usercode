@@ -33,7 +33,8 @@
 
 using namespace RooFit;
 bool superImpose = false;
-bool verbose = true;
+bool verbose = false;
+bool stupidReviewersComments = true;
 
 void defineMassBackground(RooWorkspace *ws)
 {
@@ -880,6 +881,10 @@ int main(int argc, char* argv[]) {
 
   pad1->cd(); 
   pad1->SetLogy(1); 
+
+  if (stupidReviewersComments) {
+    mframe->SetMaximum(8000.);
+  }
   mframe->Draw();
 
   TLatex *t = new TLatex();
@@ -889,6 +894,11 @@ int main(int argc, char* argv[]) {
   // t->DrawLatex(0.7,0.9,"CMS Preliminary -  #sqrt{s} = 7 TeV");
   t->DrawLatex(0.78,0.92,"CMS -  #sqrt{s} = 7 TeV"); 
   t->DrawLatex(0.78,0.86,"L = 36.7 pb^{-1}"); 
+
+  if (stupidReviewersComments) {
+    t->DrawLatex(0.78,0.62,"8 < p_{T} < 9 GeV/c"); 
+    t->DrawLatex(0.78,0.56,"|y| < 1.2");
+  }
 
   Double_t fx[2], fy[2], fex[2], fey[2];
   TGraphErrors *gfake = new TGraphErrors(2,fx,fy,fex,fey);
@@ -930,10 +940,13 @@ int main(int argc, char* argv[]) {
   mframeres->SetTitleOffset(0.6,"Y");
   mframeres->SetTitleOffset(1.0,"X");
   mframeres->addPlotable(hresid,"P") ;
-  mframeres->SetMinimum(-4.);
+  mframeres->SetMinimum(-5.0);
   mframeres->SetMaximum(-(mframeres->GetMinimum())); 
 
-  pad2->cd(); mframeres->Draw();
+  pad2->cd();
+  if (stupidReviewersComments) {
+    pad2->SetGridy();
+  }
 
   double *ypulls = hresid->GetY();
   unsigned int nBins = ws->var("Jpsi_Mass")->getBinning().numBins();
@@ -950,10 +963,14 @@ int main(int argc, char* argv[]) {
   // }
   cout << chi2 << endl;
   // chi2 /= (nFullBins - nFitPar);
-  cout << chi2 << endl;
+  // cout << chi2 << endl;
   for (unsigned int i = 0; i < nBins; i++) {
-    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
+    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.;
+    if (stupidReviewersComments) {
+      hresid->SetPointError(i,0.,0.,0.,0.);
+    }
   } 
+  mframeres->Draw();
 
   TLatex *t2 = new TLatex();
   t2->SetNDC();
@@ -963,11 +980,15 @@ int main(int argc, char* argv[]) {
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   cout << "Reduced chi2 = " << chi2 << endl;
   sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
-  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
-  
+
+  // TBox* box = new TBox(0.6,0.8,0.9,0.9);
+  // box->SetFillColor(10);
+  // box->Draw("same");
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.86,reducestr);  
+
   c1->Update();
 
-  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".pdf";
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/BPH-10-014/trunk/" + partFile + "massfitPsip_pT" + prange + "_y" + yrange + ".pdf";
   // titlestr = "pictures/testMassOnly/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1->SaveAs(titlestr.c_str());
 

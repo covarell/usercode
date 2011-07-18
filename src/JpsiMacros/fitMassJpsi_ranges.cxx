@@ -33,9 +33,10 @@
 
 using namespace RooFit;
 bool superImpose = false;
-bool verbose = true;
+bool verbose = false;
 int nVtx = 0;
 bool cutOnVert = false;
+bool stupidReviewersComments = true;
 
 void defineMassBackground(RooWorkspace *ws)
 {
@@ -650,6 +651,11 @@ int main(int argc, char* argv[]) {
   t->DrawLatex(0.38,0.92,"CMS -  #sqrt{s} = 7 TeV"); 
   t->DrawLatex(0.38,0.86,"L = 36.7 pb^{-1}"); 
 
+  if (stupidReviewersComments) {
+    t->DrawLatex(0.35,0.52,"12 < p_{T} < 15 GeV/c"); 
+    t->DrawLatex(0.35,0.46,"0.9 < |y| < 1.2");
+  }
+
   Double_t fx[2], fy[2], fex[2], fey[2];
   TGraphErrors *gfake = new TGraphErrors(2,fx,fy,fex,fey);
   gfake->SetMarkerStyle(20);
@@ -690,10 +696,13 @@ int main(int argc, char* argv[]) {
   mframeres->SetTitleOffset(0.6,"Y");
   mframeres->SetTitleOffset(1.0,"X");
   mframeres->addPlotable(hresid,"P") ;  
-  mframeres->SetMinimum(-4.0);
+  mframeres->SetMinimum(-5.0);
   mframeres->SetMaximum(-(mframeres->GetMinimum())); 
 
-  pad2->cd(); mframeres->Draw();
+  pad2->cd();
+  if (stupidReviewersComments) {
+    pad2->SetGridy();
+  }
 
   double *ypulls = hresid->GetY();
   unsigned int nBins = ws->var("Jpsi_Mass")->getBinning().numBins();
@@ -710,10 +719,15 @@ int main(int argc, char* argv[]) {
   // }
   cout << chi2 << endl;
   // chi2 /= (nFullBins - nFitPar);
-  cout << chi2 << endl;
+  // cout << chi2 << endl;
   for (unsigned int i = 0; i < nBins; i++) {
     if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
+    if (stupidReviewersComments) {
+      hresid->SetPointError(i,0.,0.,0.,0.);
+    }
   } 
+  
+  mframeres->Draw();
 
   TLatex *t2 = new TLatex();
   t2->SetNDC();
@@ -723,12 +737,12 @@ int main(int argc, char* argv[]) {
   // sprintf(reducestr,"Reduced #chi^{2} = %f ; #chi^{2} probability = %f",chi2,TMath::Prob(chi2*nDOF,nDOF));
   cout << "Reduced chi2 = " << chi2 << endl;
   sprintf(reducestr,"#chi^{2}/n_{DoF} = %4.2f/%d",chi2,nFullBins - nFitPar);
-  if (chi2 < 1000.) t2->DrawLatex(0.75,0.90,reducestr);
+  if (chi2 < 1000.) t2->DrawLatex(0.75,0.86,reducestr);
   
   c1->Update();
 
-  // titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/AN-11-098/trunk/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".pdf";
-  titlestr = "pictures/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
+  titlestr = "/afs/cern.ch/user/c/covarell/mynotes/tdr2/notes/BPH-10-014/trunk/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".pdf";
+  // titlestr = "pictures/" + partFile + "massfitJpsi_pT" + prange + "_y" + yrange + ".gif";
   c1->SaveAs(titlestr.c_str());
 
   return 1;
