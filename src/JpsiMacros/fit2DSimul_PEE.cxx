@@ -564,6 +564,8 @@ int main(int argc, char* argv[]) {
 
   RooDataSet *reddataSBJ = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
   RooDataSet *reddataSBP = (RooDataSet*) reddataSB->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
+  RooDataSet *reddataSRJ = (RooDataSet*) reddataSR->reduce("Jpsi_PsiP == Jpsi_PsiP::J");
+  RooDataSet *reddataSRP = (RooDataSet*) reddataSR->reduce("Jpsi_PsiP == Jpsi_PsiP::P");
 
   cout << "Number of true events to fit  = " << reddataTr->sumEntries() << endl; 
   // RooDataHist* bindataPR = new RooDataHist("bindataPR","MC distribution for PR signal",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataPR);
@@ -578,8 +580,10 @@ int main(int argc, char* argv[]) {
   // RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr")),*(ws->cat("Jpsi_PsiP"))),*reddataSB);
   
   RooDataHist* bincterrSBJ = new RooDataHist("bincterrSBJ","MC ct error distribution for bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSBJ);
+  RooDataHist* bincterrSIGJ = new RooDataHist("bincterrSIGJ","MC ct error distribution for sig",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSRJ);
   RooHistPdf errPdfBkg("errPdfBkg","Error PDF bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrSBJ);  ws->import(errPdfBkg);
   RooDataHist* bincterrSBP = new RooDataHist("bincterrSBP","MC ct error distribution for bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSBP);
+  RooDataHist* bincterrSIGP = new RooDataHist("bincterrSIGP","MC ct error distribution for sig",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSRP);
   RooHistPdf errPdfBkgP("errPdfBkgP","Error PDF bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrSBP);  ws->import(errPdfBkgP); 
 
   // ** test **
@@ -666,7 +670,7 @@ int main(int argc, char* argv[]) {
   float scaleF = (exp(2.9*bc)-exp(3.3*bc))/(exp(2.6*bc)-exp(2.9*bc)+exp(3.3*bc)-exp(3.6*bc));
   float scaleFTOT = (exp(2.9*bc)-exp(3.3*bc))/(exp(2.6*bc)-exp(3.6*bc));
   RooRealVar* ScaleFtot = new RooRealVar("ScaleFtot","Carlos",scaleFTOT);
-  RooDataHist* subtrData = subtractSidebands(ws,bincterrJ,bincterrSBJ,scaleF);
+  RooDataHist* subtrData = subtractSidebands(ws,bincterrSIGJ,bincterrSBJ,scaleF);
   subtrData->SetName("subtrData");
   RooHistPdf errPdfSig("errPdfSig","Error PDF signal",RooArgSet(*(ws->var("Jpsi_CtErr"))),*subtrData);  ws->import(errPdfSig);
   
@@ -674,7 +678,7 @@ int main(int argc, char* argv[]) {
   scaleF = (exp(3.45*bc)-exp(3.85*bc))/(exp(3.3*bc)-exp(3.45*bc)+exp(3.85*bc)-exp(4.2*bc));
   float scaleFPTOT = (exp(3.45*bc)-exp(3.85*bc))/(exp(3.3*bc)-exp(4.2*bc));
   RooRealVar* ScaleFPtot = new RooRealVar("ScaleFPtot","Carlos",scaleFPTOT);
-  RooDataHist* subtrDataP = subtractSidebands(ws,bincterrP,bincterrSBP,scaleF);
+  RooDataHist* subtrDataP = subtractSidebands(ws,bincterrSIGP,bincterrSBP,scaleF);
   subtrDataP->SetName("subtrDataP");
   RooHistPdf errPdfSigP("errPdfSigP","Error PDF signal",RooArgSet(*(ws->var("Jpsi_CtErr"))),*subtrDataP);  ws->import(errPdfSigP);
 

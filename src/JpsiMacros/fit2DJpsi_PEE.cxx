@@ -478,6 +478,7 @@ int main(int argc, char* argv[]) {
   } else {
     reddataSB = (RooDataSet*) reddataJ->reduce("Jpsi_Mass < 2.9 || Jpsi_Mass > 3.3");
   }
+  RooDataSet *reddataSIG = (RooDataSet*) reddataJ->reduce("Jpsi_Mass > 2.9 && Jpsi_Mass < 3.3");
 
   cout << "Number of true events to fit  = " << reddataTr->sumEntries() << endl; 
   // RooDataHist* bindataPR = new RooDataHist("bindataPR","MC distribution for PR signal",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr"))),*reddataPR);
@@ -489,6 +490,7 @@ int main(int argc, char* argv[]) {
   // RooDataHist* bindataSB = new RooDataHist("bindataSB","MC distribution for background",RooArgSet(*(ws->var("Jpsi_Mass")),*(ws->var("PsiP_Mass")),*(ws->var("Jpsi_Ct")),*(ws->var("Jpsi_CtErr")),*(ws->cat("Jpsi_PsiP"))),*reddataSB);
   
   RooDataHist* bincterrSB = new RooDataHist("bincterrSB","MC ct error distribution for bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSB);
+  RooDataHist* bincterrSIG = new RooDataHist("bincterrSIG","MC ct error distribution for sig",RooArgSet(*(ws->var("Jpsi_CtErr"))),*reddataSIG);
   RooHistPdf errPdfBkg("errPdfBkg","Error PDF bkg",RooArgSet(*(ws->var("Jpsi_CtErr"))),*bincterrSB);  ws->import(errPdfBkg);
 
   // ** test **
@@ -562,7 +564,7 @@ int main(int argc, char* argv[]) {
 
   float bc = ws->var("coefExp")->getVal();
   float scaleF = (exp(2.9*bc)-exp(3.3*bc))/(exp(2.6*bc)-exp(2.9*bc)+exp(3.3*bc)-exp(3.6*bc));
-  RooDataHist* subtrData = subtractSidebands(ws,bincterr,bincterrSB,scaleF);
+  RooDataHist* subtrData = subtractSidebands(ws,bincterrSIG,bincterrSB,scaleF);
   subtrData->SetName("subtrData");
   RooHistPdf errPdfSig("errPdfSig","Error PDF signal",RooArgSet(*(ws->var("Jpsi_CtErr"))),*subtrData);  ws->import(errPdfSig);
   
