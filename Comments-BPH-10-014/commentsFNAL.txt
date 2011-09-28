@@ -1,0 +1,415 @@
+> ***General observations***
+> 
+> The analysis appears thorough, and the techniques and results are well communicated in the draft paper.
+> It is one of the most complex analyses we have seen coming out of CMS. Not only are several measurements included
+> in the paper, but a large number of corrections and subtle effects are considered. The authors do a very good
+  job of explaining the difficulties and the methodology that has been followed.
+> However, it did seem that the paper lacks a certain amount of polish compared with other CMS papers at the CWR level
+> (and might have been a good candidate for the newly formed Editorial PAG contact process).
+> 
+> The following is a summary of all comments we received, arranged in 3 categories: substantive comments, style comments, and finally detailed line-by-line comments and suggestions.
+  
+> 
+> ***Substantive Comments***
+> 
+> Section 1
+> 
+  I am not sure why an assumption of null polarization is made for the full cross-section measurements. Changing the
+> acceptance to several other polarization scenarios gives differences that can be as high as 20%. Doesn't it make more sense to
+> report individual cross-section measurements for these scenarios?
+> 
+  Section 3
+> 
+> [L91-92] Does this mean 3 muons hence two possible pairs, or 4 muons making 2 different pairs? Ambiguous. If the latter,
+> you should take both ... are there any events with two J/psi? If so they both count in the inclusive cross section,
+> although I realize this would be a tiny effect. But anyway, why should one take the pair with the best vertex?
+> 
+> Section 4
+> 
+> For the simultaneous fits to both mesons, for the inclusive yield determination, the parameters of
+> the signal PDFs appear rather highly constrained.  Has it been checked that these constraints are
+> not too strong, perhaps by fitting a less-binned sample, or non-binned sample, to have higher statistics?
+> 
+> Section 6
+> 
+> 1. Determination of the PV by using the closest approach to the dimuon vertex (as opposed to some Sum-pt^2 or track
+> multiplicity, etc). I was somewhat surprised to see this, especially given that several of the measurements involve the b-quark decay length.
+> I am not sure I understand why this does not introduce a bigger systematic error. Is this because the PU was very low for the 2010 run?
+> 
+> 2. Is the per-event error only used to construct the function D (the per-event error distribution)? Is any significant information
+> lost by integrating over the per-event error rather than taking its actual value for each event? Does D depend on the decay length,
+> or only on the per-event error?
+> 
+> Fig.2
+> 
+> I do not understand how we can have a measurement of J/Psi at such low pt ( < 1 GeV). Is this done without muon ID?
+> I understand this is from an earlier CMS paper, but an explanation about the different Kinematic regions considered in the two papers
+> would be nice to have.
+> 
+> Figures (general)
+> 
+> It's not clear what the error bars represent. Stat+syst? Everything except lumi and polarization? Could this be added to the captions?
+> 
+> 
+> ***Style comments***
+> 
+> 1. It seems to me that the paper should either be lengthened, with more details presented and several tables summarizing the cross
+> section results added, or significantly shortened, with less emphasis on, for example, the difference between Global and Tracker muons.
+> 
+  2. "Two of" seems to be a repeating theme in the paper: Two muon reconstruction schemes, two kinds of fits, two types of muon
+> pairs (A and B), two different approaches for determining acceptance,..
+> 
+> 3. The paper mixes references to rapidity and pseudorapidity, which is okay, but in some cases I wondered whether they meant
+> the other variable.
+  [perhaps this could be clarified by making it clear eta is only used in reference to detector geometry?]
+> 
+> 4. Some of the figures are difficult to read in black-and-white (and figures 4 and 5 have explicit references to colors, which is
+> in violation of the Guidelines.
+> 
+> 5. One thing that I would like to have seen early on in the paper is a quantitative estimate of the size of the various
+  corrections/effects. For example: the issue of polarization that can change the muon momentum spectrum and affect efficiencies,
+> acceptance and ultimately the cross-section measurements. It would be good to help the reader put this in context: is this a 1% or 10%
+> effect? could it be neglected or is it a show-stopper if not done properly? Some of these things are discussed towards the end/under
+> the systematic errors, but in my view these numbers come very late.
+  
+> 6. Some of the details would fit better in the AN note. For example, the issue of coarse/fine binning. It reflects the 
+> different statistics when dealing with MC and data samples. But it is not that important in the bigger scheme of things.
+> 
+> 7. General "specific" comment: there is an abuse of commas in several places.
+> 
+> 8. Sometimes the method referenced from ref[4] could be explained a bit, e.g. page 10, line 275 to 277 seems to address
+>   an initiatic secte !!!
+> 
+> 9. A big effort is done  to account for the differences in the dimuons distributions for prompt and non-prompt J/Psi and Psi(2s). 
+> However,  the fact that the J/Psi and the Psi(2S) are J=1 particles which need a reweighting to account for the dimuon angular distributions  
+> is mentionned only in page 5.  Suggestion: It could be added to the introduction line 19, page 1 after "cross-section ratio" and before 
+> "The utility of measuring..." e.g. something like
+> "The J/Psi and Psi(2S) being j=1 particles, a re-weighting of the dimuons to accounbt for their angular distribution is done . "
+> 
+> 10. There is a possible general concern about the two main approaches for presenting the cross section results, used to account for the
+> unknown dependence on the polarizations. This is likely just due to how they are presented, and not in how they are conducted. The
+> concepts are first introduced in the paragraph starting on line 21.  Given that the second method limits the study to the region of CMS
+> acceptance, it implies that the first method includes regions outside of the acceptance.  Is this really the case, or should the
+> description of the second method be altered to state that it is restricted to the region of *good* or *well-understood* acceptance?
+> 
+> 11. Sometimes you say "at LHC" and other times "at the LHC". "at the LHC" is better (e.g. L14, 16, 36).
+> 
+> 12. The paper alternates between using "b-fraction" and "non-prompt fraction". It would be better to stick to "non-prompt".  
+> 
+> 13. There are a number of cases where a US spelling variant is used whereas the paper appears to have a preference for UK conventions.
+> These include
+>     polarization    A, L4, L21, L23, L27, L72, L143, L145, L154, L158, L160, L320, L321, L327, L344, L345, L381, L382, L383, L388, T1, T2
+>     color           L69(3), L316
+>     center          L36, L87
+>     parametrizes    L239
+>     summarized      L78, L308
+>     normalization   L239, L359
+>     modeled         L371
+>     renormalization L318
+>     factorization   L195, L318
+> 
+> 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
+  transformed into a "." and  a new sentence started.  Too many parenthesis are used for important details
+> 
+> a/  The paragraphs seems to have been written independently and hooked together. This brings immediate repetitions e.g. paragraph 5
+> Acceptance and Efficiency: There is a nice summary of the 2 approaches end of line 140-145, which just comes after the detailed description
+> of the two approaches in the previous paragraph, paragraph 4. It is too close for one more description, It had been described already
+  in the introduction as well. This nice summary could find a place as part of the conclusion 
+> 
+> b/ The sentences are often long. Shorter sentences would made the material even more clear.e.g. already in the introduction
+> - page 1 line 23 the ":" after "two different ways" could be replaced by a full stop and a new sentence started and ending line 25  
+> - page 1 line 26 for example "In the second approach, we provide...  charmonia" ending up line 28
+> - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 middle of 
+  line 45 ending up middle line 47, "A microstrip detector follows, it has ten barrel layers...184microns"
+> - page 3,  end of line 96 to middle of line 98, ":" could be replaced by a full stop
+> - taking out "this" from "As a consequence of this, the ..." -->" As a consequence, the..."
+> - A new sentence middle line 98 to the end of line 99, "Muons that bend toward each other in the magnetic files are called
+  type A dimuons while muons that bend away from each other are type B dimuons." The parenthesis were not necessary
+> - again ":" page 3,line 127 --> a full stop, and a new sentence started
+> - page 4,line 135, the parenthesis could be replaced by a ","
+> - page 4 middle of line 147could end at "reconstruction systems" and a new sentence started "they are constrained by ... magnetic field" 
+> - page 5, without line number the sentence starting by " To study and ending by [19] is too long
+> - page 5   sentence from line 177-179 could easily be cut into two sentences
+> - sentence from the middle of line 181-183  as well   
+> - page 6 line 195 , the ":" could be replaced by a full stop and a new sentence started
+> - page 7 line235 , the ":" replaced by a full stop  & new sentence started
+> - page 11 line 320-324 too long sentence 
+> - page 14- line 357-361 too long sentence
+> 
+> 
+> 
+> 
+> ***Specific line-by-line comments***
+> 
+> Abstract line 6:  "The b-hadron component is" --> "The production component from b-hadron decays is"
+> 
+> L3   $\Chi_{cj}$ -> $\Chi_c}$   for consistency
+> 
+> Line 6: "directly" could be misleading. How about "immediately following the proton-proton collision"?
+> 
+> Line 6: suggest add (pp) after proton-proton to define it
+> 
+> o line 8: This contribution -> The latter contribution
+> 
+> Line 11:  Does "where the chi_c contribution is difficult to predict" refer to the theoretical prediction? If so, I think it's worth
+> emphasizing that there are both experimental and theoretical difficulties, e.g.   "where there are also theoretical difficulties in
+> predicting the chi_c contribution" 
+> 
+> o line 13: "the need for an _independent_ test at LHC"
+> 
+> Line 15: cross sections (pluralize)
+> 
+> Line 18: suggest changing "as well as the cross-section ratio" to "as well as the ratio of the two cross-sections".
+> 
+> line 19:  Suggest removing the word "basically".
+  
+> o line 19: the utility of -> the advantage of
+> 
+> o line 20: both experimentally and theoretically
+> 
+  o line 21: This phrase is written backwards: you need to say that the J/Psi/Upsilon polarization affects the distribution of the muon
+> momenta. And that this geometric acceptance/efficiency effects need to be taken into account in order to calculate the cross-sections
+> for the two processes.
+> 
+> L21  Cross-section results depend strongly on the $J\psi$ and $\psi(2S) polarization.    This suggests that polarization in the lab frame
+> is unambiguous, which is not the case. This would be a good point to clarify the frame dependence (e.g. Collins-Soper).
+  
+> L27  of the two charmonia -> of the two charmonium states
+> 
+> L34  The left-handed Cartesian coordinate system -> The coordinate system  {The system is right-handed, L36.}
+  
+> o lines 38-40: I am not sure you need the detailed explanations on the (pseudo)rapidity definitions in a public document.
+> 
+> L41   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors: Drift Tubes in the barrel, Cathode
+> Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps, embedded in the steel return yoke.
+>   ->   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors embedded in the steel return yoke: 
+> Drift Tubes in the barrel, Cathode Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps.
+> 
+> L55  on a large part -> on a large fraction
+> 
+> L56  This part is selected -> The sample was selected
+> 
+> L59] inelastic collisions
+> 
+> o line 61: "full processing" -> either "full-event processing" or "advanced processing"
+> 
+> o line 62: "are used to arrive/make"
+> 
+> L62  both muons are required to fire a L1 muon signal -> Both muons are required to be consistent with an L1 muon signal
+> 
+> line 63:  "fire" appears as jargon
+> 
+> line 65:  "seed" may be jargon
+> 
+> o line 65: No _explicit_ requirement ...is applied (the L1 condition is equivalent to some Kinematic requirements)
+> 
+> line 66:  "check the agreement with data" may be too generic (is the intended meaning already covered by the other items in the sentence?)
+> 
+> line 67:  the clause "as well as for systematic studies" appears to make this a run-on sentence, or perhaps needs to be preceded by a comma.
+> 
+> Line 67: suggest change "systematic studies" to "studies of systematic uncertainties"
+> 
+> o line 68: "Prompt J/Psi and Psi(2s) events are..."
+
+> Line 74: decayed -> are decayed
+> 
+> o lines 74-75: decayed -> decay
+> 
+> o lines 78-79: "Muons are reconstructed by using two different algorithms"
+  
+> L78  Muons as reconstructed by two different algorithms are merged ->  Muon are required to be reconstructed by two different algorithms
+> {"merged" is ambiguous}
+> 
+> L80  pseudo-rapidity -> pseudorapidity   for consistency
+  
+> 80] but does not fully cover ..
+> 
+> 84] The tracker muon tracks are ...   (still ugly)
+> 
+> Line 84: suggest rephrase, remove "they must have" and replace commas with semi-colons:
+  "The muon tracker tracks are required to pass the following requirements: at least 10 hits in the tracker, at least two of which are required
+> to be in the pixel layers; a chi2 per degree of freedom smaller than 1.8; and they must pass within a cylinder of radius 3 cm and length
+> 30 cm centered at the vertex of the primary interaction and parallel to the beam line."
+> 
+  L92  only the one -> the one
+> 
+> L93  The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
+> region of the detector: as a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
+> to avoid spurious double-muon signature being faked by a single muon.
+> ->     The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
+> region of the detector. As a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
+> to avoid spurious double-muon signature stemming from a single muon.
+> 
+> 93] ... include a veto in the forward region ... what does this mean? Generally a veto means the event would be rejected if there is
+> something (what?) there. Obscure.
+> 
+> L97  "depending on the signed difference in azimuthal angle"
+> The difference would be the same whether the muons were in-benders or out-benders?
+> The description of A and B dimuons is not very precise. Opposite signed muons always bend away from each other in some sense, but what is of
+> interest is whether their paths cross or don't cross in the transverse plane. "in-benders" and "out-benders" are more descriptive than "A" and "B".
+> 
+> o line 105: "efficiency-independent" does not make sense. Do you mean there is no strong trigger bias for this class of events?
+> 
+> line 110:  "broaden" --> "change the width of"
+> 
+> L110 and/or -> and
+> 
+> o lines 114-116: I am not sure this kind of detail in needed in a public paper.
+> 
+> L114 Due to the large difference in the branching ratios to dimuons...
+> It is probably worth stating that the $J\psi$ and $\psi(2S)$ production cross sections are comparable.
+> 
+> L114 the total yield -> the yield
+> 
+> Line 116: suggest change "pT-y" to "pT and y".
+> 
+> L125 the two mass peaks are fit together -> the two mass peaks and the background are fit simultaneously
+> 
+> L127 corrisponding -> corresponding
+> 
+> L138 reported in the general systematic uncertainty Tables 1 and 2 -> shown in Tables 1 and 2 for the $J\psi$ and $\psi(2S)$, respectively
+> 
+  L145 and containing no uncertainty from the assumed polarizations ->  and without any polarization-related uncertainty.
+> 
+> L147 constrained by the thickness of the material -> constrained by the amount of material
+> 
+> Line 159 (actually a few lines above where numbers are missing): suggest "values of the polar and azimuthal angles" (plurals).
+  
+> Line 162,166,169:  instead of brackets, "J/Psi (Psi(2S))", suggest "J/Psi and Psi(2S)"
+> 
+> line 169-172:  Is it possible to clarify here how the difference in acceptance between J/psi and psi(2s) at BaBar is applied to calculate a
+> systematic uncertainty in acceptance at CMS? [the reference points to a BaBar paper]
+> 
+  L180 so-called {\it Tag-and-Probe} -> {\it Tag and Probe}
+> 
+> o line 181: "streams" -> is this CMS jargon?
+> 
+  Line 188: suggest replacing "both on real and simulated data" with "and checked using simulated data"
+> (the use of real data is already mentioned in the first line of the paragraph).
+> 
+> line 189:  "stronger" than what?
+> 
+> Line 190: suggest remove word "then"
+> 
+> Line 190: suggest moving information in parentheses to main sentence, e.g. "mapped in 15 pT and 14 eta bins which allows…"
+> 
+> Line 192: does e_off depend on pT and eta? [the dependence of the other three efficiencies is described]
+> 
+> Line 195: suggest "The correlation factor, rho"
+> 
+> Line 198: "except for a few bins" is vague. How many bins (out of 210?) and by how much does it exceed 10%? Suggest remove "always".
+> 
+> Line 199,220: suggest change "factor" to "correction factor" for consistency and clarity (compare line 207).
+> 
+> L199 are combined in a single factor[,] which is computed for each $|y|$ and $p_T$ bin:
+> 
+> Equation 6:  Change event (in the denominator) to non-math font.
+> 
+> L210 in order to accommodate for -> in order to allow for
+> 
+> Line 222: suggest to make it clear the efficiency corrections are still applied. Is equation 6 used with A_k=1?
+> 
+> Fig 2 caption: appearing as additive offsets in log scale -> appearing as additive offsets on the log scale
+> 
+> Fig 2: Add a label somewhere to show that it is for J/Psi (either on the y-axis label or somewhere within the plot area).
+> 
+> Fig 2: Enlarge the legend (there is plenty of space).
+> 
+> Line 243: suggest replace "defined" with determined".
+> 
+> Line 248,251,279: suggest "b-hadron" for consistency (compare line 7,74,169,228,253) (B-hadron and b hadron => b-handron)
+> 
+> L255 They are obtained respectively from the mass signal region after a sideband subtraction and the mass sideband regions ->
+>     They are obtained from the mass signal region after a sideband subtraction and mass sideband regions, respectively
+> 
+  line 262 and line 269:  Why is the lower bound of the upper mass sideband different in these two cases?
+> 
+> o line 265: need space before "statistics"
+> 
+> Line 269: The mass signal regions aren't stated anywhere. If they are in between the sidebands then say so.
+  
+> Line 271: suggest add "projected"
+> 
+> o line 271: "some selected fit" --> "some example fits for"
+> 
+> line 277:  "fits" --> "fit"
+  
+> Line 277: suggest "The largest difference in fit results compared to the nominal is taken…"
+> 
+> Line 280: "a systematic uncertainty"
+  
+> Line 283: "an alternative approach" is ambiguous, suggest to remove it?
+> 
+> L285 di-muon -> dimuon
+> 
+> Line 286: "a systematic uncertainty"
+> 
+> Line 296: suggest "and the relative difference is propagated to the non-prompt fraction and assumed as a systematic uncertainty."
+> 
+> L300 for the two charmonium states -> for the $J/\psi$ and $\psi(2S)$
+> 
+> Line 314: suggest to replace colon with semi-colon or period.
+> 
+> Table 1 caption:    lowest-$p_T$bin -> lowest $p_T$ bin   insert space
+> 
+> Table 1 caption and Table 2 caption:  While the acceptance uncertainties related to FSR are excluded for the lowest-pT bins
+> in the table, are they included in the analysis?  It is not clear.
+> 
+> L321 "extreme" -> extreme
+> 
+> Line 323: missing word(s), suggest replace "for the" with "for both states"
+> 
+> line 326:  replace "referred to" by "with respect to" or "restricted to" ?
+> 
+> Line 329: Is section 7.2 too short? Could it be combined with another section?
+> 
+> Figure 4 and Figure 5 captions: replace last comma with a period: "… calculations. The lines …"
+> 
+> Figure 4:  The left plot appears to be wrong plot.  It looks like the non-prompt J/psi plot, but should be the prompt J/psi plot.
+> 
+> Figure 4 and Figure 5:  State whether the data points include statistical and systematic (other than luminosity and polarization) uncertainties.
+> 
+> Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible in black and white? In which case they
+should be shaded differently.
+
+> Figs 4,5] Lumi. and polariz.   is ugly and unnecessary. There is room for Luminosity and polarization to be spelled out, however that can be
+> said in the captions. However actually the luminosity uncertainty of 4% is too small to see on these figures, it is less than the size of
+> the symbols! I suggest taking that off the figures.
+> 
+> Figs4,5: State what causes the theoretical variation. Consider removing the lines (could be confusing).
+  
+> Equation 10: Could the cross section ratio (excluding BRs) be presented also?
+> 
+> Line 336: repeated word "bins"
+> 
+  L336 with the coarser binning used for the $\psi(2S)$ cross section -> where the binning is based on the $\psi(2S)$ cross section
+> 
+> L342 significant variation over rapidity -> significant dependence on rapidity
+> 
+> L350 of all weakly decaying $B$ -> of all $B$
+> 
+  L356 and determining a systematic uncertainty -> to determine a systematic uncertainty
+> 
+> L358 the PDG values of -> the world averages for
+> 
+  Line 368: differences
+> 
+> Line 361,373: you define N, but don't use it. I'd like to see either the value of N, or the PDG value for comparison with the measured value.
+> 
+> L374 which is in agreement with, and is an improvement of about a factor 3.5 in uncertainty over the existing measurement ->
+>     which is in agreement with the existing measurement [Ref?] and improves on the uncertainty by a factor of 3.5.
+> 
+> L380 $p_T$(up -> $p_T$ (up     include a space
+> 
+> line 382:  "To mitigate the effect of the effects due to" --> "To mitigate the effects due to"
+> 
+> line 383:  replace "referred to" by "with respect to" or "restricted to" ?
+> 
+> Line 388: suggest "With certain hypotheses on polarization scenarios, the prompt and non-prompt differential cross-section ratios between
+> the two states are computed, benefitting from the cancellation of uncertainties."
+> 
+> Line 391: suggest repeat "of 3.5".
+> 
+> L393 Are there references for the predictions of Ma and Cacciari?
+> 
+> line 491:  Reference [28] still needs an actually arXiv number (arXiv:xxxx.yyyy is a classic!)

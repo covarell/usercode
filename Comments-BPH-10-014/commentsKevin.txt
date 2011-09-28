@@ -1,0 +1,398 @@
+> Before going through the paper
+> line by line, there are three confusing aspects of this paper.
+> 
+> The first confusing part of this paper is the fact that many of the promised results do not appear
+> in the paper but only in a Twiki.  This includes the non-prompt to prompt ratios and the results
+  without the acceptance correction.  As the length of the paper clearly precludes submission to PRL,
+> I think all results should be included in the paper.  Specifically, I would add the following
+> figures: duplicates of Figure 4 and 5 without the acceptance correction and plots of the non-prompt
+> fractions for J/psi and Psi(2S).  The remaining information on the twiki are the corrections to the
+> null polarization for the 4 extreme polarization scenarios.  I don't know how useful these will be
+  in the end.  I think they could be placed in an appendix and let the editor decide what to do.
+> 
+> The most confusing aspect is understanding the various ways that polarization is dealt with.  It is
+> hard to keep track of everything as it enters in many places.  From what I can tell, all of the
+> results actually in the paper come from correcting for acceptance assuming no polarization.  The
+> results which do not correct for acceptance are only in the Twiki.  If this continues to be true
+  then I recommend making this clear from the beginning (lines 21-28).  I would call the results
+> presented in the paper (fully corrected) the default analysis.  Then I would state that the results
+> without acceptance correction are available online.  I am also confused about what the naming and
+> usefulness of the results without acceptance correction.  The phrase often used is "results are also
+  given referred to the CMS detector acceptance region."  Is this superior to "results are given
+> without correcting for acceptance."?  The word that seems out of place is "referred".  Other than
+> the naming, how can these results actually be used in the future once a polarization measurement has
+> been made?  If I understand this correctly, to use these results, a person would need to generate
+> J/psi or Psi(2S) events in each of the pT and |y| bins and measure the fraction of the events in
+> which both muons are inside acceptance (|eta|<1.2 and pT>4 GeV or 1.2<|eta|<2.4 and pT>3.3 GeV).  Is
+> this correct?  Maybe this can be made clear when these results are presented.
+> 
+> The last confusing bit is for exactly what results are Type-A dimuons in the barrel region allowed.
+> Based on lines 104-106, these dimuons are only used for the non-prompt fraction determination.  Does
+> this mean they are not used for the prompt and non-prompt individual cross section but they are used
+> for the ratio?  If that is true, and given that the ratio plot was not deemed important enough to go
+> in the paper, it seems much easier to exclude the Type-A dimuons from the entire analysis.  If they
+> are included, when the results are presented, it should be mentioned which results include Type-A
+> dimuons in the barrel region.
+> 
+> The remaining comments are presented as they occur in the paper.  There are a few physics issues
+> but mostly just English improvements.
+> 
+> Abstract:
+> Sentence 1: Remove "meson" as it is unnecessary and used in sentence 3
+> Sentence 3: Remove "(up to 70 GeV/c for the J/psi and to 30 GeV/c for the Psi(2S))" as this is too
+> detailed for the abstract.
+> Sentence 4: Change "...component is then determined..." to "...component is determined..."
+> Sentence 5: Remove ", cancelling out many systematic uncertainties" as this is too detailed
+> Sentence 6: Change "...is then extracted..." to "...is extracted..."
+> 
+> L2-4: Heavy-flavour production includes quarkonium production.  Either remove "and quarkonium" or
+> add "Open" before heavy-flavour".  Also, the last clause "via measurements of production cross
+> sections and polarization" seems both redundant and incomplete.  I would prefer removing this clause
+> and starting the sentence with "Measurements of".  This leaves things vague enough to include all
+> production.  The reason I find the clause incomplete is because there are other measurements of
+> production beyond cross sections such as productions asymmetries and correlations.
+> 
+> L5: Change "quarkonium" to "charmonium" as there is no bottomonium here.
+> 
+> L7: Remove "On the other hand" because this is not an alternative to the previous statement but an
+> addition.  If you want to avoid starting a sentence with J/psi one could start the sentence with
+  "Production of J/psi mesons can also occur..."
+> 
+> L11: I would change "e.g." to "especially"
+> 
+> L12: "do not seem to describe well" is awkward.  How about "do not accurately describe"?
+  
+> L13-14: The end ", hence the need for a test at the LHC" is a little awkward.
+> 
+> L19: Change "/" to " to "
+> 
+> L19: Remove "basically"
+  
+> L20 Change "both on the experimental and the theoretical side" to "experimental and theoretical"
+> 
+> L21-28: See above.  The first sentence should also be rewritten.  It seems like you are saying the
+  cross section depends on the polarization which is not true.  It needs to be made clear that the
+> problem is that the polarization is unknown and the acceptance correction is very sensitive to the
+> polarization.
+> 
+> L31: Could flow smoother with "is a 6 m diameter superconducting solenoid producing a magnetic"
+> 
+> L34: I believe "left" should be "right".  This is made clear in line 36 so here you can just write
+> "The coordinate system..."
+> 
+> L46-47 "with strips of pitch" sounds like our strips are made of pitch (tar).  Perhaps "with strip pitch"
+> 
+> L50: "The silicon tracks also provides the primary vertex position, with ~15 micron accuracy" is
+> either very misleading or just wrong.  What is meant by this?  On an event-by-event basis, it may be
+> possible to get 15 micron accuracy in either of the transverse directions with many, many tracks in
+> the primary vertex but this is hardly typical, especially for charmonium.  Furthermore, I don't
+> think the z-position is ever measured that well.  In the PAS TRK-10-005 you can see the X and Y
+> resolution are about 25 microns with 45 tracks and the Z resolution is about 30 microns.  Now if
+> the beamspot is narrow enough, then one can use this information to reduce the uncertainty on the
+> X and Y position, but not the Z position.  For this analysis, this only enters in when differentiating
+> between prompt and non-prompt.  In that case, the uncertainty is dominated by the dimuon vertex so
+> the primary vertex resolution is irrelevant.  I would remove this sentence.
+> 
+> L53: If the HLT is mentioned, it should be mentioned that it consists of a computer farm and maybe
+> even mention that it takes L1 inputs and performs additional reconstruction and verification.
+> 
+> L55: Change "based on a large part of the data sample collected in 2010" to "based on the collected in 2010"
+> 
+> L56: Change "This part is selected in order to" to "The sample is selected to"
+> 
+> L60: Add "The" to the beginning of the sentence to avoid starting with J/psi.
+> 
+> L70-71: It is stated that "We use the NRQCD matrix element tuning...".  But I don't know what it is used
+> for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
+> generation?  Does it affect the shower evolution?
+> 
+> L71-72: It is stated "In the absence of theoretical and experimental information ... and in
+> advance of its direct measurement".  I think that the lack of a direct measurement is already implied by the
+> "absence of experimental information" so it seems "and in advance of its direct measurement" could
+  be removed.  If there is something else to be said, it needs to be more clear.
+> 
+> L78-L83: Could be rewritten.  The language is awkward and "tracker tracks" needs to be defined.
+> Perhaps something like "...briefly summarized.  Muons reconstructed by two algorithms (Global Muons
+> and Tracker Muons) are merged.  Both use tracks reconstructed in the silicon tracks (tracker
+  tracks).  Global muons combine tracker tracks with track segments in the muon detectors to find
+> muons while Tracker muons project tracker tracks into the muon detectors, searching for hits.
+> Global muons are higher quality while Tracker muons have higher efficiency at low momentum."
+> 
+> L88: Change "To select the events" to "To select events"
+> 
+  L92: Change "only the one" to "the one"
+> 
+> L96: Change "being faked by a single muon." to "from a single muon."
+> 
+  L96: "consequence of this" to "consequence"
+> 
+> L101:  "cross again" to "cross"
+> 
+> L101: "This has been shown to cause" to "This causes"
+> 
+> L102-103: ", type-A dimuons are rejected in the whole rapidity range." to ", all type-A dimuons are
+> rejected."
+> 
+> L104: "corresponds to a reduction in statistics of about 48%." to "corresponds to a 48% reduction in
+> yield."  The word "statistics" in this context is jargon.
+> 
+> L108: Change "imperfect knowledge of the magnetic field, modelling of the detector material," to
+> "imperfect knowledge of the magnetic field and detector material,"
+> 
+> L107-113: This paragraph only mentioned the dimuon mass peak as being affected by the momentum
+> measurement.  However, the pT and rapidity measurements will also be affected.  I'm not sure why
+> this paragraph is here.
+> 
+> L115: "smaller than the J/psi one." to "smaller than the J/psi yield."
+> 
+> L121-133: In the second kind of fits, it is never specified what signal function is used.  Is it
+> the same as in first kind of fits.  If so, then L121 should be moved to the previous paragraph and
+> should read "In both fits, the signal function is the sum of a Gaussian and a Crystal Ball function,
+> simultaneously taking into account FSR and experimental resolution."
+> 
+> L121: The Crystal Ball reference should probably be "J. E. Gaiser, Appendix-F Charmonium Spectroscopy
+> from Radiative Decays of the J/Psi and Psi-Prime, Ph.D. Thesis, SLAC-R-255 (1982)".  It is hard to
+> see that the current reference even refers to the currently used Crystall Ball function.
+> 
+> L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
+> 
+> L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
+
+> L127-128: "corrisponding" should be "corresponding".  The end of the sentence could be more simply
+> written as "is fixed to the world average value [18]."  The term "PDG tables" sounds like jargon.
+> 
+> L128: "the corresponding widths" to "the widths"
+> 
+  L131 Remove "Typically,"
+> 
+> L132: Technically it low rapidity may mean highly negative rapidity.  I would suggest changing "low
+> rapidity region" to "barrel region".  I would also change "forward, high rapidity region" to
+> "forward region".
+  
+> Figure 1: The pull plots do not seem to add much information, especially since we do not know if
+> these are typical fits or the best two.  I would suggest removing the pull plots and putting the
+> chi^2 in the mass plots.  The chi^2 does not need two decimal places; an integer is fine.  The axis
+> labels on the y-axis for the right plot need to be closer to the axis.  The font size of everything
+> should be increased, especially axis labels and values.  In the caption, the pT values do not need
+  ".0" and there does not need to be ":" after "bin".
+> 
+> L137 "taken as _the_ systematic"
+> 
+  L137-138: Remove "the values are reported..."
+> 
+> L140-145: This should be rewritten in terms of the default analysis and extra information without
+> the acceptance correction, not in terms of two distinct analyses.
+> 
+> Eq 1, L153-154: Lambda_theta needs to be defined. 
+> Furthermore, in line 23 we are told that the polarization is 0 for prompt and from EvtGen for non-prompt.
+> So why are there various polarization scenarios being mentioned here?
+> 
+> L156-Eq 2: This sentence should be rewritten.  How about "The acceptance region is defined by the single
+> muon requirements: |eta|<1.2 and pT>4 GeV or 1.2<|eta|<2.4 and pT>3.3 GeV."
+> 
+> Eq 3: Doesn't the dependence on lambda_phi mean that lambda_phi should be in Eq. 1?  Is lambda_phi
+> varied?
+> 
+> L162-165: Need to make clear why different generated spectra can lead to different acceptance.  Perhaps
+> starting the sentence with "As the acceptance is defined by single muon criteria, different spectra..."
+> Reading the AN it seems like the acceptance came from a particle gun.  If this is so, then I don't see
+> why this would be called a Pythia spectrum.
+> 
+> L165: "taken as _a_ systematic"
+> 
+> L166-172: Why should this be considered a sufficient systematic?  What about the uncertainty in the
+> measurement of [6]?  Since the measurement comes from e+e-, it does not include B_s or Lambda_b decays.
+> Is there reason to expect that the inclusive result from BaBar doesn't change with the addition of
+> B_s or Lambda_b decays?  Does this also require Pythia to get the prompt to non-prompt fraction correct?
+> If so, does it?  I don't see comparisons to Pythia in the paper to check this.
+> 
+> L173-179: This section starts with transverse momenta and then just talks about momentum.  So does this
+> systematic include effects on both pT and rapidity?
+> 
+> L177: "measured on data" to "measured with data"
+> 
+> L177: "resolution has been then used" to "resolution was used"
+> 
+> L179: "shift has been taken" to "shift taken"
+> 
+> L180: Remove "so-called"
+  
+> Line after 183: Remove ", measured on data," as this is stated in line 188.
+> 
+> L186: "and and" to "and"
+> 
+  L187: "All of the above efficiencies" to "The efficiencies"
+> 
+> L188: "techniques, both on real" to "techniques on real"
+> 
+> L189-192: Need rewriting.  "then" and "In turn" should be removed.
+> 
+  Line after 192: "expressed in the following way:" to "expressed as:"
+> 
+> L 196: Remove "both"
+> 
+  L197: At end of sentence, could include the clause ", namely the assumption that the dimuon efficiency is
+> the product of two single muon efficiencies" to be clear what the rho factor is for.
+> 
+> Eq 6, L201-203: This is one way of getting the average efficiency (actually average weight).  The
+> claim is that the recipricol of the result in Eq. 6 is the average efficiency*acceptance for a
+> particular bin.  However, if there are low efficiency*acceptance regions in that bin, they may not
+> get sampled by a limited data sample, resulting in a bias to higher efficiency*acceptance.  An
+> alternative measurement would be to use a sample of MC generated events and apply the
+> acceptance*efficiency for each event to get an efficiency for that event and average all of the
+> efficiencies in a bin.  Note that you would use the same acceptance*efficiency as you applied to the
+> data.  The difference is you average acceptance*efficiency on MC generated events instead of
+> averaging 1/(acceptance*efficiency) on data reconstructed events.  Have you tried this?  This seems
+> like an important systematic check.
+> 
+> L205-214: A central claim of the paper is that the polarization only affects the acceptance.  For
+> the efficiency, the single muon efficiencies and vertex efficiency are obtained from data so they
+> obviously have the correct polarization.  However, the rho-factor comes from MC.  Therefore, it is
+> possible for the polarization to affect the value of rho.  I think it would be good to check the
+> effect on rho of the extreme polarization scenarios.  It may not need to be included in the
+> systematic uncertainty for the acceptance corrected results which are only correct for the null
+> polarization.  However, it is a possible systematic for the results which are not corrected for
+> acceptance.
+> 
+> L216 and L219-220 are redundant.  Suggest removing "The corrected yields ... <1/AE>bin." and adjusting
+> L216 as "is the J/psi yield in a given transverse momentum--rapidity bin, multiplied by <1/AE>bin to
+> correct for the J/psi acceptance and selection efficiency."
+> 
+> L223: Need to make clear what Figure 2 is.  Should mention that it is corrected for efficiency and
+> acceptance assuing null polarization for prompt J/psi.  Should also state that it is the
+> cross section times branching ratio of J/psi to mu+mu- rather than just cross section.  Also need
+> to state if uncertainties are statistical only or if they include systematic uncertainties.  If
+> they include systematic uncertainties, which ones are included?
+> 
+> Figure 2: The units on the y-axis label are technically incorrect.  In general, writing a/b/c implies
+> a/(bc).  Assuming you do not want to change to natural units everywhere I think you need to write
+> (nb/(GeV/c)) or [nb/(GeV/c)].  The interior text is too small.  In caption, change "showing" to "shown"
+> 
+> L228: Change "In order to" to "To"
+  
+> L228: Change "fit technique is used" to "fit is performed"
+> 
+> L231: Change "x-y" to "transverse"
+> 
+  L234 "A convolution with a resolution function is applied," begs the question of what it is applied to.
+> 
+> L241: Write "The expression for the PDF F(l,m) for J/psi is:
+> 
+> L250: I think it is unreasonable that the PDFs need to be obtained from Ref 4.  Why can't they be added
+> to this paper as well?
+  
+> L262: This seems like a strange sideband region.  Why is the upper sideband so close to the J/psi
+> and so small?  In some of the high rapidity bins it is clear that this sideband region includes some
+> signal.  I don't see any reason why the J/psi sideband must be distinct from the Psi(2S)
+  sideband.
+> 
+> L265: Need space between (2S) and statistics.
+> 
+> L269: Why is the J/psi upper sideband different here (starts at 3.25 instead of 3.20)?
+> 
+> L272: "recipes" sounds too colloquial.  I would suggest "procedures"
+> 
+> Figure 3: As in Figure 1, the pull histograms do not add very much.  I would suggest moving the chi^2
+> to the lifetime plot and removing the pull histograms.  If the pull histograms are kept then I think
+> all of the points in the pull histogram need to appear in the lifetime plot.  That is, the minimum y-value
+> must be lowered to see all of the data points.  Again the chi^2/dof should just be an integer/integer.
+> The caption needs to indicate over what mass range these two projections are made.   In the caption,
+> the momenta values do not need ".0".  In the caption "Projection of a J/psi-psi(2S) two-dimensional fit"
+> is confusing because it leads to the supposition that the J/psi is also present in this plot.  Maybe
+> instead of calling them the J/psi fit and the J/psi-psi(2S) fit you can specify the mass range of the
+> fit or just call the second one the psi(2S) fit.
+> 
+> L279-281: I think a brief summary is appropriate rather than just a reference to 4.
+> 
+> L286: "taken as systematic uncertainties." to "taken as a systematic uncertainty."
+> 
+> L288: What does "used as input" mean?  This needs to be clarified.
+> 
+> L288: A +- 100 MeV variation in the sideband boundaries could be catastrophic.  The upper sideband
+> of the J/psi is 3.20-3.35 so -100 MeV would be 3.10-3.25 which would include half of the J/psi
+> signal.  Is this really what is done?!  If not, need to be more clear.
+> 
+> L297 "assumed as systematic uncertainty" to "recorded as a systematic uncertainty"
+> 
+> Table 1 (2) caption: Need space between lowest-pT and bin.  The fact that the FSR uncertainty gives a
+> 19% (29%) effect which is ignored needs to be explained.
+> 
+> Table 1 and 2: The luminosity uncertainty is not mentioned in the text but appears here.  At the least
+> there should be a reference.  It should also be mentioned in the text.
+> 
+> L303-319: Some explanation of NRQCD and FONLL should be given.  In particular, it should be explained
+> why NRQCD is compared to only the prompt and FONLL is compared to only the non-prompt.
+  
+> L311-319: Since the data points use B*dsigma, the branching ratio uncertainty does not enter into
+> the data.  However, this means the theory will have uncertainties due to the branching ratio
+> uncertainty.  Shouldn't these be included?  It is probably small for the prompt since the dimuon
+> BR is well known.  As mentioned in the text, it will be large for the non-prompt.
+  
+> L321: I don't think it is unreasonable to quickly say what the extreme scenarios are.  How about:
+> "for four extreme polarization scenarios corresponding to fully longitudinal or fully transverse in
+> the helicity frame and the Collins-Soper frame.  This produces typical relative cross-section
+> shifts..."
+> 
+  L323: "for the in the" should be "in the"
+> 
+> L325-328: This could perhaps be rephrased given the suggestions on changing how the uncorrected
+> values are described.
+  
+> L330-331: As mentioned at the beginning, I think these results deserve a figure.
+> 
+> L333: "Most of the systematic uncertainties on the acceptance ... cancel" is disingenuous.  The most
+> important systematic, the polarization, does not cancel in this ratio.  Maybe you could say most
+> of the systematic uncertainties in Table 1 cancel or you could say that most of the systematic
+> uncertainties other than the polarization cancel.
+> 
+> Fig 4: The left plot is not correct.  It is the non-prompt J/psi when it should be the prompt J/psi.
+> 
+> Fig4-5: In these plots, the y-axis uses "BR" while in Fig 2 and Eq 7 the branching ratio is
+> represented by "B".  This should be consistent.
+> 
+> Fig4-5: What do the error bars represent?  Do they include statistical and systematic uncertainties
+> added in quadrature except for luminosity and polarization?  If so, this should be mentioned.
+> 
+> Fig4-5: I think luminosity and polarization can be spelled out.
+> 
+> Fig4-5: Interior text giving histogram key is too small.
+> 
+> Fig4-5 captions: Cannot use colors to describe things.  Change "yellow and blue coloured" to "shaded"
+> 
+> L336-337: Does the J/psi yield come from the J/psi fit or the J/psi-psi(2S) fit?
+> 
+> L342: How are the ratios averaged over rapidity?  I assume that the corrected yields are summed over all
+> rapidity bins and then divided.  It would be incorrect to measure the ratio in bins of rapidity and then
+> average the ratios.
+> 
+> Figure 6: I believe the left plot is Figure 4R / Figure 4L with an appropriate average over rapidity.
+> I assumed that the right plot would be Figure 5R / Figure 5L.  This is probably true for the data.
+> However, it appears not to be true for the models becase in Figure 6 the models are fit to the data
+> rather than being a prediction.  I see that it is mentioned in the caption but maybe the histogram
+> itself should indicate that FONLL and EvtGen are actually fit to the data.
+
+> Figure 6: I think that the vertical range could be 0.02 to 0.09 to make things more visible.
+> 
+> Figure 6 caption: The polarization uncertainties only affect the left plot, correct?  This should be
+> made clear.  Either remove the statement from the caption and put it in the left plot itself or
+> indicate this fact in the caption.
+  
+> L376: The conclusion does not seem to address one question raised at the introduction, namely do
+> these results confirm the Tevatron results or the theory.
+> 
+> L377: Remove "meson" as it is redundant.
+  
+> L380: space before "(up to"
+> 
+> L382-383: "To mitigate the effect of the effects due to the" doesn't sound great and it doesn't really
+> mitigate the effect anyway.
+> 
+  L385-387: There is also the scale discrepancy for non-prompt psi(2S).
+> 
+> L391: The factor of 3 here was a factor of 3.5 in L374.  Also, the symbol used does not mean
+> approximately equal.
+  
+> L394: "the useful" to "useful"
+> 
+> Twiki (Ref 27): For J/psi, in the 1.6 < |y| < 2.1 bin, the pT ranges between 7.0 and 7.5 are listed as
+> 7.0-7.2, 7.2-7.5 in two tables and 7.0-7.25, 7.25-7.5 in one table.  They should be consistent.

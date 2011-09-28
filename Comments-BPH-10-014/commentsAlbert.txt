@@ -1,0 +1,53 @@
+> Thanks for this new paper on J/psi and psi(2S) production!
+> Much of the techniques introduced in [4] are re-used here and hence I do not have
+> many comments on the analysis techniques itself, but mostly on the presentation in the paper.
+> But frankly, here and there this draft looks a bit sloppy and perhaps just a bit prematurely released
+> (spell checking, wrong figure, see below)...
+  
+> As for the changes with the low luminosity analysis, there are two major ones: we
+> have more pile-up in this data sample and the triggers have evolved for higher instantaneous
+> luminosity. Did any of these two changes affect this analysis in a way that is
+> different from the one in [4]? This would be useful to mention explicity.
+  
+> We use the zero polarization hypothesis for the prompt production,
+> which is fine, but we actually also discuss the effect of other polarization
+> schemes (which I think is indeed the good thing to do) but the reader
+> discovers that only by line 320. I suggest to mention that we did that study upfront
+> also in the introduction. We actually do say it explicitly in the conclusion anyway.
+  
+> We compare with models like NRQCD and FONLL: I believe for self-consistency of the
+> paper we should include a description in the introduction on what the physics
+> in these models is (beyond of what we say already).
+  
+> We present the numerical values of some of the plots only on a twiki page...
+> No place in this paper? (is this our agreed way of transmitting this now?
+> best to be checked with Roberto Tenchini)
+> 
+> 
+> Details
+> 
+> line 8 Chi_cf?  (notation correct?)
+> 
+> line 13-14: what did we learn at the end in this paper related to the questions posed here?
+> line 53: maybe useful to add that the HLT uses the full detector information
+>      (as you specify the limited detector information available to the L1)
+> line 69: The sentence "color octet states undergo a shower evolution" does not really tell much
+>    What do you want to say here? A difference with the color singlet states?
+> line 95: "at the muon stations" does not sound correct…
+> line 127: "corrisponding" .. please use a spell checker for other typos…
+> line 166-168: I am not sure how that study deals without the systematic discussed
+>   in this bullet. Perhaps that would deserve a word of explaining?
+> line 189: "… have a stronger pT and eta dependence". Stronger than what?
+> line 224: do we say somewhere in the paper that ref [4] was for much lower luminosity?
+> Fig 2: The legend in the figure is too small, and hard to read. This can be easily
+>      increased in size as there is enough space in the picture frame.
+> Section 7.2 is strange: just telling that these numbers exist without showing or discussing them. If these are interesting we should discuss them here,otherwise this section should be part of some other part of the text.
+> Fig 4/5 what are these lines exacty? A fit of some kind? or just to guide the
+> eye? The caption says 'for illustrative purpose' which does not really say what it is.
+> More importantly: it looks like fig 4a and 5a are identical in the paper (both are for FONLL)
+> Is the NRQCD figure missing? difficult to check the physics discussion in the paper, with this wrong figure…
+> Fig 6: what errors are included for the data points? Statistical only?
+> line 382: "the effects of the effects"
+> line 387: Can we say something more on what it means that the non-prompt
+> cross section at high pT is not reproduced?
+> line 391: in the text we say a factor 3.5, here 3. Be consistent...

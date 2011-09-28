@@ -1,0 +1,34 @@
+> Here are my comments on PAPER-BPH-10-014 (drafted dated 11 September). It looks good.
+> 
+> Physics/Clarity
+> =============
+> 
+  *       L23: This says that you present your results into different ways: with and without the acceptance corrections.  However, I don't see these two sets of results in the rest of the paper.  Please make it much clearer which of the two methods you're using, when you present your results.
+> *       L12: You say "These models".  Please clarify which models are you referring to?  Are you only referring to the NRQCD models, or to all models?
+> *       L187-8: Shouldn't we add that the efficiency is measured only for particles within the geometric acceptance?
+> *       L189-192: Replace "a stronger" -->" the strongest"?  And "and are then" -->", so are".  Your paragraph suggests that you do not bin the tracking efficiency at all.  Is this true?  Your paragraph also says nothing about the binning of epsilon_{off|ID}.
+> *       L198: "few bins" -->" few bins at high pT".
+  *       L199-204: I suggest moving this paragraph to after L214.  It discusses how you combine and acceptance and efficiency, so it should conclude this subsection.  You might also consider moving L221-2, which explains that you also use equation 6 without the acceptance a factor for some results, to the end of this paragraph.
+> *       L210: What is a "split-gaussian"?
+> *       L232-3: Do you really take the primary vertex which is closest in Z to the J/psi vertex?  I.e.  If the J/psi vertex is non-prompt, you do not bother taking into account its reconstructed flight path when choosing the primary vertex ?
+> *       Tables 1 & 2: Since the text refers to these two figures after it refers to figures 4 & 5, please move table 1 after these figures in the paper.  If possible, I suggest that you put both tables 1 & 2 on the same page, presumably a page with no other text on it.
+> *       Table 3: I remain surprised by how small your systematic errors due to the rho factor are.  Fig. 15 C of the AN-NOTE suggests that this systematic error can be as large as ~20%, not only in the 0-0.9 rapidity bin, but also in the 0.9-1.2 and 1.2-1.6 bins.
+> *       Fig. 4a: This looks like identical to Fig. 5a !  Have you accidentally linked to the wrong figure???
+  *       Sect. 7.4: This now looks much more solid.  However, I am surprised at how small the theoretical error is (2%).  Since you measure the cross section ratio only for Pt > 5.5 GeV, you are measuring only about 20% (I guess) of the total cross-section. So you are assuming that you can extrapolate down to Pt = 0 GeV, so picking up this missing 80% with only a 2% theoretical error. I do accept your argument that many of the theoretical uncertainties will cancel in the ratio. But nonetheless I am surprised. But I am not qualified to judge these theoretical calculations, so only ask you to check.
+> 
+> English/Trivia
+> ============
+  
+> *       In general, the quality of the English in the paper is good.  However it is not quite perfect.  Therefore, after you have released the next draft taking into account the comments made during the CWR, someone (e.g Carlos Lourenco or me) should go through it carefully, and send you these minor corrections.
+> *       Everywhere: Are you using the correct latex symbol for "J/psi"?  The spaces on either side of the slash look too large to me.
+> *       Abstract: replace "b-hadron component" --> "component originating from b-hadron decay".
+> *       L7: Delete "On the other hand,".
+> *       L8: Replace ".  This contribution"-->", but this contribution".
+> *       L10: "efficient" -->" better".
+> *       L12-13: "recent production" -->" recent psi(2S) production > and also delete "for prompt psi(2S) mesons".
+> *       L19: Replace "psi(2S)/J/psi" --> "psi(2S) to J/psi".
+> *       L21: "polarization" -->" polarizations" and "affects" -->" affect".
+> *       L22: "Therefore" -->" Therefore,".
+> *       L157: "the acceptance" -->" this geometric acceptance".
+> *       L344: "affects" -->" affect".
+> *       L362: "single measurements" --> "ratio measurements" ?

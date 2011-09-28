@@ -1,0 +1,434 @@
+> General remarks
+> The paper is still difficult and heavy to read. It needs clarifications in 
+> many places and some styling at
+> latest before the Final Reading
+> ·
+  Gives the general impression that the paper does not deliver what is 
+> promised in the introduction: i.e.
+> the results restricted to the CMS acceptance are not really shown. Either 
+> show them or rephrase the
+> introduction and conclusion
+  ·
+> The structure is problematic as many details are introduced in chapters 5 
+> and 6 without any reference
+> to the results themselves. Maybe adding a guideline to the reader in the 
+> end of the introduction could
+> help: something in style "...Chapter N describe the methods used in .... 
+  and Chapter 7 summarizes the
+> results and the uncertainties".
+> ·
+> avoid use of word "statistics" to express amount of data ("low 
+  statistics"), please rephrase lines 104
+> and 265.
+> ·
+> plots of fit pulls (Figs. 1 and 3): please state in the text what should 
+> be learned from these plots, or
+> consider removing the plots, or give the goodness of fit information just 
+> as a number chi^2/NDF.
+> ·
+> · spell-check cross section vs cross-section
+> · Sections 3-7: Use past tense for describing what was done.
+> · Replace 'we' with passive.
+> · Replace 'using' with 'with'.
+> Sections 4-7: State clearly which quantities are derived from simulation 
+> and what are measured from
+> real data.
+> ·
+> Abstract
+> · "is also computed, cancelling out many systematic uncertainties." Does 
+> not read well.
+> · last line: "The inclusive branching ratio for B->Psi(2S) is then..."
+> The results in the paper are improvement of the existing results, plus new 
+> results. Maybe the authors
+> could consider adding something on this in the abstract?
+> ·
+> · Avoid sentences with parentheses in abstract.
+> The last two sentences, propose: "The ratio of the differential cross 
+> sections of the two states is also
+> computed, where the systematic uncertainties largely cancel. The branching 
+> ratio of the inclusive
+> B->psi(2s)X decay is extracted from the ratio of the non-prompt cross 
+> sections."
+> ·
+> 1 Introduction
+> Line 3: "of both perturbative and non-relativistic" -> "of the 
+> perturbative as well as non-relativistic"
+> ·
+> lines 5-7: one could add (for clarification) that since psi(2S) is the 
+  state closest to the DD threshold,
+> there is no significant feed-down from higher charmonium states
+> ·
+> line 7: Is there a phrase missing before "On the other hand,...can also 
+> occur ..."? From the phrasing, I
+  would expect to have something like "J/Psi mesons are produced..." before 
+> it to which "On the other
+> hand" and "also" refer to. Or "In addition to these two mechanisms, 
+> J/Psi... "
+> ·
+> · Line 9: delete "efficient" , not necessary.
+  line 10: This makes the psi mesons ... -> Therefore the psi mesons are (it 
+> is not clear what 'this' is
+> referring to).
+> ·
+  line 10: 'more efficient' does not describe well what you want to say, 
+> which is theoretically cleaner,
+> right?
+> ·
+> · Line 10: "of most theoretical" -> "for most theoretical"
+> · Lines 13-14: delete the end of the sentence ", hence the need.." Not 
+> necessary.
+> · line 16: substitute vague expression "recently published" with for 
+> instance "published in 2011"
+> 
+> ·
+> · line 19: remove "basically"
+> · Line 21: "Cross section results depend" -> "The cross sections depend "
+> · line 22: momentum or momenta?
+> · line 22,23: replace 'we' with passive
+> · Lines 23: Cut the sentence after "different ways" and start a new 
+> sentence: "In the first approach"
+> · Lines 25-26: Cut the sentence after [6] and start a new sentence: "In 
+> the second approach...."
+> Lines 26-27: Propose: "In the second case, we give the result without 
+> correcting for the CMS detector
+> acceptance, in order to mitigate the effect of he polarization of the two 
+> charmonium mesons."
+> ·
+> 2 The CMS detector
+> In chapter 2, there's a certain unbalance between details. Is it necessary 
+> to give all coordinate details
+> here? You could just refer elsewhere.
+> ·
+> · Line 31: "with a magnetic field of.." -> "providing an axial magnetic 
+> field of"
+> · line 34, 36: remove the word "left-handed". Contradicting 'left-handed' 
+> and 'right-handed'.
+> Line 36: "the beam direction" -> "the anticlockwise beam direction". If 
+> the American English style
+> is adopted one should write "counterclockwise" but it seems that the 
+> English style is followed here
+  (Heavy-flavour in line 1).
+> ·
+> · line 37: "measured upwards from..."
+> line 38-39: Is it really necessary to define the pseudorapidity and 
+> rapidity? We suggest to either
+  dropping them, or replacing them with a reference. The sentence "which the 
+> pseudorapidity
+> approaches" is not needed, text book material.
+> ·
+> · line 42: do not use Capital letters for drift tubes etc.
+> · line 45: "made of 66 million 100 x 150 um2 pixels": is this information 
+  really needed here?
+> Iine 46: 2.with 9.3 million strips of pitch". As the number of active 
+> elements is given for the pixel
+> detector.
+  ·
+> · line 47: "with strips of pitch between 80 and 184 um": is this 
+> information really needed here?
+> lines 50-51: 'accuracy' -> 'accuracy in plane transverse to the beam 
+> axis'. Accuracy along the beam
+> line is much worse than 15 microns.
+> ·
+> · line 53: add some details about HLT.
+> 3 Data selection and event reconstruction
+> line 58: You should maybe state already here, that this data set is not 
+> overlapping with the one used
+> for the first J/psi paper.
+> ·
+> line 58: the LHC averaged 2.2 pp collisions per bunch crossing at the CMS 
+> interaction region -> the
+> average number of pp collisions per bunch crossing at the CMS interaction 
+> region was 2.2.
+> ·
+> Line 60: Avoid starting a sentence with a symbol. Propose: "The 
+> reconstruction of the J/psi and
+> psi(2S) mesons is performed in the mu+mu- channel. The analysis is based..."
+> ·
+> line 61: double-muon triggers that exploit full processing at the HLT 
+> level  full processing is jargon.
+> Replace with more precise expression.
+> ·
+> · line 61: All three -> All the three
+> Line 67: "as well as for systematic studies..." -> "as well as for studies 
+> of the systematic
+> uncertainties."
+> ·
+> Line 72: delete "in advance of its direct measurement". You already state 
+> the lack of experimental
+> information in the beginning of the sentence.
+> ·
+> · line 78-79: you do not merge the muons! The sentence is complex. 
+> Rephrase/reorder lines 78-83?
+> · line 80: "not fully covering" -> "does not fully cover"
+  line 84: The muon tracker tracks... -> The muons are required to pass the 
+> following cuts/criteria in the
+> tracker:
+> ·
+> · line 86: 'degree of freedom' -> number of degrees of freedom.
+  · lines 86-87: 'length 30 cm' -> length of 30 cm.
+> lines 86-87: Here one already refers to a selected primary vertex, but 
+> previously it is mentioned (line
+> 58) that there are multiple interaction vertices. Add sentence how you 
+> choose the primary vertex from
+> the vertices.
+  ·
+> · Line 89: Avoid repetition. Write simply " The mass is required to be..."
+> paragraph lines 93-106: from the text it is not clear why the type A 
+> dimuons are rejected in the whole
+  rapidity range for cross section measurements, if the trigger veto is only 
+> in the forward region.
+> Clarify.
+> ·
+> · Line 95: "at the muon stations" -> "in the muon stations"
+> Line 98: "between the positive and negative muon" -> "between the 
+> positively and negatively
+> charged muons"
+> ·
+> · Line 101: "correlations between the detection efficiencies"? Please 
+> explain.
+> · line 104: reduction of 48 % relative to what selections? Just the 
+> trigger?
+> · Line 105: no hyphen in "efficiency independent" and "high rapidity"
+> · Line 109. Break the sentence after "trajectory" and start a new sentence 
+> "These effects..."
+> · Line 109: "biases in the algorithms" ? Can you formulate it better?
+> · Line 110: "reconstructed peaks of dimuon resonances" -> "mass peaks of 
+> the dimuon resonance"
+> · Line 112: "peak shapes" -> "mass peak shapes"
+> · Line 114: "for the two states" -> "of the two states"
+> Line 115: "the total psi(2S) yield is much smaller that..." -> "the total 
+> yield of psi(2s) is much
+> smaller than of J/psi."
+> ·
+> 4 Inclusive yield determination
+> Line 119: Break the sentence after "cross sections" and start a new 
+> sentence "Either the J/psi peak
+> alone is fitted in a restricted mass window or the fit is done for the 
+> combined ..."
+> ·
+> · Line 122: "resolution variations"?
+> · Line 123: "describes" -> "is used to describe"
+> · Line 125: " In the second kind of fits" -> "In the second case.."
+> · line 127: corrisponding --> corresponding
+> · line 128: corresponding again (repetition)
+> · line 130: Motivate the use of two exponentials instead of just one for 
+> the background fit.
+  · Line 137: "obtained on" -> "of", "as systematic" ->"as a systematic"
+> 5 Acceptance and Efficiency
+> · line 139: Efficiency --> efficiency (in the chapter header)
+> · line 140: "As already discussed" -> "As discussed in Section 1".
+> · Line 143: Delete "assumed" in "in the assumed polarization".
+  line 143-144: " we also provide measurements within the CMS detector 
+> acceptance only": One can
+> get an impression that we can also provide measurements outside the CMS 
+> detector
+> acceptance...rephrase with "not corrected for the detector acceptance" or 
+> something similar.
+  ·
+> · line 145: "and containing..." - bad sentence construction
+> · Line 151: "detectable" is a problematic word
+> Line 155: Propose: " In the simulation both muons are required to lie 
+  within the geometric acceptance
+> ...
+> ·
+> · line 159: Replace null lambda with lambda_theta,phi = 0.
+> · line 159-160: Define lambda_\theta\phi (it occurs in eq. (3) but is 
+> undefined).
+> Line 162: Propose: "The acceptance of the generated .... will depend on 
+> their spectra. Theoretical
+> predictions of the polarization presented in Sec. 7 have been used to 
+> recompute the acceptance, ...
+> ·
+> · Lines 166-167: Is the FSR not taken into account in simulation?."
+> Lines 180-181: Either some explanation should be given for the 
+> Tag-and-Probe method or a reference
+> should be given.
+> ·
+> · lines 182-183: the sentence is difficult to understand
+> ·
+> lines 187-188: State which T&P efficiencies (real or simulated) were used 
+> later (probably those from
+> real data? were the simulated efficiencies used anywhere?).
+> ·
+> Lines 189-192: "stronger dependence"? Relative to what? "are mapped"? The 
+> whole paragraph
+> should be rewritten more clearly.
+> ·
+> lines 193-194 and eq (5): it is not clear where the epsilon(mu) come from 
+> (simulation/real
+> data/T&P/etc. ?)
+> ·
+> · line 195: Define more precisely what is being factorised.
+> lines 201-204 and eq. (6): define what is measured from real data and what 
+> is obtained from
+> simulation.
+> ·
+> · Line 203: "estimated original number"?
+> · line 204: of events --> of MC events (?)
+> line 215: Why "5.1 Inclusive cross-section determination" is a subchapter 
+  of "5. Acceptance and
+> efficiency"? Isn't it a topic of its own?
+> ·
+> line 219: Wasn't the N_corr (J/Psi) already defined on the line 216? 
+> Repetition. "as the fit yields" ->
+  "from the fitted yield values"
+> ·
+> lines 221-222: ... results given ... --> ... results are given ... (all 
+> the same, the sentence is difficult to
+> understand)
+> ·
+  · line 223: Why "inclusive" in quotes?
+> 6 Prompt and non-prompt component determination
+> This chapter is difficult for a non-expert. You should spell out more 
+> clearly, that in this chapter you
+  are describing the methods, while the results come in the next chapter 
+> (and in ref 27).
+> ·
+> · Line 235: Terminate the sentence after ""per event error" and start a 
+> new sentence.
+> · line 238 and 257: resolution Gaussian(s), Gaussian(s) resolution?
+> · line 259: What is "the track uncertainty"?
+> · line 260: convolved --> convoluted
+> · Line 262: ""sideband region is" -> "sideband regions are"
+> lines 262 & 269: different sideband limit 3.20 and 3.25 (on purpose?) Is 
+> there unnecessary repetition
+> of limits on line 269?
+> ·
+> · Line 268: "sideband region" ->"sideband regions"
+> · Line 269: "is" -> "are"
+> line 271: (see above) Could add something alike "... showing the prompt 
+> and non-prompt components
+> obtained as described above"
+> ·
+> line 272: Are all these systematic uncertainties given quantitatively in 
+> this paper, i.e. in the tables 1
+> and 2 (or elsewhere)? If so, refer to the tables and to the results which 
+> will be presented in chapter 7
+> ·
+> · Line 277: "fits results" -> "fit results"
+> · Line 286: "is taken as systematic uncertainties" -> "is taken as a 
+> systematic uncertainty"
+> 7 Results
+> line 299: The sentence is difficult to read: Maybe: "The prompt and 
+> non-prompt double-diff
+> production cross-sections for the two charmonium states are extracted from 
+> the inclusive
+> cross-sections and from the non-prompt fraction. The cross-section ratio 
+> of the two states is also
+> computed."
+> ·
+> line 303: "Figures 4 and 5 show the measured .... cross-sections...". 
+> However, above (line 299) it says
+  that the cross-sections are "extracted" from the inclusive cross-sections 
+> and non-prompt fraction.
+> Clarify.
+> ·
+> · line 315: cross-section spectrum
+  · line 316: "feed-down contribution" might not be commonly known.
+> · line 316: color-octet -> colour-octet (BE)
+> · line 323: ... for the in ... --> ... for the (missing text) in ...
+> · paragraph 325-328: In the beginning of the paper (22-28, 140) one gets 
+> an 
+> impression, that the results
+  will be shown in two ways, acceptance-corrected and within CMS acceptance 
+> only. Now the reader
+> may be disappointed to find only a couple of lines and a reference to a 
+> webpage concerning the
+  "visible" cross sections. What about the dominant sources of systematics 
+> for the visible" cross
+> sections? The tables in the twiki give only the total systematics, but a 
+> breakdown like tables 1 and 2 is
+> not shown anywhere.
+> line 326: values are also reported referred to the CMS ... --> ... values 
+> are also reported within the
+> CMS ...
+> ·
+> · line 329: Does this need to be a subchapter of its own if the values are 
+> not given in this paper.
+> · line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
+> p_T and rapidity, ...
+> · line 344: "affects" -> "affect"
+> · Lines 345-346: Not clear, please formulate better.
+> line 346: "leads to 12% to 20% variations in the measured prompt 
+> cross-section ratio" -> "changes the
+> measured prompt cross-section ratio by 12-20%".
+> ·
+> · Lines 370-373: "some of many exclusive models"? Vague.
+> Lines 374-375: Propose: "This is in agreement with the existing 
+> measurement (Ref?) , with the
+> uncertainty improved by a factor of 3.5."
+> ·
+> · line 357: ... the ratio expectation ... --> ... the predicted ratio ...
+> · Line 357: delete "expectation", not needed.
+> 8 Conclusions
+> · line 380: add space after "pt"
+> · line 381: "extracted" -> "computed"?
+> · line 382: To mitigate the effect of the effects ... --> To mitigate the 
+> effects ...
+> Line 383: "polarizations ...." -> "polarization, the measured cross section 
+> uncorrected for the CMS
+> detector acceptance is also given.
+> ·
+> · Line 386: "compared to" -> "compared with"
+> Line 387: Terminate the sentence after ", respectively." and start a new 
+> sentence "A reasonable
+  agreement is found , except ...."
+> ·
+> Line 388-389: Propose: "With selected hypotheses on polarization, the 
+> ratio of the differential cross
+> sections of the two states is computed, leading to a reduced uncertainty 
+  as the systematic errors cancel
+> largely.
+> ·
+> · Line 390: "non-prompt ratio" -> "ratio of the non-prompt cross sections"
+> · line 391: 3 --> 3.5 (as in line 374)
+> · line 392: Acknowledgments --> Acknowledgements (may be a matter of 
+  taste)
+> · line 428: curious accents on I and A?
+> References
+> · ref. 27: date of citation of a web page should be mentioned
+  · ref. 28: arxiv details needed
+> Figures
+> · Figure 1: legends and axis labels are in too small font, difficult to 
+> read
+> Fig. 2: what is the reason for showing the bins 0-1.2 and 1.6-2.4 split in 
+> 2? Looking at the plot I dont
+> see a compelling reason, the pT ranges are roughly the same. If you want 
+> to point out to something in
+> particular, then say it.
+> ·
+> Figure 2 caption: Cut the first sentence after "five rapidity bins" and 
+> start a new sentence "Also
+> plotted are..." Remove the parentheses.
+> ·
+> · Figure 2: try to draw the legends in larger fonts.
+> Fig. 2: too many decimals for eta range (e.g. 2.10<|y|<2.40 to 
+> 2.1<|y|<2.4); Replace "Ref. [4]" with
+> "XX et al.", it is meaningless e.g. in a conference talk without reference 
+> to the paper.
+> ·
+> ·Figure 4: left figure, the legend text FONLL should be NRQCD. Is the plot 
+> actually the right one? It
+> seems very identical to Fig. 5 left (J/psi non-prompt)!
+> 
+> figs. 4,5: these figures are very busy with boxes and thin lines for 
+> theory prediction. I understand it's
+> to guide the eye, but it might be better to just depict theory with wide 
+> band going through data points.
+> Legends again with too small font and with too many decimals. Could spell 
+> out luminosity ad
+> polarization, there's enough space.
+> ·
+> figs, 4.5: can the data errors be right? They look very large (O~50%) 
+> compared to the numbers in the
+> tables (O~10%).
+> ·
+> · fig. 6 left: theory band is hiding y-axis ticks. Use gPad->RedrawAxis() 
+> before saving.
+  · Figure 6 caption: ... NRQCD predictions --> ... NRQCD prediction (in 
+> singular)
+> Tables
+> · Table 1: "lowest-p_T bin", a white space is missing.
+> table 1, 2: the uncertainty tables are missing the total uncertainty, 
+  which the reader would be most
+> interested in.
