@@ -14,11 +14,11 @@ that is
 > different from the one in [4]? This would be useful to mention explicity.
 
 The effect of the triggers is to reduce the low-pT reach of the measurements.
-On the other hand, the high pT reach is increased due to higher statistics.
+On the other hand, the high pT reach is increased due to larger statistics.
 We included Fig. 2 exactly to show these effects.
 
 Pile-up does not affect the dimuon mass, which is anyway "cleaned" by the
-tighter trigger requirements". Effects on the choice of the PV for the 
+tighter trigger requirements. Effects on the choice of the PV for the 
 lifetime measurements are detailed in the "pile-up" systematics.
 
 We can expand on both subjects in the paper.
@@ -71,9 +71,9 @@ Ok.
 
 Well, yes. In Pythia both color-singlet and color octet states are simulated
 as 'particles' with some status. However color-singlet particles are already
-physical states (either J/psi or eventually decaying into it), while 
-color-octets are unphysical, so showering must be always turned on to obtain
-a sensible event.
+physical states (either J/psi or heavier ones eventually decaying into it), 
+while color-octets are unphysical, so showering must be always turned on to 
+obtain a sensible event.
 
 > line 166-168: I am not sure how that study deals without the systematic discussed
 >   in this bullet. Perhaps that would deserve a word of explaining?
@@ -84,7 +84,7 @@ To account for the fact that this amount of FSR is taken from a MC simulation
 (PHOTOS) we take as alternative the acceptance wuth PHOTOS switched off and
 assign as a systematic uncertainty the difference with the default setting.
 
-> line 189: "¡Ä have a stronger pT and eta dependence". Stronger than what?
+> line 189: " have a stronger pT and eta dependence". Stronger than what?
 
 Changed into "the strongest".
 
@@ -99,7 +99,7 @@ Ok, we will do that.
 
 > Section 7.2 is strange: just telling that these numbers exist without showing or discussing them. If these are interesting we should discuss them here,otherwise this section should be part of some other part of the text.
 
-*** ROBERTO *** Ci mettiamo le figure senza accettanza?
+*** ROBERTO *** Ci mettiamo le figure senza accettanza? E le B-fractions?
 
 > Fig 4/5 what are these lines exacty? A fit of some kind? or just to guide the
 > eye? The caption says 'for illustrative purpose' which does not really say what it is.

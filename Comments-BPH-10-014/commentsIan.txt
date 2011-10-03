@@ -13,7 +13,7 @@ with and without the acceptance corrections.  However, I don't see these two
 sets of results in the rest of the paper.  Please make it much clearer which 
 of the two methods you're using, when you present your results.
 
-*** ROBERTO *** Ci mettiamo le figure senza accettanza?
+*** ROBERTO *** Ci mettiamo le figure senza accettanza? E le B-fractions?
 
 > *       L12: You say "These models".  Please clarify which models are 
 you referring to?  Are you only referring to the NRQCD models, or to 
@@ -36,7 +36,7 @@ No, simply the bins are larger. We will make it clearer.
 
 L189 "The muon identification and trigger efficiencies..." refers to 
 epsilon_{ID|track}, epsilon_{off|ID} and epsilon_{trig|off}: tt will be 
-explained better.
+said explicitly.
 
 > *       L198: "few bins" -->" few bins at high pT".
 
@@ -66,7 +66,7 @@ bother taking into account its reconstructed flight path when choosing the
 primary vertex ?
 
 This is a good question. In fact, in presence of significant pileup, this
-requirement should be changed to: the primary vertex that gives the smallest
+requirement should be changed to the primary vertex that gives the smallest
 pointing angle (i.e. the angle between the J/psi momentum vector
 and the reconstructed flight path in the hypothesis of that PV).
 With the very small pile-up of 2010 data, this was found to be sufficient.
@@ -77,7 +77,7 @@ Ok.
 
 > If possible, I suggest that you put both tables 1 & 2 on the same page, presumably a page with no other text on it.
 
-We will try.
+We will try, if Latex behaves.
 
 > *       Table 3: I remain surprised by how small your systematic errors due to the rho factor are.  Fig. 15 C of the AN-NOTE suggests that this systematic error can be as large as ~20%, not only in the 0-0.9 rapidity bin, but also in the 0.9-1.2 and 1.2-1.6 bins.
 
@@ -119,9 +119,6 @@ We will check this. I'm afraid that, since CMS uses a font so different from
 those used in most papers, there is no symbol which appears nice at the
 same time in CMS and paper styles. We will try a few more options, though.
 
-So if we go for 1) it will look nice in CMS and ugly in the paper, if we go 
-for 2) it will be the opposite.
-
 > *       Abstract: replace "b-hadron component" --> "component originating from b-hadron decay".
 > *       L7: Delete "On the other hand,".
 > *       L8: Replace ".  This contribution"-->", but this contribution".
@@ -132,7 +129,6 @@ for 2) it will be the opposite.
 > *       L22: "Therefore" -->" Therefore,".
 > *       L157: "the acceptance" -->" this geometric acceptance".
 > *       L344: "affects" -->" affect".
-
 > *       L362: "single measurements" --> "ratio measurements" ?
 
-Ok.
+Ok all of the above.
