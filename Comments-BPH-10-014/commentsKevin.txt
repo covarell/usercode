@@ -38,12 +38,17 @@
 > but mostly just English improvements.
 > 
 > Abstract:
-> Sentence 1: Remove "meson" as it is unnecessary and used in sentence 3
+> Sentence 1: Remove "meson" as it is unnecessary and used in sentence 3   
+DONE
 > Sentence 3: Remove "(up to 70 GeV/c for the J/psi and to 30 GeV/c for the Psi(2S))" as this is too
-> detailed for the abstract.
-> Sentence 4: Change "...component is then determined..." to "...component is determined..."
+> detailed for the abstract.  
+DONE
+> Sentence 4: Change "...component is then determined..." to "...component is determined..." 
+DONE
 > Sentence 5: Remove ", cancelling out many systematic uncertainties" as this is too detailed
+DONE
 > Sentence 6: Change "...is then extracted..." to "...is extracted..."
+DONE
 > 
 > L2-4: Heavy-flavour production includes quarkonium production.  Either remove "and quarkonium" or
 > add "Open" before heavy-flavour".  Also, the last clause "via measurements of production cross
@@ -51,36 +56,62 @@
 > and starting the sentence with "Measurements of".  This leaves things vague enough to include all
 > production.  The reason I find the clause incomplete is because there are other measurements of
 > production beyond cross sections such as productions asymmetries and correlations.
+
+Proposed change: "Measurements of quarkonium production cross section and polarization provide important tests...(QCD)".
+NOT DONE 
+
 > 
 > L5: Change "quarkonium" to "charmonium" as there is no bottomonium here.
+DONE
 > 
 > L7: Remove "On the other hand" because this is not an alternative to the previous statement but an
 > addition.  If you want to avoid starting a sentence with J/psi one could start the sentence with
-  "Production of J/psi mesons can also occur..."
+>  "Production of J/psi mesons can also occur..."
+
+Already changed.
+
 > 
 > L11: I would change "e.g." to "especially"
+
+DONE
 > 
 > L12: "do not seem to describe well" is awkward.  How about "do not accurately describe"?
+
+Not done (yet).
   
 > L13-14: The end ", hence the need for a test at the LHC" is a little awkward.
+
+this and the previous sentence passed the test of other native speakers... will consider it.
+ 
 > 
 > L19: Change "/" to " to "
+DONE
 > 
 > L19: Remove "basically"
-  
+DONE
 > L20 Change "both on the experimental and the theoretical side" to "experimental and theoretical"
 > 
+DONE
+
 > L21-28: See above.  The first sentence should also be rewritten.  It seems like you are saying the
-  cross section depends on the polarization which is not true.  It needs to be made clear that the
+>  cross section depends on the polarization which is not true.  It needs to be made clear that the
 > problem is that the polarization is unknown and the acceptance correction is very sensitive to the
 > polarization.
+
+Proposed: "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
+
 > 
 > L31: Could flow smoother with "is a 6 m diameter superconducting solenoid producing a magnetic"
 > 
 > L34: I believe "left" should be "right".  This is made clear in line 36 so here you can just write
 > "The coordinate system..."
 > 
+Done
+
 > L46-47 "with strips of pitch" sounds like our strips are made of pitch (tar).  Perhaps "with strip pitch"
+
+Done
+
 > 
 > L50: "The silicon tracks also provides the primary vertex position, with ~15 micron accuracy" is
 > either very misleading or just wrong.  What is meant by this?  On an event-by-event basis, it may be
@@ -92,14 +123,24 @@
 > X and Y position, but not the Z position.  For this analysis, this only enters in when differentiating
 > between prompt and non-prompt.  In that case, the uncertainty is dominated by the dimuon vertex so
 > the primary vertex resolution is irrelevant.  I would remove this sentence.
+
+OK for me to remove it (FL).
+
 > 
 > L53: If the HLT is mentioned, it should be mentioned that it consists of a computer farm and maybe
 > even mention that it takes L1 inputs and performs additional reconstruction and verification.
+
+The original sentence was "The High Level Trigger processor farm ...", but it was shortened due to some previous comment.
+
 > 
 > L55: Change "based on a large part of the data sample collected in 2010" to "based on the collected in 2010"
 > 
+"based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
+Changed.
+
 > L56: Change "This part is selected in order to" to "The sample is selected to"
 > 
+Done
 > L60: Add "The" to the beginning of the sentence to avoid starting with J/psi.
 > 
 > L70-71: It is stated that "We use the NRQCD matrix element tuning...".  But I don't know what it is used
