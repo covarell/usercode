@@ -58,7 +58,8 @@ DONE
 > production beyond cross sections such as productions asymmetries and correlations.
 
 Proposed change: "Measurements of quarkonium production cross section and polarization provide important tests...(QCD)".
-NOT DONE 
+
+[FL]
 
 > 
 > L5: Change "quarkonium" to "charmonium" as there is no bottomonium here.
@@ -77,12 +78,12 @@ DONE
 > 
 > L12: "do not seem to describe well" is awkward.  How about "do not accurately describe"?
 
-Not done (yet).
+Not done (yet).  [FL Non mi piace, in inglese, e Ian non ha obiettato]
   
 > L13-14: The end ", hence the need for a test at the LHC" is a little awkward.
 
 this and the previous sentence passed the test of other native speakers... will consider it.
- 
+ [FL stesso commento di sopra]
 > 
 > L19: Change "/" to " to "
 DONE
@@ -98,7 +99,7 @@ DONE
 > problem is that the polarization is unknown and the acceptance correction is very sensitive to the
 > polarization.
 
-Proposed: "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
+[FL]Proposed:  "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
 
 > 
 > L31: Could flow smoother with "is a 6 m diameter superconducting solenoid producing a magnetic"
@@ -124,25 +125,26 @@ Done
 > between prompt and non-prompt.  In that case, the uncertainty is dominated by the dimuon vertex so
 > the primary vertex resolution is irrelevant.  I would remove this sentence.
 
-OK for me to remove it (FL).
+[FL]OK for me to remove it.
 
 > 
 > L53: If the HLT is mentioned, it should be mentioned that it consists of a computer farm and maybe
 > even mention that it takes L1 inputs and performs additional reconstruction and verification.
 
-The original sentence was "The High Level Trigger processor farm ...", but it was shortened due to some previous comment.
+[FL]The original sentence was "The High Level Trigger processor farm ...", but it was shortened due to some previous comment.
 
 > 
 > L55: Change "based on a large part of the data sample collected in 2010" to "based on the collected in 2010"
 > 
-"based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
+[FL]"based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
 Changed.
 
 > L56: Change "This part is selected in order to" to "The sample is selected to"
 > 
-Done
+Done [FL]
 > L60: Add "The" to the beginning of the sentence to avoid starting with J/psi.
 > 
+DONE [FL]
 > L70-71: It is stated that "We use the NRQCD matrix element tuning...".  But I don't know what it is used
 > for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
 > generation?  Does it affect the shower evolution?
