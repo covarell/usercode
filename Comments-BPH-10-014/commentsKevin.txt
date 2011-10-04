@@ -148,39 +148,75 @@ DONE [FL]
 > L70-71: It is stated that "We use the NRQCD matrix element tuning...".  But I don't know what it is used
 > for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
 > generation?  Does it affect the shower evolution?
+
+qui non so che cosa rispondere [FL]
+
 > 
 > L71-72: It is stated "In the absence of theoretical and experimental information ... and in
 > advance of its direct measurement".  I think that the lack of a direct measurement is already implied by the
 > "absence of experimental information" so it seems "and in advance of its direct measurement" could
-  be removed.  If there is something else to be said, it needs to be more clear.
-> 
+>  be removed.  If there is something else to be said, it needs to be more clear.
+>
+
+Already modified [FL]
+
+ 
 > L78-L83: Could be rewritten.  The language is awkward and "tracker tracks" needs to be defined.
-> Perhaps something like "...briefly summarized.  Muons reconstructed by two algorithms (Global Muons
+> Perhaps something like "...briefly summarized.  
+Muons reconstructed by two algorithms (Global Muons
 > and Tracker Muons) are merged.  Both use tracks reconstructed in the silicon tracks (tracker
   tracks).  Global muons combine tracker tracks with track segments in the muon detectors to find
 > muons while Tracker muons project tracker tracks into the muon detectors, searching for hits.
 > Global muons are higher quality while Tracker muons have higher efficiency at low momentum."
 > 
+
+[FL]  Changed.
+
+
 > L88: Change "To select the events" to "To select events"
+
+Done [FL]
 > 
   L92: Change "only the one" to "the one"
+Done [FL]
+> 
 > 
 > L96: Change "being faked by a single muon." to "from a single muon."
 > 
-  L96: "consequence of this" to "consequence"
-> 
+Done [FL]
+
+>  L96: "consequence of this" to "consequence"
+
+Done [FL]
+ 
 > L101:  "cross again" to "cross"
+
+Done [FL]
 > 
 > L101: "This has been shown to cause" to "This causes"
+Done [FL]
 > 
 > L102-103: ", type-A dimuons are rejected in the whole rapidity range." to ", all type-A dimuons are
 > rejected."
 > 
+Done [FL]
+
+
 > L104: "corresponds to a reduction in statistics of about 48%." to "corresponds to a 48% reduction in
 > yield."  The word "statistics" in this context is jargon.
+
+OK Done [FL]
+
 > 
 > L108: Change "imperfect knowledge of the magnetic field, modelling of the detector material," to
 > "imperfect knowledge of the magnetic field and detector material,"
+ 
+[FL] well I think that in principle there is a difference between "knowledge" and "modelling".  
+One may know perfectly well the material, including electronic chips, cables and all, but 
+one may find it hard, or impossible, or not worth while to simulate it perfectly in the software. 
+
+Not changed for the moment.
+
 > 
 > L107-113: This paragraph only mentioned the dimuon mass peak as being affected by the momentum
 > measurement.  However, the pT and rapidity measurements will also be affected.  I'm not sure why
