@@ -1,0 +1,57 @@
+-- FIT MASSA
+
+- Figures 1, 3: the panes with pulls are really illegible - the font is way 
+too small. You waste a lot of real estate by separating the two panes 
+vertically by a huge amount of white space. Suggest combining the two 
+panes (saves you second set of x-axis labels as well!) and showing the 
+pulls with color bars, a la Fig. 2 in our dijet paper, arXiv:1107.4771. 
+This way the figures would look cleaner. You should also make them wider to 
+use the real estate more efficiently.
+
+- Figure 1: The pull plots do not seem to add much information, especially 
+since we do not know if these are typical fits or the best two.  I would 
+suggest removing the pull plots and putting the chi^2 in the mass plots. 
+The chi^2 does not need two decimal places; an integer is fine.  The axis
+labels on the y-axis for the right plot need to be closer to the axis.  
+The font size of everything should be increased, especially axis labels 
+and values.  In the caption, the pT values do not need ".0" and there does 
+not need to be ":" after "bin".
+
+- Figure 1: legends and axis labels are in too small font, difficult to 
+read
+
+- plots of fit pulls (Figs. 1 and 3): please state in the text what should
+be learned from these plots, or consider removing the plots, or give the 
+goodness of fit information just as a number chi^2/NDF.
+
+-- FIT LIFETIME
+
+- Figures 1, 3: the panes with pulls are really illegible - the font is way
+too small. You waste a lot of real estate by separating the two panes
+vertically by a huge amount of white space. Suggest combining the two
+panes (saves you second set of x-axis labels as well!) and showing the
+pulls with color bars, a la Fig. 2 in our dijet paper, arXiv:1107.4771.
+This way the figures would look cleaner. You should also make them wider 
+to use the real estate more efficiently.
+
+- Figure 3: As in Figure 1, the pull histograms do not add very much.  I 
+would suggest moving the chi^2 to the lifetime plot and removing the pull 
+histograms.  If the pull histograms are kept then I think
+all of the points in the pull histogram need to appear in the lifetime plot.
+That is, the minimum y-value must be lowered to see all of the data 
+points.  Again the chi^2/dof should just be an integer/integer.
+The caption needs to indicate over what mass range these two projections 
+are made. In the caption, the momenta values do not need ".0".  In the 
+caption "Projection of a J/psi-psi(2S) two-dimensional fit" is confusing 
+because it leads to the supposition that the J/psi is also present in 
+this plot.  Maybe instead of calling them the J/psi fit and the J/psi-psi(2S) 
+fit you can specify the mass range of the fit or just call the second one 
+the psi(2S) fit.
+
+- plots of fit pulls (Figs. 1 and 3): please state in the text what should
+be learned from these plots, or consider removing the plots, or give the 
+goodness of fit information just as a number chi^2/NDF.
+
+-- B FRACTION
+
+- Farle senza additive factors e con fonts piu' grosse

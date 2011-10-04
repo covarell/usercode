@@ -13,13 +13,14 @@ with and without the acceptance corrections.  However, I don't see these two
 sets of results in the rest of the paper.  Please make it much clearer which 
 of the two methods you're using, when you present your results.
 
-*** ROBERTO *** Ci mettiamo le figure senza accettanza? E le B-fractions?
+*** ROBERTO *** Che rispondiamo? Ci mettiamo le figure senza accettanza? 
+E le B-fractions?
 
 > *       L12: You say "These models".  Please clarify which models are 
 you referring to?  Are you only referring to the NRQCD models, or to 
 all models?
 
-Changed "These..." to "However, NRQCD..."
+This sentence will be changed.
 
 > *       L187-8: Shouldn't we add that the efficiency is measured only for 
 particles within the geometric acceptance?
