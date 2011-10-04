@@ -222,40 +222,73 @@ Not changed for the moment.
 > measurement.  However, the pT and rapidity measurements will also be affected.  I'm not sure why
 > this paragraph is here.
 > 
+
+[FL: RIVEDERE] Maybe we can take out the reference to the muon peak and just mention the systematics due to 
+tracking. The paragraph is here because this is where the tracking is mentioned, I think it was more or less like this in the published Jpsi paper.  
+
+
 > L115: "smaller than the J/psi one." to "smaller than the J/psi yield."
 > 
+
+
 > L121-133: In the second kind of fits, it is never specified what signal function is used.  Is it
 > the same as in first kind of fits.  If so, then L121 should be moved to the previous paragraph and
 > should read "In both fits, the signal function is the sum of a Gaussian and a Crystal Ball function,
 > simultaneously taking into account FSR and experimental resolution."
+
+[FL] Verificare con Francesco
+
 > 
 > L121: The Crystal Ball reference should probably be "J. E. Gaiser, Appendix-F Charmonium Spectroscopy
 > from Radiative Decays of the J/Psi and Psi-Prime, Ph.D. Thesis, SLAC-R-255 (1982)".  It is hard to
 > see that the current reference even refers to the currently used Crystall Ball function.
+
+
+[FL] Verificare con Francesco
+
+
 > 
 > L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
+
+[FL] Verificare con Francesco credo sia davvero una somma.
+
 > 
 > L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
+
+[FL]  Fatto (verificare).
 
 > L127-128: "corrisponding" should be "corresponding".  The end of the sentence could be more simply
 > written as "is fixed to the world average value [18]."  The term "PDG tables" sounds like jargon.
 > 
+[FL] Done 
+
 > L128: "the corresponding widths" to "the widths"
+[FL] Done 
+
 > 
-  L131 Remove "Typically,"
+> L131 Remove "Typically,"
 > 
 > L132: Technically it low rapidity may mean highly negative rapidity.  I would suggest changing "low
 > rapidity region" to "barrel region".  I would also change "forward, high rapidity region" to
 > "forward region".
   
+[FL] It seems clear to me that it refers to the absolute value of the rapidity. Technically one 
+could also object that "forward" is misleading, since it includes what one would call "backward".
+
+
 > Figure 1: The pull plots do not seem to add much information, especially since we do not know if
 > these are typical fits or the best two.  I would suggest removing the pull plots and putting the
 > chi^2 in the mass plots.  The chi^2 does not need two decimal places; an integer is fine.  The axis
 > labels on the y-axis for the right plot need to be closer to the axis.  The font size of everything
 > should be increased, especially axis labels and values.  In the caption, the pT values do not need
   ".0" and there does not need to be ":" after "bin".
+
+[FL] Da vedere con luca/francesco
+
 > 
 > L137 "taken as _the_ systematic"
+
+[FL] Done (but not so sure).
 > 
   L137-138: Remove "the values are reported..."
 > 
