@@ -99,7 +99,8 @@ Ok, we will do that.
 
 > Section 7.2 is strange: just telling that these numbers exist without showing or discussing them. If these are interesting we should discuss them here,otherwise this section should be part of some other part of the text.
 
-*** ROBERTO *** Ci mettiamo le figure senza accettanza? E le B-fractions?
+B-fractions and acceptance-uncorrected cross section plots will be added 
+in the results section.
 
 > Fig 4/5 what are these lines exacty? A fit of some kind? or just to guide the
 > eye? The caption says 'for illustrative purpose' which does not really say what it is.
@@ -129,4 +130,4 @@ level is correct.
 
 > line 391: in the text we say a factor 3.5, here 3. Be consistent...
 
-Ok.
+Ok, we change the second one to 3.5.

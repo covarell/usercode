@@ -13,8 +13,8 @@ with and without the acceptance corrections.  However, I don't see these two
 sets of results in the rest of the paper.  Please make it much clearer which 
 of the two methods you're using, when you present your results.
 
-*** ROBERTO *** Che rispondiamo? Ci mettiamo le figure senza accettanza? 
-E le B-fractions?
+In the new section acceptance-uncorrected cross section and B-fraction
+plots will be added. Hopefully this will clarify the methods used.
 
 > *       L12: You say "These models".  Please clarify which models are 
 you referring to?  Are you only referring to the NRQCD models, or to 
@@ -36,7 +36,7 @@ No, simply the bins are larger. We will make it clearer.
 > Your paragraph also says nothing about the binning of epsilon_{off|ID}.
 
 L189 "The muon identification and trigger efficiencies..." refers to 
-epsilon_{ID|track}, epsilon_{off|ID} and epsilon_{trig|off}: tt will be 
+epsilon_{ID|track}, epsilon_{off|ID} and epsilon_{trig|off}: it will be 
 said explicitly.
 
 > *       L198: "few bins" -->" few bins at high pT".
@@ -78,7 +78,7 @@ Ok.
 
 > If possible, I suggest that you put both tables 1 & 2 on the same page, presumably a page with no other text on it.
 
-We will try, if Latex behaves.
+We will try.
 
 > *       Table 3: I remain surprised by how small your systematic errors due to the rho factor are.  Fig. 15 C of the AN-NOTE suggests that this systematic error can be as large as ~20%, not only in the 0-0.9 rapidity bin, but also in the 0.9-1.2 and 1.2-1.6 bins.
 

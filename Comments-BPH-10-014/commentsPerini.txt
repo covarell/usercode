@@ -8,7 +8,9 @@
 > the results restricted to the CMS acceptance are not really shown. Either 
 > show them or rephrase the
 > introduction and conclusion
-  ·
+ 
+They will be shown in the next version.
+
 > The structure is problematic as many details are introduced in chapters 5 
 > and 6 without any reference
 > to the results themselves. Maybe adding a guideline to the reader in the 
@@ -16,23 +18,46 @@
 > help: something in style "...Chapter N describe the methods used in .... 
   and Chapter 7 summarizes the
 > results and the uncertainties".
-> ·
+
+This guideline will be added.
+
 > avoid use of word "statistics" to express amount of data ("low 
   statistics"), please rephrase lines 104
 > and 265.
-> ·
 > plots of fit pulls (Figs. 1 and 3): please state in the text what should 
 > be learned from these plots, or
 > consider removing the plots, or give the goodness of fit information just 
 > as a number chi^2/NDF.
+
+Agreed to remove the pull plots in the mass case. Chi2 can be added on the 
+mass plots.
+ 
+However in lifetime plots this is not extremely reliable: chi2 assumes 
+Gaussian pulls, while in the tails we have entries with a small number of
+events (or even fractional, due to non-uniform binning). We will remove 
+the chi2, but leave the pull plots (which anyway show the reader that the
+pulls do not exhibit "runs", i.e. sets of adjacent points with all
+positive or all negative pulls).
+
 > ·
 > · spell-check cross section vs cross-section
+
+This is already checked. "Cross section" is used as a standalone noun,
+"cross-section" when it is an attribute.
+
 > · Sections 3-7: Use past tense for describing what was done.
+
+Perche'???
+
 > · Replace 'we' with passive.
 > · Replace 'using' with 'with'.
 > Sections 4-7: State clearly which quantities are derived from simulation 
 > and what are measured from
 > real data.
+
+From real data: muon efficiencies, yields, B-fractions.
+From MC: acceptance, rho factors.
+
 > ·
 > Abstract
 > · "is also computed, cancelling out many systematic uncertainties." Does 
@@ -41,7 +66,9 @@
 > The results in the paper are improvement of the existing results, plus new 
 > results. Maybe the authors
 > could consider adding something on this in the abstract?
-> ·
+
+No, but it will be added in the intoduction.
+
 > · Avoid sentences with parentheses in abstract.
 > The last two sentences, propose: "The ratio of the differential cross 
 > sections of the two states is also
@@ -53,7 +80,9 @@
 > 1 Introduction
 > Line 3: "of both perturbative and non-relativistic" -> "of the 
 > perturbative as well as non-relativistic"
-> ·
+
+The first form was suggested by a native English speaker.
+
 > lines 5-7: one could add (for clarification) that since psi(2S) is the 
   state closest to the DD threshold,
 > there is no significant feed-down from higher charmonium states
@@ -213,6 +242,11 @@
 > · line 128: corresponding again (repetition)
 > · line 130: Motivate the use of two exponentials instead of just one for 
 > the background fit.
+
+There is no motivation even for one exponential... It is an empirical 
+function and alternative shapes are investigated and considered as
+systematic uncertainties.
+
   · Line 137: "obtained on" -> "of", "as systematic" ->"as a systematic"
 > 5 Acceptance and Efficiency
 > · line 139: Efficiency --> efficiency (in the chapter header)
@@ -248,8 +282,14 @@
 > ·
 > lines 187-188: State which T&P efficiencies (real or simulated) were used 
 > later (probably those from
-> real data? were the simulated efficiencies used anywhere?).
-> ·
+> real data? 
+
+Yes.
+
+> were the simulated efficiencies used anywhere?).
+
+To compute the rho factors.
+
 > Lines 189-192: "stronger dependence"? Relative to what? "are mapped"? The 
 > whole paragraph
 > should be rewritten more clearly.
@@ -288,11 +328,20 @@
 > new sentence.
 > · line 238 and 257: resolution Gaussian(s), Gaussian(s) resolution?
 > · line 259: What is "the track uncertainty"?
+
+Changed to "the uncertainty on track parameters".
+
 > · line 260: convolved --> convoluted
 > · Line 262: ""sideband region is" -> "sideband regions are"
-> lines 262 & 269: different sideband limit 3.20 and 3.25 (on purpose?) Is 
+> lines 262 & 269: different sideband limit 3.20 and 3.25 (on purpose?) 
+
+No this is a typo.
+
+Is 
 > there unnecessary repetition
 > of limits on line 269?
+
+
 > ·
 > · Line 268: "sideband region" ->"sideband regions"
 > · Line 269: "is" -> "are"
@@ -339,6 +388,9 @@
 > sections? The tables in the twiki give only the total systematics, but a 
 > breakdown like tables 1 and 2 is
 > not shown anywhere.
+
+We will clarify it in the papper.
+
 > line 326: values are also reported referred to the CMS ... --> ... values 
 > are also reported within the
 > CMS ...
@@ -422,7 +474,10 @@
 > figs, 4.5: can the data errors be right? They look very large (O~50%) 
 > compared to the numbers in the
 > tables (O~10%).
-> ·
+
+The data errors are right. All the table numbers must be summed in 
+quadrature first (statistical and systematic).
+
 > · fig. 6 left: theory band is hiding y-axis ticks. Use gPad->RedrawAxis() 
 > before saving.
   · Figure 6 caption: ... NRQCD predictions --> ... NRQCD prediction (in 
@@ -432,3 +487,4 @@
 > table 1, 2: the uncertainty tables are missing the total uncertainty, 
   which the reader would be most
 > interested in.
+

@@ -6,7 +6,9 @@
   job of explaining the difficulties and the methodology that has been followed.
 > However, it did seem that the paper lacks a certain amount of polish compared with other CMS papers at the CWR level
 > (and might have been a good candidate for the newly formed Editorial PAG contact process).
-> 
+
+The paper has already gone through Editorial PAG contact review.
+
 > The following is a summary of all comments we received, arranged in 3 categories: substantive comments, style comments, and finally detailed line-by-line comments and suggestions.
   
 > 
@@ -17,40 +19,73 @@
   I am not sure why an assumption of null polarization is made for the full cross-section measurements. Changing the
 > acceptance to several other polarization scenarios gives differences that can be as high as 20%. Doesn't it make more sense to
 > report individual cross-section measurements for these scenarios?
-> 
+
+This is done in the tables in the Twiki that will be eventually added to
+the journal webserver. Also, the acceptance-independent cross section is
+also provided, which removes completely this source of uncertainty. 
+
   Section 3
 > 
 > [L91-92] Does this mean 3 muons hence two possible pairs, or 4 muons making 2 different pairs? Ambiguous. If the latter,
 > you should take both ... are there any events with two J/psi? If so they both count in the inclusive cross section,
 > although I realize this would be a tiny effect. But anyway, why should one take the pair with the best vertex?
-> 
+
+The sentence refers to cases with 3 muons in the events.
+The 2-J/psi effect is expected at the permille level, using CSM 
+expectation for J/psi + ccbar production and another factor 
+BR(J/psi -> mumu) ~ 6%. So we neglect it in our calculations.
+
 > Section 4
 > 
 > For the simultaneous fits to both mesons, for the inclusive yield determination, the parameters of
 > the signal PDFs appear rather highly constrained.  Has it been checked that these constraints are
 > not too strong, perhaps by fitting a less-binned sample, or non-binned sample, to have higher statistics?
-> 
+
+Less-binned samples give rise to rapidity-dependent effects in the mass
+resolution, so more complicated functions should be used for this. From
+the goodness-of-fit we judge that our assumptions are correct and we think 
+that the error determined changing PDF forms also covers this uncertainty.
+
 > Section 6
 > 
 > 1. Determination of the PV by using the closest approach to the dimuon vertex (as opposed to some Sum-pt^2 or track
 > multiplicity, etc). I was somewhat surprised to see this, especially given that several of the measurements involve the b-quark decay length.
 > I am not sure I understand why this does not introduce a bigger systematic error. Is this because the PU was very low for the 2010 run?
-> 
+
+This is a good comment. In fact, in presence of significant pileup, this
+requirement should be changed to the primary vertex that gives the smallest
+pointing angle (i.e. the angle between the J/psi momentum vector
+and the reconstructed flight path in the hypothesis of that PV).
+With the very small pile-up of 2010 data, this was found to be sufficient.
+
 > 2. Is the per-event error only used to construct the function D (the per-event error distribution)? Is any significant information
 > lost by integrating over the per-event error rather than taking its actual value for each event? Does D depend on the decay length,
 > or only on the per-event error?
-> 
+
+No the per-event error is used also in the definition of F(l_J/psi, 
+sigma_l). Formula is a bit incorrect, will be fixed.
+
 > Fig.2
 > 
 > I do not understand how we can have a measurement of J/Psi at such low pt ( < 1 GeV). Is this done without muon ID?
 > I understand this is from an earlier CMS paper, but an explanation about the different Kinematic regions considered in the two papers
 > would be nice to have.
-> 
+
+Muon ID (even _global_ muon ID) works down to pT = 600 MeV/c, provided 
+that you are in the very forward region, where the _total_ momentum of the
+muon allows it anyway to go through the iron slabs of the end wheels.
+Also in the forward you can have the special occurrence when the two
+muons are exactly opposite in the x-y plane, giving rise to an object
+with ~ 0 pT. In fact the measurement down to 0 pT is limited to the 
+forward bin.
+
 > Figures (general)
 > 
 > It's not clear what the error bars represent. Stat+syst? Everything except lumi and polarization? Could this be added to the captions?
 > 
-> 
+
+Everything accept lumi and polarization. Will be said explicitly.
+
 > ***Style comments***
 > 
 > 1. It seems to me that the paper should either be lengthened, with more details presented and several tables summarizing the cross
@@ -58,20 +93,30 @@
 > 
   2. "Two of" seems to be a repeating theme in the paper: Two muon reconstruction schemes, two kinds of fits, two types of muon
 > pairs (A and B), two different approaches for determining acceptance,..
-> 
+
+???? 
+ 
 > 3. The paper mixes references to rapidity and pseudorapidity, which is okay, but in some cases I wondered whether they meant
 > the other variable.
   [perhaps this could be clarified by making it clear eta is only used in reference to detector geometry?]
-> 
+
+No, pseudorapidity and rapidity are used correctly. Specifically we use 
+always eta for muons (where the inequality m_mu << pT_mu always holds) and
+always y for charmonium (where m_psi << pT_psi does not necessarily hold). 
+
 > 4. Some of the figures are difficult to read in black-and-white (and figures 4 and 5 have explicit references to colors, which is
 > in violation of the Guidelines.
-> 
+
+We think figures are readable, references to colors will be removed.
+ 
 > 5. One thing that I would like to have seen early on in the paper is a quantitative estimate of the size of the various
   corrections/effects. For example: the issue of polarization that can change the muon momentum spectrum and affect efficiencies,
 > acceptance and ultimately the cross-section measurements. It would be good to help the reader put this in context: is this a 1% or 10%
 > effect? could it be neglected or is it a show-stopper if not done properly? Some of these things are discussed towards the end/under
 > the systematic errors, but in my view these numbers come very late.
   
+See comment above.
+
 > 6. Some of the details would fit better in the AN note. For example, the issue of coarse/fine binning. It reflects the 
 > different statistics when dealing with MC and data samples. But it is not that important in the bigger scheme of things.
 > 
@@ -79,19 +124,27 @@
 > 
 > 8. Sometimes the method referenced from ref[4] could be explained a bit, e.g. page 10, line 275 to 277 seems to address
 >   an initiatic secte !!!
-> 
+
+Ok :-)
+ 
 > 9. A big effort is done  to account for the differences in the dimuons distributions for prompt and non-prompt J/Psi and Psi(2s). 
 > However,  the fact that the J/Psi and the Psi(2S) are J=1 particles which need a reweighting to account for the dimuon angular distributions  
 > is mentionned only in page 5.  Suggestion: It could be added to the introduction line 19, page 1 after "cross-section ratio" and before 
 > "The utility of measuring..." e.g. something like
-> "The J/Psi and Psi(2S) being j=1 particles, a re-weighting of the dimuons to accounbt for their angular distribution is done . "
-> 
+> "The J/Psi and Psi(2S) being j=1 particles, a re-weighting of the dimuons to accounbt for their angular distribution is done. "
+
+No. This is done only to the generated MC samples to determine acceptance
+uncertainties. No reweighting of the dimuon is done in the mainstream
+analysis.
+
 > 10. There is a possible general concern about the two main approaches for presenting the cross section results, used to account for the
 > unknown dependence on the polarizations. This is likely just due to how they are presented, and not in how they are conducted. The
 > concepts are first introduced in the paragraph starting on line 21.  Given that the second method limits the study to the region of CMS
 > acceptance, it implies that the first method includes regions outside of the acceptance.  Is this really the case, or should the
 > description of the second method be altered to state that it is restricted to the region of *good* or *well-understood* acceptance?
-> 
+
+Ok, this will be improved (also noticed by other reviewers).
+
 > 11. Sometimes you say "at LHC" and other times "at the LHC". "at the LHC" is better (e.g. L14, 16, 36).
 > 
 > 12. The paper alternates between using "b-fraction" and "non-prompt fraction". It would be better to stick to "non-prompt".  
@@ -291,7 +344,7 @@
 > 
 > Line 190: suggest remove word "then"
 > 
-> Line 190: suggest moving information in parentheses to main sentence, e.g. "mapped in 15 pT and 14 eta bins which allows…"
+> Line 190: suggest moving information in parentheses to main sentence, e.g. "mapped in 15 pT and 14 eta bins which allows??
 > 
 > Line 192: does e_off depend on pT and eta? [the dependence of the other three efficiencies is described]
 > 
@@ -334,7 +387,7 @@
 > 
 > line 277:  "fits" --> "fit"
   
-> Line 277: suggest "The largest difference in fit results compared to the nominal is taken…"
+> Line 277: suggest "The largest difference in fit results compared to the nominal is taken??
 > 
 > Line 280: "a systematic uncertainty"
   
@@ -363,7 +416,7 @@
 > 
 > Line 329: Is section 7.2 too short? Could it be combined with another section?
 > 
-> Figure 4 and Figure 5 captions: replace last comma with a period: "… calculations. The lines …"
+> Figure 4 and Figure 5 captions: replace last comma with a period: "??calculations. The lines ??
 > 
 > Figure 4:  The left plot appears to be wrong plot.  It looks like the non-prompt J/psi plot, but should be the prompt J/psi plot.
 > 

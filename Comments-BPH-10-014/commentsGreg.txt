@@ -14,7 +14,7 @@ R. Tenchini and used in many other CMS papers).
 
 The pull plots will be removed, since many reviewers do not see a need for
 them. Also, the fact that proper pull distributions are obtained in 
-mass-lifetime plots was shown in the first J/psi paper.
+mass-lifetime plots was already shown in the first J/psi paper.
 
 > 2) L34: The RIGHT-handed; L36: along the COUNTERCLOCKWISE-beam direction.
 
@@ -31,7 +31,7 @@ muons.
 > 4) Eq. (1): since the detector and generator pT, y quantities are not the same, how do you account for bin-to-bin migration with this formula? Do you just accept it as is (which means that some acceptances could in principle exceed 1)? If so, it's worth mentioning in the text and also use p_T^det, y^det and p_T^gen, y^gen, to distinguish from one the other.
 
 This effect is included in the pT smearing technique (see "pT calibration"
-systematics description) 
+systematics description). 
 
 > 5) Eq. (3): the last two \lambda terms need to be explained, particularly if you use them in definition of the four polarization models.
 
@@ -41,8 +41,9 @@ scenarios (only \lambda_theta is changed to extreme value).
   6) LL170-172: the sentence is confusing, as the "default" choice is not clear. From the previous text, it appears that you use EvtGen as the default choice. Also, why the systematic uncertainty evaluated for e+e- production applies to the pp production, where the ratio of prompt and non-prompt mesons is very different?
 > 
 The Babar measurement is for 100% non-prompt events, since the 
-reconstruction of a B is required. And this is in fact used only for the 
-non-prompt component. We will clarify this in the paper. 
+reconstruction of a B-meson is required in their analysis. And this is 
+in fact used only for the non-prompt component. We will clarify this in 
+the paper. 
 
 > 7) LL262 and 269: why do you use different J/psi sidebands for the two fitting methods? They are different only by 50 MeV, so what's the point of not making them the same. This is particularly true given that you assign systematics on the sidebands method using twice as big variation of 100 MeV - sounds like the 50 MeV difference is in the noise and should not be there to start with.
 
