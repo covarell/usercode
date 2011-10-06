@@ -160,6 +160,9 @@ Ok, this will be improved (also noticed by other reviewers).
 >     modeled         L371
 >     renormalization L318
 >     factorization   L195, L318
+
+"color" and "center" will be UKed. The "-ize" ending is also admitted in the UK, I think.
+
 > 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
   transformed into a "." and  a new sentence started.  Too many parenthesis are used for important details
