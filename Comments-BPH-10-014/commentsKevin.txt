@@ -6,26 +6,48 @@
   without the acceptance correction.  As the length of the paper clearly precludes submission to PRL,
 > I think all results should be included in the paper.  Specifically, I would add the following
 > figures: duplicates of Figure 4 and 5 without the acceptance correction and plots of the non-prompt
-> fractions for J/psi and Psi(2S).  The remaining information on the twiki are the corrections to the
+> fractions for J/psi and Psi(2S).  
+
+These will be indeed added in the paper as plots. Tables will continue to
+stay on the Twiki page (and eventually moved to the journal webserver) see 
+answers to other reviewers). 
+
+> The remaining information on the twiki are the corrections to the
 > null polarization for the 4 extreme polarization scenarios.  I don't know how useful these will be
   in the end.  I think they could be placed in an appendix and let the editor decide what to do.
-> 
+
+Our plan is to leave extreme polarization tables only as supplemental
+material. Clearly the editor's opinion will be also considered during the
+refereeing process.
+
 > The most confusing aspect is understanding the various ways that polarization is dealt with.  It is
 > hard to keep track of everything as it enters in many places.  From what I can tell, all of the
 > results actually in the paper come from correcting for acceptance assuming no polarization.  The
 > results which do not correct for acceptance are only in the Twiki.  If this continues to be true
   then I recommend making this clear from the beginning (lines 21-28).  I would call the results
-> presented in the paper (fully corrected) the default analysis.  Then I would state that the results
+> presented in the paper (fully corrected) the default analysis. 
+
+Ok, see above.
+
+ Then I would state that the results
 > without acceptance correction are available online.  I am also confused about what the naming and
 > usefulness of the results without acceptance correction.  The phrase often used is "results are also
   given referred to the CMS detector acceptance region."  Is this superior to "results are given
-> without correcting for acceptance."?  The word that seems out of place is "referred".  Other than
+> without correcting for acceptance."? 
+
+This is the same. It will be rephrased in many places.
+
+> The word that seems out of place is "referred".  Other than
 > the naming, how can these results actually be used in the future once a polarization measurement has
 > been made?  If I understand this correctly, to use these results, a person would need to generate
 > J/psi or Psi(2S) events in each of the pT and |y| bins and measure the fraction of the events in
 > which both muons are inside acceptance (|eta|<1.2 and pT>4 GeV or 1.2<|eta|<2.4 and pT>3.3 GeV).  Is
 > this correct?  Maybe this can be made clear when these results are presented.
-> 
+
+Yes, this is correct. Since this needs to be done only at generator level, 
+the person will not need CMS simulation to extract the correct 
+cross-section once the polarization is measured.
+ 
 > The last confusing bit is for exactly what results are Type-A dimuons in the barrel region allowed.
 > Based on lines 104-106, these dimuons are only used for the non-prompt fraction determination.  Does
 > this mean they are not used for the prompt and non-prompt individual cross section but they are used
@@ -33,7 +55,14 @@
 > in the paper, it seems much easier to exclude the Type-A dimuons from the entire analysis.  If they
 > are included, when the results are presented, it should be mentioned which results include Type-A
 > dimuons in the barrel region.
-> 
+
+The fact that the B-fraction are not presented explicitly (this will 
+change anyway) does not mean that the final results do not include them.
+Prompt (non-prompt) cross-sections are obtained multiplying the inclusive
+result by 1-f_B (f_B), and this is actually the main statistical error.
+Hence the need to use as much data as possible and including type-A for
+this determination.
+
 > The remaining comments are presented as they occur in the paper.  There are a few physics issues
 > but mostly just English improvements.
 > 
@@ -149,7 +178,7 @@ DONE [FL]
 > for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
 > generation?  Does it affect the shower evolution?
 
-qui non so che cosa rispondere [FL]
+Only the size of the color octet contribution in the total cross section.
 
 > 
 > L71-72: It is stated "In the absence of theoretical and experimental information ... and in
@@ -250,7 +279,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > 
 > L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
 
-[FL] Verificare con Francesco credo sia davvero una somma.
+[FL] It is a sum.
 
 > 
 > L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
@@ -334,8 +363,10 @@ Note that these parameters refer to a particular frame, so technically the accep
 > Reading the AN it seems like the acceptance came from a particle gun.  If this is so, then I don't see
 > why this would be called a Pythia spectrum.
 
-[FL] mi stanno venendo dubbi!! E' fatta col particle gun? In che senso allora si provano vari spettri? facendo il reweigting alle varie predizioni teoriche? l'accettanza di default con quale spettro è stata fatta?
-In effetti l'AN dice che è fatta con un particle gun...
+[FL] mi stanno venendo dubbi!! E' fatta col particle gun? In che senso allora si provano vari spettri? facendo il reweigting alle varie predizioni teoriche? l'accettanza di default con quale spettro ??stata fatta?
+In effetti l'AN dice che ??fatta con un particle gun...
+Questo l'abbiamo chiesto mille volte a Shuang ma nessuno ha mai capito la 
+risposta.
 
 proposta:
 The AN is incorrect, we'll change that. The default acceptance was determined using the events as generated by Pythia.
@@ -424,7 +455,7 @@ suggest that the factorization hypothesis is the bias the previous sentence refe
 > 
 
 [FL] we tried this for the Jpsi paper. The difference is that with this alternative method one relies 
-on the MC spectrum inside a bin. WE are convinced that the method we used 
+on the MC spectrum inside a bin. We are convinced that the method we used 
 correctly includes the "bias to higher efficiency*acceptance" in the statistical error. 
 *VEDERE*
 
@@ -465,7 +496,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > (nb/(GeV/c)) or [nb/(GeV/c)].  The interior text is too small.  In caption, change "showing" to "shown"
 
 
-*da cambiare*
+Done by LM.
 
 > 
 > L228: Change "In order to" to "To"
@@ -511,7 +542,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > L269: Why is the J/psi upper sideband different here (starts at 3.25 instead of 3.20)?
 > 
 
-[FL] *vedere*
+[FL] Typo, corected.
 
 
 > L272: "recipes" sounds too colloquial.  I would suggest "procedures"
@@ -529,7 +560,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > fit or just call the second one the psi(2S) fit.
 > 
 
-[FL] *vedere*
+[FL] Done by RC.
 
 > L279-281: I think a brief summary is appropriate rather than just a reference to 4.
 > 
@@ -552,7 +583,10 @@ Proposed: "the fitted shape is used as a fixed background PDF in the signal regi
 > of the J/psi is 3.20-3.35 so -100 MeV would be 3.10-3.25 which would include half of the J/psi
 > signal.  Is this really what is done?!  If not, need to be more clear.
 
-[FL] *chiarire* (Roberto?)
+It is only the left boundary of the left J/psi sideband (right boundary of 
+the psi' right sidebands) which is changed, exactly to see what the effect
+is when changing of the (quite arbitrary) fraction of left-right events
+in the total sideband sample.
 
 > 
 > L297 "assumed as systematic uncertainty" to "recorded as a systematic uncertainty"
@@ -580,14 +614,17 @@ Not done yet
 > L303-319: Some explanation of NRQCD and FONLL should be given.  In particular, it should be explained
 > why NRQCD is compared to only the prompt and FONLL is compared to only the non-prompt.
 
-FL not done yet
+It will be done in the inntoriduticon.
   
 > L311-319: Since the data points use B*dsigma, the branching ratio uncertainty does not enter into
 > the data.  However, this means the theory will have uncertainties due to the branching ratio
 > uncertainty.  Shouldn't these be included?  It is probably small for the prompt since the dimuon
 > BR is well known.  As mentioned in the text, it will be large for the non-prompt.
   
-
+The total cross-section estimates include errors on the J/psi, psi' BRs
+for the prompt and additionally the B -> J/psi, psi' BRs in the 
+non-prompt. In the last case, this is a sizabel contribution so it must be
+added to the text. Thanks for spotting this,.
 
 > L321: I don't think it is unreasonable to quickly say what the extreme scenarios are.  How about:
 > "for four extreme polarization scenarios corresponding to fully longitudinal or fully transverse in
@@ -610,27 +647,44 @@ FL not done yet
 > uncertainties other than the polarization cancel.
 >
 
-*FL vedere con Fabrizio
+OK. Fai come dice Kevin.
  
 > Fig 4: The left plot is not correct.  It is the non-prompt J/psi when it should be the prompt J/psi.
-> 
+
+Changed.
+
 > Fig4-5: In these plots, the y-axis uses "BR" while in Fig 2 and Eq 7 the branching ratio is
 > represented by "B".  This should be consistent.
-> 
+
+Changed.
+
 > Fig4-5: What do the error bars represent?  Do they include statistical and systematic uncertainties
 > added in quadrature except for luminosity and polarization?  If so, this should be mentioned.
-> 
+
+It is the last option you say. It will be added.
+
 > Fig4-5: I think luminosity and polarization can be spelled out.
-> 
+
+Done.
+
 > Fig4-5: Interior text giving histogram key is too small.
-> 
+
+Not done (no room for this)
+ 
 > Fig4-5 captions: Cannot use colors to describe things.  Change "yellow and blue coloured" to "shaded"
-> 
+
+Done.
+
 > L336-337: Does the J/psi yield come from the J/psi fit or the J/psi-psi(2S) fit?
-> 
+
+The J/psi fit. The J/psi-psi(2S) fit is done onl in larger bins.
+
 > L342: How are the ratios averaged over rapidity?  I assume that the corrected yields are summed over all
 > rapidity bins and then divided.  It would be incorrect to measure the ratio in bins of rapidity and then
 > average the ratios.
+
+They are done in the correct way (i.e. the fitsr you mention)
+
 > 
 > Figure 6: I believe the left plot is Figure 4R / Figure 4L with an appropriate average over rapidity.
 > I assumed that the right plot would be Figure 5R / Figure 5L.  This is probably true for the data.
@@ -638,15 +692,26 @@ FL not done yet
 > rather than being a prediction.  I see that it is mentioned in the caption but maybe the histogram
 > itself should indicate that FONLL and EvtGen are actually fit to the data.
 
+Changed.
+
 > Figure 6: I think that the vertical range could be 0.02 to 0.09 to make things more visible.
-> 
+
+Changed.
+
 > Figure 6 caption: The polarization uncertainties only affect the left plot, correct?  This should be
 > made clear.  Either remove the statement from the caption and put it in the left plot itself or
 > indicate this fact in the caption.
+
+Already changed.
   
 > L376: The conclusion does not seem to address one question raised at the introduction, namely do
 > these results confirm the Tevatron results or the theory.
-> 
+
+The CDF results were compared to a very old theoretical estimation, which 
+is not examined here. The sentence in the introduction will be changed.
+Our only statement is that our results are in agreement with the most
+recent NRQCD calculations including color octet.
+
 > L377: Remove "meson" as it is redundant.
   
 *FL DONE
@@ -657,17 +722,18 @@ FL not done yet
 > L382-383: "To mitigate the effect of the effects due to the" doesn't sound great and it doesn't really
 > mitigate the effect anyway.
 
-FL removed  "the effects due to"
+FL removed  "the effects due to" and "to mitigate"?
 
 > 
 > L385-387: There is also the scale discrepancy for non-prompt psi(2S).
 
-FL *vedere*
+FL Yes, but since we are then extracting the BR from this discrepancy,
+it is not a result worth being repeated in the conclusions.
 
 > 
 > L391: The factor of 3 here was a factor of 3.5 in L374. 
 
-FL rounding to one digit.
+FL NO, METTIAMO 3.5!
 
 > Also, the symbol used does not mean approximately equal.
 
@@ -677,3 +743,5 @@ FL rounding to one digit.
 > 
 > Twiki (Ref 27): For J/psi, in the 1.6 < |y| < 2.1 bin, the pT ranges between 7.0 and 7.5 are listed as
 > 7.0-7.2, 7.2-7.5 in two tables and 7.0-7.25, 7.25-7.5 in one table.  They should be consistent.
+
+Done by LM.
