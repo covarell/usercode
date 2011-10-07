@@ -473,8 +473,17 @@ it's explained in the sentence following the colon.
 > The difference would be the same whether the muons were in-benders or out-benders?
 > The description of A and B dimuons is not very precise. Opposite signed muons always bend away from each other in some sense, but what is of
 > interest is whether their paths cross or don't cross in the transverse plane. "in-benders" and "out-benders" are more descriptive than "A" and "B".
+
+The original names were "cowboys" and "seagulls" which was *very* descriptive and also amusing, 
+but was thought to be inappropriate... We can discuss changing the name again but I'm sure that every choice would raise some eyebrows.
+After all it is not a crucial issue in the paper.
+
+
 > 
 > o line 105: "efficiency-independent" does not make sense. Do you mean there is no strong trigger bias for this class of events?
+
+It means that possible trigger and selection bias do not affect prompt and non-prompt components in appreciably different ways.  *CONTROLLARE*
+
 > 
 > line 110:  "broaden" --> "change the width of"
 > 
