@@ -254,30 +254,60 @@ clarify the relationship between sentences rather than simply separate them. [FL
 > ***Specific line-by-line comments***
 > 
 > Abstract line 6:  "The b-hadron component is" --> "The production component from b-hadron decays is"
+
+Already changed
+
 > 
 > L3   $\Chi_{cj}$ -> $\Chi_c}$   for consistency
+
+DONE
+
 > 
 > Line 6: "directly" could be misleading. How about "immediately following the proton-proton collision"?
 > 
+FL isn't "directly" an established jargon? One could also argue that "immediately following" is not so clear
+
 > Line 6: suggest add (pp) after proton-proton to define it
 > 
+DONE
+
 > o line 8: This contribution -> The latter contribution
-> 
+>
+DONE
+ 
 > Line 11:  Does "where the chi_c contribution is difficult to predict" refer to the theoretical prediction? If so, I think it's worth
 > emphasizing that there are both experimental and theoretical difficulties, e.g.   "where there are also theoretical difficulties in
 > predicting the chi_c contribution" 
 > 
+
+FL I think it's clear that the prediction the text refers to are the theoretical ones.
+
 > o line 13: "the need for an _independent_ test at LHC"
+
+DONE
 > 
 > Line 15: cross sections (pluralize)
+
+DONE
+
 > 
 > Line 18: suggest changing "as well as the cross-section ratio" to "as well as the ratio of the two cross-sections".
 > 
+
+DONE
+
 > line 19:  Suggest removing the word "basically".
   
+DONE
+
 > o line 19: the utility of -> the advantage of
+
+was changed to usefulness, but I like "advantage" better. DONE
+
 > 
 > o line 20: both experimentally and theoretically
+
+already changed
 > 
   o line 21: This phrase is written backwards: you need to say that the J/Psi/Upsilon polarization affects the distribution of the muon
 > momenta. And that this geometric acceptance/efficiency effects need to be taken into account in order to calculate the cross-sections
@@ -285,17 +315,35 @@ clarify the relationship between sentences rather than simply separate them. [FL
 > 
 > L21  Cross-section results depend strongly on the $J\psi$ and $\psi(2S) polarization.    This suggests that polarization in the lab frame
 > is unambiguous, which is not the case. This would be a good point to clarify the frame dependence (e.g. Collins-Soper).
+
+Proposed [FL]:
+
+The polarizations of the \Jpsi\ and \Psis\ states, 
+as defined in suitable decay frames [19], affect the muon momentum spectra in the laboratory frame. 
+This in turn affects the selection acceptance and, as a consequence, 
+the extracted cross-sections results.
+
+
   
 > L27  of the two charmonia -> of the two charmonium states
 > 
+DONE
+
 > L34  The left-handed Cartesian coordinate system -> The coordinate system  {The system is right-handed, L36.}
   
+already changed
+
 > o lines 38-40: I am not sure you need the detailed explanations on the (pseudo)rapidity definitions in a public document.
-> 
+>
+
+others have not complained...
+
 > L41   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors: Drift Tubes in the barrel, Cathode
 > Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps, embedded in the steel return yoke.
 >   ->   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors embedded in the steel return yoke: 
 > Drift Tubes in the barrel, Cathode Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps.
+
+
 > 
 > L55  on a large part -> on a large fraction
 > 
