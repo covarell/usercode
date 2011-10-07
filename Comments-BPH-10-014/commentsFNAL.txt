@@ -125,7 +125,7 @@ See comment above.
 > 8. Sometimes the method referenced from ref[4] could be explained a bit, e.g. page 10, line 275 to 277 seems to address
 >   an initiatic secte !!!
 
-Ok :-)
+Ok :-) [chi lo fa? FL]
  
 > 9. A big effort is done  to account for the differences in the dimuons distributions for prompt and non-prompt J/Psi and Psi(2s). 
 > However,  the fact that the J/Psi and the Psi(2S) are J=1 particles which need a reweighting to account for the dimuon angular distributions  
@@ -146,6 +146,9 @@ analysis.
 Ok, this will be improved (also noticed by other reviewers).
 
 > 11. Sometimes you say "at LHC" and other times "at the LHC". "at the LHC" is better (e.g. L14, 16, 36).
+
+corrected [FL]
+
 > 
 > 12. The paper alternates between using "b-fraction" and "non-prompt fraction". It would be better to stick to "non-prompt".  
 > 
@@ -161,18 +164,34 @@ Ok, this will be improved (also noticed by other reviewers).
 >     renormalization L318
 >     factorization   L195, L318
 
-"color" and "center" will be UKed. The "-ize" ending is also admitted in the UK, I think.
+"color" and "center" will be UKed. The "-ize/ise" issue is debated, I think the -ize form is admitted 
+in the UK (the cambridge online dictionary gives it as the standard form, specifying that the -ISE form is 
+the "usual" one in UK). Personally I prefer the "-ize" spelling [FL]
 
 > 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
   transformed into a "." and  a new sentence started.  Too many parenthesis are used for important details
 > 
-> a/  The paragraphs seems to have been written independently and hooked together. This brings immediate repetitions e.g. paragraph 5
+> a/  The paragraphs seems to have been written independently and hooked together.
+
+ ehm...
+
+
+> This brings immediate repetitions e.g. paragraph 5
 > Acceptance and Efficiency: There is a nice summary of the 2 approaches end of line 140-145, which just comes after the detailed description
-> of the two approaches in the previous paragraph, paragraph 4. It is too close for one more description, It had been described already
-  in the introduction as well. This nice summary could find a place as part of the conclusion 
+> of the two approaches in the previous paragraph, paragraph 4. 
+
+[fl] questa non la capisco, il par 4 parla di due diversi fit, l'inizio del 5 parla di correggere o no per l'accettanza...
+
+> It is too close for one more description, It had been described already
+>  in the introduction as well. This nice summary could find a place as part of the conclusion 
 > 
-> b/ The sentences are often long. Shorter sentences would made the material even more clear.e.g. already in the introduction
+> b/ The sentences are often long. Shorter sentences would made the material even more clear
+
+This is a cultural bias, since in Italian longer sentences are more elegant and more "readable" than longer sequences of shorter sentences. Here we have to trust native readers/writers. [FL]
+
+
+>.e.g. already in the introduction
 > - page 1 line 23 the ":" after "two different ways" could be replaced by a full stop and a new sentence started and ending line 25  
 > - page 1 line 26 for example "In the second approach, we provide...  charmonia" ending up line 28
 > - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 middle of 
