@@ -16,23 +16,6 @@ answers to other reviewers).
 > null polarization for the 4 extreme polarization scenarios.  I don't know how useful these will be
   in the end.  I think they could be placed in an appendix and let the editor decide what to do.
 
-Our plan is to leave extreme polarization tables only as supplemental
-material. Clearly the editor's opinion will be also considered during the
-refereeing process.
-
-> The most confusing aspect is understanding the various ways that polarization is dealt with.  It is
-> hard to keep track of everything as it enters in many places.  From what I can tell, all of the
-> results actually in the paper come from correcting for acceptance assuming no polarization.  The
-> results which do not correct for acceptance are only in the Twiki.  If this continues to be true
-  then I recommend making this clear from the beginning (lines 21-28).  I would call the results
-> presented in the paper (fully corrected) the default analysis. 
-
-Ok, see above.
-
- Then I would state that the results
-> without acceptance correction are available online.  I am also confused about what the naming and
-> usefulness of the results without acceptance correction.  The phrase often used is "results are also
-  given referred to the CMS detector acceptance region."  Is this superior to "results are given
 > without correcting for acceptance."? 
 
 This is the same. It will be rephrased in many places.
@@ -470,7 +453,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > acceptance.
 > 
 
-[FL]*vedere*
+[FL]  Controllare con Luca.
 
 > L216 and L219-220 are redundant.  Suggest removing "The corrected yields ... <1/AE>bin." and adjusting
 > L216 as "is the J/psi yield in a given transverse momentum--rapidity bin, multiplied by <1/AE>bin to
@@ -488,7 +471,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 
 [FL] The text says the results are "fully corrected", I think that the null polarization is understood. 
 
- *specificare errori VEDERE*
+ all systematic errors are included except lumi.
 
 
 > Figure 2: The units on the y-axis label are technically incorrect.  In general, writing a/b/c implies
@@ -531,7 +514,7 @@ Done by LM.
 > signal.  I don't see any reason why the J/psi sideband must be distinct from the Psi(2S)
 >  sideband.
 
-[FL] *vedere*
+[FL]
 
 > 
 > L265: Need space between (2S) and statistics.
@@ -576,6 +559,7 @@ Done by LM.
 
 [FL] The fitted parameters are fixed in the background part of the PDF for the signal fit.
 Proposed: "the fitted shape is used as a fixed background PDF in the signal region"
+Not done yet.
 
 
 > 
@@ -607,14 +591,13 @@ We thought the caption was clear enough on this point, but maybe it's not clear 
 > Table 1 and 2: The luminosity uncertainty is not mentioned in the text but appears here.  At the least
 > there should be a reference.  It should also be mentioned in the text.
 
-[FL] we'll put a reference 
-Not done yet
+[FL] it's reference [8]
 
 > 
 > L303-319: Some explanation of NRQCD and FONLL should be given.  In particular, it should be explained
 > why NRQCD is compared to only the prompt and FONLL is compared to only the non-prompt.
 
-It will be done in the inntoriduticon.
+It will be done in the introduction.
   
 > L311-319: Since the data points use B*dsigma, the branching ratio uncertainty does not enter into
 > the data.  However, this means the theory will have uncertainties due to the branching ratio
@@ -623,7 +606,7 @@ It will be done in the inntoriduticon.
   
 The total cross-section estimates include errors on the J/psi, psi' BRs
 for the prompt and additionally the B -> J/psi, psi' BRs in the 
-non-prompt. In the last case, this is a sizabel contribution so it must be
+non-prompt. In the last case, this is a sizable contribution so it must be
 added to the text. Thanks for spotting this,.
 
 > L321: I don't think it is unreasonable to quickly say what the extreme scenarios are.  How about:
@@ -631,6 +614,9 @@ added to the text. Thanks for spotting this,.
 > the helicity frame and the Collins-Soper frame.  This produces typical relative cross-section
 > shifts..."
 > 
+
+*FL DONE
+
 >  L323: "for the in the" should be "in the"
 
 *FL  DONE
@@ -639,7 +625,12 @@ added to the text. Thanks for spotting this,.
 > L325-328: This could perhaps be rephrased given the suggestions on changing how the uncorrected
 > values are described.
   
+FL  *********Questo chi lo cambia?****
+
 > L330-331: As mentioned at the beginning, I think these results deserve a figure.
+
+FL Qui che si fa?
+
 > 
 > L333: "Most of the systematic uncertainties on the acceptance ... cancel" is disingenuous.  The most
 > important systematic, the polarization, does not cancel in this ratio.  Maybe you could say most
@@ -647,7 +638,8 @@ added to the text. Thanks for spotting this,.
 > uncertainties other than the polarization cancel.
 >
 
-OK. Fai come dice Kevin.
+FL Changed to "Most of the systematic uncertainties on acceptances and efficiencies listed in Table 1 cancel"
+
  
 > Fig 4: The left plot is not correct.  It is the non-prompt J/psi when it should be the prompt J/psi.
 
