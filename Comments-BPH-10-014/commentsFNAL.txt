@@ -343,36 +343,71 @@ others have not complained...
 >   ->   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors embedded in the steel return yoke: 
 > Drift Tubes in the barrel, Cathode Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps.
 
+DONE
 
 > 
 > L55  on a large part -> on a large fraction
+
+DONE
 > 
 > L56  This part is selected -> The sample was selected
 > 
+
+DONE
+
+
 > L59] inelastic collisions
+
+DONE
+
 > 
 > o line 61: "full processing" -> either "full-event processing" or "advanced processing"
+
+FL "advanced processing" chosen
 > 
 > o line 62: "are used to arrive/make"
 > 
+
+"make" chosen
+
 > L62  both muons are required to fire a L1 muon signal -> Both muons are required to be consistent with an L1 muon signal
 > 
+
+DONE
+
+
 > line 63:  "fire" appears as jargon
 > 
 > line 65:  "seed" may be jargon
+
+we think it's acceptable
+
 > 
 > o line 65: No _explicit_ requirement ...is applied (the L1 condition is equivalent to some Kinematic requirements)
 > 
+OK
+
 > line 66:  "check the agreement with data" may be too generic (is the intended meaning already covered by the other items in the sentence?)
 > 
 > line 67:  the clause "as well as for systematic studies" appears to make this a run-on sentence, or perhaps needs to be preceded by a comma.
+
+comma inserted
+
 > 
 > Line 67: suggest change "systematic studies" to "studies of systematic uncertainties"
 > 
+
+we think this is acceptable jargon.
+
+
 > o line 68: "Prompt J/Psi and Psi(2s) events are..."
+
+OK done
 
 > Line 74: decayed -> are decayed
 > 
+already changed
+
 > o lines 74-75: decayed -> decay
 > 
 > o lines 78-79: "Muons are reconstructed by using two different algorithms"
@@ -380,18 +415,42 @@ others have not complained...
 > L78  Muons as reconstructed by two different algorithms are merged ->  Muon are required to be reconstructed by two different algorithms
 > {"merged" is ambiguous}
 > 
+
+
+corrected by Kevin (who was not bothered by "merge"):
+
+Muons reconstructed by two algorithms 
+({\it Global Muons} and {\it Tracker Muons})
+ are merged.  Both use tracks reconstructed in the silicon tracker (tracker
+  tracks).  Global Muons combine tracker tracks with track segments 
+in the muon detectors to find muons, while 
+Tracker Muons project tracker tracks into the muon detectors, 
+searching for hits.
+Global Muons are of higher quality, while Tracker Muons
+have higher efficiency at low momentum.
+ 
+
 > L80  pseudo-rapidity -> pseudorapidity   for consistency
   
+
 > 80] but does not fully cover ..
 > 
 > 84] The tracker muon tracks are ...   (still ugly)
+
+alas!
+
 > 
 > Line 84: suggest rephrase, remove "they must have" and replace commas with semi-colons:
   "The muon tracker tracks are required to pass the following requirements: at least 10 hits in the tracker, at least two of which are required
 > to be in the pixel layers; a chi2 per degree of freedom smaller than 1.8; and they must pass within a cylinder of radius 3 cm and length
 > 30 cm centered at the vertex of the primary interaction and parallel to the beam line."
-> 
-  L92  only the one -> the one
+
+semicolons inserted.
+
+>  L92  only the one -> the one
+
+OK
+
 > 
 > L93  The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
 > region of the detector: as a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
@@ -399,9 +458,16 @@ others have not complained...
 > ->     The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
 > region of the detector. As a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
 > to avoid spurious double-muon signature stemming from a single muon.
+
+the colon is supposed to signify that the following sentence is an explanation of what the veto is, so we keep it. "being faked by" 
+already corrected to "from"
+
 > 
 > 93] ... include a veto in the forward region ... what does this mean? Generally a veto means the event would be rejected if there is
 > something (what?) there. Obscure.
+
+it's explained in the sentence following the colon.
+
 > 
 > L97  "depending on the signed difference in azimuthal angle"
 > The difference would be the same whether the muons were in-benders or out-benders?
