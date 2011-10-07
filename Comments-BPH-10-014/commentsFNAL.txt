@@ -151,6 +151,9 @@ corrected [FL]
 
 > 
 > 12. The paper alternates between using "b-fraction" and "non-prompt fraction". It would be better to stick to "non-prompt".  
+
+[FL] Done.
+
 > 
 > 13. There are a number of cases where a US spelling variant is used whereas the paper appears to have a preference for UK conventions.
 > These include
@@ -166,7 +169,7 @@ corrected [FL]
 
 "color" and "center" will be UKed. The "-ize/ise" issue is debated, I think the -ize form is admitted 
 in the UK (the cambridge online dictionary gives it as the standard form, specifying that the -ISE form is 
-the "usual" one in UK). Personally I prefer the "-ize" spelling [FL]
+the "usual" one in UK). Personally I (Franco) prefer the "-ize" spelling.
 
 > 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
@@ -193,16 +196,50 @@ This is a cultural bias, since in Italian longer sentences are more elegant and 
 
 >.e.g. already in the introduction
 > - page 1 line 23 the ":" after "two different ways" could be replaced by a full stop and a new sentence started and ending line 25  
+
+done
+
 > - page 1 line 26 for example "In the second approach, we provide...  charmonia" ending up line 28
-> - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 middle of 
-  line 45 ending up middle line 47, "A microstrip detector follows, it has ten barrel layers...184microns"
+> - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 
+>  middle of line 45 ending up middle line 47, "A microstrip detector follows, it has ten barrel layers...184microns"
+
+A full stop after "pixels" would imply that the silicon tracker only consists in the pixel detector [FL]
+
 > - page 3,  end of line 96 to middle of line 98, ":" could be replaced by a full stop
+
+ok
+
 > - taking out "this" from "As a consequence of this, the ..." -->" As a consequence, the..."
+
+done
 > - A new sentence middle line 98 to the end of line 99, "Muons that bend toward each other in the magnetic files are called
   type A dimuons while muons that bend away from each other are type B dimuons." The parenthesis were not necessary
+
+Changed to: 
+
+Muons that bend towards each other in the magnetic field are called dimuons of type A, while  muons 
+that bend away from each other are type-B dimuons. 
+[I left the hyphen but I'm not sure whether it's necesary here, because "type A" is  more a definition than just an attribute. 
+Inverted commas, maybe? Or italic?]
+
+
 > - again ":" page 3,line 127 --> a full stop, and a new sentence started
+
+What is it you guys have against colons? :-) Here (and elsewhere) the colon 
+was supposed to introduce the explanation of the word or sentences immediately preceding it.
+But again, we might be biased by our being Italian [See http://en.wikipedia.org/wiki/Colon_(punctuation)  ]
+
+
 > - page 4,line 135, the parenthesis could be replaced by a ","
+
+or by a ":"   ;-)
+Again: it's an explanation, so IMHO the comma would make it a tad less clear. I feel that punctuation can - and should - be used to help 
+clarify the relationship between sentences rather than simply separate them. [FL]
+
 > - page 4 middle of line 147could end at "reconstruction systems" and a new sentence started "they are constrained by ... magnetic field" 
+
+
+
 > - page 5, without line number the sentence starting by " To study and ending by [19] is too long
 > - page 5   sentence from line 177-179 could easily be cut into two sentences
 > - sentence from the middle of line 181-183  as well   
