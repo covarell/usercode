@@ -1,0 +1,119 @@
+> General remarks
+> -----------------------
+> The results described in the paper are interesting and valuable. The paper itself is in certain parts hard to digest and to understand.
+> 
+> Parts of the paper should be rewritten in order to improve the clarity of the described details of the analysis. Some technicalities are very hard, if at all, understandable. Some parts could be shortened.
+> 
+> The text should be reviewed by a native speaker, many grammatical constructions and the choices of words can be improved. Given the large number of strange formulations and the fact that we are not native English we note only a fraction them.
+> 
+> For the equations the proper arguments should be given; using the same symbol epsilon in different ways with different arguments is quite confusing.
+  
+> The figure styles need to be improved and the text of the captions and legends need to be unified and generally enlarged.
+  
+> Figure 4 contains a wrong picture.
+  
+> At present the paper cannot be understood without consulting Ref. [4]. Please consider at several places to summarize in one sentence what is meant.
+
+> Abstract
+> -----------
+> - Check if 36.7 inv. pb is correct? Most analyses have 36.0pb.
+> - "…, assuming null polarization in the prompt production": Remove the colon and the word "null" appears poor usage of english.
+> - "the inclusive … is then extracted from the non-prompt ratio" -> improve english
+> 
+> 1 Introduction
+> -------------------
+> - The physics relevance of the paper in view of the non-relativistic QCD and the ideas of the measurement should be stated more clearly in the introduction
+> - The issue of color octet vs. color singlet production should be discussed here (not in l.69).
+  - english: "… the utility of measuring the … lies in the cancellation"
+> - The J/Psi symbol needs to be printed more tighter.
+  
+> 2 The CMS detector
+  ---------------------------
+> The left-handed Cartesian coordinate system… -> This is wrong and the whole paragraph needs rewriting.
+> 
+> The tracking system is described with awkward details and inconsistent use of capital letters for the naming of the detectors. A lot of information in parentheses.
+> 
+> 3 Data selection and event reconstruction
+> --------------------------------------------------------
+> 56: "This part is selected in order to have…." Check language
+> 72: in advance
+> 84-87: Needs to be rephrased.
+> 78-79: "Muons as reconstructed by two different measurements are merged": What does it mean?
+  Please verify the luminosity error
+> 103-106: Type A muons are *not used* …. Do here the systematic uncertainties really cancel?
+  83ff: Can you give a typical muon momentum range?
+> 90: The two muon trajectories are fitted with a common vertex constraint, … -> What is done exactly?
+  92: How often are more than one pair found?
+> 95: How close is "too close in space"?
+> 
+> 4 Inclusive yield determination
+> -----------------------------------------
+> 126: …the same PDF is used…. -> Explain what "the same" means in this context?
+> 127: corresponding
+> 131: The figures should be referred to using e.g. (a), (b), …
+> - The figures, i.e. the text size in the labels need to be improved
+> - Explain how you get in the end the total number of signal events.
+> 
+  5 Acceptance and Efficiency
+> --------------------------------------
+  This section would profit from sub-sections
+> 142-145: Unclear what you mean. Are both results discussed in the paper?
+  Eq. (1) To which properties refer p_t and y, e.g. generator or detector level?
+> Eq. (2) could be replaced by an explaining sentence.
+> Eq. (3) contains variables not explained in the text. Are the lambdas independent?
+> 169-170: What is the size of the difference between the acceptance of prompt and non-prompt mesons?
+> 170-172: Unclear what this means
+> 189ff: english: The muon identification….
+> 189-204: rho has to be explained more clearly. What is the typical size of the epsilons and rho? Can rho be larger than 1? The clarity of this discussion needs to be improved.
+> - Eq. (6) What is A_k epsilon_k ? Is this the A from Eq. (1)? How does this depend on what was previously discussed?
+> - Can you provide distributions of A_k epsilon_k (not for the paper)? If the values are small, the use of the method is doubtful
+> - How is A_k epsilon_k for an individual event obtained? How do the equations depend on pT_mu1, pT_mu_2, y_mu1, y_mu2?
+> - Systematic uncertainty discussions are distributed over many places, e.g. 205-214.
+  209: Check tense
+> 
+  Subsections 5.1 should become section 6 as this is not really a sub part of section 5.
+> 
+  Figure 2: Unify text sizes. The parenthesis in the caption should be discussed in the text. Use consistent abbreviation for branching ratios.
+> 216: What is the dependency of Ncorr? Please write variables in a consistent scheme, i.e. use J/Psi as subscript. Can you give the formula for Ncorr?
+> 221: "In the case of the results given within the CMS detector acceptance, the acceptance corrections are not applied. " is not understandable.
+> 
+> 6 Prompt and non-prompt component determination
+> ----------------------------------------------------------------------
+> 230: What is the pseudo-proper decay length, how is it defined?
+> 234-240: On what is the convolution applied? Please rephrase.
+> 241-261: Is very hard to follow and in our opinion not necessary for the understanding of the result and the paper. We suggest to reduce this to a short discussion without formula.
+> 262: Delete, because this is discussed in 269 and is inconsistent compared to 269.
+> 
+  Figure 3: Where does the decay length from the background originate from? (ref. line 250). Please discuss.
+> The mass sideband region as discussed in 269 should be added to the figure / caption.
+  
+> 273: Give reference to the systematic uncertainty table. Perhaps also move the uncertainty table into this section?
+  277: english: "fits results"
+> 282: Is this estimation of the systematic error reasonable? In most cases multiple vertices will be sufficiently separated in z, so that a unique assignment should not be a problem. Maybe we are missing the point.
+> 289: variation in upper sideband region is unclear
+> 311: Definition of indirect production?
+> 325: Makes little sense
+> 327 and Ref [27]: Include in the note or drop the discussion
+> 
+> 7.2 either skip or give details
+> 
+> Figure 6: Why don't you include also the polarization uncertainties in the plot?
+> 
+  7 Results
+> -------------
+  - Figure 4: The yellow line is hard to see in some printouts
+> - Use consistent symbols for branching ratios
+  - Remove ref. to Sec. 7.4
+> - Clarify if the branching ratio determined in this paper is included in the theoretical model fit?
+> - What is fitted to the theoretical model?
+> 357: Give current PDG BR
+> 
+> 8 Conclusions
+> -------------------
+> The text should be improved
+> 387: no agreement for non-prompt cross section at hight pT: Not really discussed in the paper before. Where can this disagreement be seen? Perhaps the relevant plot is missing?
+> 391: compare to 374; factor ~3 or 3.5 ?
+> 
+  Ref [23]: Proceeding with capital P
+> Ref [28]: change to P. Faccioli, archive number is missing
+ 
