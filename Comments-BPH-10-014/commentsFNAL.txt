@@ -284,7 +284,8 @@ FL I think it's clear that the prediction the text refers to are the theoretical
 
 > o line 13: "the need for an _independent_ test at LHC"
 
-DONE
+modified
+
 > 
 > Line 15: cross sections (pluralize)
 
@@ -486,8 +487,13 @@ It means that possible trigger and selection bias do not affect prompt and non-p
 
 > 
 > line 110:  "broaden" --> "change the width of"
+
+done
+
 > 
 > L110 and/or -> and
+
+done
 > 
 > o lines 114-116: I am not sure this kind of detail in needed in a public paper.
 > 
@@ -497,12 +503,19 @@ It means that possible trigger and selection bias do not affect prompt and non-p
 > L114 the total yield -> the yield
 > 
 > Line 116: suggest change "pT-y" to "pT and y".
+
+We think this makes it clearer that it's a double-differential cross section.
+
 > 
 > L125 the two mass peaks are fit together -> the two mass peaks and the background are fit simultaneously
+done
 > 
 > L127 corrisponding -> corresponding
+done
 > 
 > L138 reported in the general systematic uncertainty Tables 1 and 2 -> shown in Tables 1 and 2 for the $J\psi$ and $\psi(2S)$, respectively
+
+line erased.
 > 
   L145 and containing no uncertainty from the assumed polarizations ->  and without any polarization-related uncertainty.
 > 
