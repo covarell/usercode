@@ -168,8 +168,9 @@ corrected [FL]
 >     factorization   L195, L318
 
 "color" and "center" will be UKed. The "-ize/ise" issue is debated, I think the -ize form is admitted 
-in the UK (the cambridge online dictionary gives it as the standard form, specifying that the -ISE form is 
-the "usual" one in UK). Personally I (Franco) prefer the "-ize" spelling.
+in the UK (the Cambridge online dictionary gives it as the standard form, specifying that the -ISE form is 
+the "usual" one in UK. The Concise Oxford Dictionary also gives -ize as the standard form). 
+Personally I (Franco) prefer the "-ize" spelling.
 
 > 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
@@ -516,69 +517,159 @@ done
 > L138 reported in the general systematic uncertainty Tables 1 and 2 -> shown in Tables 1 and 2 for the $J\psi$ and $\psi(2S)$, respectively
 
 line erased.
-> 
-  L145 and containing no uncertainty from the assumed polarizations ->  and without any polarization-related uncertainty.
+
+>  L145 and containing no uncertainty from the assumed polarizations ->  and without any polarization-related uncertainty.
+
+done
+
 > 
 > L147 constrained by the thickness of the material -> constrained by the amount of material
+
+done
+
 > 
 > Line 159 (actually a few lines above where numbers are missing): suggest "values of the polar and azimuthal angles" (plurals).
-  
+
+done  
+
 > Line 162,166,169:  instead of brackets, "J/Psi (Psi(2S))", suggest "J/Psi and Psi(2S)"
+
+done, changed to "quarkonium" at line 168
+
 > 
 > line 169-172:  Is it possible to clarify here how the difference in acceptance between J/psi and psi(2s) at BaBar is applied to calculate a
 > systematic uncertainty in acceptance at CMS? [the reference points to a BaBar paper]
+
+************ controllare ****************
+I's not a "difference in acceptance between J/psi and psi(2s)". 
+It is the difference, in each case, between the efficiencies of the non-prompt and prompt mesons. The BaBar vs EvtGen comparison refers to the spectrum used in the simulation of the non-prompt case, corrected to match the  polarization measured by BaBar, as explained in the introduction.
+
+Proposed change: "(as measured in [])" --> "(where the spectrum is corrected to match the experimental results of ~\cite{babarpol}, as explained in the Introduction)"
+************ /controllare ****************
+
+
+
 > 
-  L180 so-called {\it Tag-and-Probe} -> {\it Tag and Probe}
+>  L180 so-called {\it Tag-and-Probe} -> {\it Tag and Probe}
 > 
 > o line 181: "streams" -> is this CMS jargon?
+
+nobody else complained!  *controllare FL*
+
 > 
   Line 188: suggest replacing "both on real and simulated data" with "and checked using simulated data"
 > (the use of real data is already mentioned in the first line of the paragraph).
 > 
+ "On real and simulated data" refers to "using T&P techniques", not to "have been measured".
+
+changed to:
+
+"...techniques applied to real and simulated data".
+
 > line 189:  "stronger" than what?
+
+than the (dependence of the) tracking efficiency
+
 > 
 > Line 190: suggest remove word "then"
+done
 > 
 > Line 190: suggest moving information in parentheses to main sentence, e.g. "mapped in 15 pT and 14 eta bins which allows??
+
+OK
+
 > 
 > Line 192: does e_off depend on pT and eta? [the dependence of the other three efficiencies is described]
+
+ *VEDERE*
+
 > 
 > Line 195: suggest "The correlation factor, rho"
+
+Strictly, it is not a correlation factor, since it equals 1 in case of uncorrelated efficiencies.
+
 > 
 > Line 198: "except for a few bins" is vague. How many bins (out of 210?) and by how much does it exceed 10%? Suggest remove "always".
+
+removed.  *RISPONDERE alle domande quantitative*
+
 > 
 > Line 199,220: suggest change "factor" to "correction factor" for consistency and clarity (compare line 207).
+
+done
+
+
 > 
 > L199 are combined in a single factor[,] which is computed for each $|y|$ and $p_T$ bin:
+
+OK
+
 > 
 > Equation 6:  Change event (in the denominator) to non-math font.
+
+DONE
 > 
 > L210 in order to accommodate for -> in order to allow for
+DONE
+
 > 
 > Line 222: suggest to make it clear the efficiency corrections are still applied. Is equation 6 used with A_k=1?
 > 
+
+propose to change to "only efficiency corrections are applied" *CONTROLLARE*
+
+
 > Fig 2 caption: appearing as additive offsets in log scale -> appearing as additive offsets on the log scale
+
+OK
+
 > 
 > Fig 2: Add a label somewhere to show that it is for J/Psi (either on the y-axis label or somewhere within the plot area).
 > 
 > Fig 2: Enlarge the legend (there is plenty of space).
+
+*VEDERE (luca?)*
+
+
 > 
 > Line 243: suggest replace "defined" with determined".
+
+"determined" would be confusing, since it might suggest that the parameters of the mass PDFs here are fixed to the values determined in the mass fits
+*CONTROLLARE* (Roberto?)
+
 > 
 > Line 248,251,279: suggest "b-hadron" for consistency (compare line 7,74,169,228,253) (B-hadron and b hadron => b-handron)
+
+done
+
 > 
 > L255 They are obtained respectively from the mass signal region after a sideband subtraction and the mass sideband regions ->
 >     They are obtained from the mass signal region after a sideband subtraction and mass sideband regions, respectively
-> 
-  line 262 and line 269:  Why is the lower bound of the upper mass sideband different in these two cases?
+
+done
+
+>  line 262 and line 269:  Why is the lower bound of the upper mass sideband different in these two cases?
+
+typo, corrected
+
 > 
 > o line 265: need space before "statistics"
+
+corrected
+
 > 
 > Line 269: The mass signal regions aren't stated anywhere. If they are in between the sidebands then say so.
+
+It seemed obvious to us, we'll consider specifying it *VEDERE*
   
 > Line 271: suggest add "projected"
 > 
+
+added before "distributions" *CONTROLLARE**************
+
 > o line 271: "some selected fit" --> "some example fits for"
+
+ok
 > 
 > line 277:  "fits" --> "fit"
   
