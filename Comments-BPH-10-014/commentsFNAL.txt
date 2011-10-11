@@ -22,7 +22,7 @@ The paper has already gone through Editorial PAG contact review.
 
 This is done in the tables in the Twiki that will be eventually added to
 the journal webserver. Also, the acceptance-independent cross section is
-also provided, which removes completely this source of uncertainty. 
+provided, which removes completely this source of uncertainty. 
 
   Section 3
 > 
@@ -76,7 +76,7 @@ that you are in the very forward region, where the _total_ momentum of the
 muon allows it anyway to go through the iron slabs of the end wheels.
 Also in the forward you can have the special occurrence when the two
 muons are exactly opposite in the x-y plane, giving rise to an object
-with ~ 0 pT. In fact the measurement down to 0 pT is limited to the 
+with ~ 0 pT. In fact the measurement down to 0 pT was limited to the 
 forward bin.
 
 > Figures (general)
@@ -94,7 +94,7 @@ Everything accept lumi and polarization. Will be said explicitly.
   2. "Two of" seems to be a repeating theme in the paper: Two muon reconstruction schemes, two kinds of fits, two types of muon
 > pairs (A and B), two different approaches for determining acceptance,..
 
-???? 
+We do not understand what you want us to change...
  
 > 3. The paper mixes references to rapidity and pseudorapidity, which is okay, but in some cases I wondered whether they meant
 > the other variable.
@@ -119,13 +119,15 @@ See comment above.
 
 > 6. Some of the details would fit better in the AN note. For example, the issue of coarse/fine binning. It reflects the 
 > different statistics when dealing with MC and data samples. But it is not that important in the bigger scheme of things.
-> 
+
+Ok.
+
 > 7. General "specific" comment: there is an abuse of commas in several places.
 > 
 > 8. Sometimes the method referenced from ref[4] could be explained a bit, e.g. page 10, line 275 to 277 seems to address
 >   an initiatic secte !!!
 
-Ok :-) [chi lo fa? FL]
+Ok :-) [chi lo fa? FL, Io RC]
  
 > 9. A big effort is done  to account for the differences in the dimuons distributions for prompt and non-prompt J/Psi and Psi(2s). 
 > However,  the fact that the J/Psi and the Psi(2S) are J=1 particles which need a reweighting to account for the dimuon angular distributions  
@@ -143,7 +145,10 @@ analysis.
 > acceptance, it implies that the first method includes regions outside of the acceptance.  Is this really the case, or should the
 > description of the second method be altered to state that it is restricted to the region of *good* or *well-understood* acceptance?
 
-Ok, this will be improved (also noticed by other reviewers).
+Ok, this will be improved (also noticed by other reviewers). The punchline is:
+we do not give results where the _charmonium_ pT is unaccessible, i.e. we
+have no events, but we correct for the _single muon_ acceptance in this
+accessible region (which is < 100%).
 
 > 11. Sometimes you say "at LHC" and other times "at the LHC". "at the LHC" is better (e.g. L14, 16, 36).
 
@@ -167,19 +172,16 @@ corrected [FL]
 >     renormalization L318
 >     factorization   L195, L318
 
-"color" and "center" will be UKed. The "-ize/ise" issue is debated, I think the -ize form is admitted 
-in the UK (the Cambridge online dictionary gives it as the standard form, specifying that the -ISE form is 
-the "usual" one in UK. The Concise Oxford Dictionary also gives -ize as the standard form). 
+"color" and "center" will be UKed. The "-ize/ise" issue is debated, I think 
+the -ize form is admitted in the UK (the Cambridge online dictionary gives it 
+as the standard form, specifying that the -ISE form is the "usual" one in UK. 
+The Concise Oxford Dictionary also gives -ize as the standard form). 
 Personally I (Franco) prefer the "-ize" spelling.
-
 > 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
   transformed into a "." and  a new sentence started.  Too many parenthesis are used for important details
 > 
 > a/  The paragraphs seems to have been written independently and hooked together.
-
- ehm...
-
 
 > This brings immediate repetitions e.g. paragraph 5
 > Acceptance and Efficiency: There is a nice summary of the 2 approaches end of line 140-145, which just comes after the detailed description
@@ -192,7 +194,9 @@ Personally I (Franco) prefer the "-ize" spelling.
 > 
 > b/ The sentences are often long. Shorter sentences would made the material even more clear
 
-This is a cultural bias, since in Italian longer sentences are more elegant and more "readable" than longer sequences of shorter sentences. Here we have to trust native readers/writers. [FL]
+This is a cultural bias, since in Italian longer sentences are more elegant 
+and more "readable" than longer sequences of shorter sentences. Here we have 
+to trust native readers/writers. [FL]
 
 
 >.e.g. already in the introduction
@@ -204,7 +208,8 @@ done
 > - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 
 >  middle of line 45 ending up middle line 47, "A microstrip detector follows, it has ten barrel layers...184microns"
 
-A full stop after "pixels" would imply that the silicon tracker only consists in the pixel detector [FL]
+A full stop after "pixels" would imply that the silicon tracker only consists 
+of the pixel detector [FL]
 
 > - page 3,  end of line 96 to middle of line 98, ":" could be replaced by a full stop
 
@@ -213,33 +218,38 @@ ok
 > - taking out "this" from "As a consequence of this, the ..." -->" As a consequence, the..."
 
 done
+
 > - A new sentence middle line 98 to the end of line 99, "Muons that bend toward each other in the magnetic files are called
   type A dimuons while muons that bend away from each other are type B dimuons." The parenthesis were not necessary
 
 Changed to: 
 
-Muons that bend towards each other in the magnetic field are called dimuons of type A, while  muons 
+Muons that bend towards each other in the magnetic field are called dimuons 
+of type A, while  muons 
 that bend away from each other are type-B dimuons. 
-[I left the hyphen but I'm not sure whether it's necesary here, because "type A" is  more a definition than just an attribute. 
+[I left the hyphen but I'm not sure whether it's necesary here, because 
+"type A" is  more a definition than just an attribute. 
 Inverted commas, maybe? Or italic?]
 
 
 > - again ":" page 3,line 127 --> a full stop, and a new sentence started
 
 What is it you guys have against colons? :-) Here (and elsewhere) the colon 
-was supposed to introduce the explanation of the word or sentences immediately preceding it.
-But again, we might be biased by our being Italian [See http://en.wikipedia.org/wiki/Colon_(punctuation)  ]
+was supposed to introduce the explanation of the word or sentences immediately
+preceding it.
+But again, we might be biased by our being Italian 
+[See http://en.wikipedia.org/wiki/Colon_(punctuation)  ]
 
 
 > - page 4,line 135, the parenthesis could be replaced by a ","
 
 or by a ":"   ;-)
-Again: it's an explanation, so IMHO the comma would make it a tad less clear. I feel that punctuation can - and should - be used to help 
-clarify the relationship between sentences rather than simply separate them. [FL]
+Again: it's an explanation, so IMHO the comma would make it a tad less clear. 
+I feel that punctuation can - and should - be used to help 
+clarify the relationship between sentences rather than simply separate 
+them. [FL]
 
 > - page 4 middle of line 147could end at "reconstruction systems" and a new sentence started "they are constrained by ... magnetic field" 
-
-
 
 > - page 5, without line number the sentence starting by " To study and ending by [19] is too long
 > - page 5   sentence from line 177-179 could easily be cut into two sentences
@@ -281,7 +291,8 @@ DONE
 > predicting the chi_c contribution" 
 > 
 
-FL I think it's clear that the prediction the text refers to are the theoretical ones.
+FL I think it's clear that the prediction the text refers to are the 
+theoretical ones.
 
 > o line 13: "the need for an _independent_ test at LHC"
 
@@ -439,7 +450,6 @@ have higher efficiency at low momentum.
 > 
 > 84] The tracker muon tracks are ...   (still ugly)
 
-alas!
 
 > 
 > Line 84: suggest rephrase, remove "they must have" and replace commas with semi-colons:
@@ -457,9 +467,9 @@ OK
 > L93  The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
 > region of the detector: as a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
 > to avoid spurious double-muon signature being faked by a single muon.
-> ->     The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
-> region of the detector. As a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
-> to avoid spurious double-muon signature stemming from a single muon.
+ ->     The double-muon L1 triggers include a veto in the forward region, whose specific criteria depend on the type of muon chamber and the
+ region of the detector. As a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
+ to avoid spurious double-muon signature stemming from a single muon.
 
 the colon is supposed to signify that the following sentence is an explanation of what the veto is, so we keep it. "being faked by" 
 already corrected to "from"
@@ -476,15 +486,16 @@ it's explained in the sentence following the colon.
 > The description of A and B dimuons is not very precise. Opposite signed muons always bend away from each other in some sense, but what is of
 > interest is whether their paths cross or don't cross in the transverse plane. "in-benders" and "out-benders" are more descriptive than "A" and "B".
 
-The original names were "cowboys" and "seagulls" which was *very* descriptive and also amusing, 
-but was thought to be inappropriate... We can discuss changing the name again but I'm sure that every choice would raise some eyebrows.
+The original names were "cowboys" and "seagulls" which was *very* 
+descriptive and also amusing, 
+but was thought to be inappropriate... We can discuss changing the name again 
+but I'm sure that every choice would raise some eyebrows.
 After all it is not a crucial issue in the paper.
-
 
 > 
 > o line 105: "efficiency-independent" does not make sense. Do you mean there is no strong trigger bias for this class of events?
 
-It means that possible trigger and selection bias do not affect prompt and non-prompt components in appreciably different ways.  *CONTROLLARE*
+It means that possible trigger and selection bias do not affect prompt and non-prompt components in appreciably different ways.  
 
 > 
 > line 110:  "broaden" --> "change the width of"
@@ -628,7 +639,7 @@ OK
 > 
 > Fig 2: Enlarge the legend (there is plenty of space).
 
-*VEDERE (luca?)*
+Done.
 
 
 > 

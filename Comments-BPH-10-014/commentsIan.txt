@@ -78,8 +78,6 @@ Ok.
 
 > If possible, I suggest that you put both tables 1 & 2 on the same page, presumably a page with no other text on it.
 
-We will try.
-
 > *       Table 3: I remain surprised by how small your systematic errors due to the rho factor are.  Fig. 15 C of the AN-NOTE suggests that this systematic error can be as large as ~20%, not only in the 0-0.9 rapidity bin, but also in the 0.9-1.2 and 1.2-1.6 bins.
 
 Not in the region where we give results. You can see from the final tables and 
@@ -103,7 +101,8 @@ to check.
 
 Yes, we checked this with M. Cacciari (author of the FONLL predictions) who
 also gave us the minimum and maximum value of the ratio prediction on which
-we base the theoretical uncertainty. See also the approval slides.
+we base the theoretical uncertainty. See also the approval slides and the
+long HN discussion.
 
 > 
 > English/Trivia

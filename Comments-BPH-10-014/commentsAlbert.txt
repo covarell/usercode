@@ -59,7 +59,7 @@ good choice.
 
 As noticed by other reviewers, this sentence is too strong and will be 
 changed. The result of our paper is that psi' production agrees with NLO
-NRQCD within the (quite large) theory errors.
+NRQCD with LDMEs fitted from CDF data, within the theory errors.
 
 > line 53: maybe useful to add that the HLT uses the full detector information
 >      (as you specify the limited detector information available to the L1)
@@ -72,8 +72,10 @@ Ok.
 Well, yes. In Pythia both color-singlet and color octet states are simulated
 as 'particles' with some status. However color-singlet particles are already
 physical states (either J/psi or heavier ones eventually decaying into it), 
-while color-octets are unphysical, so showering must be always turned on to 
-obtain a sensible event.
+while color-octets are unphysical, so showering must be always turned on
+in this case to obtain a sensible event. In the other case, a production of
+a single 1P state, then radiative-decaying into a J/psi is a perfectly
+acceptable process.
 
 > line 166-168: I am not sure how that study deals without the systematic discussed
 >   in this bullet. Perhaps that would deserve a word of explaining?
@@ -90,7 +92,8 @@ Changed into "the strongest".
 
 > line 224: do we say somewhere in the paper that ref [4] was for much lower luminosity?
 
-No, we can add it in the introduction or in the inclusive cross-section part.
+Yes, it is explained in the introduction, where we say that the present
+measurement "extends the results to a larger amount of data".
 
 > Fig 2: The legend in the figure is too small, and hard to read. This can be easily
 >      increased in size as there is enough space in the picture frame.
@@ -118,7 +121,7 @@ refer to the corresponding figure in the PAS (which is correct).
 > Fig 6: what errors are included for the data points? Statistical only?
 
 No, statistics + all systematics except luminosity and polarization, as 
-specified in the figure.
+specified in the figure. It will be added in the caption as well.
 
 > line 387: Can we say something more on what it means that the non-prompt
 > cross section at high pT is not reproduced?
