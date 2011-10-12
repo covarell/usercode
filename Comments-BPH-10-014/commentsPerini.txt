@@ -230,65 +230,115 @@ removed
 > ·
 > · line 53: add some details about HLT.
 
-We'll consider that *CONTROLLARE*
+We'll consider that *VEDERE*
 
 
 > 3 Data selection and event reconstruction
 > line 58: You should maybe state already here, that this data set is not 
 > overlapping with the one used
 > for the first J/psi paper.
+
+We'll consider that *VEDERE*
+
 > ·
 > line 58: the LHC averaged 2.2 pp collisions per bunch crossing at the CMS 
 > interaction region -> the
 > average number of pp collisions per bunch crossing at the CMS interaction 
 > region was 2.2.
 > ·
+
+not changed (approved by FNAL with the addition of "inelastic")
+
 > Line 60: Avoid starting a sentence with a symbol. Propose: "The 
 > reconstruction of the J/psi and
 > psi(2S) mesons is performed in the mu+mu- channel. The analysis is based..."
+
+modified
+
 > ·
 > line 61: double-muon triggers that exploit full processing at the HLT 
+
 > level  full processing is jargon.
 > Replace with more precise expression.
+
+replaced with "advanced processing" as suggested by FNAL
 > ·
 > · line 61: All three -> All the three
+
+done (but this had not bothered other native speakers)
+
+
 > Line 67: "as well as for systematic studies..." -> "as well as for studies 
 > of the systematic
 > uncertainties."
+
+We felt this was acceptable jargon.
+
 > ·
 > Line 72: delete "in advance of its direct measurement". You already state 
 > the lack of experimental
 > information in the beginning of the sentence.
+
+done
+
 > ·
 > · line 78-79: you do not merge the muons! The sentence is complex. 
+
+changed
+
 > Rephrase/reorder lines 78-83?
 > · line 80: "not fully covering" -> "does not fully cover"
   line 84: The muon tracker tracks... -> The muons are required to pass the 
 > following cuts/criteria in the
 > tracker:
+
+
 > ·
 > · line 86: 'degree of freedom' -> number of degrees of freedom.
-  · lines 86-87: 'length 30 cm' -> length of 30 cm.
+
+I think this is standard jargon. "Per number of degrees of freedom" doesn't sound right to me, 
+it should be "divided by the number of ..."
+
+>· lines 86-87: 'length 30 cm' -> length of 30 cm.
+
 > lines 86-87: Here one already refers to a selected primary vertex, but 
 > previously it is mentioned (line
 > 58) that there are multiple interaction vertices. Add sentence how you 
 > choose the primary vertex from
 > the vertices.
+
+*VEDERE*
   ·
 > · Line 89: Avoid repetition. Write simply " The mass is required to be..."
+
+done
+
 > paragraph lines 93-106: from the text it is not clear why the type A 
 > dimuons are rejected in the whole
-  rapidity range for cross section measurements, if the trigger veto is only 
+> rapidity range for cross section measurements, if the trigger veto is only 
 > in the forward region.
 > Clarify.
 > ·
+
+*VEDERE o rispondere*
+
 > · Line 95: "at the muon stations" -> "in the muon stations"
+
+OK
+
 > Line 98: "between the positive and negative muon" -> "between the 
 > positively and negatively
 > charged muons"
+
+OK
+
 > ·
 > · Line 101: "correlations between the detection efficiencies"? Please 
 > explain.
+
+The probability for one track to be detected is no longer independent of where the other is, 
+when the two come close to each other.
+
 > · line 104: reduction of 48 % relative to what selections? Just the 
 > trigger?
 > · Line 105: no hyphen in "efficiency independent" and "high rapidity"
