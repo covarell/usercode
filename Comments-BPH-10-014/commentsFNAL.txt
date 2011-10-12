@@ -685,42 +685,92 @@ ok
 > line 277:  "fits" --> "fit"
   
 > Line 277: suggest "The largest difference in fit results compared to the nominal is taken??
+
+already modified
 > 
 > Line 280: "a systematic uncertainty"
+
+done
   
 > Line 283: "an alternative approach" is ambiguous, suggest to remove it?
+
+removed
 > 
 > L285 di-muon -> dimuon
+
+done
+
 > 
 > Line 286: "a systematic uncertainty"
+
+done
+
 > 
 > Line 296: suggest "and the relative difference is propagated to the non-prompt fraction and assumed as a systematic uncertainty."
 > 
+
+done
+
 > L300 for the two charmonium states -> for the $J/\psi$ and $\psi(2S)$
+
+not changed, we think it's clear which states this refers to
+
 > 
 > Line 314: suggest to replace colon with semi-colon or period.
+
+changed to semicolon.
+
 > 
 > Table 1 caption:    lowest-$p_T$bin -> lowest $p_T$ bin   insert space
+
+done
 > 
 > Table 1 caption and Table 2 caption:  While the acceptance uncertainties related to FSR are excluded for the lowest-pT bins
 > in the table, are they included in the analysis?  It is not clear.
+
+They are excluded in the table because the high valuse would have been misleading, as explained above.
+Caption slightly modified.
+
 > 
 > L321 "extreme" -> extreme
+
+OK
+
 > 
 > Line 323: missing word(s), suggest replace "for the" with "for both states"
+
+OK
+
 > 
 > line 326:  replace "referred to" by "with respect to" or "restricted to" ?
+
+changed
+
+
 > 
 > Line 329: Is section 7.2 too short? Could it be combined with another section?
+
+It's a little bit longer now
+
 > 
 > Figure 4 and Figure 5 captions: replace last comma with a period: "??calculations. The lines ??
+
+done
+
 > 
 > Figure 4:  The left plot appears to be wrong plot.  It looks like the non-prompt J/psi plot, but should be the prompt J/psi plot.
 > 
+it was a mistake. changed.
+
 > Figure 4 and Figure 5:  State whether the data points include statistical and systematic (other than luminosity and polarization) uncertainties.
+
+line added *CONTROLLARE*
+
 > 
-> Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible in black and white? In which case they
-should be shaded differently.
+> Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible 
+> in black and white? In which case they should be shaded differently.
+
+*vedere*
 
 > Figs 4,5] Lumi. and polariz.   is ugly and unnecessary. There is room for Luminosity and polarization to be spelled out, however that can be
 > said in the captions. However actually the luminosity uncertainty of 4% is too small to see on these figures, it is less than the size of
