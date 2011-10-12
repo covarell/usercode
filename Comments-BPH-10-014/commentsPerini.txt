@@ -84,8 +84,11 @@ No, but it will be added in the intoduction.
 The first form was suggested by a native English speaker.
 
 > lines 5-7: one could add (for clarification) that since psi(2S) is the 
-  state closest to the DD threshold,
-> there is no significant feed-down from higher charmonium states
+  state closest to the DD threshold,> there is no significant feed-down from higher charmonium states
+
+
+*VEDERE*
+
 > ·
 > line 7: Is there a phrase missing before "On the other hand,...can also 
 > occur ..."? From the phrasing, I
@@ -93,36 +96,77 @@ The first form was suggested by a native English speaker.
 > it to which "On the other
 > hand" and "also" refer to. Or "In addition to these two mechanisms, 
 > J/Psi... "
+
+changed
+
 > ·
 > · Line 9: delete "efficient" , not necessary.
+
+done
+
+
   line 10: This makes the psi mesons ... -> Therefore the psi mesons are (it 
 > is not clear what 'this' is
 > referring to).
 > ·
-  line 10: 'more efficient' does not describe well what you want to say, 
+
+not changed for the moment
+
+
+>  line 10: 'more efficient' does not describe well what you want to say, 
 > which is theoretically cleaner,
 > right?
+
+more or less
+
 > ·
 > · Line 10: "of most theoretical" -> "for most theoretical"
+
+not changed
+
 > · Lines 13-14: delete the end of the sentence ", hence the need.." Not 
 > necessary.
+
+changed
+
 > · line 16: substitute vague expression "recently published" with for 
 > instance "published in 2011"
 > 
+
+we're still in 2011 !
+
 > ·
 > · line 19: remove "basically"
+
+done
+
 > · Line 21: "Cross section results depend" -> "The cross sections depend "
+
+changed
+
 > · line 22: momentum or momenta?
 > · line 22,23: replace 'we' with passive
+
+Subject changed from "we" to "the first/second approach"
+
 > · Lines 23: Cut the sentence after "different ways" and start a new 
 > sentence: "In the first approach"
+done
 > · Lines 25-26: Cut the sentence after [6] and start a new sentence: "In 
 > the second approach...."
+
+done 
+
+
 > Lines 26-27: Propose: "In the second case, we give the result without 
 > correcting for the CMS detector
 > acceptance, in order to mitigate the effect of he polarization of the two 
 > charmonium mesons."
 > ·
+
+"we" removed, as suggested by the previous comment
+
+
 > 2 The CMS detector
 > In chapter 2, there's a certain unbalance between details. Is it necessary 
 > to give all coordinate details
@@ -130,13 +174,23 @@ The first form was suggested by a native English speaker.
 > ·
 > · Line 31: "with a magnetic field of.." -> "providing an axial magnetic 
 > field of"
+
+changed 
+
 > · line 34, 36: remove the word "left-handed". Contradicting 'left-handed' 
 > and 'right-handed'.
+
+corrected
+
 > Line 36: "the beam direction" -> "the anticlockwise beam direction". If 
 > the American English style
 > is adopted one should write "counterclockwise" but it seems that the 
 > English style is followed here
   (Heavy-flavour in line 1).
+
+removed
+
+
 > ·
 > · line 37: "measured upwards from..."
 > line 38-39: Is it really necessary to define the pseudorapidity and 
@@ -144,21 +198,41 @@ The first form was suggested by a native English speaker.
   dropping them, or replacing them with a reference. The sentence "which the 
 > pseudorapidity
 > approaches" is not needed, text book material.
+
+WE'll consider dropping it
+*CONTROLLARE*
+
 > ·
 > · line 42: do not use Capital letters for drift tubes etc.
+
+done
+
 > · line 45: "made of 66 million 100 x 150 um2 pixels": is this information 
   really needed here?
+
+removed
+
 > Iine 46: 2.with 9.3 million strips of pitch". As the number of active 
 > elements is given for the pixel
 > detector.
   ·
 > · line 47: "with strips of pitch between 80 and 184 um": is this 
 > information really needed here?
+
+removed
+
 > lines 50-51: 'accuracy' -> 'accuracy in plane transverse to the beam 
 > axis'. Accuracy along the beam
 > line is much worse than 15 microns.
+
+removed
+
 > ·
 > · line 53: add some details about HLT.
+
+We'll consider that *CONTROLLARE*
+
+
 > 3 Data selection and event reconstruction
 > line 58: You should maybe state already here, that this data set is not 
 > overlapping with the one used
