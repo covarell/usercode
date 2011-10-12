@@ -842,14 +842,29 @@ already changed
 > L380 $p_T$(up -> $p_T$ (up     include a space
 > 
 > line 382:  "To mitigate the effect of the effects due to" --> "To mitigate the effects due to"
+OK
 > 
-> line 383:  replace "referred to" by "with respect to" or "restricted to" ?
+> line 383:  replace "referred to" by "with respect to" or "restricted to" 
+
+changed to "restricted to"
 > 
 > Line 388: suggest "With certain hypotheses on polarization scenarios, the prompt and non-prompt differential cross-section ratios between
 > the two states are computed, benefitting from the cancellation of uncertainties."
+
+OK
+
 > 
 > Line 391: suggest repeat "of 3.5".
+
+OK *CONTROLLARE*
 > 
 > L393 Are there references for the predictions of Ma and Cacciari?
 > 
+
+*Controllare* 
+
 > line 491:  Reference [28] still needs an actually arXiv number (arXiv:xxxx.yyyy is a classic!)
+
+********
+è un articolo? o si mette private communication? Controllare
+********************************
