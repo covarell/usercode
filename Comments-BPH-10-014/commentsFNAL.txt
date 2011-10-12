@@ -770,34 +770,74 @@ line added *CONTROLLARE*
 > Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible 
 > in black and white? In which case they should be shaded differently.
 
-*vedere*
+
+
 
 > Figs 4,5] Lumi. and polariz.   is ugly and unnecessary. There is room for Luminosity and polarization to be spelled out, however that can be
 > said in the captions. However actually the luminosity uncertainty of 4% is too small to see on these figures, it is less than the size of
 > the symbols! I suggest taking that off the figures.
+
+*****************************
+*vedere nuove figure*
+*********************************
+
 > 
 > Figs4,5: State what causes the theoretical variation. Consider removing the lines (could be confusing).
+
+
+*VEDERE (fabrizio)*
   
 > Equation 10: Could the cross section ratio (excluding BRs) be presented also?
+
+*VEDERE (fabrizio, roberto)*
+ 
 > 
 > Line 336: repeated word "bins"
+
+corrected
+
 > 
   L336 with the coarser binning used for the $\psi(2S)$ cross section -> where the binning is based on the $\psi(2S)$ cross section
 > 
+
+
+
 > L342 significant variation over rapidity -> significant dependence on rapidity
+
+Done
+
 > 
 > L350 of all weakly decaying $B$ -> of all $B$
-> 
-  L356 and determining a systematic uncertainty -> to determine a systematic uncertainty
+
+**********perché non va bene?  
+controllare
+********************
+
+
+> L356 and determining a systematic uncertainty -> to determine a systematic uncertainty
+
+DONE
 > 
 > L358 the PDG values of -> the world averages for
-> 
-  Line 368: differences
+
+changed
+
+>   Line 368: differences
+
+done
 > 
 > Line 361,373: you define N, but don't use it. I'd like to see either the value of N, or the PDG value for comparison with the measured value.
+
+***************
+*PROPOSTA: mettiamo il valore  fittato di N nel testo immediatamente prima di eq. 11? In ogni caso non mi sembra un'obiezione rilevante. Si potrebbe mettere nella AN?
+***************************
+
 > 
 > L374 which is in agreement with, and is an improvement of about a factor 3.5 in uncertainty over the existing measurement ->
 >     which is in agreement with the existing measurement [Ref?] and improves on the uncertainty by a factor of 3.5.
+
+already changed
+
 > 
 > L380 $p_T$(up -> $p_T$ (up     include a space
 > 
