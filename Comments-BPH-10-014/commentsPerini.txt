@@ -2,7 +2,7 @@
 > The paper is still difficult and heavy to read. It needs clarifications in 
 > many places and some styling at
 > latest before the Final Reading
-> Â·
+> ·
   Gives the general impression that the paper does not deliver what is 
 > promised in the introduction: i.e.
 > the results restricted to the CMS acceptance are not really shown. Either 
@@ -39,18 +39,18 @@ the chi2, but leave the pull plots (which anyway show the reader that the
 pulls do not exhibit "runs", i.e. sets of adjacent points with all
 positive or all negative pulls).
 
-> Â·
-> Â· spell-check cross section vs cross-section
+> ·
+> · spell-check cross section vs cross-section
 
 This is already checked. "Cross section" is used as a standalone noun,
 "cross-section" when it is an attribute.
 
-> Â· Sections 3-7: Use past tense for describing what was done.
+> · Sections 3-7: Use past tense for describing what was done.
 
 Perche'???
 
-> Â· Replace 'we' with passive.
-> Â· Replace 'using' with 'with'.
+> · Replace 'we' with passive.
+> · Replace 'using' with 'with'.
 > Sections 4-7: State clearly which quantities are derived from simulation 
 > and what are measured from
 > real data.
@@ -58,25 +58,25 @@ Perche'???
 From real data: muon efficiencies, yields, B-fractions.
 From MC: acceptance, rho factors.
 
-> Â·
+> ·
 > Abstract
-> Â· "is also computed, cancelling out many systematic uncertainties." Does 
+> · "is also computed, cancelling out many systematic uncertainties." Does 
 > not read well.
-> Â· last line: "The inclusive branching ratio for B->Psi(2S) is then..."
+> · last line: "The inclusive branching ratio for B->Psi(2S) is then..."
 > The results in the paper are improvement of the existing results, plus new 
 > results. Maybe the authors
 > could consider adding something on this in the abstract?
 
 No, but it will be added in the intoduction.
 
-> Â· Avoid sentences with parentheses in abstract.
+> · Avoid sentences with parentheses in abstract.
 > The last two sentences, propose: "The ratio of the differential cross 
 > sections of the two states is also
 > computed, where the systematic uncertainties largely cancel. The branching 
 > ratio of the inclusive
 > B->psi(2s)X decay is extracted from the ratio of the non-prompt cross 
 > sections."
-> Â·
+> ·
 > 1 Introduction
 > Line 3: "of both perturbative and non-relativistic" -> "of the 
 > perturbative as well as non-relativistic"
@@ -89,7 +89,7 @@ The first form was suggested by a native English speaker.
 
 *VEDERE*
 
-> Â·
+> ·
 > line 7: Is there a phrase missing before "On the other hand,...can also 
 > occur ..."? From the phrasing, I
   would expect to have something like "J/Psi mesons are produced..." before 
@@ -99,8 +99,8 @@ The first form was suggested by a native English speaker.
 
 changed
 
-> Â·
-> Â· Line 9: delete "efficient" , not necessary.
+> ·
+> · Line 9: delete "efficient" , not necessary.
 
 done
 
@@ -108,7 +108,7 @@ done
   line 10: This makes the psi mesons ... -> Therefore the psi mesons are (it 
 > is not clear what 'this' is
 > referring to).
-> Â·
+> ·
 
 not changed for the moment
 
@@ -119,40 +119,40 @@ not changed for the moment
 
 more or less
 
-> Â·
-> Â· Line 10: "of most theoretical" -> "for most theoretical"
+> ·
+> · Line 10: "of most theoretical" -> "for most theoretical"
 
 not changed
 
-> Â· Lines 13-14: delete the end of the sentence ", hence the need.." Not 
+> · Lines 13-14: delete the end of the sentence ", hence the need.." Not 
 > necessary.
 
 changed
 
-> Â· line 16: substitute vague expression "recently published" with for 
+> · line 16: substitute vague expression "recently published" with for 
 > instance "published in 2011"
 > 
 
 we're still in 2011 !
 
-> Â·
-> Â· line 19: remove "basically"
+> ·
+> · line 19: remove "basically"
 
 done
 
-> Â· Line 21: "Cross section results depend" -> "The cross sections depend "
+> · Line 21: "Cross section results depend" -> "The cross sections depend "
 
 changed
 
-> Â· line 22: momentum or momenta?
-> Â· line 22,23: replace 'we' with passive
+> · line 22: momentum or momenta?
+> · line 22,23: replace 'we' with passive
 
 Subject changed from "we" to "the first/second approach"
 
-> Â· Lines 23: Cut the sentence after "different ways" and start a new 
+> · Lines 23: Cut the sentence after "different ways" and start a new 
 > sentence: "In the first approach"
 done
-> Â· Lines 25-26: Cut the sentence after [6] and start a new sentence: "In 
+> · Lines 25-26: Cut the sentence after [6] and start a new sentence: "In 
 > the second approach...."
 
 done 
@@ -162,7 +162,7 @@ done
 > correcting for the CMS detector
 > acceptance, in order to mitigate the effect of he polarization of the two 
 > charmonium mesons."
-> Â·
+> ·
 
 "we" removed, as suggested by the previous comment
 
@@ -171,13 +171,13 @@ done
 > In chapter 2, there's a certain unbalance between details. Is it necessary 
 > to give all coordinate details
 > here? You could just refer elsewhere.
-> Â·
-> Â· Line 31: "with a magnetic field of.." -> "providing an axial magnetic 
+> ·
+> · Line 31: "with a magnetic field of.." -> "providing an axial magnetic 
 > field of"
 
 changed 
 
-> Â· line 34, 36: remove the word "left-handed". Contradicting 'left-handed' 
+> · line 34, 36: remove the word "left-handed". Contradicting 'left-handed' 
 > and 'right-handed'.
 
 corrected
@@ -191,8 +191,8 @@ corrected
 removed
 
 
-> Â·
-> Â· line 37: "measured upwards from..."
+> ·
+> · line 37: "measured upwards from..."
 > line 38-39: Is it really necessary to define the pseudorapidity and 
 > rapidity? We suggest to either
   dropping them, or replacing them with a reference. The sentence "which the 
@@ -202,12 +202,12 @@ removed
 WE'll consider dropping it
 *CONTROLLARE*
 
-> Â·
-> Â· line 42: do not use Capital letters for drift tubes etc.
+> ·
+> · line 42: do not use Capital letters for drift tubes etc.
 
 done
 
-> Â· line 45: "made of 66 million 100 x 150 um2 pixels": is this information 
+> · line 45: "made of 66 million 100 x 150 um2 pixels": is this information 
   really needed here?
 
 removed
@@ -215,8 +215,8 @@ removed
 > Iine 46: 2.with 9.3 million strips of pitch". As the number of active 
 > elements is given for the pixel
 > detector.
-  Â·
-> Â· line 47: "with strips of pitch between 80 and 184 um": is this 
+  ·
+> · line 47: "with strips of pitch between 80 and 184 um": is this 
 > information really needed here?
 
 removed
@@ -227,8 +227,8 @@ removed
 
 removed
 
-> Â·
-> Â· line 53: add some details about HLT.
+> ·
+> · line 53: add some details about HLT.
 
 We'll consider that *VEDERE*
 
@@ -240,12 +240,12 @@ We'll consider that *VEDERE*
 
 We'll consider that *VEDERE*
 
-> Â·
+> ·
 > line 58: the LHC averaged 2.2 pp collisions per bunch crossing at the CMS 
 > interaction region -> the
 > average number of pp collisions per bunch crossing at the CMS interaction 
 > region was 2.2.
-> Â·
+> ·
 
 not changed (approved by FNAL with the addition of "inelastic")
 
@@ -255,15 +255,15 @@ not changed (approved by FNAL with the addition of "inelastic")
 
 modified
 
-> Â·
+> ·
 > line 61: double-muon triggers that exploit full processing at the HLT 
 
-> level Â– full processing is jargon.
+> level – full processing is jargon.
 > Replace with more precise expression.
 
 replaced with "advanced processing" as suggested by FNAL
-> Â·
-> Â· line 61: All three -> All the three
+> ·
+> · line 61: All three -> All the three
 
 done (but this had not bothered other native speakers)
 
@@ -274,32 +274,32 @@ done (but this had not bothered other native speakers)
 
 We felt this was acceptable jargon.
 
-> Â·
+> ·
 > Line 72: delete "in advance of its direct measurement". You already state 
 > the lack of experimental
 > information in the beginning of the sentence.
 
 done
 
-> Â·
-> Â· line 78-79: you do not merge the muons! The sentence is complex. 
+> ·
+> · line 78-79: you do not merge the muons! The sentence is complex. 
 
 changed
 
 > Rephrase/reorder lines 78-83?
-> Â· line 80: "not fully covering" -> "does not fully cover"
+> · line 80: "not fully covering" -> "does not fully cover"
   line 84: The muon tracker tracks... -> The muons are required to pass the 
 > following cuts/criteria in the
 > tracker:
 
 
-> Â·
-> Â· line 86: 'degree of freedom' -> number of degrees of freedom.
+> ·
+> · line 86: 'degree of freedom' -> number of degrees of freedom.
 
 I think this is standard jargon. "Per number of degrees of freedom" doesn't sound right to me, 
 it should be "divided by the number of ..."
 
->Â· lines 86-87: 'length 30 cm' -> length of 30 cm.
+>· lines 86-87: 'length 30 cm' -> length of 30 cm.
 
 > lines 86-87: Here one already refers to a selected primary vertex, but 
 > previously it is mentioned (line
@@ -308,8 +308,8 @@ it should be "divided by the number of ..."
 > the vertices.
 
 *VEDERE*
-  Â·
-> Â· Line 89: Avoid repetition. Write simply " The mass is required to be..."
+  ·
+> · Line 89: Avoid repetition. Write simply " The mass is required to be..."
 
 done
 
@@ -318,11 +318,11 @@ done
 > rapidity range for cross section measurements, if the trigger veto is only 
 > in the forward region.
 > Clarify.
-> Â·
+> ·
 
 *VEDERE o rispondere*
 
-> Â· Line 95: "at the muon stations" -> "in the muon stations"
+> · Line 95: "at the muon stations" -> "in the muon stations"
 
 OK
 
@@ -332,78 +332,139 @@ OK
 
 OK
 
-> Â·
-> Â· Line 101: "correlations between the detection efficiencies"? Please 
+> ·
+> · Line 101: "correlations between the detection efficiencies"? Please 
 > explain.
 
 The probability for one track to be detected is no longer independent of where the other is, 
 when the two come close to each other.
 
-> Â· line 104: reduction of 48 % relative to what selections? Just the 
+> · line 104: reduction of 48 % relative to what selections? Just the 
 > trigger?
-> Â· Line 105: no hyphen in "efficiency independent" and "high rapidity"
-> Â· Line 109. Break the sentence after "trajectory" and start a new sentence 
+
+with respect to all selection cuts except  this. *controllare*
+
+
+> · Line 105: no hyphen in "efficiency independent" and "high rapidity"
+done
+
+> · Line 109. Break the sentence after "trajectory" and start a new sentence 
 > "These effects..."
-> Â· Line 109: "biases in the algorithms" ? Can you formulate it better?
-> Â· Line 110: "reconstructed peaks of dimuon resonances" -> "mass peaks of 
+
+Done
+
+> · Line 109: "biases in the algorithms" ? Can you formulate it better?
+
+*vedere*
+
+> · Line 110: "reconstructed peaks of dimuon resonances" -> "mass peaks of 
 > the dimuon resonance"
-> Â· Line 112: "peak shapes" -> "mass peak shapes"
-> Â· Line 114: "for the two states" -> "of the two states"
+
+ok
+
+> · Line 112: "peak shapes" -> "mass peak shapes"
+
+this should be obvious
+
+> · Line 114: "for the two states" -> "of the two states"
+OK
+
 > Line 115: "the total psi(2S) yield is much smaller that..." -> "the total 
 > yield of psi(2s) is much
 > smaller than of J/psi."
-> Â·
+
+already modified
+
+> ·
 > 4 Inclusive yield determination
 > Line 119: Break the sentence after "cross sections" and start a new 
 > sentence "Either the J/psi peak
 > alone is fitted in a restricted mass window or the fit is done for the 
 > combined ..."
-> Â·
-> Â· Line 122: "resolution variations"?
-> Â· Line 123: "describes" -> "is used to describe"
-> Â· Line 125: " In the second kind of fits" -> "In the second case.."
-> Â· line 127: corrisponding --> corresponding
-> Â· line 128: corresponding again (repetition)
-> Â· line 130: Motivate the use of two exponentials instead of just one for 
+
+this has not disturbed other native speakers, we prefer to leave it as it is.
+
+> ·
+> · Line 122: "resolution variations"?
+
+the fact that the resolution may not be constant.
+
+> · Line 123: "describes" -> "is used to describe"
+OK
+
+> · Line 125: " In the second kind of fits" -> "In the second case.."
+> · line 127: corrisponding --> corresponding
+
+typo
+
+> · line 128: corresponding again (repetition)
+changed
+
+> · line 130: Motivate the use of two exponentials instead of just one for 
 > the background fit.
 
 There is no motivation even for one exponential... It is an empirical 
 function and alternative shapes are investigated and considered as
 systematic uncertainties.
 
-  Â· Line 137: "obtained on" -> "of", "as systematic" ->"as a systematic"
+> · Line 137: "obtained on" -> "of",
+
+changed to "in"
+
+> "as systematic" ->"as a systematic"
+
+OK
+
+
 > 5 Acceptance and Efficiency
-> Â· line 139: Efficiency --> efficiency (in the chapter header)
-> Â· line 140: "As already discussed" -> "As discussed in Section 1".
-> Â· Line 143: Delete "assumed" in "in the assumed polarization".
-  line 143-144: " we also provide measurements within the CMS detector 
+> · line 139: Efficiency --> efficiency (in the chapter header)
+Ok
+> · line 140: "As already discussed" -> "As discussed in Section 1".
+OK
+> · Line 143: Delete "assumed" in "in the assumed polarization".
+
+
+we don't know what the polarization is, so in order to apply acceptance corrections we need 
+to assume one. That's why we wrote "assumed" here.
+
+> line 143-144: " we also provide measurements within the CMS detector 
 > acceptance only": One can
 > get an impression that we can also provide measurements outside the CMS 
 > detector
 > acceptance...rephrase with "not corrected for the detector acceptance" or 
 > something similar.
-  Â·
-> Â· line 145: "and containing..." - bad sentence construction
-> Â· Line 151: "detectable" is a problematic word
+
+changed
+
+  ·
+> · line 145: "and containing..." - bad sentence construction
+
+changed
+
+> · Line 151: "detectable" is a problematic word
+
+it did not trouble the other reviewers and I found it on major dictionaries like 
+http://dictionary.cambridge.org/dictionary/british/detect
+
 > Line 155: Propose: " In the simulation both muons are required to lie 
   within the geometric acceptance
 > ...
-> Â·
-> Â· line 159: Replace null lambda with lambda_theta,phi = 0.
-> Â· line 159-160: Define lambda_\theta\phi (it occurs in eq. (3) but is 
+> ·
+> · line 159: Replace null lambda with lambda_theta,phi = 0.
+> · line 159-160: Define lambda_\theta\phi (it occurs in eq. (3) but is 
 > undefined).
 > Line 162: Propose: "The acceptance of the generated .... will depend on 
 > their spectra. Theoretical
 > predictions of the polarization presented in Sec. 7 have been used to 
 > recompute the acceptance, ...
-> Â·
-> Â· Lines 166-167: Is the FSR not taken into account in simulation?."
+> ·
+> · Lines 166-167: Is the FSR not taken into account in simulation?."
 > Lines 180-181: Either some explanation should be given for the 
 > Tag-and-Probe method or a reference
 > should be given.
-> Â·
-> Â· lines 182-183: the sentence is difficult to understand
-> Â·
+> ·
+> · lines 182-183: the sentence is difficult to understand
+> ·
 > lines 187-188: State which T&P efficiencies (real or simulated) were used 
 > later (probably those from
 > real data? 
@@ -417,46 +478,49 @@ To compute the rho factors.
 > Lines 189-192: "stronger dependence"? Relative to what? "are mapped"? The 
 > whole paragraph
 > should be rewritten more clearly.
-> Â·
+> ·
 > lines 193-194 and eq (5): it is not clear where the epsilon(mu) come from 
 > (simulation/real
 > data/T&P/etc. ?)
-> Â·
-> Â· line 195: Define more precisely what is being factorised.
+> ·
+> · line 195: Define more precisely what is being factorised.
 > lines 201-204 and eq. (6): define what is measured from real data and what 
 > is obtained from
 > simulation.
-> Â·
-> Â· Line 203: "estimated original number"?
-> Â· line 204: of events --> of MC events (?)
+> ·
+> · Line 203: "estimated original number"?
+> · line 204: of events --> of MC events (?)
 > line 215: Why "5.1 Inclusive cross-section determination" is a subchapter 
   of "5. Acceptance and
 > efficiency"? Isn't it a topic of its own?
-> Â·
+> ·
 > line 219: Wasn't the N_corr (J/Psi) already defined on the line 216? 
 > Repetition. "as the fit yields" ->
   "from the fitted yield values"
-> Â·
+> ·
 > lines 221-222: ... results given ... --> ... results are given ... (all 
 > the same, the sentence is difficult to
 > understand)
-> Â·
-  Â· line 223: Why "inclusive" in quotes?
+> ·
+  · line 223: Why "inclusive" in quotes?
 > 6 Prompt and non-prompt component determination
 > This chapter is difficult for a non-expert. You should spell out more 
 > clearly, that in this chapter you
   are describing the methods, while the results come in the next chapter 
 > (and in ref 27).
-> Â·
-> Â· Line 235: Terminate the sentence after ""per event error" and start a 
+> ·
+> · Line 235: Terminate the sentence after ""per event error" and start a 
 > new sentence.
-> Â· line 238 and 257: resolution Gaussian(s), Gaussian(s) resolution?
-> Â· line 259: What is "the track uncertainty"?
+> · line 238 and 257: resolution Gaussian(s), Gaussian(s) resolution?
+> · line 259: What is "the track uncertainty"?
 
 Changed to "the uncertainty on track parameters".
 
-> Â· line 260: convolved --> convoluted
-> Â· Line 262: ""sideband region is" -> "sideband regions are"
+> · line 260: convolved --> convoluted
+
+this is debated
+
+> · Line 262: ""sideband region is" -> "sideband regions are"
 > lines 262 & 269: different sideband limit 3.20 and 3.25 (on purpose?) 
 
 No this is a typo.
@@ -466,20 +530,20 @@ Is
 > of limits on line 269?
 
 
-> Â·
-> Â· Line 268: "sideband region" ->"sideband regions"
-> Â· Line 269: "is" -> "are"
+> ·
+> · Line 268: "sideband region" ->"sideband regions"
+> · Line 269: "is" -> "are"
 > line 271: (see above) Could add something alike "... showing the prompt 
 > and non-prompt components
 > obtained as described above"
-> Â·
+> ·
 > line 272: Are all these systematic uncertainties given quantitatively in 
 > this paper, i.e. in the tables 1
 > and 2 (or elsewhere)? If so, refer to the tables and to the results which 
 > will be presented in chapter 7
-> Â·
-> Â· Line 277: "fits results" -> "fit results"
-> Â· Line 286: "is taken as systematic uncertainties" -> "is taken as a 
+> ·
+> · Line 277: "fits results" -> "fit results"
+> · Line 286: "is taken as systematic uncertainties" -> "is taken as a 
 > systematic uncertainty"
 > 7 Results
 > line 299: The sentence is difficult to read: Maybe: "The prompt and 
@@ -489,18 +553,18 @@ Is
 > cross-sections and from the non-prompt fraction. The cross-section ratio 
 > of the two states is also
 > computed."
-> Â·
+> ·
 > line 303: "Figures 4 and 5 show the measured .... cross-sections...". 
 > However, above (line 299) it says
   that the cross-sections are "extracted" from the inclusive cross-sections 
 > and non-prompt fraction.
 > Clarify.
-> Â·
-> Â· line 315: cross-section spectrum
-  Â· line 316: "feed-down contribution" might not be commonly known.
-> Â· line 316: color-octet -> colour-octet (BE)
-> Â· line 323: ... for the in ... --> ... for the (missing text) in ...
-> Â· paragraph 325-328: In the beginning of the paper (22-28, 140) one gets 
+> ·
+> · line 315: cross-section spectrum
+  · line 316: "feed-down contribution" might not be commonly known.
+> · line 316: color-octet -> colour-octet (BE)
+> · line 323: ... for the in ... --> ... for the (missing text) in ...
+> · paragraph 325-328: In the beginning of the paper (22-28, 140) one gets 
 > an 
 > impression, that the results
   will be shown in two ways, acceptance-corrected and within CMS acceptance 
@@ -508,7 +572,7 @@ Is
 > may be disappointed to find only a couple of lines and a reference to a 
 > webpage concerning the
   "visible" cross sections. What about the dominant sources of systematics 
-> for the Â“visible" cross
+> for the “visible" cross
 > sections? The tables in the twiki give only the total systematics, but a 
 > breakdown like tables 1 and 2 is
 > not shown anywhere.
@@ -518,72 +582,72 @@ We will clarify it in the papper.
 > line 326: values are also reported referred to the CMS ... --> ... values 
 > are also reported within the
 > CMS ...
-> Â·
-> Â· line 329: Does this need to be a subchapter of its own if the values are 
+> ·
+> · line 329: Does this need to be a subchapter of its own if the values are 
 > not given in this paper.
-> Â· line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
+> · line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
 > p_T and rapidity, ...
-> Â· line 344: "affects" -> "affect"
-> Â· Lines 345-346: Not clear, please formulate better.
+> · line 344: "affects" -> "affect"
+> · Lines 345-346: Not clear, please formulate better.
 > line 346: "leads to 12% to 20% variations in the measured prompt 
 > cross-section ratio" -> "changes the
 > measured prompt cross-section ratio by 12-20%".
-> Â·
-> Â· Lines 370-373: "some of many exclusive models"? Vague.
+> ·
+> · Lines 370-373: "some of many exclusive models"? Vague.
 > Lines 374-375: Propose: "This is in agreement with the existing 
 > measurement (Ref?) , with the
 > uncertainty improved by a factor of 3.5."
-> Â·
-> Â· line 357: ... the ratio expectation ... --> ... the predicted ratio ...
-> Â· Line 357: delete "expectation", not needed.
+> ·
+> · line 357: ... the ratio expectation ... --> ... the predicted ratio ...
+> · Line 357: delete "expectation", not needed.
 > 8 Conclusions
-> Â· line 380: add space after "pt"
-> Â· line 381: "extracted" -> "computed"?
-> Â· line 382: To mitigate the effect of the effects ... --> To mitigate the 
+> · line 380: add space after "pt"
+> · line 381: "extracted" -> "computed"?
+> · line 382: To mitigate the effect of the effects ... --> To mitigate the 
 > effects ...
 > Line 383: "polarizations ...." -> "polarization, the measured cross section 
 > uncorrected for the CMS
 > detector acceptance is also given.
-> Â·
-> Â· Line 386: "compared to" -> "compared with"
+> ·
+> · Line 386: "compared to" -> "compared with"
 > Line 387: Terminate the sentence after ", respectively." and start a new 
 > sentence "A reasonable
   agreement is found , except ...."
-> Â·
+> ·
 > Line 388-389: Propose: "With selected hypotheses on polarization, the 
 > ratio of the differential cross
 > sections of the two states is computed, leading to a reduced uncertainty 
   as the systematic errors cancel
 > largely.
-> Â·
-> Â· Line 390: "non-prompt ratio" -> "ratio of the non-prompt cross sections"
-> Â· line 391: 3 --> 3.5 (as in line 374)
-> Â· line 392: Acknowledgments --> Acknowledgements (may be a matter of 
+> ·
+> · Line 390: "non-prompt ratio" -> "ratio of the non-prompt cross sections"
+> · line 391: 3 --> 3.5 (as in line 374)
+> · line 392: Acknowledgments --> Acknowledgements (may be a matter of 
   taste)
-> Â· line 428: curious accents on I and A?
+> · line 428: curious accents on I and A?
 > References
-> Â· ref. 27: date of citation of a web page should be mentioned
-  Â· ref. 28: arxiv details needed
+> · ref. 27: date of citation of a web page should be mentioned
+  · ref. 28: arxiv details needed
 > Figures
-> Â· Figure 1: legends and axis labels are in too small font, difficult to 
+> · Figure 1: legends and axis labels are in too small font, difficult to 
 > read
 > Fig. 2: what is the reason for showing the bins 0-1.2 and 1.6-2.4 split in 
-> 2? Looking at the plot I donÂ’t
+> 2? Looking at the plot I don’t
 > see a compelling reason, the pT ranges are roughly the same. If you want 
 > to point out to something in
 > particular, then say it.
-> Â·
+> ·
 > Figure 2 caption: Cut the first sentence after "five rapidity bins" and 
 > start a new sentence "Also
 > plotted are..." Remove the parentheses.
-> Â·
-> Â· Figure 2: try to draw the legends in larger fonts.
+> ·
+> · Figure 2: try to draw the legends in larger fonts.
 > Fig. 2: too many decimals for eta range (e.g. 2.10<|y|<2.40 to 
 > 2.1<|y|<2.4); Replace "Ref. [4]" with
 > "XX et al.", it is meaningless e.g. in a conference talk without reference 
 > to the paper.
-> Â·
-> Â·Figure 4: left figure, the legend text FONLL should be NRQCD. Is the plot 
+> ·
+> ·Figure 4: left figure, the legend text FONLL should be NRQCD. Is the plot 
 > actually the right one? It
 > seems very identical to Fig. 5 left (J/psi non-prompt)!
 > 
@@ -594,7 +658,7 @@ We will clarify it in the papper.
 > Legends again with too small font and with too many decimals. Could spell 
 > out luminosity ad
 > polarization, there's enough space.
-> Â·
+> ·
 > figs, 4.5: can the data errors be right? They look very large (O~50%) 
 > compared to the numbers in the
 > tables (O~10%).
@@ -602,12 +666,12 @@ We will clarify it in the papper.
 The data errors are right. All the table numbers must be summed in 
 quadrature first (statistical and systematic).
 
-> Â· fig. 6 left: theory band is hiding y-axis ticks. Use gPad->RedrawAxis() 
+> · fig. 6 left: theory band is hiding y-axis ticks. Use gPad->RedrawAxis() 
 > before saving.
-  Â· Figure 6 caption: ... NRQCD predictions --> ... NRQCD prediction (in 
+  · Figure 6 caption: ... NRQCD predictions --> ... NRQCD prediction (in 
 > singular)
 > Tables
-> Â· Table 1: "lowest-p_T bin", a white space is missing.
+> · Table 1: "lowest-p_T bin", a white space is missing.
 > table 1, 2: the uncertainty tables are missing the total uncertainty, 
   which the reader would be most
 > interested in.
