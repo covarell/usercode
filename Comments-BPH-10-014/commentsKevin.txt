@@ -71,7 +71,7 @@ DONE
 
 Proposed change: "Measurements of quarkonium production cross section and polarization provide important tests...(QCD)".
 
-[FL]
+
 
 > 
 > L5: Change "quarkonium" to "charmonium" as there is no bottomonium here.
@@ -90,12 +90,12 @@ DONE
 > 
 > L12: "do not seem to describe well" is awkward.  How about "do not accurately describe"?
 
-Not done (yet).  [FL Non mi piace, in inglese, e Ian non ha obiettato]
+Not done (yet).  [ Non mi piace, in inglese, e Ian non ha obiettato]
   
 > L13-14: The end ", hence the need for a test at the LHC" is a little awkward.
 
 this and the previous sentence passed the test of other native speakers... will consider it.
- [FL stesso commento di sopra]
+ [ stesso commento di sopra]
 > 
 > L19: Change "/" to " to "
 DONE
@@ -111,7 +111,7 @@ DONE
 > problem is that the polarization is unknown and the acceptance correction is very sensitive to the
 > polarization.
 
-[FL]Proposed:  "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
+Proposed:  "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
 
 > 
 > L31: Could flow smoother with "is a 6 m diameter superconducting solenoid producing a magnetic"
@@ -137,26 +137,26 @@ Done
 > between prompt and non-prompt.  In that case, the uncertainty is dominated by the dimuon vertex so
 > the primary vertex resolution is irrelevant.  I would remove this sentence.
 
-[FL]OK for me to remove it.
+OK for me to remove it.
 
 > 
 > L53: If the HLT is mentioned, it should be mentioned that it consists of a computer farm and maybe
 > even mention that it takes L1 inputs and performs additional reconstruction and verification.
 
-[FL]The original sentence was "The High Level Trigger processor farm ...", but it was shortened due to some previous comment.
+The original sentence was "The High Level Trigger processor farm ...", but it was shortened due to some previous comment.
 
 > 
 > L55: Change "based on a large part of the data sample collected in 2010" to "based on the collected in 2010"
 > 
-[FL]"based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
+"based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
 Changed.
 
 > L56: Change "This part is selected in order to" to "The sample is selected to"
 > 
-Done [FL]
+Done 
 > L60: Add "The" to the beginning of the sentence to avoid starting with J/psi.
 > 
-DONE [FL]
+DONE 
 > L70-71: It is stated that "We use the NRQCD matrix element tuning...".  But I don't know what it is used
 > for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
 > generation?  Does it affect the shower evolution?
@@ -170,7 +170,7 @@ Only the size of the color octet contribution in the total cross section.
 >  be removed.  If there is something else to be said, it needs to be more clear.
 >
 
-Already modified [FL]
+Already modified 
 
  
 > L78-L83: Could be rewritten.  The language is awkward and "tracker tracks" needs to be defined.
@@ -182,48 +182,48 @@ Muons reconstructed by two algorithms (Global Muons
 > Global muons are higher quality while Tracker muons have higher efficiency at low momentum."
 > 
 
-[FL]  Changed.
+  Changed.
 
 
 > L88: Change "To select the events" to "To select events"
 
-Done [FL]
+Done 
 > 
   L92: Change "only the one" to "the one"
-Done [FL]
+Done 
 > 
 > 
 > L96: Change "being faked by a single muon." to "from a single muon."
 > 
-Done [FL]
+Done 
 
 >  L96: "consequence of this" to "consequence"
 
-Done [FL]
+Done 
  
 > L101:  "cross again" to "cross"
 
-Done [FL]
+Done 
 > 
 > L101: "This has been shown to cause" to "This causes"
-Done [FL]
+Done 
 > 
 > L102-103: ", type-A dimuons are rejected in the whole rapidity range." to ", all type-A dimuons are
 > rejected."
 > 
-Done [FL]
+Done 
 
 
 > L104: "corresponds to a reduction in statistics of about 48%." to "corresponds to a 48% reduction in
 > yield."  The word "statistics" in this context is jargon.
 
-OK Done [FL]
+OK Done 
 
 > 
 > L108: Change "imperfect knowledge of the magnetic field, modelling of the detector material," to
 > "imperfect knowledge of the magnetic field and detector material,"
  
-[FL] well I think that in principle there is a difference between "knowledge" and "modelling".  
+ well I think that in principle there is a difference between "knowledge" and "modelling".  
 One may know perfectly well the material, including electronic chips, cables and all, but 
 one may find it hard, or impossible, or not worth while to simulate it perfectly in the software. 
 
@@ -235,7 +235,7 @@ Not changed for the moment.
 > this paragraph is here.
 > 
 
-[FL: RIVEDERE] Maybe we can take out the reference to the muon peak and just mention the systematics due to 
+[: RIVEDERE] Maybe we can take out the reference to the muon peak and just mention the systematics due to 
 tracking. The paragraph is here because this is where the tracking is mentioned, I think it was more or less like this in the published Jpsi paper.  
 
 
@@ -248,7 +248,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > should read "In both fits, the signal function is the sum of a Gaussian and a Crystal Ball function,
 > simultaneously taking into account FSR and experimental resolution."
 
-[FL] Verificare con Francesco
+ Verificare con Francesco
 
 > 
 > L121: The Crystal Ball reference should probably be "J. E. Gaiser, Appendix-F Charmonium Spectroscopy
@@ -256,26 +256,26 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > see that the current reference even refers to the currently used Crystall Ball function.
 
 
-[FL] Verificare con Francesco
+ Verificare con Francesco
 
 
 > 
 > L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
 
-[FL] It is a sum.
+ It is a sum.
 
 > 
 > L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
 
-[FL]  Fatto (verificare).
+  Fatto (verificare).
 
 > L127-128: "corrisponding" should be "corresponding".  The end of the sentence could be more simply
 > written as "is fixed to the world average value [18]."  The term "PDG tables" sounds like jargon.
 > 
-[FL] Done 
+ Done 
 
 > L128: "the corresponding widths" to "the widths"
-[FL] Done 
+ Done 
 
 > 
 > L131 Remove "Typically,"
@@ -284,7 +284,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > rapidity region" to "barrel region".  I would also change "forward, high rapidity region" to
 > "forward region".
   
-[FL] It seems clear to me that it refers to the absolute value of the rapidity. Technically one 
+ It seems clear to me that it refers to the absolute value of the rapidity. Technically one 
 could also object that "forward" is misleading, since it includes what one would call "backward".
 
 
@@ -295,33 +295,33 @@ could also object that "forward" is misleading, since it includes what one would
 > should be increased, especially axis labels and values.  In the caption, the pT values do not need
   ".0" and there does not need to be ":" after "bin".
 
-[FL] Da vedere con luca/francesco
+ Da vedere con luca/francesco
 
 > 
 > L137 "taken as _the_ systematic"
 
-[FL] Done (but not so sure).
+ Done (but not so sure).
 > 
 >  L137-138: Remove "the values are reported..."
 
-[FL] Done
+ Done
 
 > 
 > L140-145: This should be rewritten in terms of the default analysis and extra information without
 > the acceptance correction, not in terms of two distinct analyses.
 
-[FL] Che facciamo, riscriviamo?
+ Che facciamo, riscriviamo?
 
 > 
 > Eq 1, L153-154: Lambda_theta needs to be defined. 
 
-[FL] As the text was supposed to explain, the parameter in the eq. only appears to indicate 
+ As the text was supposed to explain, the parameter in the eq. only appears to indicate 
 a dependence on the polarization.
 
 > Furthermore, in line 23 we are told that the polarization is 0 for prompt and from EvtGen for non-prompt
 > So why are there various polarization scenarios being mentioned here?
 
-[FL] because in general the acceptance does depend on the assumed polarization. 
+ because in general the acceptance does depend on the assumed polarization. 
 The polarization is taken to be null in the default analysis, but then four particular polarization scenarios are considered, for which lambda_theta is nonzero (while lambda_phi is null).
 
 > 
@@ -329,24 +329,24 @@ The polarization is taken to be null in the default analysis, but then four part
 > muon requirements: |eta|<1.2 and pT>4 GeV or 1.2<|eta|<2.4 and pT>3.3 GeV."
 > 
 
-[FL] DONE
+ DONE
  
 > Eq 3: Doesn't the dependence on lambda_phi mean that lambda_phi should be in Eq. 1?  Is lambda_phi
 > varied?
 
-[FL] In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in the general formula, but is null in the four extreme polarization cases we actually considered. So in practice it is not varied. 
+ In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in the general formula, but is null in the four extreme polarization cases we actually considered. So in practice it is not varied. 
 Note that these parameters refer to a particular frame, so technically the acceptance depends on yet another index, specifying which frame is being considered. This would have made eq.1 too  heavily detailed for its illustrative purpose, so we kept the lambda_theta as a mere reminder of the polarization dependence. [VEDERE]
 
 > 
 > L162-165: Need to make clear why different generated spectra can lead to different acceptance.  Perhaps
 > starting the sentence with "As the acceptance is defined by single muon criteria, different spectra..."
 
-[FL] changed
+ changed
 
 > Reading the AN it seems like the acceptance came from a particle gun.  If this is so, then I don't see
 > why this would be called a Pythia spectrum.
 
-[FL] mi stanno venendo dubbi!! E' fatta col particle gun? In che senso allora si provano vari spettri? facendo il reweigting alle varie predizioni teoriche? l'accettanza di default con quale spettro ??stata fatta?
+ mi stanno venendo dubbi!! E' fatta col particle gun? In che senso allora si provano vari spettri? facendo il reweigting alle varie predizioni teoriche? l'accettanza di default con quale spettro ??stata fatta?
 In effetti l'AN dice che ??fatta con un particle gun...
 Questo l'abbiamo chiesto mille volte a Shuang ma nessuno ha mai capito la 
 risposta.
@@ -358,7 +358,7 @@ The AN is incorrect, we'll change that. The default acceptance was determined us
 > 
 > L165: "taken as _a_ systematic"
 > 
-[FL] DONE (but not sure)
+ DONE (but not sure)
 
 > L166-172: Why should this be considered a sufficient systematic?  What about the uncertainty in the
 > measurement of [6]?  Since the measurement comes from e+e-, it does not include B_s or Lambda_b decays.
@@ -366,60 +366,60 @@ The AN is incorrect, we'll change that. The default acceptance was determined us
 > B_s or Lambda_b decays?  Does this also require Pythia to get the prompt to non-prompt fraction correct?
 > If so, does it?  I don't see comparisons to Pythia in the paper to check this.
 
-[FL] ******Da vedere*******
+ ******Da vedere*******
 
 > 
 > L173-179: This section starts with transverse momenta and then just talks about momentum.  So does this
 > systematic include effects on both pT and rapidity?
 > 
 
-[FL] It does   ***** verificare ****
+ It does   ***** verificare ****
 
 > L177: "measured on data" to "measured with data"
 > 
-[FL] DONE
+ DONE
 
 > L177: "resolution has been then used" to "resolution was used"
 > 
-[FL] DONE
+ DONE
 
 > L179: "shift has been taken" to "shift taken"
 > 
-[FL] DONE
+ DONE
 
 > L180: Remove "so-called"
 
-[FL] DONE
+ DONE
   
 > Line after 183: Remove ", measured on data," as this is stated in line 188.
 > 
 > L186: "and and" to "and"
 
-[FL] DONE
+ DONE
 
 > L187: "All of the above efficiencies" to "The efficiencies"
 
-[FL] DONE
+ DONE
 > 
 > L188: "techniques, both on real" to "techniques on real"
-[FL] DONE
+ DONE
 > 
 > L189-192: Need rewriting.  "then" and "In turn" should be removed.
-[FL] "then" removed.
+ "then" removed.
 "In turn, the tracking efficiency" -> "The tracking efficiency, on the other hand, is"?  
 
 >  
 > Line after 192: "expressed in the following way:" to "expressed as:"
 > 
 
-[FL] DONE
+ DONE
 
 > L 196: Remove "both"
 > 
 >  L197: At end of sentence, could include the clause ", namely the assumption that the dimuon efficiency is
 > the product of two single muon efficiencies" to be clear what the rho factor is for.
 
-[FL] I think this is already stated at the beginning, when we say that the rho factor represents a 
+ I think this is already stated at the beginning, when we say that the rho factor represents a 
 correction to the factorization hypothesis. The proposed clause sounds confusing to me, since it would 
 suggest that the factorization hypothesis is the bias the previous sentence refers to.
 
@@ -437,7 +437,7 @@ suggest that the factorization hypothesis is the bias the previous sentence refe
 > like an important systematic check.
 > 
 
-[FL] we tried this for the Jpsi paper. The difference is that with this alternative method one relies 
+ we tried this for the Jpsi paper. The difference is that with this alternative method one relies 
 on the MC spectrum inside a bin. We are convinced that the method we used 
 correctly includes the "bias to higher efficiency*acceptance" in the statistical error. 
 *VEDERE*
@@ -453,13 +453,13 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > acceptance.
 > 
 
-[FL]  Controllare con Luca.
+  Controllare con Luca.
 
 > L216 and L219-220 are redundant.  Suggest removing "The corrected yields ... <1/AE>bin." and adjusting
 > L216 as "is the J/psi yield in a given transverse momentum--rapidity bin, multiplied by <1/AE>bin to
 > correct for the J/psi acceptance and selection efficiency."
 
-[FL] DONE
+ DONE
 
 > 
 > L223: Need to make clear what Figure 2 is.  Should mention that it is corrected for efficiency and
@@ -469,7 +469,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > they include systematic uncertainties, which ones are included?
 > 
 
-[FL] The text says the results are "fully corrected", I think that the null polarization is understood. 
+ The text says the results are "fully corrected", I think that the null polarization is understood. 
 
  all systematic errors are included except lumi.
 
@@ -484,53 +484,53 @@ Done by LM.
 > 
 > L228: Change "In order to" to "To"
   
-[FL] DONE
+ DONE
 
 > L228: Change "fit technique is used" to "fit is performed"
 > 
-[FL] DONE
+ DONE
 
 > L231: Change "x-y" to "transverse"
 
-[FL] DONE
+ DONE
 > 
 >  L234 "A convolution with a resolution function is applied," begs the question of what it is applied to.
 
-[FL] to the PDF?  *controllare*
+ to the PDF?  *controllare*
 
 > 
 > L241: Write "The expression for the PDF F(l,m) for J/psi is:
 
-[FL] DONE but not sure  ("for *the* Jpsi"?)
+ DONE but not sure  ("for *the* Jpsi"?)
 
 > 
 > L250: I think it is unreasonable that the PDFs need to be obtained from Ref 4.  Why can't they be added
 > to this paper as well?
 
-[FL] looked like an avoidable repetition to us.
+ looked like an avoidable repetition to us.
   
 > L262: This seems like a strange sideband region.  Why is the upper sideband so close to the J/psi
 > and so small?  In some of the high rapidity bins it is clear that this sideband region includes some
 > signal.  I don't see any reason why the J/psi sideband must be distinct from the Psi(2S)
 >  sideband.
 
-[FL]
+
 
 > 
 > L265: Need space between (2S) and statistics.
 > 
 
-[FL] DONE
+ DONE
 
 > L269: Why is the J/psi upper sideband different here (starts at 3.25 instead of 3.20)?
 > 
 
-[FL] Typo, corected.
+ Typo, corected.
 
 
 > L272: "recipes" sounds too colloquial.  I would suggest "procedures"
 
-[FL] already changed.
+ already changed.
 > 
 > Figure 3: As in Figure 1, the pull histograms do not add very much.  I would suggest moving the chi^2
 > to the lifetime plot and removing the pull histograms.  If the pull histograms are kept then I think
@@ -543,21 +543,21 @@ Done by LM.
 > fit or just call the second one the psi(2S) fit.
 > 
 
-[FL] Done by RC.
+ Done by RC.
 
 > L279-281: I think a brief summary is appropriate rather than just a reference to 4.
 > 
-[FL] *vedere*
+ *vedere*
 
 
 > L286: "taken as systematic uncertainties." to "taken as a systematic uncertainty."
 
-[FL] DONE
+ DONE
 
 > 
 > L288: What does "used as input" mean?  This needs to be clarified.
 
-[FL] The fitted parameters are fixed in the background part of the PDF for the signal fit.
+ The fitted parameters are fixed in the background part of the PDF for the signal fit.
 Proposed: "the fitted shape is used as a fixed background PDF in the signal region"
 Not done yet.
 
@@ -581,7 +581,7 @@ DONE
 > Table 1 (2) caption: Need space between lowest-pT and bin.  The fact that the FSR uncertainty gives a
 > 19% (29%) effect which is ignored needs to be explained.
 
-[FL] The effect is ignored in the table, not in the results. Since the table only gives "typical" or "average" variations, it would have been misleading to quote a 19% (29%) as an upper limit, 
+ The effect is ignored in the table, not in the results. Since the table only gives "typical" or "average" variations, it would have been misleading to quote a 19% (29%) as an upper limit, 
 since it would have given the wrong impression of a 
 uniformly high - or wildly fluctuating - systematic uncertainty, whereas it's only a border effect.
 We thought the caption was clear enough on this point, but maybe it's not clear enough.
@@ -591,7 +591,7 @@ We thought the caption was clear enough on this point, but maybe it's not clear 
 > Table 1 and 2: The luminosity uncertainty is not mentioned in the text but appears here.  At the least
 > there should be a reference.  It should also be mentioned in the text.
 
-[FL] it's reference [8]
+ it's reference [8]
 
 > 
 > L303-319: Some explanation of NRQCD and FONLL should be given.  In particular, it should be explained
@@ -615,21 +615,21 @@ added to the text. Thanks for spotting this,.
 > shifts..."
 > 
 
-*FL DONE
+* DONE
 
 >  L323: "for the in the" should be "in the"
 
-*FL  DONE
+*  DONE
 
 > 
 > L325-328: This could perhaps be rephrased given the suggestions on changing how the uncorrected
 > values are described.
   
-FL  *********Questo chi lo cambia?****
+  *********Questo chi lo cambia?****
 
 > L330-331: As mentioned at the beginning, I think these results deserve a figure.
 
-FL Qui che si fa?
+ Qui che si fa?
 
 > 
 > L333: "Most of the systematic uncertainties on the acceptance ... cancel" is disingenuous.  The most
@@ -638,7 +638,7 @@ FL Qui che si fa?
 > uncertainties other than the polarization cancel.
 >
 
-FL Changed to "Most of the systematic uncertainties on acceptances and efficiencies listed in Table 1 cancel"
+ Changed to "Most of the systematic uncertainties on acceptances and efficiencies listed in Table 1 cancel"
 
  
 > Fig 4: The left plot is not correct.  It is the non-prompt J/psi when it should be the prompt J/psi.
@@ -706,30 +706,30 @@ recent NRQCD calculations including color octet.
 
 > L377: Remove "meson" as it is redundant.
   
-*FL DONE
+* DONE
 > L380: space before "(up to"
 > 
-*FL DONE
+* DONE
 
 > L382-383: "To mitigate the effect of the effects due to the" doesn't sound great and it doesn't really
 > mitigate the effect anyway.
 
-FL removed  "the effects due to" and "to mitigate"?
+ removed  "the effects due to" and "to mitigate"?
 
 > 
 > L385-387: There is also the scale discrepancy for non-prompt psi(2S).
 
-FL Yes, but since we are then extracting the BR from this discrepancy,
+ Yes, but since we are then extracting the BR from this discrepancy,
 it is not a result worth being repeated in the conclusions.
 
 > 
 > L391: The factor of 3 here was a factor of 3.5 in L374. 
 
-FL NO, METTIAMO 3.5!
+ NO, METTIAMO 3.5!
 
 > Also, the symbol used does not mean approximately equal.
 
-*FL It does for some. Changed anyway.
+* It does for some. Changed anyway.
   
 > L394: "the useful" to "useful"
 > 

@@ -1,3 +1,8 @@
+Thanks for your careful reading.
+Answers to main comments follow, style and grandmar corrections are accepted
+unless specified or unless bigger changes have been done to the relative 
+parts.
+
 > General remarks
 > -----------------------
 > The results described in the paper are interesting and valuable. The paper itself is in certain parts hard to digest and to understand.
@@ -14,106 +19,298 @@
   
 > At present the paper cannot be understood without consulting Ref. [4]. Please consider at several places to summarize in one sentence what is meant.
 
+The paper has been rewritten in several parts, hopefully the new version
+is improved concerning your general remarks.
+
 > Abstract
 > -----------
 > - Check if 36.7 inv. pb is correct? Most analyses have 36.0pb.
+
+It is correct. We use the "MuonPhys" JSON file of 2010 (~40 pb-1) but we
+remove runA (< 10% of the statistics) to have a simpler trigger description.
+For details you can refer to the AN-2011-098.
+
 > - "…, assuming null polarization in the prompt production": Remove the colon and the word "null" appears poor usage of english.
+
+Replace by "isotropic".
+
 > - "the inclusive … is then extracted from the non-prompt ratio" -> improve english
-> 
+
+Removed "then".
+
 > 1 Introduction
 > -------------------
 > - The physics relevance of the paper in view of the non-relativistic QCD and the ideas of the measurement should be stated more clearly in the introduction
+
+We added more details on NRQCD models as well as the FONLL model for bbbar
+production.
+
 > - The issue of color octet vs. color singlet production should be discussed here (not in l.69).
+
+It is now mentioned. 
+
   - english: "… the utility of measuring the … lies in the cancellation"
-> - The J/Psi symbol needs to be printed more tighter.
+
+Changed.
   
 > 2 The CMS detector
   ---------------------------
 > The left-handed Cartesian coordinate system… -> This is wrong and the whole paragraph needs rewriting.
-> 
+
+Ok.
+ 
 > The tracking system is described with awkward details and inconsistent use of capital letters for the naming of the detectors. A lot of information in parentheses.
-> 
+
+The full paragraph has been shortined.
+ 
 > 3 Data selection and event reconstruction
 > --------------------------------------------------------
 > 56: "This part is selected in order to have…." Check language
+
+Removed "in order".
+
 > 72: in advance
+
+Ok.
+
 > 84-87: Needs to be rephrased.
 > 78-79: "Muons as reconstructed by two different measurements are merged": What does it mean?
-  Please verify the luminosity error
+
+These two paragraphs have been merged and rewritten.
+
+>  Please verify the luminosity error
+
+There is no lumi error mentioned in lines 78-79. If you refer to line 57,
+this is taken from the reference provided.
+
 > 103-106: Type A muons are *not used* …. Do here the systematic uncertainties really cancel?
+
+We don't understand which systematic uncertainties you are referring to. 
+Since all the efficiency estimations have been done consistently (for 
+type-B dimuons only), the systematics are determined for that sample only.
+
   83ff: Can you give a typical muon momentum range?
+
+Since there is no momentum cut on the muons, we cannot add it here, but we
+can speicfy it in line 188, giving the minimum and maximum ranges of the 
+pT_mu bins. 
+
 > 90: The two muon trajectories are fitted with a common vertex constraint, … -> What is done exactly?
-  92: How often are more than one pair found?
+
+A Kalman vertex fit. This is a common technique and we did not want to discuss
+details here.
+
+> 92: How often are more than one pair found?
+
+~7% of the cases, but only in ~1% we need to select on chi2 vertex probability
+(in the other case we choose the GlobalMuon-GlobalMuon pair)
+
 > 95: How close is "too close in space"?
+
+No fixed amount (they are requirements at the hardware level): this is 
+explained by the sentence line 94: "whose specific criteria depend on the type of muon chamber and the region of the detector" 
 > 
 > 4 Inclusive yield determination
 > -----------------------------------------
 > 126: …the same PDF is used…. -> Explain what "the same" means in this context?
+
+A Crystal Ball for the J/psi, a Crystal Ball for the psi', i.e. the same PDF.
+
 > 127: corresponding
-> 131: The figures should be referred to using e.g. (a), (b), …
+> 131: The figures should be referred to using e.g. (a), (b)
+
+Many papers use left/right, top/bottom etc. to refer to figures.
+
 > - The figures, i.e. the text size in the labels need to be improved
 > - Explain how you get in the end the total number of signal events.
-> 
+
+Rephrased lines 118-120: "Two kinds of fits are performed on the bla bla bla
+to extract the inclusive YIELDS, fitting either the...  . Yields are derived
+from extended unbinned maximum-likelihood fits."
+ 
   5 Acceptance and Efficiency
 > --------------------------------------
-  This section would profit from sub-sections
+>  This section would profit from sub-sections
+
+Added subsections.
+
 > 142-145: Unclear what you mean. Are both results discussed in the paper?
-  Eq. (1) To which properties refer p_t and y, e.g. generator or detector level?
+
+Yes, they are.
+
+>  Eq. (1) To which properties refer p_t and y, e.g. generator or detector level?
+
+Generator level (hence the "pT calibration" systematics. It will be added (*).
+
 > Eq. (2) could be replaced by an explaining sentence.
-> Eq. (3) contains variables not explained in the text. Are the lambdas independent?
+
+Since this is very important to define the cross-sections in the muon 
+acceptance we prefer to have an Eq. number to refer to.
+
+> Eq. (3) contains variables not explained in the text. 
+
+But explained in Ref. [19].
+
+> Are the lambdas independent?
+
+Yes.
+
 > 169-170: What is the size of the difference between the acceptance of prompt and non-prompt mesons?
+
+After doing a proper polarization hypothesis for the two, it is zero. 
+Acceptance depends only on the detectability in the muon chambers, and prompt
+and non-prompt events are indistinguible, except for a small difference in
+the vertex (not seen by the muon chambers).
+
 > 170-172: Unclear what this means
+
+After addition (*) this should become clearer.
+
 > 189ff: english: The muon identification….
-> 189-204: rho has to be explained more clearly. What is the typical size of the epsilons and rho? Can rho be larger than 1? The clarity of this discussion needs to be improved.
-> - Eq. (6) What is A_k epsilon_k ? Is this the A from Eq. (1)? How does this depend on what was previously discussed?
+
+Removed "the".
+
+> 189-204: rho has to be explained more clearly. What is the typical size of the epsilons and rho?
+
+There is no "typical" size of epsilon. It can vary between 10 and ~100%...
+Most pT bins are close to 100% because the turn-on is very steep.
+rho sizes are given already (line 195).
+
+> Can rho be larger than 1? The clarity of this discussion needs to be improved.
+
+Sure, in principle we are not claiming from which source the correlation
+comes (although this is discussed in the AN) so it depends if e(mumu) is 
+larger or smaller than e(mu+)e(mu-)e_vertex in MC. It can be both.
+
+> - Eq. (6) What is A_k epsilon_k ? Is this the A from Eq. (1)? 
+
+Yes. epsilon_k changed to epsilon(mumu)_k to be consistent with Eq. 5.
+
+> How does this depend on what was previously discussed?
+
+We don't understand the question.
+
 > - Can you provide distributions of A_k epsilon_k (not for the paper)? If the values are small, the use of the method is doubtful
+
+Tables 2-3 of the AN give these numbers. Provided that the errors are computed
+properly, this method works for any <A x e>. In general we removed bins
+with too small <A x e> (< 1%), as it happened for pT=5.5-6.5 in
+y=1.2-1.6 and y=1.6-2.1.
+
 > - How is A_k epsilon_k for an individual event obtained? How do the equations depend on pT_mu1, pT_mu_2, y_mu1, y_mu2?
+
+Acceptance: from the "fine-grained" bins, using pT-y of the charmonium. 
+Efficiency: using Eq. 5 for the proper pT_mu1, pT_mu_2, y_mu1, y_mu2 
+
 > - Systematic uncertainty discussions are distributed over many places, e.g. 205-214.
-  209: Check tense
+
+This is done on purpose. Every quantity determination is followed by the
+systematics on that specific quantites.
+
 > 
   Subsections 5.1 should become section 6 as this is not really a sub part of section 5.
-> 
-  Figure 2: Unify text sizes. The parenthesis in the caption should be discussed in the text. Use consistent abbreviation for branching ratios.
-> 216: What is the dependency of Ncorr? Please write variables in a consistent scheme, i.e. use J/Psi as subscript. Can you give the formula for Ncorr?
+
+Ok.
+
+>  Figure 2: Unify text sizes. The parenthesis in the caption should be discussed in the text. Use consistent abbreviation for branching ratios.
+
+Done.
+
+> 216: What is the dependency of Ncorr? Please write variables in a consistent scheme, i.e. use J/Psi as subscript. 
+
+Ok. 
+
+> Can you give the formula for Ncorr?
+
+It is (They are) given in the text now (actually there are two types of 
+corrections).
+
 > 221: "In the case of the results given within the CMS detector acceptance, the acceptance corrections are not applied. " is not understandable.
-> 
+ 
+Changed.
+
 > 6 Prompt and non-prompt component determination
 > ----------------------------------------------------------------------
 > 230: What is the pseudo-proper decay length, how is it defined?
+
+It is already defined in 228-229 (and Ref. [4])
+
 > 234-240: On what is the convolution applied? Please rephrase.
+
+It si explained afterwards. Removed "A convolution to".
+
 > 241-261: Is very hard to follow and in our opinion not necessary for the understanding of the result and the paper. We suggest to reduce this to a short discussion without formula.
+
+Other reviewers approve the long formulation.
+
 > 262: Delete, because this is discussed in 269 and is inconsistent compared to 269.
-> 
-  Figure 3: Where does the decay length from the background originate from? (ref. line 250). Please discuss.
+
+Disagree. They are two different types of fits.
+
+>  Figure 3: Where does the decay length from the background originate from? (ref. line 250). Please discuss.
+
+It is mainly due to true muons from semileptonic B decays but generic MC
+is not accurate enough to estimate the fraction if this source. However it is 
+not essential since the shape is data-driven.
+
 > The mass sideband region as discussed in 269 should be added to the figure / caption.
+
+The figure is done projecting in the full mass region, not in the mass 
+sideband. We will add the regions in the caption.
   
-> 273: Give reference to the systematic uncertainty table. Perhaps also move the uncertainty table into this section?
-  277: english: "fits results"
+> 273: Give reference to the systematic uncertainty table. 
+
+OK
+
+> Perhaps also move the uncertainty table into this section?
+
+No, because it includes also all other sources of systematics which do not 
+depend on the non-prompt fraction.
+
 > 282: Is this estimation of the systematic error reasonable? In most cases multiple vertices will be sufficiently separated in z, so that a unique assignment should not be a problem. Maybe we are missing the point.
 > 289: variation in upper sideband region is unclear
+
+Improved
+
 > 311: Definition of indirect production?
+
 > 325: Makes little sense
+
+Plots are now added.
+
 > 327 and Ref [27]: Include in the note or drop the discussion
-> 
+
+Plots are now added.
+
 > 7.2 either skip or give details
-> 
+
+See above.
+ 
 > Figure 6: Why don't you include also the polarization uncertainties in the plot?
 > 
   7 Results
 > -------------
   - Figure 4: The yellow line is hard to see in some printouts
-> - Use consistent symbols for branching ratios
+
+But since this is just to guide the eye (and stands anyway in between two
+blue lines) this is not so important.
+
   - Remove ref. to Sec. 7.4
 > - Clarify if the branching ratio determined in this paper is included in the theoretical model fit?
 > - What is fitted to the theoretical model?
+
+The shape of the ratio vs. pT.
+
 > 357: Give current PDG BR
 > 
 > 8 Conclusions
 > -------------------
 > The text should be improved
 > 387: no agreement for non-prompt cross section at hight pT: Not really discussed in the paper before. Where can this disagreement be seen? Perhaps the relevant plot is missing?
+
+It is discussed in line 312 and it is visible from the high-Pt comparison
+in fig. 5a.
+
 > 391: compare to 374; factor ~3 or 3.5 ?
-> 
-  Ref [23]: Proceeding with capital P
-> Ref [28]: change to P. Faccioli, archive number is missing
- 
+
+Changed all to 3.5 
