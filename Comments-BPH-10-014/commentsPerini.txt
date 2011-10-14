@@ -133,7 +133,7 @@ changed
 > instance "published in 2011"
 > 
 
-we're still in 2011 !
+we're still in 2011... is "recently" really unbearable? We thought it was understood that recently refers to the publication date of the present paper.  
 
 > ·
 > · line 19: remove "basically"
@@ -207,8 +207,7 @@ WE'll consider dropping it
 
 done
 
-> · line 45: "made of 66 million 100 x 150 um2 pixels": is this information 
-  really needed here?
+> · line 45: "made of 66 million 100 x 150 um2 pixels": is this information really needed here?
 
 removed
 
@@ -449,22 +448,51 @@ http://dictionary.cambridge.org/dictionary/british/detect
 > Line 155: Propose: " In the simulation both muons are required to lie 
   within the geometric acceptance
 > ...
+
+OK
+
 > ·
 > · line 159: Replace null lambda with lambda_theta,phi = 0.
+
+not changed, the notation would have been cumbersome.
+
 > · line 159-160: Define lambda_\theta\phi (it occurs in eq. (3) but is 
 > undefined).
+
+it is defined by the equation.
+
 > Line 162: Propose: "The acceptance of the generated .... will depend on 
 > their spectra. Theoretical
 > predictions of the polarization presented in Sec. 7 have been used to 
 > recompute the acceptance, ...
+
+this is about the charmonium momentum spectrum, not the polarization.
+
 > ·
 > · Lines 166-167: Is the FSR not taken into account in simulation?."
+
+FSR is of course present in the simulation. The issue here is that, because of FSR, 
+the reconstructed dimuon momentum may not be equal to the Psi momentum. 
+What we reconstruct is the dimuon, but what we want to measure is the psi's double-differential 
+cross section. Ideally the proper way  of dealing with this would be an unfolding procedure 
+(of the kind used in b-jet analyses) independent of the generated psi spectrum. 
+Since the effect is small, however, we decided to evaluate its size by using either the dimuon 
+or the psi kinematic variables in the acceptance map, and quote the difference in the results 
+as a systematic uncertainty.
+
+*controllare*
+
 > Lines 180-181: Either some explanation should be given for the 
 > Tag-and-Probe method or a reference
 > should be given.
+
+It is explained in the muon efficiency references given above, and was explained in the previous Jpsi paper quoted in the beginning, so we didnt think it necessary to repeat it here.
+*controllare*
+
 > ·
 > · lines 182-183: the sentence is difficult to understand
 > ·
+
 > lines 187-188: State which T&P efficiencies (real or simulated) were used 
 > later (probably those from
 > real data? 
@@ -475,39 +503,86 @@ Yes.
 
 To compute the rho factors.
 
-> Lines 189-192: "stronger dependence"? Relative to what? "are mapped"? The 
+> Lines 189-192: "stronger dependence"? Relative to what? 
+
+to the tracking efficiency.
+changed to "relatively strong" (of course relative to the tracking efficiency)
+
+*controllare*
+
+>"are mapped"? The 
 > whole paragraph
 > should be rewritten more clearly.
+
 > ·
 > lines 193-194 and eq (5): it is not clear where the epsilon(mu) come from 
 > (simulation/real
 > data/T&P/etc. ?)
-> ·
-> · line 195: Define more precisely what is being factorised.
+
+epsilon(mu) is defined in eq(4): it comes from T&P on data, as stated right before eq. 4.
+The T&P technique has also been used on MC to correct for possible biases of the T&P method
+(included in the rho factor)
+
+
+>
+>  line 195: Define more precisely what is being factorised.
+
+ With rho=1, eq(5) essentially expresses the dimuon detection efficiency 
+(excluding vertexing requests)  as the product of the single muon efficiencies. 
+As the text says, the rho factor is actually defined by eq. 5
+
 > lines 201-204 and eq. (6): define what is measured from real data and what 
 > is obtained from
 > simulation.
+
+It was explained in the previous paragraphs. The acceptance is obtained from simulation, 
+the efficiency essentially from data.
+
+
 > ·
 > · Line 203: "estimated original number"?
 > · line 204: of events --> of MC events (?)
-> line 215: Why "5.1 Inclusive cross-section determination" is a subchapter 
-  of "5. Acceptance and
+
+we measure a number of events in data but we want to 
+know how many events were really produced in the first place, 
+so we divide by an efficiency factor. This we called
+the "estimated original number" of events (in data, meaning: in real life - of course the data only contain the events that passed the selection cuts).
+
+
+> line 215: Why "5.1 Inclusive cross-section determination" is a subchapter  of "5. Acceptance and
 > efficiency"? Isn't it a topic of its own?
-> ·
+
+It used to be a separate section, but it was suggested that we split it in half (yield determinatio - cross section determination) inserting the acceptance section in between. This was supposed 
+to follow more closely the logical and procedural steps of the analysis.
+
 > line 219: Wasn't the N_corr (J/Psi) already defined on the line 216? 
-> Repetition. "as the fit yields" ->
-  "from the fitted yield values"
-> ·
+> Repetition. "as the fit yields" -> "from the fitted yield values"
+
+true. This has been rephrased.
+
+
+
 > lines 221-222: ... results given ... --> ... results are given ... (all 
 > the same, the sentence is difficult to
 > understand)
-> ·
-  · line 223: Why "inclusive" in quotes?
+
+same as above (rephrased).
+
+> line 223: Why "inclusive" in quotes?
+
+quotes removed
+
 > 6 Prompt and non-prompt component determination
 > This chapter is difficult for a non-expert. You should spell out more 
-> clearly, that in this chapter you
-  are describing the methods, while the results come in the next chapter 
+> clearly, that in this chapter you  are describing the methods, 
+> while the results come in the next chapter 
 > (and in ref 27).
+
+There will be an outline of the section contents at the end of the introduction
+
+***controllare*****
+
+
 > ·
 > · Line 235: Terminate the sentence after ""per event error" and start a 
 > new sentence.
@@ -518,33 +593,49 @@ Changed to "the uncertainty on track parameters".
 
 > · line 260: convolved --> convoluted
 
-this is debated
+some sources prefer convolve to convolute
+(see for instance http://en.wiktionary.org/wiki/convolve )
 
 > · Line 262: ""sideband region is" -> "sideband regions are"
 > lines 262 & 269: different sideband limit 3.20 and 3.25 (on purpose?) 
 
 No this is a typo.
 
-Is 
-> there unnecessary repetition
+> Is  there unnecessary repetition
 > of limits on line 269?
+
+True. first occurrence removed
 
 
 > ·
 > · Line 268: "sideband region" ->"sideband regions"
 > · Line 269: "is" -> "are"
+
+OK
+
+
 > line 271: (see above) Could add something alike "... showing the prompt 
 > and non-prompt components
 > obtained as described above"
-> ·
+>
 > line 272: Are all these systematic uncertainties given quantitatively in 
 > this paper, i.e. in the tables 1
 > and 2 (or elsewhere)? If so, refer to the tables and to the results which 
 > will be presented in chapter 7
+
+OK, done at the end of the section.
+
 > ·
 > · Line 277: "fits results" -> "fit results"
+
+done
+
 > · Line 286: "is taken as systematic uncertainties" -> "is taken as a 
 > systematic uncertainty"
+
+done
+
+
 > 7 Results
 > line 299: The sentence is difficult to read: Maybe: "The prompt and 
 > non-prompt double-diff
@@ -582,6 +673,8 @@ We will clarify it in the papper.
 > line 326: values are also reported referred to the CMS ... --> ... values 
 > are also reported within the
 > CMS ...
+
+changed
 > ·
 > · line 329: Does this need to be a subchapter of its own if the values are 
 > not given in this paper.
