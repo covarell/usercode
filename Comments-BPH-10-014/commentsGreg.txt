@@ -78,19 +78,64 @@ this did not trouble other reviewers, kept.
 changed to "ratio between the differential cross sections for the two states"
 
 > 
-> 2) Introduction, L6: COLLISIONS; L7: "On the other hand" here doesn't make sense, as you are saying that psi(2S) can ALSO be produced via the same two mechanisms, as J/psi - please rephrase with "Similarly" or something of that kind. L8: suggest using $B&V(Bc instead of cryptic $B&V(BcJ",whichisnotexplained.L16:first$B!](B>early;L19:\phi(2S)/(J/\psi)$ (put J/psi in parentheses, as otherwise two slashes are confusing. L26: of the Compact Muon Solenoid (CMS).
+> 2) Introduction, L6: COLLISIONS; L7: "On the other hand" here doesn't make sense, as you are saying that psi(2S) can ALSO be produced via the same two mechanisms, as J/psi - please rephrase with "Similarly" or something of that kind. L8: suggest using ’¦Öc instead of cryptic ’¦ÖcJ",whichisnotexplained.L16:first’¡Ý>early;L19:\phi(2S)/(J/\psi)$ (put J/psi in parentheses, as otherwise two slashes are confusing. L26: of the Compact Muon Solenoid (CMS).
 > 
 > 3) Data selection ..., L58i: the Large Hadron Collider (LHC); L61: by dimuon triggers; L63: fire (jargon) a L1 muon signal -> pass a L1 muon trigger requirement; to be -> be; L64: to be -> be; L68: {\sc Pythia}; L72: add a comma before the second "and"; L75: {\sc EvtGen}; L76: {\sc PHOTOS}; L80: pseudorapidity; L84: "muon tracker tracks" sounds awkward as it may mean tracks in the muon tracker; rephrase as "The tracker tracks matching muon candidates; L93: dimuon; L95: which -> that (or precede with a comma); L96: double muon -> dimuon; being faked -> originated; L109: which -> that (or precede with a comma); L114: ratios -> fractions; L116: cross section (no hyphen).
 > 
 > 4) Inclusive yield ..., L121: used for THE DESCRIPTION OF the; L123: Figure 1 (left); L131: Figure 1 (right).
 > 
-> 5) Acceptance and Efficiency, L139: "efficiency" should not be capitalized to match other section titles; L147: kinematic reach; L156: to separately PASS L1 single-muon TRIGGER. L4 below Eq. (2): cross section (no hyphen); next line: begs a citation for the helicity and Collins-Soper frames; L163: in Section 7; L164: {\sc Pythia}; L168: Eq. (1); L171: in Ref. [6]; L173: in Ref. [4]; L180: in Refs. [21,22]; L181: independent sets of TRIGGERS are used (trigger stream is jargon!); L183: add a comma before "which"; next line: measured IN; Eq. (4): end with a comma; LL184-185: muon identification EFFICIENCY for a; L186: reconstructed muons PASSING THE MUON ID CRITERIA; L187: also PASSED the trigger; L188: both WITH THE LHC and simulated data; L190: add a comma before "which"; Eq.(5): move the period at the end closer to the \eps_vertex; L195: do not start a new paragraph here; \rho-factor; delete (defined by Eq. 5" as you are explaining variables in that very equation in this whole paragraph. L199: add a comma before "which"; rapidity-; L200: pT-bin; Eq. (6): end with a comma; LL201-202: the clause "using the "fine-grained" bins of the acceptance" is completely useless, as it doesn't explain at all what's meant by the fine-grained, which is mysteriously put in quotation marks - delete it, as it doesn't provide any information. L204: cross section estimates; L206: errors -> uncertainties; L208: toy -> pseudo-; L217: transverse-momentum-rapidity; L218: pT and y bins; ratio -> fraction; Fig. 2 caption, L3: cross section; Section 7; change a short dash after "factors" with an em-dash; L4: change a short dash to an emdash.
+> 5) Acceptance and Efficiency, L139: "efficiency" should not be capitalized to match other section titles; L147: kinematic reach; L156: to separately PASS L1 single-muon TRIGGER. 
+
+"fire" changed to PASS
+
+>L4 below Eq. (2): cross section (no hyphen); 
+
+we keep the hyphen when it is an attribute. Probably here it is not, strictly speaking. The opinion of an authority is needed :)
+(Why no hyphen here, and a hyphen in the  title of subsection 5.1?)
+
+>next line: begs a citation for the helicity and Collins-Soper frames;
+
+the definitions are given in the reference.
+
+
+> L163: in Section 7; L164: {\sc Pythia}; L168: Eq. (1); L171: in Ref. [6]; L173: in Ref. [4]; L180: in Refs. [21,22]; L181: independent sets of TRIGGERS are used (trigger stream is jargon!); L183: add a comma before "which"
+
+"which" does not ALWAYS need to be preceded by a comma; actually sometimes the comma is wrong.
+
+>; next line: measured IN; Eq. (4): end with a comma; LL184-185: muon identification EFFICIENCY for a; L186: reconstructed muons PASSING THE MUON ID CRITERIA; L187: also PASSED the trigger; L188: both WITH THE LHC and simulated data; L190: add a comma before "which"; Eq.(5): move the period at the end closer to the \eps_vertex; L195: do not start a new paragraph here; \rho-factor; delete (defined by Eq. 5" as you are explaining variables in that very equation in this whole paragraph. 
+
+We have been asked to explain what "factorization" means, so we still feel we have to point out that rho is defined by the equation.
+
+>L199: add a comma before "which"; 
+
+> rapidity-; L200: pT-bin;
+
+many different suggestions here... the form (y,pt), that had been used elsewhere, has  been corrected to "y AND pt"... Not clear which is the best.
+
+
+> Eq. (6): end with a comma; LL201-202: the clause "using the "fine-grained" bins of the acceptance" is completely useless, as it doesn't explain at all what's meant by the fine-grained, which is mysteriously put in quotation marks - delete it, as it doesn't provide any information. 
+
+The acceptance and the efficiency have been computed in bins of much smaller size than those used for the cross(-)section determination, and this is stated at the beginning of the section.
+We think it *is* relevant to recall this, for equation (6) would otherwise make 
+no sense at all. 
+ 
+
+
+>L204: cross section estimates; 
+
+attribute or not? hyphen removed, but not so sure anymore.
+
+>L206: errors -> uncertainties;
+
+it's just to avoid repetition...
+
+> L208: toy -> pseudo-; L217: transverse-momentum-rapidity; L218: pT and y bins; ratio -> fraction; Fig. 2 caption, L3: cross section; Section 7; change a short dash after "factors" with an em-dash; L4: change a short dash to an emdash.
 > 
 > 6) Prompt and non-prompt ..., LL229,232: in Ref. [4]; L235: "per-event UNCERTAINTY"; L237: standard deviation -> r.m.s.; L239: parametrizes THE EFFECT OF; Eq. (8): add \cdot's between the D and F terms; L243: in Section 4; L248: b-hadron decays; L250: in Ref. [4]; L254: per-event UNCERTAINTY; LL255-256: from the signal region IN INVARIANT MASS after ... from the sideband regions, respectively; L257: decay-length; L258: per-event UNCERTAINTY; L260: CONVOLUTED; L262: The sideband region IN INVARIANT MASS is defined; L268: The sideband region IN INVARIANT MASS for the; L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S); L272: in Ref. [4]; Fig. 3 caption, LL1,3: no colon after "bin:"; LL273,274: Tracker -> tracker; L275: add a comma before "which"; L276: in Ref. [4] and add a comma after [4]; L277: this -> misaligned; L279: THE b-hadron lifetime; L280: in Ref. [4]; L284: end with a colon; L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
 > 
 > 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES; L317: add a citation to the fit determination from the Tevatron data; L318: theoretical UNCERTAINTIES include THE CHOICE OF THE renormalization and factorization SCALES; quark MASSES; L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
 > 
-> 8) Conclusions, L378: The data SAMPLE CORRESPONDS to; L382: four OTHER polarization; L383: referred to -> within; L385: cross sections; L391: factor OF $A!V(B3.
+> 8) Conclusions, L378: The data SAMPLE CORRESPONDS to; L382: four OTHER polarization; L383: referred to -> within; L385: cross sections; L391: factor OF ‘¡Ö3.
 > 
 > 9) Acknowledgements: increase the font size for the section title.
 > 
