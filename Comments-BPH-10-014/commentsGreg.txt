@@ -66,7 +66,17 @@ b-fractions = non-prompt fractions. We will use this second notation.
 hyphen kept when "b-hadron" is an attribute, as in "b-hadron decays"
 
 > 
-> 1) Abstract, LL2-3: at the LHC WITH the data SAMPLE CORRESPONDING to; L6: null -> zero; L8: between -> for.
+> 1) Abstract, LL2-3: at the LHC WITH the data SAMPLE CORRESPONDING to;
+
+Sentence break kept. "sample" added.
+
+> L6: null -> zero; 
+this did not trouble other reviewers, kept.
+
+> L8: between -> for.
+
+changed to "ratio between the differential cross sections for the two states"
+
 > 
 > 2) Introduction, L6: COLLISIONS; L7: "On the other hand" here doesn't make sense, as you are saying that psi(2S) can ALSO be produced via the same two mechanisms, as J/psi - please rephrase with "Similarly" or something of that kind. L8: suggest using χc instead of cryptic χcJ",whichisnotexplained.L16:first−>early;L19:\phi(2S)/(J/\psi)$ (put J/psi in parentheses, as otherwise two slashes are confusing. L26: of the Compact Muon Solenoid (CMS).
 > 
