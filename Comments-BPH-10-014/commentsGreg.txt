@@ -131,7 +131,29 @@ it's just to avoid repetition...
 
 > L208: toy -> pseudo-; L217: transverse-momentum-rapidity; L218: pT and y bins; ratio -> fraction; Fig. 2 caption, L3: cross section; Section 7; change a short dash after "factors" with an em-dash; L4: change a short dash to an emdash.
 > 
-> 6) Prompt and non-prompt ..., LL229,232: in Ref. [4]; L235: "per-event UNCERTAINTY"; L237: standard deviation -> r.m.s.; L239: parametrizes THE EFFECT OF; Eq. (8): add \cdot's between the D and F terms; L243: in Section 4; L248: b-hadron decays; L250: in Ref. [4]; L254: per-event UNCERTAINTY; LL255-256: from the signal region IN INVARIANT MASS after ... from the sideband regions, respectively; L257: decay-length; L258: per-event UNCERTAINTY; L260: CONVOLUTED; L262: The sideband region IN INVARIANT MASS is defined; L268: The sideband region IN INVARIANT MASS for the; L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S); L272: in Ref. [4]; Fig. 3 caption, LL1,3: no colon after "bin:"; LL273,274: Tracker -> tracker; L275: add a comma before "which"; L276: in Ref. [4] and add a comma after [4]; L277: this -> misaligned; L279: THE b-hadron lifetime; L280: in Ref. [4]; L284: end with a colon; L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
+> 6) Prompt and non-prompt ..., LL229,232: in Ref. [4]; L235: "per-event UNCERTAINTY"; L237: standard deviation -> r.m.s.; L239: parametrizes THE EFFECT OF; Eq. (8): add \cdot's between the D and F terms; L243: in Section 4; L248: b-hadron decays; L250: in Ref. [4]; L254: per-event UNCERTAINTY; LL255-256: from the signal region IN INVARIANT MASS after ... from the sideband regions, respectively; L257: decay-length; L258: per-event UNCERTAINTY; L260: CONVOLUTED;
+
+convolved vs convoluted is apparently debated and debatable.
+(over 135000 google occurrences for "convolved with a Gaussian", as opposed to 47000 occurrences for "convoluted with a Gaussian")
+
+> L262: The sideband region IN INVARIANT MASS is defined; L268: The sideband region IN INVARIANT MASS for the; L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S);
+
+changed according to FNAL's suggestion
+
+> L272: in Ref. [4]; Fig. 3 caption, LL1,3: no colon after "bin:"; LL273,274: Tracker -> tracker; 
+
+
+>L275: add a comma before "which";
+> L276: in Ref. [4] and add a comma after [4];
+
+this is one of the cases where the commas would be wrong since the 
+would change the logical meaning of the sentence.
+
+> L277: this -> misaligned; L279: THE b-hadron lifetime; L280: in Ref. [4]; L284: end with a colon; 
+
+We have been accused of loving colons too much!
+
+>L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
 > 
 > 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES; L317: add a citation to the fit determination from the Tevatron data; L318: theoretical UNCERTAINTIES include THE CHOICE OF THE renormalization and factorization SCALES; quark MASSES; L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
 > 
