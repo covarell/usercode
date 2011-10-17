@@ -126,11 +126,11 @@ specified in the figure. It will be added in the caption as well.
 > line 387: Can we say something more on what it means that the non-prompt
 > cross section at high pT is not reproduced?
 
-Also this statement will be softened, because the effect is not so 
-significant and there are many factors (e.g. model for b fragmentation into
+There can be many factors (e.g. model for b fragmentation into
 B and then J/psi) that could affect the spectra even if the FONLL at parton
-level is correct.
+level is correct. We just observe that within the uncertainties we assume
+for the theory and the measurement, there is no excellent agreement.
 
 > line 391: in the text we say a factor 3.5, here 3. Be consistent...
 
-Ok, we change the second one to 3.5.
+Ok, we change the second one to 3.
