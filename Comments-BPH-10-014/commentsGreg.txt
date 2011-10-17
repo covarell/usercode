@@ -155,10 +155,21 @@ We have been accused of loving colons too much!
 
 >L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
 > 
-> 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES; L317: add a citation to the fit determination from the Tevatron data; L318: theoretical UNCERTAINTIES include THE CHOICE OF THE renormalization and factorization SCALES; quark MASSES; L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
+> 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES;
+
+it's repeated too many times. Everyone knows that "errors" is not strictly correct, but we think it can be used as as synonym when there is no ambiguity and when it can avoid ugly repetitions.
+
+
+> L317: add a citation to the fit determination from the Tevatron data; L318: theoretical UNCERTAINTIES include THE CHOICE OF THE renormalization and factorization SCALES; quark MASSES; 
+
+plurals corrected. "Errors" kept for the reasons stated above.
+
+>L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
 > 
 > 8) Conclusions, L378: The data SAMPLE CORRESPONDS to; L382: four OTHER polarization; L383: referred to -> within; L385: cross sections; L391: factor OF ‘¡Ö3.
 > 
 > 9) Acknowledgements: increase the font size for the section title.
 > 
 > 10) References, Ref. [7]: JINST {\bf 03} ...; Ref. [9]: JHEP {\bf 05}; Ref. [14]: JINST {\bf 05}; Ref. [18]: add a doi reference; Ref. [25]: JHEP {\bf 05}; Ref. [26]: JHEP {\bf03}; Ref. [28]: when this is supposed to be submitted?
+
+*vedere*
