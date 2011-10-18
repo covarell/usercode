@@ -359,7 +359,8 @@ Done
 
 >  --- Line 109: "biases in the algorithms" ? Can you formulate it better?
 
-*vedere*
+This is taken verbatim from the MuscleFit algorithm description, however
+we removed the last part.
 
 >  --- Line 110: "reconstructed peaks of dimuon resonances" -> "mass peaks of 
 > the dimuon resonance"
@@ -386,14 +387,16 @@ already modified
 > alone is fitted in a restricted mass window or the fit is done for the 
 > combined ..."
 
-this has not disturbed other native speakers, we prefer to leave it as it is.
+This has not disturbed other native speakers, we prefer to leave it as it is.
 
 >  ---
 >  --- Line 122: "resolution variations"?
 
-the fact that the resolution may not be constant.
+The fact that the resolution may not be constant when intergrating over a 
+broad rapidity range. Added "rapidity-dependent".
 
 >  --- Line 123: "describes" -> "is used to describe"
+
 OK
 
 >  --- Line 125: " In the second kind of fits" -> "In the second case.."
@@ -407,7 +410,7 @@ changed
 >  --- line 130: Motivate the use of two exponentials instead of just one for 
 > the background fit.
 
-There is no motivation even for one exponential... It is an empirical 
+There is no strict motivation even for one exponential... It is an empirical 
 function and alternative shapes are investigated and considered as
 systematic uncertainties.
 
@@ -427,9 +430,8 @@ Ok
 OK
 >  --- Line 143: Delete "assumed" in "in the assumed polarization".
 
-
-we don't know what the polarization is, so in order to apply acceptance corrections we need 
-to assume one. That's why we wrote "assumed" here.
+We don't know what the polarization is, so in order to apply acceptance 
+corrections we need to assume one. That's why we wrote "assumed" here.
 
 > line 143-144: " we also provide measurements within the CMS detector 
 > acceptance only": One can
@@ -447,7 +449,8 @@ changed
 
 >  --- Line 151: "detectable" is a problematic word
 
-it did not trouble the other reviewers and I found it on major dictionaries like 
+It did not trouble the other reviewers and I found it on major dictionaries 
+like 
 http://dictionary.cambridge.org/dictionary/british/detect
 
 > Line 155: Propose: " In the simulation both muons are required to lie 
@@ -459,40 +462,41 @@ OK
 >  ---
 >  --- line 159: Replace null lambda with lambda_theta,phi = 0.
 
-not changed, the notation would have been cumbersome.
+Not changed, the notation would have been cumbersome.
 
 >  --- line 159-160: Define lambda_\theta\phi (it occurs in eq. (3) but is 
 > undefined).
 
-it is defined by the equation.
+We added a small description before the euqation.
 
 > Line 162: Propose: "The acceptance of the generated .... will depend on 
 > their spectra. Theoretical
 > predictions of the polarization presented in Sec. 7 have been used to 
 > recompute the acceptance, ...
 
-this is about the charmonium momentum spectrum, not the polarization.
+This is about the charmonium momentum spectrum, has nothing to do with the 
+polarization. The polarization uncertainty is kept separated. 
 
 >  ---
 >  --- Lines 166-167: Is the FSR not taken into account in simulation?."
 
-FSR is of course present in the simulation. The issue here is that, because of FSR, 
-the reconstructed dimuon momentum may not be equal to the Psi momentum. 
-What we reconstruct is the dimuon, but what we want to measure is the psi's double-differential 
-cross section. Ideally the proper way  of dealing with this would be an unfolding procedure 
-(of the kind used in b-jet analyses) independent of the generated psi spectrum. 
-Since the effect is small, however, we decided to evaluate its size by using either the dimuon 
-or the psi kinematic variables in the acceptance map, and quote the difference in the results 
-as a systematic uncertainty.
-
-*controllare*
+FSR is of course present in the simulation. The issue here is that, because 
+of FSR, the reconstructed dimuon momentum may not be equal to the Psi 
+momentum. What we reconstruct is the dimuon, but what we want to measure is 
+the psi's double-differential cross section. Ideally the proper way of dealing 
+with this would be an unfolding procedure (of the kind used in b-jet analyses) 
+independent of the generated psi spectrum. 
+However, for simplicity, we decided to evaluate its size by 
+using either the dimuon or the psi kinematic variables in the acceptance map, 
+and quote the difference in the results as a systematic uncertainty.
 
 > Lines 180-181: Either some explanation should be given for the 
 > Tag-and-Probe method or a reference
 > should be given.
 
-It is explained in the muon efficiency references given above, and was explained in the previous Jpsi paper quoted in the beginning, so we didnt think it necessary to repeat it here.
-*controllare*
+It is explained in the muon efficiency references given above, and was 
+explained in detail in the previous Jpsi paper quoted in the beginning, so 
+we didn't think it necessary to repeat it here.
 
 >  ---
 >  --- lines 182-183: the sentence is difficult to understand
@@ -510,55 +514,56 @@ To compute the rho factors.
 
 > Lines 189-192: "stronger dependence"? Relative to what? 
 
-to the tracking efficiency.
-changed to "relatively strong" (of course relative to the tracking efficiency)
-
-*controllare*
+To the tracking efficiency.
+changed to "the strongest" (of course relative to the tracking efficiency)
 
 >"are mapped"? The 
 > whole paragraph
 > should be rewritten more clearly.
+
+Changed "mapped" with "computed".
 
 >  ---
 > lines 193-194 and eq (5): it is not clear where the epsilon(mu) come from 
 > (simulation/real
 > data/T&P/etc. ?)
 
-epsilon(mu) is defined in eq(4): it comes from T&P on data, as stated right before eq. 4.
-The T&P technique has also been used on MC to correct for possible biases of the T&P method
-(included in the rho factor)
+epsilon(mu) is defined in eq(4): it comes from T&P on data, as stated right 
+before eq. 4. The T&P technique has also been used on MC to correct for 
+possible biases of the T&P method (included in the rho factor)
 
 
 >
 >  line 195: Define more precisely what is being factorised.
 
  With rho=1, eq(5) essentially expresses the dimuon detection efficiency 
-(excluding vertexing requests)  as the product of the single muon efficiencies. 
-As the text says, the rho factor is actually defined by eq. 5
+(excluding vertexing requests)  as the product of the single muon 
+efficiencies. As the text says, the rho factor is actually defined by eq. 5.
 
 > lines 201-204 and eq. (6): define what is measured from real data and what 
 > is obtained from
 > simulation.
 
-It was explained in the previous paragraphs. The acceptance is obtained from simulation, 
-the efficiency essentially from data.
+It was explained in the previous paragraphs. The acceptance is obtained from 
+simulation, the efficiency essentially from data.
 
 
 >  ---
 >  --- Line 203: "estimated original number"?
 >  --- line 204: of events --> of MC events (?)
 
-we measure a number of events in data but we want to 
+We measure a number of events in data but we want to 
 know how many events were really produced in the first place, 
 so we divide by an efficiency factor. This we called
-the "estimated original number" of events (in data, meaning: in real life - of course the data only contain the events that passed the selection cuts).
-
+the "estimated original number" of events (in data, meaning: in real life 
+- of course the data only contain the events that passed the selection cuts).
+This sentence is now removed, because the actual relations are given in 
+Section 6.
 
 > line 215: Why "5.1 Inclusive cross-section determination" is a subchapter  of "5. Acceptance and
 > efficiency"? Isn't it a topic of its own?
 
-It used to be a separate section, but it was suggested that we split it in half (yield determinatio - cross section determination) inserting the acceptance section in between. This was supposed 
-to follow more closely the logical and procedural steps of the analysis.
+Yes, it is. It became Section 6.
 
 > line 219: Wasn't the N_corr (J/Psi) already defined on the line 216? 
 > Repetition. "as the fit yields" -> "from the fitted yield values"
@@ -583,7 +588,8 @@ quotes removed
 > while the results come in the next chapter 
 > (and in ref 27).
 
-There will be an outline of the section contents at the end of the introduction
+There will be an outline of the section contents at the end of the 
+introduction.
 
 
 >  ---
@@ -607,8 +613,8 @@ No this is a typo.
 > Is  there unnecessary repetition
 > of limits on line 269?
 
-True. first occurrence removed
-
+It is necessary, because there are 2 types of fits (which in principle could
+have different sideband limits).
 
 >  ---
 >  --- Line 268: "sideband region" ->"sideband regions"
@@ -620,7 +626,9 @@ OK
 > line 271: (see above) Could add something alike "... showing the prompt 
 > and non-prompt components
 > obtained as described above"
->
+
+Added.
+
 > line 272: Are all these systematic uncertainties given quantitatively in 
 > this paper, i.e. in the tables 1
 > and 2 (or elsewhere)? If so, refer to the tables and to the results which 
@@ -647,17 +655,31 @@ done
 > cross-sections and from the non-prompt fraction. The cross-section ratio 
 > of the two states is also
 > computed."
->  ---
+
+Changed to what is actually done (multiply the two factors).
+
 > line 303: "Figures 4 and 5 show the measured .... cross-sections...". 
 > However, above (line 299) it says
   that the cross-sections are "extracted" from the inclusive cross-sections 
 > and non-prompt fraction.
 > Clarify.
+
+See above.
+
 >  ---
 >  --- line 315: cross-section spectrum
+
+Not nice but OK.
+
    --- line 316: "feed-down contribution" might not be commonly known.
+
+The problem of feed-down for J/psi is widely explained in the Introduction.
+
 >  --- line 316: color-octet -> colour-octet (BE)
 >  --- line 323: ... for the in ... --> ... for the (missing text) in ...
+
+Sentence changed.
+
 >  --- paragraph 325-328: In the beginning of the paper (22-28, 140) one gets 
 > an 
 > impression, that the results
@@ -666,12 +688,12 @@ done
 > may be disappointed to find only a couple of lines and a reference to a 
 > webpage concerning the
   "visible" cross sections. What about the dominant sources of systematics 
-> for the “visible" cross
+> for the "visible" cross
 > sections? The tables in the twiki give only the total systematics, but a 
 > breakdown like tables 1 and 2 is
 > not shown anywhere.
 
-We will clarify it in the papper.
+We will clarify it in the papper. Also all results are now presented as plots.
 
 > line 326: values are also reported referred to the CMS ... --> ... values 
 > are also reported within the
@@ -681,6 +703,9 @@ changed
 >  ---
 >  --- line 329: Does this need to be a subchapter of its own if the values are 
 > not given in this paper.
+
+See above.
+
 >  --- line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
 > p_T and rapidity, ...
 >  --- line 344: "affects" -> "affect"
@@ -689,86 +714,163 @@ changed
 > cross-section ratio" -> "changes the
 > measured prompt cross-section ratio by 12-20%".
 >  ---
+
+Ok.
+
 >  --- Lines 370-373: "some of many exclusive models"? Vague.
+
+It's not "some", it is "sum".
+
 > Lines 374-375: Propose: "This is in agreement with the existing 
 > measurement (Ref?) , with the
 > uncertainty improved by a factor of 3.5."
+
+Changed according to another suggestion (FNAL).
+
 >  ---
 >  --- line 357: ... the ratio expectation ... --> ... the predicted ratio ...
 >  --- Line 357: delete "expectation", not needed.
+
+Ok
+
 > 8 Conclusions
 >  --- line 380: add space after "pt"
 >  --- line 381: "extracted" -> "computed"?
 >  --- line 382: To mitigate the effect of the effects ... --> To mitigate the 
 > effects ...
-> Line 383: "polarizations ...." -> "polarization, the measured cross section 
-> uncorrected for the CMS
-> detector acceptance is also given.
->  ---
+
+Done. 
+
+
 >  --- Line 386: "compared to" -> "compared with"
 > Line 387: Terminate the sentence after ", respectively." and start a new 
 > sentence "A reasonable
   agreement is found , except ...."
 >  ---
+
+Ok.
+
 > Line 388-389: Propose: "With selected hypotheses on polarization, the 
 > ratio of the differential cross
 > sections of the two states is computed, leading to a reduced uncertainty 
   as the systematic errors cancel
 > largely.
+
+Taken your suggestion.
+
 >  ---
 >  --- Line 390: "non-prompt ratio" -> "ratio of the non-prompt cross sections"
+
+Ok.
+
 >  --- line 391: 3 --> 3.5 (as in line 374)
+
+The error has increased, so we change all to 3.
+
 >  --- line 392: Acknowledgments --> Acknowledgements (may be a matter of 
   taste)
+
+Ok.
+
 >  --- line 428: curious accents on I and A?
+
+Don't know. Copy-pasted from another paper... they look strange to us as well.
+
 > References
 >  --- ref. 27: date of citation of a web page should be mentioned
+
+Temporary. See answers to Greg and Kevin.
+
    --- ref. 28: arxiv details needed
+
+Will come soon.
+
+
 > Figures
 >  --- Figure 1: legends and axis labels are in too small font, difficult to 
 > read
+
+Fixed.
+
 > Fig. 2: what is the reason for showing the bins 0-1.2 and 1.6-2.4 split in 
 > 2? Looking at the plot I don’t
 > see a compelling reason, the pT ranges are roughly the same. If you want 
 > to point out to something in
 > particular, then say it.
+
+The reason is that the (new) measurement is done in 5 rapidity bins, so we
+cannot show results for 3. Simply we don't have them.
+
 >  ---
 > Figure 2 caption: Cut the first sentence after "five rapidity bins" and 
 > start a new sentence "Also
 > plotted are..." Remove the parentheses.
 >  ---
 >  --- Figure 2: try to draw the legends in larger fonts.
+
+Not easy after other changes.
+
 > Fig. 2: too many decimals for eta range (e.g. 2.10<|y|<2.40 to 
-> 2.1<|y|<2.4); Replace "Ref. [4]" with
+> 2.1<|y|<2.4); 
+
+Done
+
+> Replace "Ref. [4]" with
 > "XX et al.", it is meaningless e.g. in a conference talk without reference 
 > to the paper.
+
+Done
+
 >  ---
 >  ---Figure 4: left figure, the legend text FONLL should be NRQCD. Is the plot 
 > actually the right one? It
 > seems very identical to Fig. 5 left (J/psi non-prompt)!
 > 
+It was wrong. Fixed.
+
 > figs. 4,5: these figures are very busy with boxes and thin lines for 
 > theory prediction. I understand it's
 > to guide the eye, but it might be better to just depict theory with wide 
 > band going through data points.
+
+No. Using bands brings in the famous problem of Wyatt's paper. If you use
+bands you have to choose special x points where to plot your data: if you
+choose an incorrect one, you introduce artificial theory-experiment 
+discrepancies.
+
 > Legends again with too small font and with too many decimals. Could spell 
 > out luminosity ad
 > polarization, there's enough space.
+
+Ok.
+
 >  ---
 > figs, 4.5: can the data errors be right? They look very large (O~50%) 
 > compared to the numbers in the
 > tables (O~10%).
 
-The data errors are right. All the table numbers must be summed in 
-quadrature first (statistical and systematic).
+Small problem in the plotting macro, fixed. All the table numbers must be 
+summed in quadrature first (statistical and systematic).
 
->  --- fig. 6 left: theory band is hiding y-axis ticks. Use gPad->RedrawAxis() 
-> before saving.
+
    --- Figure 6 caption: ... NRQCD predictions --> ... NRQCD prediction (in 
 > singular)
+
+Ok. 
+
 > Tables
 >  --- Table 1: "lowest-p_T bin", a white space is missing.
+
+Ok.
+
 > table 1, 2: the uncertainty tables are missing the total uncertainty, 
   which the reader would be most
 > interested in.
+
+The table actually summarizes uncertainties for 4 quantities at the same
+time: prompt cross-sections, non-prompt cross-section, non-prompt fractions,
+and finally cross-sections uncorrected for acceptance. Adding a single total
+(for which of those?) would be incorrect.
+
+
 
