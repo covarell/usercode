@@ -1,3 +1,6 @@
+Thanks for the careful reading of the paper.
+Comments on style are not always explicitly agreed.
+
 > Before going through the paper
 > line by line, there are three confusing aspects of this paper.
 > 
@@ -8,14 +11,26 @@
 > figures: duplicates of Figure 4 and 5 without the acceptance correction and plots of the non-prompt
 > fractions for J/psi and Psi(2S).  
 
-These will be indeed added in the paper as plots. Tables will continue to
-stay on the Twiki page (and eventually moved to the journal webserver) see 
-answers to other reviewers). 
+These are now indeed added in the paper as plots. Tables will continue to
+stay on the Twiki page. The Twiki info is only a temporary entry and 
+will be changed into the proper link to the journal web server at submission 
+time (method suggested by R. Tenchini and used in many other CMS papers).
 
 > The remaining information on the twiki are the corrections to the
 > null polarization for the 4 extreme polarization scenarios.  I don't know how useful these will be
   in the end.  I think they could be placed in an appendix and let the editor decide what to do.
 
+These will also stay on the Twiki page for the moment.
+
+> The most confusing aspect is understanding the various ways that polarization is dealt with.  It is
+> hard to keep track of everything as it enters in many places.  From what I can tell, all of the
+> results actually in the paper come from correcting for acceptance assuming no polarization.  The
+> results which do not correct for acceptance are only in the Twiki.  If this continues to be true
+> then I recommend making this clear from the beginning (lines 21-28).  I would call the results
+> presented in the paper (fully corrected) the default analysis.  Then I would state that the results
+> without acceptance correction are available online.  I am also confused about what the naming and
+> usefulness of the results without acceptance correction.  The phrase often used is "results are also
+> given referred to the CMS detector acceptance region."  Is this superior to "results are given
 > without correcting for acceptance."? 
 
 This is the same. It will be rephrased in many places.
@@ -34,8 +49,17 @@ cross-section once the polarization is measured.
 > The last confusing bit is for exactly what results are Type-A dimuons in the barrel region allowed.
 > Based on lines 104-106, these dimuons are only used for the non-prompt fraction determination.  Does
 > this mean they are not used for the prompt and non-prompt individual cross section but they are used
-> for the ratio?  If that is true, and given that the ratio plot was not deemed important enough to go
-> in the paper, it seems much easier to exclude the Type-A dimuons from the entire analysis.  If they
+> for the ratio?  
+
+This is impossible, see answer below.
+
+> If that is true, and given that the ratio plot was not deemed important enough to go
+> in the paper, 
+
+It is now.
+
+> it seems much easier to exclude the Type-A dimuons from the entire analysis.
+>  If they
 > are included, when the results are presented, it should be mentioned which results include Type-A
 > dimuons in the barrel region.
 
@@ -71,8 +95,6 @@ DONE
 
 Proposed change: "Measurements of quarkonium production cross section and polarization provide important tests...(QCD)".
 
-
-
 > 
 > L5: Change "quarkonium" to "charmonium" as there is no bottomonium here.
 DONE
@@ -90,13 +112,13 @@ DONE
 > 
 > L12: "do not seem to describe well" is awkward.  How about "do not accurately describe"?
 
-Not done (yet).  [ Non mi piace, in inglese, e Ian non ha obiettato]
+The sentence was changed.
   
 > L13-14: The end ", hence the need for a test at the LHC" is a little awkward.
 
-this and the previous sentence passed the test of other native speakers... will consider it.
- [ stesso commento di sopra]
-> 
+
+Same.
+ 
 > L19: Change "/" to " to "
 DONE
 > 
@@ -111,7 +133,7 @@ DONE
 > problem is that the polarization is unknown and the acceptance correction is very sensitive to the
 > polarization.
 
-Proposed:  "...changes the muon spectra in the laboratory frame, and consequently the experimental acceptance."
+Substantially changed, following FNAL's suggestions.
 
 > 
 > L31: Could flow smoother with "is a 6 m diameter superconducting solenoid producing a magnetic"
@@ -137,7 +159,7 @@ Done
 > between prompt and non-prompt.  In that case, the uncertainty is dominated by the dimuon vertex so
 > the primary vertex resolution is irrelevant.  I would remove this sentence.
 
-OK for me to remove it.
+Removed.
 
 > 
 > L53: If the HLT is mentioned, it should be mentioned that it consists of a computer farm and maybe
@@ -149,7 +171,6 @@ The original sentence was "The High Level Trigger processor farm ...", but it wa
 > L55: Change "based on a large part of the data sample collected in 2010" to "based on the collected in 2010"
 > 
 "based on the data collected in 2010"?  The sentence wanted to stress that  not all of the 2010 data were used.
-Changed.
 
 > L56: Change "This part is selected in order to" to "The sample is selected to"
 > 
@@ -161,7 +182,9 @@ DONE
 > for.  Is it used inside Pythia?  Does it affect the color-singlet generation?  Does it affect the color-octect
 > generation?  Does it affect the shower evolution?
 
-Only the size of the color octet contribution in the total cross section.
+It affects the size of the color octet contribution in the total cross section,
+whose long distance matrix elements are fit from data in NRQCD models, so
+they must be provided as generator tuning parameters.
 
 > 
 > L71-72: It is stated "In the absence of theoretical and experimental information ... and in
@@ -235,8 +258,10 @@ Not changed for the moment.
 > this paragraph is here.
 > 
 
-[: RIVEDERE] Maybe we can take out the reference to the muon peak and just mention the systematics due to 
-tracking. The paragraph is here because this is where the tracking is mentioned, I think it was more or less like this in the published Jpsi paper.  
+The paragraph is here because this is where the tracking is mentioned, 
+exactly like in the published Jpsi paper. pT calibration issues affecting the
+acceptance (and so the pT/y measurements) are detailed in the corresponding
+section.
 
 
 > L115: "smaller than the J/psi one." to "smaller than the J/psi yield."
@@ -248,7 +273,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > should read "In both fits, the signal function is the sum of a Gaussian and a Crystal Ball function,
 > simultaneously taking into account FSR and experimental resolution."
 
- Verificare con Francesco
+Ok.
 
 > 
 > L121: The Crystal Ball reference should probably be "J. E. Gaiser, Appendix-F Charmonium Spectroscopy
@@ -256,8 +281,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > see that the current reference even refers to the currently used Crystall Ball function.
 
 
- Verificare con Francesco
-
+Ok.
 
 > 
 > L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
@@ -267,7 +291,7 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > 
 > L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
 
-  Fatto (verificare).
+Removed and the sentence was changed.
 
 > L127-128: "corrisponding" should be "corresponding".  The end of the sentence could be more simply
 > written as "is fixed to the world average value [18]."  The term "PDG tables" sounds like jargon.
@@ -284,18 +308,26 @@ tracking. The paragraph is here because this is where the tracking is mentioned,
 > rapidity region" to "barrel region".  I would also change "forward, high rapidity region" to
 > "forward region".
   
- It seems clear to me that it refers to the absolute value of the rapidity. Technically one 
+ It seems clear to us that it refers to the absolute value of the rapidity. 
+Technically one 
 could also object that "forward" is misleading, since it includes what one would call "backward".
 
 
 > Figure 1: The pull plots do not seem to add much information, especially since we do not know if
 > these are typical fits or the best two.  I would suggest removing the pull plots and putting the
- > chi^2 in the mass plots.  The chi^2 does not need two decimal places; an integer is fine.  The axis
+ > chi^2 in the mass plots.  
+
+Done. 
+> The chi^2 does not need two decimal places; an integer is fine.  
+
+Changed to 1 decimal place.
+
+>The axis
 > labels on the y-axis for the right plot need to be closer to the axis.  The font size of everything
 > should be increased, especially axis labels and values.  In the caption, the pT values do not need
   ".0" and there does not need to be ":" after "bin".
 
- Da vedere con luca/francesco
+All done.
 
 > 
 > L137 "taken as _the_ systematic"
@@ -310,19 +342,22 @@ could also object that "forward" is misleading, since it includes what one would
 > L140-145: This should be rewritten in terms of the default analysis and extra information without
 > the acceptance correction, not in terms of two distinct analyses.
 
- Che facciamo, riscriviamo?
+Paragraph rewritten, but not following your suggestion.
 
 > 
 > Eq 1, L153-154: Lambda_theta needs to be defined. 
 
- As the text was supposed to explain, the parameter in the eq. only appears to indicate 
-a dependence on the polarization.
+ As the text was supposed to explain, the parameter in the eq. only appears 
+to indicate a dependence on the polarization. We added a definition, specifying
+that they are independent parameters.
 
 > Furthermore, in line 23 we are told that the polarization is 0 for prompt and from EvtGen for non-prompt
 > So why are there various polarization scenarios being mentioned here?
 
- because in general the acceptance does depend on the assumed polarization. 
-The polarization is taken to be null in the default analysis, but then four particular polarization scenarios are considered, for which lambda_theta is nonzero (while lambda_phi is null).
+Because in general the acceptance does depend on the assumed polarization. 
+The polarization is taken to be null in the default analysis, but then four 
+particular polarization scenarios are considered, for which lambda_theta is 
+nonzero (while lambda_phi is still null).
 
 > 
 > L156-Eq 2: This sentence should be rewritten.  How about "The acceptance region is defined by the single
@@ -334,8 +369,14 @@ The polarization is taken to be null in the default analysis, but then four part
 > Eq 3: Doesn't the dependence on lambda_phi mean that lambda_phi should be in Eq. 1?  Is lambda_phi
 > varied?
 
- In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in the general formula, but is null in the four extreme polarization cases we actually considered. So in practice it is not varied. 
-Note that these parameters refer to a particular frame, so technically the acceptance depends on yet another index, specifying which frame is being considered. This would have made eq.1 too  heavily detailed for its illustrative purpose, so we kept the lambda_theta as a mere reminder of the polarization dependence. [VEDERE]
+ In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in 
+the general formula, but is null in the four extreme polarization cases we 
+actually considered. So in practice it is not varied. 
+Note that these parameters refer to a particular frame, so technically the 
+acceptance depends on yet another index, specifying which frame is being 
+considered. This would have made eq.1 too  heavily detailed for its 
+illustrative purpose, so we kept the lambda_theta as a mere reminder of the 
+polarization dependence.
 
 > 
 > L162-165: Need to make clear why different generated spectra can lead to different acceptance.  Perhaps
@@ -346,14 +387,8 @@ Note that these parameters refer to a particular frame, so technically the accep
 > Reading the AN it seems like the acceptance came from a particle gun.  If this is so, then I don't see
 > why this would be called a Pythia spectrum.
 
- mi stanno venendo dubbi!! E' fatta col particle gun? In che senso allora si provano vari spettri? facendo il reweigting alle varie predizioni teoriche? l'accettanza di default con quale spettro ??stata fatta?
-In effetti l'AN dice che ??fatta con un particle gun...
-Questo l'abbiamo chiesto mille volte a Shuang ma nessuno ha mai capito la 
-risposta.
-
-proposta:
-The AN is incorrect, we'll change that. The default acceptance was determined using the events as generated by Pythia.
-
+It is done with a particle gun, but events are (first) reweighted to the
+expected Pythia spectrum.
 
 > 
 > L165: "taken as _a_ systematic"
@@ -361,19 +396,33 @@ The AN is incorrect, we'll change that. The default acceptance was determined us
  DONE (but not sure)
 
 > L166-172: Why should this be considered a sufficient systematic?  What about the uncertainty in the
-> measurement of [6]?  Since the measurement comes from e+e-, it does not include B_s or Lambda_b decays.
-> Is there reason to expect that the inclusive result from BaBar doesn't change with the addition of
-> B_s or Lambda_b decays?  Does this also require Pythia to get the prompt to non-prompt fraction correct?
-> If so, does it?  I don't see comparisons to Pythia in the paper to check this.
+> measurement of [6]?  
 
- ******Da vedere*******
+The uncertainty on the measurement in [6] is not very clear, because it is
+only given in p* bins and it's not specified which systematics are/are not
+correlated between the bins to give the average alpha. Anyway the total
+uncertainty should be smaller than the one considered here.
+
+> Since the measurement comes from e+e-, it does not include B_s or Lambda_b decays.
+
+You mean, since the measurement came from Y(4S)...
+
+> Is there reason to expect that the inclusive result from BaBar doesn't change with the addition of
+> B_s or Lambda_b decays?  
+
+Only the fact that f_u, f_d >> f_s, f_baryon and the fact that EvtGen 
+(including B_s and Lambda_b decays) agrees well with the measurement.
+
+> Does this also require Pythia to get the prompt to non-prompt fraction correct?
+> If so, does it?  I don't see comparisons to Pythia in the paper to check this.
+No, the acceptance are mixed based on the measured non-prompt fractions.
 
 > 
 > L173-179: This section starts with transverse momenta and then just talks about momentum.  So does this
 > systematic include effects on both pT and rapidity?
 > 
 
- It does   ***** verificare ****
+ It does but the effect on y is really small.
 
 > L177: "measured on data" to "measured with data"
 > 
@@ -437,10 +486,10 @@ suggest that the factorization hypothesis is the bias the previous sentence refe
 > like an important systematic check.
 > 
 
- we tried this for the Jpsi paper. The difference is that with this alternative method one relies 
-on the MC spectrum inside a bin. We are convinced that the method we used 
-correctly includes the "bias to higher efficiency*acceptance" in the statistical error. 
-*VEDERE*
+ We tried this for the old Jpsi paper. The difference is that with this 
+alternative method one relies on the MC spectrum inside a bin. We are 
+convinced that the method we used correctly includes the "bias to higher 
+efficiency*acceptance" in the statistical error. 
 
 
 > L205-214: A central claim of the paper is that the polarization only affects the acceptance.  For
@@ -453,7 +502,10 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 > acceptance.
 > 
 
-  Controllare con Luca.
+We only have FullSim samples with null and EvtGen polarization and we did not
+find any difference in rho using one or the other. This ensures that rho 
+(evaluated only on muons passing acceptance cuts, obviously) does not
+depend on the polarization. 
 
 > L216 and L219-220 are redundant.  Suggest removing "The corrected yields ... <1/AE>bin." and adjusting
 > L216 as "is the J/psi yield in a given transverse momentum--rapidity bin, multiplied by <1/AE>bin to
@@ -471,7 +523,7 @@ correctly includes the "bias to higher efficiency*acceptance" in the statistical
 
  The text says the results are "fully corrected", I think that the null polarization is understood. 
 
- all systematic errors are included except lumi.
+ all systematic errors are included except lumi. Specified in the caption.
 
 
 > Figure 2: The units on the y-axis label are technically incorrect.  In general, writing a/b/c implies
@@ -496,7 +548,7 @@ Done by LM.
 > 
 >  L234 "A convolution with a resolution function is applied," begs the question of what it is applied to.
 
- to the PDF?  *controllare*
+ Sentence changed.
 
 > 
 > L241: Write "The expression for the PDF F(l,m) for J/psi is:
@@ -507,14 +559,19 @@ Done by LM.
 > L250: I think it is unreasonable that the PDFs need to be obtained from Ref 4.  Why can't they be added
 > to this paper as well?
 
- looked like an avoidable repetition to us.
+It looked like an avoidable repetition to us.
   
 > L262: This seems like a strange sideband region.  Why is the upper sideband so close to the J/psi
 > and so small?  In some of the high rapidity bins it is clear that this sideband region includes some
 > signal.  I don't see any reason why the J/psi sideband must be distinct from the Psi(2S)
 >  sideband.
 
-
+The sideband composition changes a lot moving from 2.5 to 4.2 GeV, because
+double semileptonic b and c decays only "appear" above ~3.5 GeV, while fakes
+decrease a lot with increasing mass. This is the reason for the strange "rise"
+of the background that one can see in Fig. 1 right. So, sideband compositions
+in terms of lifetime distributions can be trusted only in the vicinity of the
+(corresponding) peaks, hence the choice of the close (and split) sidebands.
 
 > 
 > L265: Need space between (2S) and statistics.
@@ -543,11 +600,11 @@ Done by LM.
 > fit or just call the second one the psi(2S) fit.
 > 
 
- Done by RC.
+All done by RC.
 
 > L279-281: I think a brief summary is appropriate rather than just a reference to 4.
 > 
- *vedere*
+Ok.
 
 
 > L286: "taken as systematic uncertainties." to "taken as a systematic uncertainty."
@@ -557,34 +614,7 @@ Done by LM.
 > 
 > L288: What does "used as input" mean?  This needs to be clarified.
 
- The fitted parameters are fixed in the background part of the PDF for the signal fit.
-Proposed: "the fitted shape is used as a fixed background PDF in the signal region"
-Not done yet.
-
-
-> 
-> L288: A +- 100 MeV variation in the sideband boundaries could be catastrophic.  The upper sideband
-> of the J/psi is 3.20-3.35 so -100 MeV would be 3.10-3.25 which would include half of the J/psi
-> signal.  Is this really what is done?!  If not, need to be more clear.
-
-It is only the left boundary of the left J/psi sideband (right boundary of 
-the psi' right sidebands) which is changed, exactly to see what the effect
-is when changing of the (quite arbitrary) fraction of left-right events
-in the total sideband sample.
-
-> 
-> L297 "assumed as systematic uncertainty" to "recorded as a systematic uncertainty"
-> 
-
-DONE
-
-> Table 1 (2) caption: Need space between lowest-pT and bin.  The fact that the FSR uncertainty gives a
-> 19% (29%) effect which is ignored needs to be explained.
-
- The effect is ignored in the table, not in the results. Since the table only gives "typical" or "average" variations, it would have been misleading to quote a 19% (29%) as an upper limit, 
-since it would have given the wrong impression of a 
-uniformly high - or wildly fluctuating - systematic uncertainty, whereas it's only a border effect.
-We thought the caption was clear enough on this point, but maybe it's not clear enough.
+.
 
 
 > 
@@ -597,17 +627,17 @@ We thought the caption was clear enough on this point, but maybe it's not clear 
 > L303-319: Some explanation of NRQCD and FONLL should be given.  In particular, it should be explained
 > why NRQCD is compared to only the prompt and FONLL is compared to only the non-prompt.
 
-It will be done in the introduction.
+It is now done in the introduction.
   
 > L311-319: Since the data points use B*dsigma, the branching ratio uncertainty does not enter into
 > the data.  However, this means the theory will have uncertainties due to the branching ratio
 > uncertainty.  Shouldn't these be included?  It is probably small for the prompt since the dimuon
 > BR is well known.  As mentioned in the text, it will be large for the non-prompt.
   
-The total cross-section estimates include errors on the J/psi, psi' BRs
+The total cross-section estimates indeed include errors on the J/psi, psi' BRs
 for the prompt and additionally the B -> J/psi, psi' BRs in the 
 non-prompt. In the last case, this is a sizable contribution so it must be
-added to the text. Thanks for spotting this,.
+added to the text. Thanks for spotting this.
 
 > L321: I don't think it is unreasonable to quickly say what the extreme scenarios are.  How about:
 > "for four extreme polarization scenarios corresponding to fully longitudinal or fully transverse in
@@ -625,11 +655,11 @@ added to the text. Thanks for spotting this,.
 > L325-328: This could perhaps be rephrased given the suggestions on changing how the uncorrected
 > values are described.
   
-  *********Questo chi lo cambia?****
+Ok.
 
 > L330-331: As mentioned at the beginning, I think these results deserve a figure.
 
- Qui che si fa?
+Figures are added.
 
 > 
 > L333: "Most of the systematic uncertainties on the acceptance ... cancel" is disingenuous.  The most
@@ -638,12 +668,13 @@ added to the text. Thanks for spotting this,.
 > uncertainties other than the polarization cancel.
 >
 
- Changed to "Most of the systematic uncertainties on acceptances and efficiencies listed in Table 1 cancel"
+ Changed to "Most of the systematic uncertainties on acceptances and efficiencies listed in Table 1 cancel". Anyway it should be clear at this point that we
+do not treat polarizzation on the same ground as the other systematic sources.
 
  
 > Fig 4: The left plot is not correct.  It is the non-prompt J/psi when it should be the prompt J/psi.
 
-Changed.
+Whoops! Changed.
 
 > Fig4-5: In these plots, the y-axis uses "BR" while in Fig 2 and Eq 7 the branching ratio is
 > represented by "B".  This should be consistent.
@@ -669,7 +700,7 @@ Done.
 
 > L336-337: Does the J/psi yield come from the J/psi fit or the J/psi-psi(2S) fit?
 
-The J/psi fit. The J/psi-psi(2S) fit is done onl in larger bins.
+The J/psi-psi(2S) fit. The J/psi fit is done only in smaller bins.
 
 > L342: How are the ratios averaged over rapidity?  I assume that the corrected yields are summed over all
 > rapidity bins and then divided.  It would be incorrect to measure the ratio in bins of rapidity and then
@@ -699,8 +730,9 @@ Already changed.
 > L376: The conclusion does not seem to address one question raised at the introduction, namely do
 > these results confirm the Tevatron results or the theory.
 
-The CDF results were compared to a very old theoretical estimation, which 
-is not examined here. The sentence in the introduction will be changed.
+The CDF results were compared to a very old theoretical estimation
+(Khoze et al.), which is not examined here. 
+The sentence in the introduction will be changed.
 Our only statement is that our results are in agreement with the most
 recent NRQCD calculations including color octet.
 
@@ -725,11 +757,11 @@ it is not a result worth being repeated in the conclusions.
 > 
 > L391: The factor of 3 here was a factor of 3.5 in L374. 
 
- NO, METTIAMO 3.5!
+We changed evreything to 3.
 
 > Also, the symbol used does not mean approximately equal.
 
-* It does for some. Changed anyway.
+It does for some. Changed anyway.
   
 > L394: "the useful" to "useful"
 > 

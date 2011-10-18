@@ -1,9 +1,4 @@
-> General remarks
-> The paper is still difficult and heavy to read. It needs clarifications in 
-> many places and some styling at
-> latest before the Final Reading.
-
-Hm, OK.
+Thanks for your careful reading.
 
 > Gives the general impression that the paper does not deliver what is 
 > promised in the introduction: i.e.
@@ -11,7 +6,8 @@ Hm, OK.
 > show them or rephrase the
 > introduction and conclusion
  
-They will be shown in the next version.
+They will all be shown in the next version, since many reviewers/conveners
+etc. asked for them.
 
 > The structure is problematic as many details are introduced in chapters 5 
 > and 6 without any reference
@@ -21,7 +17,7 @@ They will be shown in the next version.
   and Chapter 7 summarizes the
 > results and the uncertainties".
 
-This guideline will be added.
+This guideline is now added.
 
 > avoid use of word "statistics" to express amount of data ("low 
   statistics"), please rephrase lines 104
@@ -31,7 +27,7 @@ This guideline will be added.
 > consider removing the plots, or give the goodness of fit information just 
 > as a number chi^2/NDF.
 
-Agreed to remove the pull plots in the mass case. Chi2 can be added on the 
+Agreed to remove the pull plots in the mass case. Chi2 is added on the 
 mass plots.
  
 However in lifetime plots this is not extremely reliable: chi2 assumes 
@@ -69,7 +65,7 @@ From MC: acceptance, rho factors.
 > results. Maybe the authors
 > could consider adding something on this in the abstract?
 
-No, but it will be added in the introduction.
+It will be said very clearly in the introduction.
 
 >  --- Avoid sentences with parentheses in abstract.
 > The last two sentences, propose: "The ratio of the differential cross 
@@ -78,6 +74,9 @@ No, but it will be added in the introduction.
 > ratio of the inclusive
 > B->psi(2s)X decay is extracted from the ratio of the non-prompt cross 
 > sections."
+
+We take your suggestion.
+
 >  ---
 > 1 Introduction
 > Line 3: "of both perturbative and non-relativistic" -> "of the 
@@ -89,7 +88,8 @@ The first form was suggested by a native English speaker.
   state closest to the DD threshold,> there is no significant feed-down from higher charmonium states
 
 I would avoid these kind of sentences, since recently a lot of non-standard
-charmonium states have been found above the DD threshold.
+charmonium states have been found above the DD threshold... We prefer to leave
+it as it is.
 
 >  ---
 > line 7: Is there a phrase missing before "On the other hand,...can also 
@@ -135,8 +135,7 @@ changed
 > instance "published in 2011"
 > 
 
-we're still in 2011... is "recently" really unbearable? We thought it was 
-understood that recently refers to the publication date of the present paper.  
+Rephrased. 
 
 >  ---
 >  --- line 19: remove "basically"
@@ -175,7 +174,7 @@ done
 > to give all coordinate details
 > here? You could just refer elsewhere.
 
-This is a CMS paper standard. However, we removed some tracker details.
+This is a CMS paper standard. However, we removed some details on the tracker.
 
 >  --- Line 31: "with a magnetic field of.." -> "providing an axial magnetic 
 > field of"
@@ -205,7 +204,7 @@ removed
 > approaches" is not needed, text book material.
 
 Many reviewers got confused between rapidity and pseudorapidity even with this
-sentence in the paper. So we keep it.
+sentence in the paper. So we prefer to keep it.
 
 >  ---
 >  --- line 42: do not use Capital letters for drift tubes etc.
@@ -234,7 +233,7 @@ removed
 >  ---
 >  --- line 53: add some details about HLT.
 
-We'll consider that *VEDERE*
+We'll consider that.
 
 
 > 3 Data selection and event reconstruction
@@ -242,7 +241,7 @@ We'll consider that *VEDERE*
 > overlapping with the one used
 > for the first J/psi paper.
 
-We'll consider that *VEDERE*
+Added.
 
 >  ---
 > line 58: the LHC averaged 2.2 pp collisions per bunch crossing at the CMS 
@@ -251,7 +250,7 @@ We'll consider that *VEDERE*
 > region was 2.2.
 >  ---
 
-not changed (approved by FNAL with the addition of "inelastic")
+not changed (approved by RAL/FNAL with the addition of "inelastic")
 
 > Line 60: Avoid starting a sentence with a symbol. Propose: "The 
 > reconstruction of the J/psi and
@@ -296,6 +295,7 @@ changed
 > following cuts/criteria in the
 > tracker:
 
+Paragraph completely changed.
 
 >  ---
 >  --- line 86: 'degree of freedom' -> number of degrees of freedom.
@@ -311,7 +311,7 @@ sound right to me, it should be "divided by the number of ..."
 > choose the primary vertex from
 > the vertices.
 
-*VEDERE*
+Moved the definition.
    ---
 >  --- Line 89: Avoid repetition. Write simply " The mass is required to be..."
 
@@ -324,7 +324,7 @@ done
 > Clarify.
 >  ---
 
-*VEDERE o rispondere*
+Moved "in the forward region" to the paragraph below.
 
 >  --- Line 95: "at the muon stations" -> "in the muon stations"
 
@@ -346,7 +346,7 @@ where the other is, when the two come close to each other.
 >  --- line 104: reduction of 48 % relative to what selections? Just the 
 > trigger?
 
-with respect to all other selection cuts. 
+No, with respect to all other selection cuts, as explained in order... 
 
 
 >  --- Line 105: no hyphen in "efficiency independent" and "high rapidity"
