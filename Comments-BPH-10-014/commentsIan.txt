@@ -14,24 +14,24 @@ sets of results in the rest of the paper.  Please make it much clearer which
 of the two methods you're using, when you present your results.
 
 In the new section acceptance-uncorrected cross section and B-fraction
-plots will be added. Hopefully this will clarify the methods used.
+plots will be added. Text additions will clarify the methods used.
 
 > *       L12: You say "These models".  Please clarify which models are 
 you referring to?  Are you only referring to the NRQCD models, or to 
 all models?
 
-This sentence will be changed.
+This sentence is now changed.
 
 > *       L187-8: Shouldn't we add that the efficiency is measured only for 
 particles within the geometric acceptance?
 
-It will be added.
+It will be added (beginning of Sec. 5.1).
 
 > *       L189-192: Replace "a stronger" -->" the strongest"?  And "and are 
 then" -->", so are".  Your paragraph suggests that you do not bin the 
 tracking efficiency at all.  Is this true? 
 
-No, simply the bins are larger. We will make it clearer.
+No, simply the bins are larger. We can make it clearer.
 
 > Your paragraph also says nothing about the binning of epsilon_{off|ID}.
 
@@ -54,7 +54,7 @@ systematics.
 
 > You might also consider moving L221-2, which explains that you also use equation 6 without the acceptance a factor for some results, to the end of this paragraph.
 
-Agreed.
+Changed now.
 
 > *       L210: What is a "split-gaussian"?
 
@@ -74,9 +74,11 @@ With the very small pile-up of 2010 data, this was found to be sufficient.
 
 > *       Tables 1 & 2: Since the text refers to these two figures after it refers to figures 4 & 5, please move table 1 after these figures in the paper.  
 
-Ok.
+Ok, actually the order of sentences is now swapped.
 
 > If possible, I suggest that you put both tables 1 & 2 on the same page, presumably a page with no other text on it.
+
+They are not fitting in the current format.
 
 > *       Table 3: I remain surprised by how small your systematic errors due to the rho factor are.  Fig. 15 C of the AN-NOTE suggests that this systematic error can be as large as ~20%, not only in the 0-0.9 rapidity bin, but also in the 0.9-1.2 and 1.2-1.6 bins.
 
@@ -101,8 +103,8 @@ to check.
 
 Yes, we checked this with M. Cacciari (author of the FONLL predictions) who
 also gave us the minimum and maximum value of the ratio prediction on which
-we base the theoretical uncertainty. See also the approval slides and the
-long HN discussion.
+we base the theoretical uncertainty. See also the approval slides, the
+long HN discussion and the additions on the B -> charmonium spectrum.
 
 > 
 > English/Trivia
@@ -117,7 +119,7 @@ CWR phase, so we suggest you to wait for the next draft.
 
 We will check this. I'm afraid that, since CMS uses a font so different from
 those used in most papers, there is no symbol which appears nice at the
-same time in CMS and paper styles. We will try a few more options, though.
+same time in CMS and paper styles. We have tried another option, though.
 
 > *       Abstract: replace "b-hadron component" --> "component originating from b-hadron decay".
 > *       L7: Delete "On the other hand,".
@@ -131,4 +133,4 @@ same time in CMS and paper styles. We will try a few more options, though.
 > *       L344: "affects" -->" affect".
 > *       L362: "single measurements" --> "ratio measurements" ?
 
-Ok all of the above.
+Many of the above have been accepted or superceded by other changes.

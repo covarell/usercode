@@ -18,10 +18,10 @@ On the other hand, the high pT reach is increased due to larger statistics.
 We included Fig. 2 exactly to show these effects.
 
 Pile-up does not affect the dimuon mass, which is anyway "cleaned" by the
-tighter trigger requirements. Effects on the choice of the PV for the 
+tight trigger requirements. Effects on the choice of the PV for the 
 lifetime measurements are detailed in the "pile-up" systematics.
 
-We can expand on both subjects in the paper.
+We have expanded on both subjects in the paper.
   
 > We use the zero polarization hypothesis for the prompt production,
 > which is fine, but we actually also discuss the effect of other polarization
@@ -30,14 +30,14 @@ We can expand on both subjects in the paper.
 > also in the introduction. 
 
 The discussion on the acceptance/polarization is indeed a bit split up, as
-noticed also by other reviewers. We will improve on that.
+noticed also by other reviewers. We have improved on that.
   
 > We compare with models like NRQCD and FONLL: I believe for self-consistency of the
 > paper we should include a description in the introduction on what the physics
 > in these models is (beyond of what we say already).
   
 Both are complex models, taking into account several effects which are hard
-to summarize in a few lines. We will try to add more information.
+to summarize in a few lines. We have tried to add more information.
 
 > We present the numerical values of some of the plots only on a twiki page...
 > No place in this paper? (is this our agreed way of transmitting this now?
@@ -52,30 +52,32 @@ the material will be placed in the appropriate areas of the journal webserver.
 > line 8 Chi_cf?  (notation correct?)
 
 Do you mean chi_cJ? It is a standard way to refer to the three resonances
-chi_c0, chi_c1, chi_c2 using the total spin index. chi_c only may be also a
-good choice.
+chi_c0, chi_c1, chi_c2, using the total spin index. chi_c only is also a
+good choice (changed).
  
 > line 13-14: what did we learn at the end in this paper related to the questions posed here?
 
 As noticed by other reviewers, this sentence is too strong and will be 
 changed. The result of our paper is that psi' production agrees with NLO
-NRQCD with LDMEs fitted from CDF data, within the theory errors.
+NRQCD with long-didtances matrix elements fitted from CDF data, within the 
+theory errors.
 
 > line 53: maybe useful to add that the HLT uses the full detector information
 >      (as you specify the limited detector information available to the L1)
 
-Ok.
+Ok. A sentence about "advanced processing at HLT" has been added. Some details
+are give, which should make clear that full detector information is 
+available at that stage.
 
 > line 69: The sentence "color octet states undergo a shower evolution" does not really tell much
 >    What do you want to say here? A difference with the color singlet states?
 
-Well, yes. In Pythia both color-singlet and color octet states are simulated
+Yes. In Pythia both color-singlet and color octet states are simulated
 as 'particles' with some status. However color-singlet particles are already
-physical states (either J/psi or heavier ones eventually decaying into it), 
-while color-octets are unphysical, so showering must be always turned on
-in this case to obtain a sensible event. In the other case, a production of
-a single 1P state, then radiative-decaying into a J/psi is a perfectly
-acceptable process.
+physical states, while color-octets are unphysical, so showering must be 
+always turned on in this case to obtain a sensible event. In the other case, 
+a production of a single 1P state, then radiatively decaying into a J/psi is 
+a perfectly acceptable process.
 
 > line 166-168: I am not sure how that study deals without the systematic discussed
 >   in this bullet. Perhaps that would deserve a word of explaining?
@@ -88,7 +90,8 @@ assign as a systematic uncertainty the difference with the default setting.
 
 > line 189: " have a stronger pT and eta dependence". Stronger than what?
 
-Changed into "the strongest".
+Than the tracking efficiency. Changed into "the strongest", following
+Ian's suggestion.
 
 > line 224: do we say somewhere in the paper that ref [4] was for much lower luminosity?
 
@@ -98,11 +101,12 @@ measurement "extends the results to a larger amount of data".
 > Fig 2: The legend in the figure is too small, and hard to read. This can be easily
 >      increased in size as there is enough space in the picture frame.
 
-Ok, we will do that.
+The legend has been enlarged a bit and the format has changed (following
+Perini's comment).
 
 > Section 7.2 is strange: just telling that these numbers exist without showing or discussing them. If these are interesting we should discuss them here,otherwise this section should be part of some other part of the text.
 
-B-fractions and acceptance-uncorrected cross section plots will be added 
+B-fractions and acceptance-uncorrected cross section plots are now added 
 in the results section.
 
 > Fig 4/5 what are these lines exacty? A fit of some kind? or just to guide the
@@ -121,7 +125,7 @@ refer to the corresponding figure in the PAS (which is correct).
 > Fig 6: what errors are included for the data points? Statistical only?
 
 No, statistics + all systematics except luminosity and polarization, as 
-specified in the figure. It will be added in the caption as well.
+specified in the figure. It is now added in the caption as well.
 
 > line 387: Can we say something more on what it means that the non-prompt
 > cross section at high pT is not reproduced?
@@ -129,7 +133,7 @@ specified in the figure. It will be added in the caption as well.
 There can be many factors (e.g. model for b fragmentation into
 B and then J/psi) that could affect the spectra even if the FONLL at parton
 level is correct. We just observe that within the uncertainties we assume
-for the theory and the measurement, there is no excellent agreement.
+for the theory and the measurements, there is no excellent agreement.
 
 > line 391: in the text we say a factor 3.5, here 3. Be consistent...
 

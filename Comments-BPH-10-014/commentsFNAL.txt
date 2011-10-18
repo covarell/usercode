@@ -21,8 +21,10 @@ The paper has already gone through Editorial PAG contact review.
 > report individual cross-section measurements for these scenarios?
 
 This is done in the tables in the Twiki that will be eventually added to
-the journal webserver. Also, the acceptance-independent cross section is
-provided, which removes completely this source of uncertainty. 
+the journal webserver, but it's too heavy for the paper (also not so useful,
+because the real measurement will be in between...). Also, the 
+acceptance-independent cross section is provided, which removes completely 
+this source of uncertainty. 
 
   Section 3
 > 
@@ -31,7 +33,7 @@ provided, which removes completely this source of uncertainty.
 > although I realize this would be a tiny effect. But anyway, why should one take the pair with the best vertex?
 
 The sentence refers to cases with 3 muons in the events.
-The 2-J/psi effect is expected at the permille level, using CSM 
+The 2-J/psi effect is expected below the permille level, using CSM 
 expectation for J/psi + ccbar production and another factor 
 BR(J/psi -> mumu) ~ 6%. So we neglect it in our calculations.
 
@@ -43,8 +45,7 @@ BR(J/psi -> mumu) ~ 6%. So we neglect it in our calculations.
 
 Less-binned samples give rise to rapidity-dependent effects in the mass
 resolution, so more complicated functions should be used for this. From
-the goodness-of-fit we judge that our assumptions are correct and we think 
-that the error determined changing PDF forms also covers this uncertainty.
+the goodness-of-fit we judge that our assumptions are correct.
 
 > Section 6
 > 
@@ -75,7 +76,7 @@ Muon ID (even _global_ muon ID) works down to pT = 600 MeV/c, provided
 that you are in the very forward region, where the _total_ momentum of the
 muon allows it anyway to go through the iron slabs of the end wheels.
 Also in the forward you can have the special occurrence when the two
-muons are exactly opposite in the x-y plane, giving rise to an object
+muons are exactly opposite in the x-y plane, giving rise to a dimuon
 with ~ 0 pT. In fact the measurement down to 0 pT was limited to the 
 forward bin.
 
@@ -107,7 +108,7 @@ always y for charmonium (where m_psi << pT_psi does not necessarily hold).
 > 4. Some of the figures are difficult to read in black-and-white (and figures 4 and 5 have explicit references to colors, which is
 > in violation of the Guidelines.
 
-We think figures are readable, references to colors will be removed.
+We think figures are readable, references to colors will be parenthesized.
  
 > 5. One thing that I would like to have seen early on in the paper is a quantitative estimate of the size of the various
   corrections/effects. For example: the issue of polarization that can change the muon momentum spectrum and affect efficiencies,
@@ -120,14 +121,16 @@ See comment above.
 > 6. Some of the details would fit better in the AN note. For example, the issue of coarse/fine binning. It reflects the 
 > different statistics when dealing with MC and data samples. But it is not that important in the bigger scheme of things.
 
-Ok.
+It's not just that. Acceptance-efficiency averages, for example, remove a
+lot of the (unknown) spectrum dependence, so they are worth mentioning in the
+paper.
 
 > 7. General "specific" comment: there is an abuse of commas in several places.
 > 
 > 8. Sometimes the method referenced from ref[4] could be explained a bit, e.g. page 10, line 275 to 277 seems to address
 >   an initiatic secte !!!
 
-Ok :-) [chi lo fa? FL, Io RC]
+Ok :-) 
  
 > 9. A big effort is done  to account for the differences in the dimuons distributions for prompt and non-prompt J/Psi and Psi(2s). 
 > However,  the fact that the J/Psi and the Psi(2S) are J=1 particles which need a reweighting to account for the dimuon angular distributions  
@@ -148,16 +151,16 @@ analysis.
 Ok, this will be improved (also noticed by other reviewers). The punchline is:
 we do not give results where the _charmonium_ pT is unaccessible, i.e. we
 have no events, but we correct for the _single muon_ acceptance in this
-accessible region (which is < 100%).
+accessible region (but which is < 100%).
 
 > 11. Sometimes you say "at LHC" and other times "at the LHC". "at the LHC" is better (e.g. L14, 16, 36).
 
-corrected [FL]
+corrected
 
 > 
 > 12. The paper alternates between using "b-fraction" and "non-prompt fraction". It would be better to stick to "non-prompt".  
 
-[FL] Done.
+Done.
 
 > 
 > 13. There are a number of cases where a US spelling variant is used whereas the paper appears to have a preference for UK conventions.
@@ -177,7 +180,7 @@ the -ize form is admitted in the UK (the Cambridge online dictionary gives it
 as the standard form, specifying that the -ISE form is the "usual" one in UK. 
 The Concise Oxford Dictionary also gives -ize as the standard form). 
 Personally I (Franco) prefer the "-ize" spelling.
-> 
+ 
 > 14. The weak points of the paper are in its redaction. It has: a/redundancies and b/long sentences. Almost every ":" could be
   transformed into a "." and  a new sentence started.  Too many parenthesis are used for important details
 > 
@@ -187,7 +190,7 @@ Personally I (Franco) prefer the "-ize" spelling.
 > Acceptance and Efficiency: There is a nice summary of the 2 approaches end of line 140-145, which just comes after the detailed description
 > of the two approaches in the previous paragraph, paragraph 4. 
 
-[fl] questa non la capisco, il par 4 parla di due diversi fit, l'inizio del 5 parla di correggere o no per l'accettanza...
+This part has changed, please check new version.
 
 > It is too close for one more description, It had been described already
 >  in the introduction as well. This nice summary could find a place as part of the conclusion 
@@ -195,9 +198,8 @@ Personally I (Franco) prefer the "-ize" spelling.
 > b/ The sentences are often long. Shorter sentences would made the material even more clear
 
 This is a cultural bias, since in Italian longer sentences are more elegant 
-and more "readable" than longer sequences of shorter sentences. Here we have 
-to trust native readers/writers. [FL]
-
+and more "readable" than sequences of shorter sentences. Here we have 
+to trust native readers/writers. 
 
 >.e.g. already in the introduction
 > - page 1 line 23 the ":" after "two different ways" could be replaced by a full stop and a new sentence started and ending line 25  
@@ -208,8 +210,7 @@ done
 > - end of page 1 end of line 43, to the middles of line 45 "The silicon tracker ...pixels"  Then a new sentence page 2 
 >  middle of line 45 ending up middle line 47, "A microstrip detector follows, it has ten barrel layers...184microns"
 
-A full stop after "pixels" would imply that the silicon tracker only consists 
-of the pixel detector [FL]
+This part is removed now.
 
 > - page 3,  end of line 96 to middle of line 98, ":" could be replaced by a full stop
 
@@ -234,11 +235,9 @@ Inverted commas, maybe? Or italic?]
 
 > - again ":" page 3,line 127 --> a full stop, and a new sentence started
 
-What is it you guys have against colons? :-) Here (and elsewhere) the colon 
+Here (and elsewhere) the colon 
 was supposed to introduce the explanation of the word or sentences immediately
 preceding it.
-But again, we might be biased by our being Italian 
-[See http://en.wikipedia.org/wiki/Colon_(punctuation)  ]
 
 
 > - page 4,line 135, the parenthesis could be replaced by a ","
@@ -247,7 +246,7 @@ or by a ":"   ;-)
 Again: it's an explanation, so IMHO the comma would make it a tad less clear. 
 I feel that punctuation can - and should - be used to help 
 clarify the relationship between sentences rather than simply separate 
-them. [FL]
+them.
 
 > - page 4 middle of line 147could end at "reconstruction systems" and a new sentence started "they are constrained by ... magnetic field" 
 
@@ -259,8 +258,9 @@ them. [FL]
 > - page 11 line 320-324 too long sentence 
 > - page 14- line 357-361 too long sentence
 > 
-> 
-> 
+
+We changed some of the above.
+
 > 
 > ***Specific line-by-line comments***
 > 
@@ -276,7 +276,10 @@ DONE
 > 
 > Line 6: "directly" could be misleading. How about "immediately following the proton-proton collision"?
 > 
-FL isn't "directly" an established jargon? One could also argue that "immediately following" is not so clear
+
+Directly is not misleading, it has a precise meaning in quarkonium production
+theories. It has nothing to do with "immediately", it means that the J/psi
+is not produced in strong decays of heavier states.
 
 > Line 6: suggest add (pp) after proton-proton to define it
 > 
@@ -291,7 +294,7 @@ DONE
 > predicting the chi_c contribution" 
 > 
 
-FL I think it's clear that the prediction the text refers to are the 
+We think it's clear that the prediction the text refers to are the 
 theoretical ones.
 
 > o line 13: "the need for an _independent_ test at LHC"
@@ -329,7 +332,7 @@ already changed
 > L21  Cross-section results depend strongly on the $J\psi$ and $\psi(2S) polarization.    This suggests that polarization in the lab frame
 > is unambiguous, which is not the case. This would be a good point to clarify the frame dependence (e.g. Collins-Soper).
 
-Proposed [FL]:
+Proposed:
 
 The polarizations of the \Jpsi\ and \Psis\ states, 
 as defined in suitable decay frames [19], affect the muon momentum spectra in the laboratory frame. 
@@ -349,7 +352,9 @@ already changed
 > o lines 38-40: I am not sure you need the detailed explanations on the (pseudo)rapidity definitions in a public document.
 >
 
-others have not complained...
+But before you say: " The paper mixes references to rapidity and 
+pseudorapidity, which is okay, but in some cases I wondered whether they meant
+the other variable." So we think that explanations are really needed...
 
 > L41   Muons are detected in the pseudorapidity range $|\eta| < 2.4$ by three types of gas-based detectors: Drift Tubes in the barrel, Cathode
 > Strip Chambers in the endcaps, and Resistive Plate Chambers in both the barrel and endcaps, embedded in the steel return yoke.
@@ -376,7 +381,7 @@ DONE
 > 
 > o line 61: "full processing" -> either "full-event processing" or "advanced processing"
 
-FL "advanced processing" chosen
+"advanced processing" chosen
 > 
 > o line 62: "are used to arrive/make"
 > 
@@ -429,19 +434,7 @@ already changed
 > {"merged" is ambiguous}
 > 
 
-
-corrected by Kevin (who was not bothered by "merge"):
-
-Muons reconstructed by two algorithms 
-({\it Global Muons} and {\it Tracker Muons})
- are merged.  Both use tracks reconstructed in the silicon tracker (tracker
-  tracks).  Global Muons combine tracker tracks with track segments 
-in the muon detectors to find muons, while 
-Tracker Muons project tracker tracks into the muon detectors, 
-searching for hits.
-Global Muons are of higher quality, while Tracker Muons
-have higher efficiency at low momentum.
- 
+Reduced to a very short sentence. 
 
 > L80  pseudo-rapidity -> pseudorapidity   for consistency
   
@@ -450,6 +443,7 @@ have higher efficiency at low momentum.
 > 
 > 84] The tracker muon tracks are ...   (still ugly)
 
+See above.
 
 > 
 > Line 84: suggest rephrase, remove "they must have" and replace commas with semi-colons:
@@ -471,7 +465,8 @@ OK
  region of the detector. As a general requirement, muon signals which are too close in space at the muon stations are rejected, in order
  to avoid spurious double-muon signature stemming from a single muon.
 
-the colon is supposed to signify that the following sentence is an explanation of what the veto is, so we keep it. "being faked by" 
+The colon is supposed to signify that the following sentence is an 
+explanation of what the veto is, so we keep it. "being faked by" 
 already corrected to "from"
 
 > 
@@ -495,7 +490,8 @@ After all it is not a crucial issue in the paper.
 > 
 > o line 105: "efficiency-independent" does not make sense. Do you mean there is no strong trigger bias for this class of events?
 
-It means that possible trigger and selection bias do not affect prompt and non-prompt components in appreciably different ways.  
+It means that possible trigger and selection bias do not affect prompt and 
+non-prompt fractions in appreciably different ways.  
 
 > 
 > line 110:  "broaden" --> "change the width of"
@@ -527,7 +523,7 @@ done
 > 
 > L138 reported in the general systematic uncertainty Tables 1 and 2 -> shown in Tables 1 and 2 for the $J\psi$ and $\psi(2S)$, respectively
 
-line erased.
+Ok
 
 >  L145 and containing no uncertainty from the assumed polarizations ->  and without any polarization-related uncertainty.
 
@@ -551,13 +547,10 @@ done, changed to "quarkonium" at line 168
 > line 169-172:  Is it possible to clarify here how the difference in acceptance between J/psi and psi(2s) at BaBar is applied to calculate a
 > systematic uncertainty in acceptance at CMS? [the reference points to a BaBar paper]
 
-************ controllare ****************
-I's not a "difference in acceptance between J/psi and psi(2s)". 
+It's not a "difference in acceptance between J/psi and psi(2s)". 
 It is the difference, in each case, between the efficiencies of the non-prompt and prompt mesons. The BaBar vs EvtGen comparison refers to the spectrum used in the simulation of the non-prompt case, corrected to match the  polarization measured by BaBar, as explained in the introduction.
 
-Proposed change: "(as measured in [])" --> "(where the spectrum is corrected to match the experimental results of ~\cite{babarpol}, as explained in the Introduction)"
-************ /controllare ****************
-
+Proposed change: "(as measured in [])" --> "(corrected to match the experimental results of ~\cite{babarpol})"
 
 
 > 
@@ -565,7 +558,7 @@ Proposed change: "(as measured in [])" --> "(where the spectrum is corrected to 
 > 
 > o line 181: "streams" -> is this CMS jargon?
 
-nobody else complained!  *controllare FL*
+nobody else complained
 
 > 
   Line 188: suggest replacing "both on real and simulated data" with "and checked using simulated data"
@@ -579,7 +572,7 @@ changed to:
 
 > line 189:  "stronger" than what?
 
-than the (dependence of the) tracking efficiency
+than the (dependence of the) tracking efficiency. Changed to "the strongest".
 
 > 
 > Line 190: suggest remove word "then"
@@ -592,7 +585,7 @@ OK
 > 
 > Line 192: does e_off depend on pT and eta? [the dependence of the other three efficiencies is described]
 
- *VEDERE*
+Clarified.
 
 > 
 > Line 195: suggest "The correlation factor, rho"
@@ -602,7 +595,8 @@ Strictly, it is not a correlation factor, since it equals 1 in case of uncorrela
 > 
 > Line 198: "except for a few bins" is vague. How many bins (out of 210?) and by how much does it exceed 10%? Suggest remove "always".
 
-removed.  *RISPONDERE alle domande quantitative*
+Changed to "some high-pT bins" (it is 6 bins in total, and all concentrated
+above 30-45 GeV/c). See Fig. 15c in AN-2011-098.
 
 > 
 > Line 199,220: suggest change "factor" to "correction factor" for consistency and clarity (compare line 207).
@@ -627,7 +621,7 @@ DONE
 > Line 222: suggest to make it clear the efficiency corrections are still applied. Is equation 6 used with A_k=1?
 > 
 
-propose to change to "only efficiency corrections are applied" *CONTROLLARE*
+All this part has been rewritten.
 
 
 > Fig 2 caption: appearing as additive offsets in log scale -> appearing as additive offsets on the log scale
@@ -636,17 +630,19 @@ OK
 
 > 
 > Fig 2: Add a label somewhere to show that it is for J/Psi (either on the y-axis label or somewhere within the plot area).
+
+It is already in the y-axis label.
+
 > 
 > Fig 2: Enlarge the legend (there is plenty of space).
 
-Done.
+The legend has changed, following comments from Perini.
 
 
 > 
 > Line 243: suggest replace "defined" with determined".
 
-"determined" would be confusing, since it might suggest that the parameters of the mass PDFs here are fixed to the values determined in the mass fits
-*CONTROLLARE* (Roberto?)
+Ok.
 
 > 
 > Line 248,251,279: suggest "b-hadron" for consistency (compare line 7,74,169,228,253) (B-hadron and b hadron => b-handron)
@@ -671,12 +667,12 @@ corrected
 > 
 > Line 269: The mass signal regions aren't stated anywhere. If they are in between the sidebands then say so.
 
-It seemed obvious to us, we'll consider specifying it *VEDERE*
-  
+Ok.
+
 > Line 271: suggest add "projected"
 > 
 
-added before "distributions" *CONTROLLARE**************
+added before "distributions"
 
 > o line 271: "some selected fit" --> "some example fits for"
 
@@ -728,8 +724,9 @@ done
 > Table 1 caption and Table 2 caption:  While the acceptance uncertainties related to FSR are excluded for the lowest-pT bins
 > in the table, are they included in the analysis?  It is not clear.
 
-They are excluded in the table because the high valuse would have been misleading, as explained above.
-Caption slightly modified.
+They are excluded _in the table_, not in the analysis because the high 
+values would have been misleading, as explained above. Caption slightly 
+modified.
 
 > 
 > L321 "extreme" -> extreme
@@ -750,7 +747,7 @@ changed
 > 
 > Line 329: Is section 7.2 too short? Could it be combined with another section?
 
-It's a little bit longer now
+It's a little bit longer now and with plots.
 
 > 
 > Figure 4 and Figure 5 captions: replace last comma with a period: "??calculations. The lines ??
@@ -764,32 +761,30 @@ it was a mistake. changed.
 
 > Figure 4 and Figure 5:  State whether the data points include statistical and systematic (other than luminosity and polarization) uncertainties.
 
-line added *CONTROLLARE*
+line added 
 
 > 
 > Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible 
 > in black and white? In which case they should be shaded differently.
 
-
+We do changed to yellow and blue (shaded)
 
 
 > Figs 4,5] Lumi. and polariz.   is ugly and unnecessary. There is room for Luminosity and polarization to be spelled out, however that can be
 > said in the captions. However actually the luminosity uncertainty of 4% is too small to see on these figures, it is less than the size of
 > the symbols! I suggest taking that off the figures.
 
-*****************************
-*vedere nuove figure*
-*********************************
+It has been left in, but spelled out.
 
 > 
 > Figs4,5: State what causes the theoretical variation. Consider removing the lines (could be confusing).
 
-
-*VEDERE (fabrizio)*
+It is explained (and now expanded) in the text.
   
 > Equation 10: Could the cross section ratio (excluding BRs) be presented also?
 
-*VEDERE (fabrizio, roberto)*
+It's just the same numbers multiplied by a constant. Not worth for a paper
+which is already quite dense...
  
 > 
 > Line 336: repeated word "bins"
@@ -800,7 +795,7 @@ corrected
   L336 with the coarser binning used for the $\psi(2S)$ cross section -> where the binning is based on the $\psi(2S)$ cross section
 > 
 
-
+Ok.
 
 > L342 significant variation over rapidity -> significant dependence on rapidity
 
@@ -809,10 +804,7 @@ Done
 > 
 > L350 of all weakly decaying $B$ -> of all $B$
 
-**********perché non va bene?  
-controllare
-********************
-
+No, not all B. B* -> B gamma is not included for example. 
 
 > L356 and determining a systematic uncertainty -> to determine a systematic uncertainty
 
@@ -828,9 +820,7 @@ done
 > 
 > Line 361,373: you define N, but don't use it. I'd like to see either the value of N, or the PDG value for comparison with the measured value.
 
-***************
-*PROPOSTA: mettiamo il valore  fittato di N nel testo immediatamente prima di eq. 11? In ogni caso non mi sembra un'obiezione rilevante. Si potrebbe mettere nella AN?
-***************************
+We choose the 2nd one.
 
 > 
 > L374 which is in agreement with, and is an improvement of about a factor 3.5 in uncertainty over the existing measurement ->
@@ -853,18 +843,13 @@ changed to "restricted to"
 
 OK
 
-> 
-> Line 391: suggest repeat "of 3.5".
 
-OK *CONTROLLARE*
 > 
 > L393 Are there references for the predictions of Ma and Cacciari?
 > 
 
-*Controllare* 
+Yes, they are references 3 and 28 (in the new version).
 
 > line 491:  Reference [28] still needs an actually arXiv number (arXiv:xxxx.yyyy is a classic!)
 
-********
-è un articolo? o si mette private communication? Controllare
-********************************
+Ok, will come soon.

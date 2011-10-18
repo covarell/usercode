@@ -14,17 +14,15 @@ R. Tenchini and used in many other CMS papers).
 
 > 1) Figures 1, 3: the panes with pulls are really illegible - the font is way too small. You waste a lot of real estate by separating the two panes vertically by a huge amount of white space. Suggest combining the two panes (saves you second set of x-axis labels as well!) and showing the pulls with color bars, a la Fig. 2 in our dijet paper, arXiv:1107.4771. This way the figures would look cleaner. You should also make them wider to use the real estate more efficiently.
 
-The pull plots will be removed, since many reviewers do not see a need for
-them. Also, the fact that proper pull distributions are obtained in 
-mass-lifetime plots was already shown in the first J/psi paper. They will
-be kept for the lifetime plots where Pearson's test is less reliable due
-to small number of entries in the tails. The "B" (bar) option in ROOT is
-not optimized for bins of different widths, so we are forced to keep the
-markers instead.
+The pull plots in the mass fits will be removed, since many reviewers do not 
+see a need for them. They will be kept for the lifetime plots where Pearson's 
+test is less reliable due to small number of entries in the tails. The 
+"B" (bar) graph option you suggest is not suitable in ROOT for bins of 
+different widths, so we are forced to keep the markers instead.
 
 > 2) L34: The RIGHT-handed; L36: along the COUNTERCLOCKWISE-beam direction.
 
-Ok.
+All the sentence has been rephrased.
 
   3) L87: why the muons is allowed to pass as far as +/-30 cm in z from the primary vertex? This doesn't make sense - is this a typo?
 
@@ -42,18 +40,18 @@ systematics description).
 > 5) Eq. (3): the last two \lambda terms need to be explained, particularly if you use them in definition of the four polarization models.
 
 They are not used. They are always fixed to 0 in the extreme polarization 
-scenarios (only \lambda_theta is changed to extreme values).
+scenarios (only \lambda_theta is changed to extreme values). Added short
+description.
 
 >  6) LL170-172: the sentence is confusing, as the "default" choice is not clear. From the previous text, it appears that you use EvtGen as the default choice. Also, why the systematic uncertainty evaluated for e+e- production applies to the pp production, where the ratio of prompt and non-prompt mesons is very different?
  
 The Babar measurement is for 100% non-prompt events, since the 
 reconstruction of a B-meson is required in their analysis. And this is 
-in fact used only for the non-prompt component. We will clarify this in 
-the paper. 
+in fact used only for the non-prompt component.
 
 > 7) LL262 and 269: why do you use different J/psi sidebands for the two fitting methods? They are different only by 50 MeV, so what's the point of not making them the same. This is particularly true given that you assign systematics on the sidebands method using twice as big variation of 100 MeV - sounds like the 50 MeV difference is in the noise and should not be there to start with.
 
-They are the same. Typo.
+They are the same. Typo. First one removed now.
 
   8) L386: what is meant here by "b-fractions" (should be b fractions, with no hyphen!)? This sounds too close to "branching fractions", so please rephrase more clearly.
 
@@ -61,7 +59,11 @@ b-fractions = non-prompt fractions. We will use this second notation.
  
 > STYLE COMMENTS:
 > 
-> 0) General: the paper uses mixed notations for various MC codes. The CMS Style calls for typesetting them all in small caps, i.e. {\sc EvtGen}, {\sc Pythia}, etc. When citing a particular reference, the construct "in [xx]" is grammatically incomplete; please use "in Ref. [xx]" instead - there are really many places, where this change is needed, so please use context search-and-replace to fix those. The paper mixes "branching ratio" and "branching fraction" notations; please use the latter as the proper term (also used in majority of our other publications). You mix "B hadron", "b hadron", and "b-hadron" through the paper. Please, decide whether you want to capitalize the B or not. Also, since you do not hyphenate other compounds containing particle names, you should not hyphenate "b hadron". Finally, it would be logical if you pick "b hadron" to call the prompt decay fraction fb, not fB.
+> 0) General: the paper uses mixed notations for various MC codes. The CMS Style calls for typesetting them all in small caps, i.e. {\sc EvtGen}, {\sc Pythia}, etc. 
+
+Changed.
+
+When citing a particular reference, the construct "in [xx]" is grammatically incomplete; please use "in Ref. [xx]" instead - there are really many places, where this change is needed, so please use context search-and-replace to fix those. The paper mixes "branching ratio" and "branching fraction" notations; please use the latter as the proper term (also used in majority of our other publications). You mix "B hadron", "b hadron", and "b-hadron" through the paper. Please, decide whether you want to capitalize the B or not. Also, since you do not hyphenate other compounds containing particle names, you should not hyphenate "b hadron". Finally, it would be logical if you pick "b hadron" to call the prompt decay fraction fb, not fB.
 
 hyphen kept when "b-hadron" is an attribute, as in "b-hadron decays"
 
@@ -71,6 +73,7 @@ hyphen kept when "b-hadron" is an attribute, as in "b-hadron decays"
 Sentence break kept. "sample" added.
 
 > L6: null -> zero; 
+
 this did not trouble other reviewers, kept.
 
 > L8: between -> for.
@@ -95,12 +98,11 @@ we keep the hyphen when it is an attribute. Probably here it is not, strictly sp
 
 >next line: begs a citation for the helicity and Collins-Soper frames;
 
-the definitions are given in the reference.
-
+The definitions are complex and given in the reference.
 
 > L163: in Section 7; L164: {\sc Pythia}; L168: Eq. (1); L171: in Ref. [6]; L173: in Ref. [4]; L180: in Refs. [21,22]; L181: independent sets of TRIGGERS are used (trigger stream is jargon!); L183: add a comma before "which"
 
-"which" does not ALWAYS need to be preceded by a comma; actually sometimes the comma is wrong.
+"which" does not always need to be preceded by a comma; actually sometimes the comma is wrong.
 
 >; next line: measured IN; Eq. (4): end with a comma; LL184-185: muon identification EFFICIENCY for a; L186: reconstructed muons PASSING THE MUON ID CRITERIA; L187: also PASSED the trigger; L188: both WITH THE LHC and simulated data; L190: add a comma before "which"; Eq.(5): move the period at the end closer to the \eps_vertex; L195: do not start a new paragraph here; \rho-factor; delete (defined by Eq. 5" as you are explaining variables in that very equation in this whole paragraph. 
 
@@ -115,15 +117,11 @@ many different suggestions here... the form (y,pt), that had been used elsewhere
 
 > Eq. (6): end with a comma; LL201-202: the clause "using the "fine-grained" bins of the acceptance" is completely useless, as it doesn't explain at all what's meant by the fine-grained, which is mysteriously put in quotation marks - delete it, as it doesn't provide any information. 
 
-The acceptance and the efficiency have been computed in bins of much smaller size than those used for the cross(-)section determination, and this is stated at the beginning of the section.
-We think it *is* relevant to recall this, for equation (6) would otherwise make 
-no sense at all. 
- 
-
-
->L204: cross section estimates; 
-
-attribute or not? hyphen removed, but not so sure anymore.
+The acceptance and the efficiency have been computed in bins of much smaller 
+size than those used for the cross(-)section determination, to minimize 
+spectrum-shape effects and this is stated at the beginning of the section.
+We think it is relevant to recall this, for equation (6) would otherwise make 
+no sense at all (no averaging is needed). 
 
 >L206: errors -> uncertainties;
 
@@ -133,7 +131,7 @@ it's just to avoid repetition...
 > 
 > 6) Prompt and non-prompt ..., LL229,232: in Ref. [4]; L235: "per-event UNCERTAINTY"; L237: standard deviation -> r.m.s.; L239: parametrizes THE EFFECT OF; Eq. (8): add \cdot's between the D and F terms; L243: in Section 4; L248: b-hadron decays; L250: in Ref. [4]; L254: per-event UNCERTAINTY; LL255-256: from the signal region IN INVARIANT MASS after ... from the sideband regions, respectively; L257: decay-length; L258: per-event UNCERTAINTY; L260: CONVOLUTED;
 
-convolved vs convoluted is apparently debated and debatable.
+"convolved" vs "convoluted" is apparently debated.
 (over 135000 google occurrences for "convolved with a Gaussian", as opposed to 47000 occurrences for "convoluted with a Gaussian")
 
 > L262: The sideband region IN INVARIANT MASS is defined; L268: The sideband region IN INVARIANT MASS for the; L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S);
@@ -151,18 +149,18 @@ would change the logical meaning of the sentence.
 
 > L277: this -> misaligned; L279: THE b-hadron lifetime; L280: in Ref. [4]; L284: end with a colon; 
 
-We have been accused of loving colons too much!
+Opposite comment by other reviewers.
 
 >L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
 > 
 > 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES;
 
-it's repeated too many times. Everyone knows that "errors" is not strictly correct, but we think it can be used as as synonym when there is no ambiguity and when it can avoid ugly repetitions.
+It's repeated too many times. Everyone knows that "errors" is not strictly correct, but we think it can be used as as synonym when there is no ambiguity and when it can avoid ugly repetitions.
 
 
 > L317: add a citation to the fit determination from the Tevatron data; L318: theoretical UNCERTAINTIES include THE CHOICE OF THE renormalization and factorization SCALES; quark MASSES; 
 
-plurals corrected. "Errors" kept for the reasons stated above.
+Plurals corrected. "Errors" kept for the reasons stated above.
 
 >L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
 > 
@@ -172,4 +170,5 @@ plurals corrected. "Errors" kept for the reasons stated above.
 > 
 > 10) References, Ref. [7]: JINST {\bf 03} ...; Ref. [9]: JHEP {\bf 05}; Ref. [14]: JINST {\bf 05}; Ref. [18]: add a doi reference; Ref. [25]: JHEP {\bf 05}; Ref. [26]: JHEP {\bf03}; Ref. [28]: when this is supposed to be submitted?
 
-*vedere*
+The authors are going to give the arXiv number very soon (2 days or so).
+All the rest is done by BibTeX...

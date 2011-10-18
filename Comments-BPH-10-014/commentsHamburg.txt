@@ -36,14 +36,14 @@ Replace by "isotropic".
 
 > - "the inclusive ¡Ä is then extracted from the non-prompt ratio" -> improve english
 
-Removed "then".
+Removed "then" and changed.
 
 > 1 Introduction
 > -------------------
 > - The physics relevance of the paper in view of the non-relativistic QCD and the ideas of the measurement should be stated more clearly in the introduction
 
-We added more details on NRQCD models as well as the FONLL model for bbbar
-production.
+We added a few more details on NRQCD models as well as the FONLL model for 
+bbbar production.
 
 > - The issue of color octet vs. color singlet production should be discussed here (not in l.69).
 
@@ -76,7 +76,7 @@ Ok.
 > 84-87: Needs to be rephrased.
 > 78-79: "Muons as reconstructed by two different measurements are merged": What does it mean?
 
-These two paragraphs have been merged and rewritten.
+These two paragraphs have been merged and shortined a lot.
 
 >  Please verify the luminosity error
 
@@ -91,9 +91,9 @@ type-B dimuons only), the systematics are determined for that sample only.
 
   83ff: Can you give a typical muon momentum range?
 
-Since there is no momentum cut on the muons, we cannot add it here, but we
-can speicfy it in line 188, giving the minimum and maximum ranges of the 
-pT_mu bins. 
+Since there is no momentum cut on the muons, except the acceptance cuts, 
+we cannot add it here, but we can speicfy it in line 188, giving the minimum 
+and maximum ranges of the pT_mu bins. 
 
 > 90: The two muon trajectories are fitted with a common vertex constraint, ¡Ä -> What is done exactly?
 
@@ -108,7 +108,8 @@ details here.
 > 95: How close is "too close in space"?
 
 No fixed amount (they are requirements at the hardware level): this is 
-explained by the sentence line 94: "whose specific criteria depend on the type of muon chamber and the region of the detector" 
+explained by the sentence line 94: "whose specific criteria depend on the 
+type of muon chamber and the region of the detector" 
 > 
 > 4 Inclusive yield determination
 > -----------------------------------------
@@ -140,7 +141,7 @@ Yes, they are.
 
 >  Eq. (1) To which properties refer p_t and y, e.g. generator or detector level?
 
-Generator level (hence the "pT calibration" systematics. It will be added (*).
+Generator level (hence the "pT calibration" systematics). It will be added (*).
 
 > Eq. (2) could be replaced by an explaining sentence.
 
@@ -153,11 +154,12 @@ But explained in Ref. [19].
 
 > Are the lambdas independent?
 
-Yes.
+Yes. Added.
 
 > 169-170: What is the size of the difference between the acceptance of prompt and non-prompt mesons?
 
-After doing a proper polarization hypothesis for the two, it is zero. 
+You may see it in the AN (alpha_HX = 0 vs. alpha_HX ~ -0.4, corresponding
+to 5-10%). 
 Acceptance depends only on the detectability in the muon chambers, and prompt
 and non-prompt events are indistinguible, except for a small difference in
 the vertex (not seen by the muon chambers).
@@ -168,7 +170,7 @@ After addition (*) this should become clearer.
 
 > 189ff: english: The muon identification¡Ä.
 
-Removed "the".
+Not understood.
 
 > 189-204: rho has to be explained more clearly. What is the typical size of the epsilons and rho?
 
@@ -188,13 +190,14 @@ Yes. epsilon_k changed to epsilon(mumu)_k to be consistent with Eq. 5.
 
 > How does this depend on what was previously discussed?
 
-We don't understand the question.
+We don't understand the question. Symbols are the same (A is acceptance, 
+epsilon is the total efficiency in Eq. 5.)
 
 > - Can you provide distributions of A_k epsilon_k (not for the paper)? If the values are small, the use of the method is doubtful
 
 Tables 2-3 of the AN give these numbers. Provided that the errors are computed
 properly, this method works for any <A x e>. In general we removed bins
-with too small <A x e> (< 1%), as it happened for pT=5.5-6.5 in
+with too small <A x e> (< 1%), as it happened e.g. for pT=5.5-6.5 in
 y=1.2-1.6 and y=1.6-2.1.
 
 > - How is A_k epsilon_k for an individual event obtained? How do the equations depend on pT_mu1, pT_mu_2, y_mu1, y_mu2?
@@ -214,7 +217,8 @@ Ok.
 
 >  Figure 2: Unify text sizes. The parenthesis in the caption should be discussed in the text. Use consistent abbreviation for branching ratios.
 
-Done.
+Mostly done (where possible).  The parenthesis in the caption only refers to 
+the figure itself, so it will be left in the caption.
 
 > 216: What is the dependency of Ncorr? Please write variables in a consistent scheme, i.e. use J/Psi as subscript. 
 
@@ -237,7 +241,7 @@ It is already defined in 228-229 (and Ref. [4])
 
 > 234-240: On what is the convolution applied? Please rephrase.
 
-It si explained afterwards. Removed "A convolution to".
+It is explained afterwards. Removed "A convolution to".
 
 > 241-261: Is very hard to follow and in our opinion not necessary for the understanding of the result and the paper. We suggest to reduce this to a short discussion without formula.
 
@@ -246,12 +250,13 @@ Other reviewers approve the long formulation.
 > 262: Delete, because this is discussed in 269 and is inconsistent compared to 269.
 
 Disagree. They are two different types of fits.
+There was a typo in the first sideband values.
 
 >  Figure 3: Where does the decay length from the background originate from? (ref. line 250). Please discuss.
 
 It is mainly due to true muons from semileptonic B decays but generic MC
-is not accurate enough to estimate the fraction if this source. However it is 
-not essential since the shape is data-driven.
+is not accurate enough to estimate the fraction if this source. However this 
+is not essential since the shape is data-driven.
 
 > The mass sideband region as discussed in 269 should be added to the figure / caption.
 
@@ -270,7 +275,7 @@ depend on the non-prompt fraction.
 > 282: Is this estimation of the systematic error reasonable? In most cases multiple vertices will be sufficiently separated in z, so that a unique assignment should not be a problem. Maybe we are missing the point.
 > 289: variation in upper sideband region is unclear
 
-Improved
+Improved.
 
 > 311: Definition of indirect production?
 
@@ -287,19 +292,25 @@ Plots are now added.
 See above.
  
 > Figure 6: Why don't you include also the polarization uncertainties in the plot?
-> 
+
+Because the theory band we compare to is also assuming null polarization in
+the direct production.
+
   7 Results
 > -------------
   - Figure 4: The yellow line is hard to see in some printouts
 
 But since this is just to guide the eye (and stands anyway in between two
-blue lines) this is not so important.
+blue lines) this is not important.
 
   - Remove ref. to Sec. 7.4
 > - Clarify if the branching ratio determined in this paper is included in the theoretical model fit?
+
+Clearly no... This is the result of the fit.
+
 > - What is fitted to the theoretical model?
 
-The shape of the ratio vs. pT.
+Tha data normalization, keeping fixed the shape of the ratio vs. pT.
 
 > 357: Give current PDG BR
 > 
@@ -313,6 +324,4 @@ in fig. 5a.
 
 > 391: compare to 374; factor ~3 or 3.5 ?
 
-Changed all to 3.5 
-
-*controllare*
+Changed all to 3.
