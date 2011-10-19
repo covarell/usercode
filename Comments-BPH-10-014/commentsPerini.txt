@@ -668,29 +668,11 @@ OK
 
 > line 316: "feed-down contribution" might not be commonly known.
 
-I think it's accepted theoretical jargon *CONTROLLARE*
+The problem of feed-down for J/psi is widely explained in the Introduction.
 
 > line 316: color-octet -> colour-octet (BE)
 
 right! corrected
-
-> line 323: ... for the in ... --> ... for the (missing text) in ...
-
-corrected
-
->  ---
->  --- line 315: cross-section spectrum
-
-Not nice but OK.
-
-   --- line 316: "feed-down contribution" might not be commonly known.
-
-The problem of feed-down for J/psi is widely explained in the Introduction.
-
->  --- line 316: color-octet -> colour-octet (BE)
->  --- line 323: ... for the in ... --> ... for the (missing text) in ...
-
-Sentence changed.
 
 >  --- paragraph 325-328: In the beginning of the paper (22-28, 140) one gets 
 > an 
@@ -712,8 +694,6 @@ We will clarify it in the paper. Also all results are now presented as plots.
 > CMS ...
 
 changed
-<<<<<<< commentsPerini.txt
-
 
 > 
 >  line 329: Does this need to be a subchapter of its own if the values are 
@@ -722,7 +702,6 @@ it's been (slightly) lengthened...
 
 
 >  --- line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
->>>>>>> 1.7
 > p_T and rapidity, ...
 
 
@@ -736,10 +715,6 @@ changed
 
 rephrased.
 
-
->  --- line 344: "affects" -> "affect"
->  --- Lines 345-346: Not clear, please formulate better.
-
 > line 346: "leads to 12% to 20% variations in the measured prompt 
 > cross-section ratio" -> "changes the
 > measured prompt cross-section ratio by 12-20%".
@@ -752,25 +727,16 @@ done
 
 actually it's "a sum of many exclusive (decay) modes"
 
-
-=======
 >  ---
 
 Ok.
-
->  --- Lines 370-373: "some of many exclusive models"? Vague.
-
-
-Actually it's "sum of many exclusive modes"
-
-
 
 > Lines 374-375: Propose: "This is in agreement with the existing 
 > measurement (Ref?) , with the
 > uncertainty improved by a factor of 3.5."
 
 
-its been rephrased
+it's been rephrased
 
 
 > ·
@@ -785,9 +751,6 @@ DONE
 > · line 380: add space after "pt"
 ok
 
-> · line 381: "extracted" -> "computed"?
-> · line 382: To mitigate the effect of the effects ... --> To mitigate the 
->  --- line 380: add space after "pt"
 >  --- line 381: "extracted" -> "computed"?
 >  --- line 382: To mitigate the effect of the effects ... --> To mitigate the 
 
@@ -804,14 +767,6 @@ OK
 
 
 > Line 386: "compared to" -> "compared with"
-
-OK
-
-Done. 
-
-
-
->  --- Line 386: "compared to" -> "compared with"
 
 OK
 
