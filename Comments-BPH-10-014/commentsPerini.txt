@@ -227,15 +227,14 @@ removed
 >  ---
 >  --- line 53: add some details about HLT.
 
-We'll consider that.
-
+We added a reference
 
 > 3 Data selection and event reconstruction
 > line 58: You should maybe state already here, that this data set is not 
 > overlapping with the one used
 > for the first J/psi paper.
 
-Added.
+OK
 
 >  ---
 > line 58: the LHC averaged 2.2 pp collisions per bunch crossing at the CMS 
@@ -305,8 +304,12 @@ sound right to me, it should be "divided by the number of ..."
 > choose the primary vertex from
 > the vertices.
 
+
+it's the beam-spot centroid. Changed
+
 Moved the definition before.
-   ---
+
+  
 >  --- Line 89: Avoid repetition. Write simply " The mass is required to be..."
 
 done
@@ -318,7 +321,9 @@ done
 > Clarify.
 >  ---
 
+
 Moved "in the forward region" to the paragraph below.
+
 
 >  --- Line 95: "at the muon stations" -> "in the muon stations"
 
@@ -435,7 +440,7 @@ changed
 
 >  --- Line 151: "detectable" is a problematic word
 
-It did not trouble the other reviewers and I found it on major dictionaries 
+It did not trouble the other reviewers and it is found on major dictionaries 
 like 
 http://dictionary.cambridge.org/dictionary/british/detect
 
@@ -525,6 +530,7 @@ possible biases of the T&P method (included in the rho factor)
  With rho=1, eq(5) essentially expresses the dimuon detection efficiency 
 (excluding vertexing requests)  as the product of the single muon 
 efficiencies. As the text says, the rho factor is actually defined by eq. 5.
+Added "efficiency factorization".
 
 > lines 201-204 and eq. (6): define what is measured from real data and what 
 > is obtained from
@@ -642,15 +648,35 @@ done
 > of the two states is also
 > computed."
 
+
 Changed to what is actually done (multiply the two factors).
+
 
 > line 303: "Figures 4 and 5 show the measured .... cross-sections...". 
 > However, above (line 299) it says
-  that the cross-sections are "extracted" from the inclusive cross-sections 
+> that the cross-sections are "extracted" from the inclusive cross-sections 
 > and non-prompt fraction.
 > Clarify.
 
-See above.
+
+This extraction is ultimately a measurement, so we use the two terms as synonyms.
+
+>
+> line 315: cross-section spectrum
+
+OK
+
+> line 316: "feed-down contribution" might not be commonly known.
+
+I think it's accepted theoretical jargon *CONTROLLARE*
+
+> line 316: color-octet -> colour-octet (BE)
+
+right! corrected
+
+> line 323: ... for the in ... --> ... for the (missing text) in ...
+
+corrected
 
 >  ---
 >  --- line 315: cross-section spectrum
@@ -679,70 +705,130 @@ Sentence changed.
 > breakdown like tables 1 and 2 is
 > not shown anywhere.
 
-We will clarify it in the papper. Also all results are now presented as plots.
+We will clarify it in the paper. Also all results are now presented as plots.
 
 > line 326: values are also reported referred to the CMS ... --> ... values 
 > are also reported within the
 > CMS ...
 
 changed
->  ---
->  --- line 329: Does this need to be a subchapter of its own if the values are 
-> not given in this paper.
+<<<<<<< commentsPerini.txt
 
-See above.
+
+> 
+>  line 329: Does this need to be a subchapter of its own if the values are 
+
+it's been (slightly) lengthened...
+
 
 >  --- line 336: ... in bins of p_T and rapidity bins, ... --> ... in bins of 
+>>>>>>> 1.7
 > p_T and rapidity, ...
+
+
+changed
+
+> line 344: "affects" -> "affect"
+
+changed
+
+>  Lines 345-346: Not clear, please formulate better.
+
+rephrased.
+
+
 >  --- line 344: "affects" -> "affect"
 >  --- Lines 345-346: Not clear, please formulate better.
+
 > line 346: "leads to 12% to 20% variations in the measured prompt 
 > cross-section ratio" -> "changes the
 > measured prompt cross-section ratio by 12-20%".
+
+
+done
+
+
+>  Lines 370-373: "some of many exclusive models"? Vague.
+
+actually it's "a sum of many exclusive (decay) modes"
+
+
+=======
 >  ---
 
 Ok.
 
 >  --- Lines 370-373: "some of many exclusive models"? Vague.
 
-It's not "some", it is "sum".
+
+Actually it's "sum of many exclusive modes"
+
+
 
 > Lines 374-375: Propose: "This is in agreement with the existing 
 > measurement (Ref?) , with the
 > uncertainty improved by a factor of 3.5."
 
-Changed according to another suggestion (FNAL).
 
->  ---
->  --- line 357: ... the ratio expectation ... --> ... the predicted ratio ...
->  --- Line 357: delete "expectation", not needed.
+its been rephrased
 
-Ok
+
+> ·
+> · line 357: ... the ratio expectation ... --> ... the predicted ratio ...
+
+DONE
+
+
 
 > 8 Conclusions
+
+> · line 380: add space after "pt"
+ok
+
+> · line 381: "extracted" -> "computed"?
+> · line 382: To mitigate the effect of the effects ... --> To mitigate the 
 >  --- line 380: add space after "pt"
 >  --- line 381: "extracted" -> "computed"?
 >  --- line 382: To mitigate the effect of the effects ... --> To mitigate the 
+
 > effects ...
+
+
+changed
+> Line 383: "polarizations ...." -> "polarization, the measured cross section 
+> uncorrected for the CMS
+> detector acceptance is also given.
+
+
+OK
+
+
+> Line 386: "compared to" -> "compared with"
+
+OK
 
 Done. 
 
 
+
 >  --- Line 386: "compared to" -> "compared with"
+
+OK
+
 > Line 387: Terminate the sentence after ", respectively." and start a new 
 > sentence "A reasonable
   agreement is found , except ...."
->  ---
 
 Ok.
+
 
 > Line 388-389: Propose: "With selected hypotheses on polarization, the 
 > ratio of the differential cross
 > sections of the two states is computed, leading to a reduced uncertainty 
-  as the systematic errors cancel
+> as the systematic errors cancel
 > largely.
 
-Taken your suggestion.
+suggestion taken.
 
 >  ---
 >  --- Line 390: "non-prompt ratio" -> "ratio of the non-prompt cross sections"
@@ -761,6 +847,7 @@ Ok.
 >  --- line 428: curious accents on I and A?
 
 Don't know. Copy-pasted from another paper... they look strange to us as well.
+Changed.
 
 > References
 >  --- ref. 27: date of citation of a web page should be mentioned
