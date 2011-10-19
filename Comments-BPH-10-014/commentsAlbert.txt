@@ -29,7 +29,7 @@ We have expanded on both subjects in the paper.
 > discovers that only by line 320. I suggest to mention that we did that study upfront
 > also in the introduction. 
 
-The discussion on the acceptance/polarization is indeed a bit split up, as
+The discussion on the acceptance/polarization was indeed a bit split up, as
 noticed also by other reviewers. We have improved on that.
   
 > We compare with models like NRQCD and FONLL: I believe for self-consistency of the
@@ -66,7 +66,7 @@ theory errors.
 >      (as you specify the limited detector information available to the L1)
 
 Ok. A sentence about "advanced processing at HLT" has been added. Some details
-are give, which should make clear that full detector information is 
+are given, which should make clear that full detector information is 
 available at that stage.
 
 > line 69: The sentence "color octet states undergo a shower evolution" does not really tell much

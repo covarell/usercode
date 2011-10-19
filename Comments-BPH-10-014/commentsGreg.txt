@@ -47,11 +47,11 @@ description.
  
 The Babar measurement is for 100% non-prompt events, since the 
 reconstruction of a B-meson is required in their analysis. And this is 
-in fact used only for the non-prompt component.
+in fact used only for the non-prompt component. Explanation improved.
 
 > 7) LL262 and 269: why do you use different J/psi sidebands for the two fitting methods? They are different only by 50 MeV, so what's the point of not making them the same. This is particularly true given that you assign systematics on the sidebands method using twice as big variation of 100 MeV - sounds like the 50 MeV difference is in the noise and should not be there to start with.
 
-They are the same. Typo. First one removed now.
+They are the same. Typo. Second one removed now.
 
   8) L386: what is meant here by "b-fractions" (should be b fractions, with no hyphen!)? This sounds too close to "branching fractions", so please rephrase more clearly.
 
@@ -59,11 +59,7 @@ b-fractions = non-prompt fractions. We will use this second notation.
  
 > STYLE COMMENTS:
 > 
-> 0) General: the paper uses mixed notations for various MC codes. The CMS Style calls for typesetting them all in small caps, i.e. {\sc EvtGen}, {\sc Pythia}, etc. 
-
-Changed.
-
-When citing a particular reference, the construct "in [xx]" is grammatically incomplete; please use "in Ref. [xx]" instead - there are really many places, where this change is needed, so please use context search-and-replace to fix those. The paper mixes "branching ratio" and "branching fraction" notations; please use the latter as the proper term (also used in majority of our other publications). You mix "B hadron", "b hadron", and "b-hadron" through the paper. Please, decide whether you want to capitalize the B or not. Also, since you do not hyphenate other compounds containing particle names, you should not hyphenate "b hadron". Finally, it would be logical if you pick "b hadron" to call the prompt decay fraction fb, not fB.
+> Also, since you do not hyphenate other compounds containing particle names, you should not hyphenate "b hadron". Finally, it would be logical if you pick "b hadron" to call the prompt decay fraction fb, not fB.
 
 hyphen kept when "b-hadron" is an attribute, as in "b-hadron decays"
 
@@ -81,13 +77,7 @@ this did not trouble other reviewers, kept.
 changed to "ratio between the differential cross sections for the two states"
 
 > 
-> 2) Introduction, L6: COLLISIONS; L7: "On the other hand" here doesn't make sense, as you are saying that psi(2S) can ALSO be produced via the same two mechanisms, as J/psi - please rephrase with "Similarly" or something of that kind. L8: suggest using ’¦Öc instead of cryptic ’¦ÖcJ",whichisnotexplained.L16:first’¡Ý>early;L19:\phi(2S)/(J/\psi)$ (put J/psi in parentheses, as otherwise two slashes are confusing. L26: of the Compact Muon Solenoid (CMS).
-> 
-> 3) Data selection ..., L58i: the Large Hadron Collider (LHC); L61: by dimuon triggers; L63: fire (jargon) a L1 muon signal -> pass a L1 muon trigger requirement; to be -> be; L64: to be -> be; L68: {\sc Pythia}; L72: add a comma before the second "and"; L75: {\sc EvtGen}; L76: {\sc PHOTOS}; L80: pseudorapidity; L84: "muon tracker tracks" sounds awkward as it may mean tracks in the muon tracker; rephrase as "The tracker tracks matching muon candidates; L93: dimuon; L95: which -> that (or precede with a comma); L96: double muon -> dimuon; being faked -> originated; L109: which -> that (or precede with a comma); L114: ratios -> fractions; L116: cross section (no hyphen).
-> 
-> 4) Inclusive yield ..., L121: used for THE DESCRIPTION OF the; L123: Figure 1 (left); L131: Figure 1 (right).
-> 
-> 5) Acceptance and Efficiency, L139: "efficiency" should not be capitalized to match other section titles; L147: kinematic reach; L156: to separately PASS L1 single-muon TRIGGER. 
+> L156: to separately PASS L1 single-muon TRIGGER. 
 
 "fire" changed to PASS
 
@@ -100,15 +90,14 @@ we keep the hyphen when it is an attribute. Probably here it is not, strictly sp
 
 The definitions are complex and given in the reference.
 
-> L163: in Section 7; L164: {\sc Pythia}; L168: Eq. (1); L171: in Ref. [6]; L173: in Ref. [4]; L180: in Refs. [21,22]; L181: independent sets of TRIGGERS are used (trigger stream is jargon!); L183: add a comma before "which"
+> L183: add a comma before "which"
 
 "which" does not always need to be preceded by a comma; actually sometimes the comma is wrong.
 
->; next line: measured IN; Eq. (4): end with a comma; LL184-185: muon identification EFFICIENCY for a; L186: reconstructed muons PASSING THE MUON ID CRITERIA; L187: also PASSED the trigger; L188: both WITH THE LHC and simulated data; L190: add a comma before "which"; Eq.(5): move the period at the end closer to the \eps_vertex; L195: do not start a new paragraph here; \rho-factor; delete (defined by Eq. 5" as you are explaining variables in that very equation in this whole paragraph. 
+>;  \rho-factor; delete (defined by Eq. 5" as you are explaining variables in that very equation in this whole paragraph. 
 
 We have been asked to explain what "factorization" means, so we still feel we have to point out that rho is defined by the equation.
-
->L199: add a comma before "which"; 
+ 
 
 > rapidity-; L200: pT-bin;
 
@@ -121,39 +110,32 @@ The acceptance and the efficiency have been computed in bins of much smaller
 size than those used for the cross(-)section determination, to minimize 
 spectrum-shape effects and this is stated at the beginning of the section.
 We think it is relevant to recall this, for equation (6) would otherwise make 
-no sense at all (no averaging is needed). 
+no sense at all (no averaging would be needed). 
 
 >L206: errors -> uncertainties;
 
 it's just to avoid repetition...
 
-> L208: toy -> pseudo-; L217: transverse-momentum-rapidity; L218: pT and y bins; ratio -> fraction; Fig. 2 caption, L3: cross section; Section 7; change a short dash after "factors" with an em-dash; L4: change a short dash to an emdash.
-> 
-> 6) Prompt and non-prompt ..., LL229,232: in Ref. [4]; L235: "per-event UNCERTAINTY"; L237: standard deviation -> r.m.s.; L239: parametrizes THE EFFECT OF; Eq. (8): add \cdot's between the D and F terms; L243: in Section 4; L248: b-hadron decays; L250: in Ref. [4]; L254: per-event UNCERTAINTY; LL255-256: from the signal region IN INVARIANT MASS after ... from the sideband regions, respectively; L257: decay-length; L258: per-event UNCERTAINTY; L260: CONVOLUTED;
+>  L260: CONVOLUTED;
 
 "convolved" vs "convoluted" is apparently debated.
 (over 135000 google occurrences for "convolved with a Gaussian", as opposed to 47000 occurrences for "convoluted with a Gaussian")
 
-> L262: The sideband region IN INVARIANT MASS is defined; L268: The sideband region IN INVARIANT MASS for the; L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S);
+>  L271: Shows TWO REPRESENTATIVE FITS TO THE J/\psi and \psi(2S);
 
 changed according to FNAL's suggestion
 
-> L272: in Ref. [4]; Fig. 3 caption, LL1,3: no colon after "bin:"; LL273,274: Tracker -> tracker; 
 
-
->L275: add a comma before "which";
 > L276: in Ref. [4] and add a comma after [4];
 
 this is one of the cases where the commas would be wrong since the 
 would change the logical meaning of the sentence.
 
-> L277: this -> misaligned; L279: THE b-hadron lifetime; L280: in Ref. [4]; L284: end with a colon; 
+> L284: end with a colon; 
 
 Opposite comment by other reviewers.
 
->L285: dimuon vertex; L286: as A systematics UNCERTAINTY; L291: using A SINGLE Gaussian SHAPE. L297: as A systematic.
-> 
-> 7) Results, L305: for the prompt AND FONLL [25,26] for the non-prompt CASES. Also, FONLL (fixed-order NLL?) has never been defined - please do. L311: indirect -> non-prompt; L315: DIFFERENTIAL cross sections seem to fall; L316: theoretical UNCERTAINTIES;
+> L316: theoretical UNCERTAINTIES;
 
 It's repeated too many times. Everyone knows that "errors" is not strictly correct, but we think it can be used as as synonym when there is no ambiguity and when it can avoid ugly repetitions.
 
@@ -162,11 +144,6 @@ It's repeated too many times. Everyone knows that "errors" is not strictly corre
 
 Plurals corrected. "Errors" kept for the reasons stated above.
 
->L319: DENSITY functions; L324: in Ref. [27]; L326: reported WITHIN the CMS; LL328,331: in Ref. [27]; Fig. 4 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Fig. 5 caption, L2: yellow- and blue-coloured; L3: calculations; the lines; Eq. (10): end with a comma; L336: delete the second occurrence of "bins"; L338: entering Eq. (10); L340: and single-muon efficiency THAT CANCEL OUT IN THE RATIO. L353: total result -> full phase space; Fig. 6 caption, L4: Section 7.4; L358: add a comma before "and"; L365: branching FRACTIONS.
-> 
-> 8) Conclusions, L378: The data SAMPLE CORRESPONDS to; L382: four OTHER polarization; L383: referred to -> within; L385: cross sections; L391: factor OF ‘¡Ö3.
-> 
-> 9) Acknowledgements: increase the font size for the section title.
 > 
 > 10) References, Ref. [7]: JINST {\bf 03} ...; Ref. [9]: JHEP {\bf 05}; Ref. [14]: JINST {\bf 05}; Ref. [18]: add a doi reference; Ref. [25]: JHEP {\bf 05}; Ref. [26]: JHEP {\bf03}; Ref. [28]: when this is supposed to be submitted?
 

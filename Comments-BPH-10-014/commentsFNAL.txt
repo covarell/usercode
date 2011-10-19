@@ -1,3 +1,6 @@
+Thanks for your careful reading.
+Some style/grammar comments are accepted without commenting on them.
+
 > ***General observations***
 > 
 > The analysis appears thorough, and the techniques and results are well communicated in the draft paper.
@@ -352,7 +355,7 @@ already changed
 > o lines 38-40: I am not sure you need the detailed explanations on the (pseudo)rapidity definitions in a public document.
 >
 
-But before you say: " The paper mixes references to rapidity and 
+But before you say: "The paper mixes references to rapidity and 
 pseudorapidity, which is okay, but in some cases I wondered whether they meant
 the other variable." So we think that explanations are really needed...
 
@@ -558,7 +561,7 @@ Proposed change: "(as measured in [])" --> "(corrected to match the experimental
 > 
 > o line 181: "streams" -> is this CMS jargon?
 
-nobody else complained
+nobody else complained, but we changed to "sets of triggers".
 
 > 
   Line 188: suggest replacing "both on real and simulated data" with "and checked using simulated data"
@@ -767,7 +770,7 @@ line added
 > Figs 4, 5] yellow and blue ... don't we have a rule that all plots should be comprehensible 
 > in black and white? In which case they should be shaded differently.
 
-We do changed to yellow and blue (shaded)
+We do changed to "yellow and blue (shaded)"
 
 
 > Figs 4,5] Lumi. and polariz.   is ugly and unnecessary. There is room for Luminosity and polarization to be spelled out, however that can be

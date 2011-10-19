@@ -1,4 +1,5 @@
 Thanks for your careful reading.
+Some style/grammar comments are accepted without commenting on them.
 
 > Gives the general impression that the paper does not deliver what is 
 > promised in the introduction: i.e.
@@ -43,12 +44,7 @@ positive or all negative pulls).
 This is already checked. "Cross section" is used as a standalone noun,
 "cross-section" when it is an attribute.
 
->  --- Sections 3-7: Use past tense for describing what was done.
 
-Mostly done.
-
->  --- Replace 'we' with passive.
->  --- Replace 'using' with 'with'.
 > Sections 4-7: State clearly which quantities are derived from simulation 
 > and what are measured from
 > real data.
@@ -195,8 +191,6 @@ corrected
 removed
 
 
->  ---
->  --- line 37: "measured upwards from..."
 > line 38-39: Is it really necessary to define the pseudorapidity and 
 > rapidity? We suggest to either
   dropping them, or replacing them with a reference. The sentence "which the 
@@ -311,7 +305,7 @@ sound right to me, it should be "divided by the number of ..."
 > choose the primary vertex from
 > the vertices.
 
-Moved the definition.
+Moved the definition before.
    ---
 >  --- Line 89: Avoid repetition. Write simply " The mass is required to be..."
 
@@ -398,14 +392,6 @@ broad rapidity range. Added "rapidity-dependent".
 >  --- Line 123: "describes" -> "is used to describe"
 
 OK
-
->  --- Line 125: " In the second kind of fits" -> "In the second case.."
->  --- line 127: corrisponding --> corresponding
-
-typo
-
->  --- line 128: corresponding again (repetition)
-changed
 
 >  --- line 130: Motivate the use of two exponentials instead of just one for 
 > the background fit.
@@ -565,7 +551,7 @@ Section 6.
 
 Yes, it is. It became Section 6.
 
-> line 219: Wasn't the N_corr (J/Psi) already defined on the line 216? 
+
 > Repetition. "as the fit yields" -> "from the fitted yield values"
 
 true. This has been rephrased.
@@ -592,17 +578,17 @@ There will be an outline of the section contents at the end of the
 introduction.
 
 
->  ---
->  --- Line 235: Terminate the sentence after ""per event error" and start a 
-> new sentence.
 >  --- line 238 and 257: resolution Gaussian(s), Gaussian(s) resolution?
+
+No, we use it as the r.m.s. of the Gaussian, not of the resolution.
+
 >  --- line 259: What is "the track uncertainty"?
 
 Changed to "the uncertainty on track parameters".
 
 >  --- line 260: convolved --> convoluted
 
-some sources prefer convolve to convolute
+Several sources prefer convolve to convolute
 (see for instance http://en.wiktionary.org/wiki/convolve )
 
 >  --- Line 262: ""sideband region is" -> "sideband regions are"

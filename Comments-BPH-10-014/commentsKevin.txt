@@ -264,10 +264,6 @@ acceptance (and so the pT/y measurements) are detailed in the corresponding
 section.
 
 
-> L115: "smaller than the J/psi one." to "smaller than the J/psi yield."
-> 
-
-
 > L121-133: In the second kind of fits, it is never specified what signal function is used.  Is it
 > the same as in first kind of fits.  If so, then L121 should be moved to the previous paragraph and
 > should read "In both fits, the signal function is the sum of a Gaussian and a Crystal Ball function,
@@ -286,7 +282,7 @@ Ok.
 > 
 > L121: Is it really a "sum of a Gaussian and a Crystal Ball function"?  Or is it a convolution?
 
- It is a sum.
+It is a sum.
 
 > 
 > L122: "within a single bin." is ambiguous as I don't know what bin is being referred to.  I would remove it.
@@ -309,8 +305,8 @@ Removed and the sentence was changed.
 > "forward region".
   
  It seems clear to us that it refers to the absolute value of the rapidity. 
-Technically one 
-could also object that "forward" is misleading, since it includes what one would call "backward".
+Technically one could also object that "forward" is misleading, since it 
+includes what one would call "backward".
 
 
 > Figure 1: The pull plots do not seem to add much information, especially since we do not know if
@@ -342,7 +338,7 @@ All done.
 > L140-145: This should be rewritten in terms of the default analysis and extra information without
 > the acceptance correction, not in terms of two distinct analyses.
 
-Paragraph rewritten, but not following your suggestion.
+Paragraph rewritten, not exactly following your suggestion.
 
 > 
 > Eq 1, L153-154: Lambda_theta needs to be defined. 
@@ -369,14 +365,14 @@ nonzero (while lambda_phi is still null).
 > Eq 3: Doesn't the dependence on lambda_phi mean that lambda_phi should be in Eq. 1?  Is lambda_phi
 > varied?
 
- In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in 
+In principle lambda_phi should appear in eq. 1 too. Lambda_phi appears in 
 the general formula, but is null in the four extreme polarization cases we 
 actually considered. So in practice it is not varied. 
 Note that these parameters refer to a particular frame, so technically the 
 acceptance depends on yet another index, specifying which frame is being 
 considered. This would have made eq.1 too  heavily detailed for its 
 illustrative purpose, so we kept the lambda_theta as a mere reminder of the 
-polarization dependence.
+polarization dependence. [FP]
 
 > 
 > L162-165: Need to make clear why different generated spectra can lead to different acceptance.  Perhaps
@@ -404,9 +400,6 @@ correlated between the bins to give the average alpha. Anyway the total
 uncertainty should be smaller than the one considered here.
 
 > Since the measurement comes from e+e-, it does not include B_s or Lambda_b decays.
-
-You mean, since the measurement came from Y(4S)...
-
 > Is there reason to expect that the inclusive result from BaBar doesn't change with the addition of
 > B_s or Lambda_b decays?  
 
@@ -416,6 +409,7 @@ Only the fact that f_u, f_d >> f_s, f_baryon and the fact that EvtGen
 > Does this also require Pythia to get the prompt to non-prompt fraction correct?
 > If so, does it?  I don't see comparisons to Pythia in the paper to check this.
 No, the acceptance are mixed based on the measured non-prompt fractions.
+(Actually the two acceptances are determined separately and summed after).
 
 > 
 > L173-179: This section starts with transverse momenta and then just talks about momentum.  So does this
@@ -486,10 +480,10 @@ suggest that the factorization hypothesis is the bias the previous sentence refe
 > like an important systematic check.
 > 
 
- We tried this for the old Jpsi paper. The difference is that with this 
+We tried this for the old Jpsi paper. The difference is that with this 
 alternative method one relies on the MC spectrum inside a bin. We are 
 convinced that the method we used correctly includes the "bias to higher 
-efficiency*acceptance" in the statistical error. 
+efficiency*acceptance" in the statistical error. [FP]
 
 
 > L205-214: A central claim of the paper is that the polarization only affects the acceptance.  For
@@ -502,7 +496,7 @@ efficiency*acceptance" in the statistical error.
 > acceptance.
 > 
 
-We only have FullSim samples with null and EvtGen polarization and we did not
+We only have FullSim samples with null or EvtGen polarization and we did not
 find any difference in rho using one or the other. This ensures that rho 
 (evaluated only on muons passing acceptance cuts, obviously) does not
 depend on the polarization. 
@@ -521,7 +515,8 @@ depend on the polarization.
 > they include systematic uncertainties, which ones are included?
 > 
 
- The text says the results are "fully corrected", I think that the null polarization is understood. 
+ The text says the results are "fully corrected", I think that the 
+null polarization is understood. 
 
  all systematic errors are included except lumi. Specified in the caption.
 
@@ -636,7 +631,7 @@ It is now done in the introduction.
   
 The total cross-section estimates indeed include errors on the J/psi, psi' BRs
 for the prompt and additionally the B -> J/psi, psi' BRs in the 
-non-prompt. In the last case, this is a sizable contribution so it must be
+non-prompt. In the last case, this is a sizeable contribution so it must be
 added to the text. Thanks for spotting this.
 
 > L321: I don't think it is unreasonable to quickly say what the extreme scenarios are.  How about:
