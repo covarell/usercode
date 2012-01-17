@@ -128,7 +128,7 @@ void fitAccPars() {
     *of[i] << "para2 = " << myfunc2->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 5; j++) {
-    *allParams << "para2_" << j << " " << myfunc2->GetParameter(j+2) << "\n";
+    *allParams << "para2 " << j << " " << myfunc2->GetParameter(j+2) << "\n";
   }
 
   cosThetaStar.cd(2);
@@ -144,7 +144,7 @@ void fitAccPars() {
     *of[i] << "para4 = " << myfunc2->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 5; j++) {
-    *allParams << "para4_" << j << " " << myfunc2->GetParameter(j+2) << "\n";
+    *allParams << "para4 " << j << " " << myfunc2->GetParameter(j+2) << "\n";
   }
 
   cosThetaStar.cd(3);
@@ -160,7 +160,7 @@ void fitAccPars() {
     *of[i] << "para6 = " << myfunc1->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 2; j++) {
-    *allParams << "para6_" << j << " " << myfunc1->GetParameter(j+1) << "\n";
+    *allParams << "para6 " << j << " " << myfunc1->GetParameter(j+1) << "\n";
   }
  
   cosThetaStar.cd(4);
@@ -194,7 +194,7 @@ void fitAccPars() {
     *of[i] << "b2 = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "b2_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "b2 " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta1.cd(2);
@@ -210,7 +210,7 @@ void fitAccPars() {
     *of[i] << "b4 = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "b4_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "b4 " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta1.SaveAs("fitPar_cosTheta1.ps");
@@ -231,7 +231,7 @@ void fitAccPars() {
     *of[i] << "a2 = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "a2_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "a2 " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta2.cd(2);
@@ -247,7 +247,7 @@ void fitAccPars() {
     *of[i] << "a4 = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "a4_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "a4 " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta2.cd(3);
@@ -263,7 +263,7 @@ void fitAccPars() {
     *of[i] << "g = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "g_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "g " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta2.cd(4);
@@ -279,7 +279,7 @@ void fitAccPars() {
     *of[i] << "cutOff = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "cutOff_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "cutOff " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   cosTheta2.SaveAs("fitPar_cosTheta2.ps");
@@ -299,7 +299,7 @@ void fitAccPars() {
     *of[i] << "acca2 = " << mypol3->Eval(masspoints[i]) << " C \n";
   }
   for (unsigned int j = 0; j < 4; j++) {
-    *allParams << "acca2_" << j << " " << mypol3->GetParameter(j) << "\n";
+    *allParams << "acca2 " << j << " " << mypol3->GetParameter(j) << "\n";
   }
 
   phi1.SaveAs("fitPar_phi1.ps");
