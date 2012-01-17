@@ -95,6 +95,7 @@ int main(int argc, char* argv[]) {
   bool constrCostheta1 = false;
   bool constrCostheta2 = false;
   bool constrCosthetaStar = false;
+  bool onlyDraw = false;
 
   for(Int_t i=1;i<argc;i++){
     char *pchar = argv[i];
@@ -118,6 +119,11 @@ int main(int argc, char* argv[]) {
       case 'a':
 	minAcc = atof(argv[i+1]);
 	cout << "Minimum acceptance considered is " << minAcc << endl;
+	break;	
+
+      case 'o':
+	onlyDraw = true;
+	cout << "Only draw, no fit" << endl;
 	break;	
 
       case 'c':
@@ -278,7 +284,8 @@ int main(int argc, char* argv[]) {
   if (!constrCosthetaStar) thePars.add(*ws->var("para2"));
 
   char filein[200];
-  sprintf(filein,"acc_pars%d.txt",int(mass));
+  if (onlyDraw) sprintf(filein,"acc_parsEstim%d.txt",int(mass));
+  else sprintf(filein,"acc_pars%d.txt",int(mass));
   thePars.readFromFile(filein,0,"Acceptance");
 
   // para4.setVal(0.0);  para4.setConstant(kTRUE);
@@ -342,29 +349,45 @@ int main(int argc, char* argv[]) {
 		       *ws->var("b2"), *ws->var("b4"), one);  // N
 
   // MAXIMUM LIKELIHOOD FIT
-  cout << "***" << endl << "FITTING" << endl << "***" << endl;
-  fitf.fitTo(*dataNew,Minos(0),Hesse(0),SumW2Error(kTRUE),NumCPU(4),Save(1));
+  if (!onlyDraw) {
+    cout << "***" << endl << "FITTING" << endl << "***" << endl;
+    fitf.fitTo(*dataNew,Minos(0),Hesse(0),SumW2Error(kTRUE),NumCPU(4),Save(1));
+  }
 
+  char fileout[200];
   TCanvas c1("c1","c1",10,10,1200,800);
   c1.Divide(3,2);
 
   // DUMP FOR ROOT
-  char fileout[200];
-  cout << "***" << endl << "WRITING" << endl << "***" << endl;
-  sprintf(fileout,"acc_parsFinal%d.txt",int(mass));
-  ofstream of(fileout);
-  of << "para2 " << ws->var("para2")->getVal() << " " << ws->var("para2")->getError() << endl;
-  of << "para4 " << ws->var("para4")->getVal() << " " << ws->var("para4")->getError() << endl;
-  of << "para6 " << ws->var("para6")->getVal() << " " << ws->var("para6")->getError() << endl;
-  of << "para8 " << ws->var("para8")->getVal() << " " << ws->var("para8")->getError()  << endl;
-  of << "acca2 " << acca2.getVal() << " " << acca2.getError() << endl;
-  of << "a2 " << ws->var("a2")->getVal() << " " << ws->var("a2")->getError() << endl;
-  of << "cutOff " << ws->var("cutOff")->getVal() << " 0.01" << endl;
-  of << "g " << ws->var("g")->getVal() << " " << ws->var("g")->getError() << endl;
-  of << "a4 " << ws->var("a4")->getVal() << " " << ws->var("a4")->getError() << endl;
-  of << "b2 " << ws->var("b2")->getVal() << " " << 0.14*fabs(ws->var("b2")->getVal()) << endl;
-  of << "b4 " << ws->var("b4")->getVal() << " " << 0.06*fabs(ws->var("b4")->getVal()) << endl;
-  of.close();
+  if (!onlyDraw) {
+    
+    cout << "***" << endl << "WRITING" << endl << "***" << endl;
+    sprintf(fileout,"acc_parsFinal%d.txt",int(mass));
+    ofstream of(fileout);
+    /* of << "para2 " << ws->var("para2")->getVal() << " " << ws->var("para2")->getError() << endl;
+    of << "para4 " << ws->var("para4")->getVal() << " " << ws->var("para4")->getError() << endl;
+    of << "para6 " << ws->var("para6")->getVal() << " " << ws->var("para6")->getError() << endl;
+    of << "para8 " << ws->var("para8")->getVal() << " " << ws->var("para8")->getError()  << endl;
+    of << "acca2 " << acca2.getVal() << " " << acca2.getError() << endl;
+    of << "a2 " << ws->var("a2")->getVal() << " " << ws->var("a2")->getError() << endl;
+    of << "cutOff " << ws->var("cutOff")->getVal() << " 0.01" << endl;
+    of << "g " << ws->var("g")->getVal() << " " << ws->var("g")->getError() << endl;
+    of << "a4 " << ws->var("a4")->getVal() << " " << ws->var("a4")->getError() << endl;
+    of << "b2 " << ws->var("b2")->getVal() << " " << 0.14*fabs(ws->var("b2")->getVal()) << endl;
+    of << "b4 " << ws->var("b4")->getVal() << " " << 0.06*fabs(ws->var("b4")->getVal()) << endl; */
+    of << "para2 " << ws->var("para2")->getVal() << " " << 0.01*fabs(ws->var("para2")->getVal()) << endl;
+    of << "para4 " << ws->var("para4")->getVal() << " " << 0.01*fabs(ws->var("para4")->getVal()) << endl;
+    of << "para6 " << ws->var("para6")->getVal() << " " << 0.01*fabs(ws->var("para6")->getVal()) << endl;
+    // of << "para8 " << ws->var("para8")->getVal() << " " << 0.01*fabs(ws->var("para8")->getVal()) << endl;
+    of << "acca2 " << acca2.getVal() << " " << acca2.getError() << endl;
+    of << "a2 " << ws->var("a2")->getVal() << " " << 0.01*fabs(ws->var("a2")->getVal()) << endl;
+    of << "cutOff " << ws->var("cutOff")->getVal() << " 0.01" << endl;
+    of << "g " << ws->var("g")->getVal() << " " << ws->var("g")->getError() << endl;
+    of << "a4 " << ws->var("a4")->getVal() << " " << 0.01*fabs(ws->var("a4")->getVal()) << endl;
+    of << "b2 " << ws->var("b2")->getVal() << " " << 0.14*fabs(ws->var("b2")->getVal()) << endl;
+    of << "b4 " << ws->var("b4")->getVal() << " " << 0.06*fabs(ws->var("b4")->getVal()) << endl;
+    of.close();
+  }
 
   cout << "***" << endl << "PLOTTING" << endl << "***" << endl;
   c1.cd(1);
@@ -397,7 +420,8 @@ int main(int argc, char* argv[]) {
   fitf.plotOn(p1frame,Normalization(dataNew->sumEntries(),RooAbsReal::NumEvent),ProjWData(*dataNew));
   p1frame->Draw(); 
   
-  sprintf(fileout,"fitResult%d.ps",int(mass));
+  if (onlyDraw) sprintf(fileout,"fitCheck%d.ps",int(mass));
+  else sprintf(fileout,"fitResult%d.ps",int(mass));
   c1.SaveAs(fileout);
 
   return 1;

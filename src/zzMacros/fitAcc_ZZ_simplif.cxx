@@ -30,6 +30,7 @@
 #include "RooBinning.h"
 #include "RooAddPdf.h"
 #include "RooWorkspace.h"
+#include "RooRandom.h"
 
 #include "RooJetsPentaSpinTwo.h"
 #include "RooPentaSpinTwo.h"
@@ -199,6 +200,7 @@ int main(int argc, char* argv[]) {
 		       zero, zero, one);  // b2, b4, N
 
   cout << "***" << endl << "GENERATING" << endl << "***" << endl;
+  RooRandom::randomGenerator()->SetSeed(4.);
   RooDataSet *uncorr = fitf.generate(RooArgSet(*ws->var("cosTheta1"),
 					       *ws->var("cosTheta2"),
 					       *ws->var("Phi"),
@@ -308,7 +310,11 @@ int main(int argc, char* argv[]) {
   c2.cd(3);
   acc_cosThetaStar->SetMinimum(0.);
   TF1* fcosThetaStar;
-  if (mass > 475.) fcosThetaStar = new TF1("fcosThetaStar","pol8",ws->var("cosThetaStar")->getMin(),ws->var("cosThetaStar")->getMax());
+  if (mass > 900.) {
+    fcosThetaStar = new TF1("fcosThetaStar","pol6",ws->var("cosThetaStar")->getMin(),ws->var("cosThetaStar")->getMax());
+    // fcosThetaStar->FixParameter(2,12.);
+  }
+  else if (mass > 450.) fcosThetaStar = new TF1("fcosThetaStar","pol4",ws->var("cosThetaStar")->getMin(),ws->var("cosThetaStar")->getMax());
   else fcosThetaStar = new TF1("fcosThetaStar","pol2",ws->var("cosThetaStar")->getMin(),ws->var("cosThetaStar")->getMax());
   // fcosThetaStar->FixParameter(1,0.);
   fcosThetaStar->SetLineWidth(2);
@@ -362,13 +368,15 @@ int main(int argc, char* argv[]) {
   float para8red = 0.;
   float para4rederr, para6rederr, para8rederr;
 
-  if (mass > 475.) {
+  if (mass > 450.) {
     para4red = fcosThetaStar->GetParameter(4)/fcosThetaStar->GetParameter(0);
     para4rederr = fcosThetaStar->GetParError(4)/fcosThetaStar->GetParameter(0);
-    para6red = fcosThetaStar->GetParameter(6)/fcosThetaStar->GetParameter(0);
-    para6rederr = fcosThetaStar->GetParError(6)/fcosThetaStar->GetParameter(0);
-    para8red = fcosThetaStar->GetParameter(8)/fcosThetaStar->GetParameter(0);
-    para8rederr = fcosThetaStar->GetParError(8)/fcosThetaStar->GetParameter(0);
+    if (mass > 900.) {
+      para6red = fcosThetaStar->GetParameter(6)/fcosThetaStar->GetParameter(0);
+      para6rederr = fcosThetaStar->GetParError(6)/fcosThetaStar->GetParameter(0);
+      // para8red = fcosThetaStar->GetParameter(8)/fcosThetaStar->GetParameter(0);
+      // para8rederr = fcosThetaStar->GetParError(8)/fcosThetaStar->GetParameter(0);
+     }
   }
 
   float cutOffred = fcosTheta2->GetParameter(1) /* /fcosTheta2->GetParameter(0) */;
@@ -386,10 +394,12 @@ int main(int argc, char* argv[]) {
   float b4rederr = fcosTheta1->GetParError(4)/fcosTheta1->GetParameter(0);
 
   cout << "para2 = " << para2red << endl;
-  if (mass > 475.) {
+  if (mass > 450.) {
     cout << "para4 = " << para4red << endl;
-    cout << "para6 = " << para6red << endl;
-    cout << "para8 = " << para8red << endl;
+    if (mass > 900.) {
+      cout << "para6 = " << para6red << endl;
+      // cout << "para8 = " << para8red << endl;
+    }
   }
   if (cosThetaStarLim >= 0.) cout << "cosThetaStarLim = " << cosThetaStarLim << endl << endl; 
   else cout << "No cosThetaStarLim" << endl << endl;
@@ -416,21 +426,25 @@ int main(int argc, char* argv[]) {
   ofstream of(fileout);
   of << "[Acceptance] \n";
   of << "para2 = " << para2red << " +/- " << para2rederr << " L(-5 - 5) \n";
-  if (mass > 475.) {
+  if (mass > 900.) {
     of << "para4 = " << para4red << " +/- " << para4rederr << " L(-20 - 20) \n";
     of << "para6 = " << para6red << " +/- " << para6rederr << " L(-20 - 10) \n";
-    of << "para8 = " << para8red << " +/- " << para8rederr << " L(-10 - 10) \n";
+    of << "para8 = " << para8red << " C \n";
+  } else if (mass > 450.) {
+    of << "para4 = " << para4red << " +/- " << para4rederr << " L(-20 - 20) \n";
+    of << "para6 = " << para6red << " C \n";
+    of << "para8 = " << para8red << " C \n";
   } else {
     of << "para4 = " << para4red << " C \n";
     of << "para6 = " << para6red << " C \n";
     of << "para8 = " << para8red << " C \n";
   }
   of << "acca2 = " << -(fPhi1->GetParameter(1)) << " +/- " << fPhi1->GetParError(1) << " L(-2 - 2) \n";
-  of << "a2 = " << a2red << " +/- " << a2rederr << " L(" <<  a2red-a2rederr << " - " << a2red+a2rederr << ") \n";
+  of << "a2 = " << a2red << " +/- " << a2rederr << " L(" <<  a2red-(a2rederr/2.) << " - " << a2red+(a2rederr/2.) << ") \n";
   // of << "cutOff = " << cutOffred << " +/- " << cutOffrederr << " L(" <<  cutOffred-cutOffrederr << " - " << cutOffred+cutOffrederr << ") \n";
   of << "cutOff = " << cutOffred << " C \n";
   of << "g = " << gred << " +/- " << grederr << " L(" <<  gred-grederr << " - " << gred+grederr << ") \n";
-  of << "a4 = " << a4red << " +/- " << a4rederr << " L(" <<  a4red-a4rederr << " - " << a4red+a4rederr << ") \n";
+  of << "a4 = " << a4red << " +/- " << a4rederr << " L(" <<  a4red-(a4rederr/2.) << " - " << a4red+(a4rederr/2.) << ") \n";
   // of << "b2 = " << b2red << " +/- " << b2rederr << " L(-5 - 5) \n";
   // of << "b4 = " << b4red << " +/- " << b4rederr << " L(-5 - 5) \n";
   of << "b2 = " << b2red << " C \n";

@@ -12,6 +12,21 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
+Double_t slope1(Double_t *x, Double_t *par) {
+  Double_t fitval;
+  if (x[0] <= par[0]) fitval = par[1];
+  else fitval = par[2]*x[0] + par[1] - par[2]*par[0];
+  return fitval;
+}
+
+Double_t slope121(Double_t *x, Double_t *par) {
+  Double_t fitval;
+  if (x[0] <= par[0]) fitval = par[5]*x[0] - par[5]*par[0] + par[2]*par[0]*par[0] + par[3]*par[0] - par[4];
+  else if (x[0] >= par[1]) fitval = par[6]*x[0] - par[6]*par[1] + par[2]*par[1]*par[1] + par[3]*par[1] - par[4];
+  else fitval = par[2]*x[0]*x[0] + par[3]*x[0] - par[4];
+  return fitval;
+}
+
 void fitAccPars() {
 
   static const unsigned int Nmasspoints = 6;
@@ -45,9 +60,16 @@ void fitAccPars() {
   double b2err[Nmasspoints] = {0.,0.,0.,0.,0.,0.}; 
   double b4err[Nmasspoints] = {0.,0.,0.,0.,0.,0.};
 
+  ofstream *allParams;
+  ofstream *of[Nmasspoints];
+  char fileout[200];
+
   for (unsigned int i = 0; i < Nmasspoints; i++) {
     masspoints[i] = (double)atof(masspointsS[i].c_str());
+    sprintf(fileout,"acc_parsEstim%s.txt",masspointsS[i].c_str());
+    of[i] = new ofstream(fileout);
   }
+  allParams = new ofstream("allParams.txt");
 
   string fileName;  
   char thePar[10];
@@ -61,7 +83,7 @@ void fitAccPars() {
 	
     while (theFile >> thePar >> fitted >> error) {
       cout << thePar << " " << fitted << " " << error << endl;
-      if (error > fabs(fitted)) error = 0.; 
+      if (error < 0.001) error = 0.01; 
       if (!strcmp(thePar,"para2")) {para2[i] = fitted; para2err[i] = error;}
       if (!strcmp(thePar,"para4")) {para4[i] = fitted; para4err[i] = error;}
       if (!strcmp(thePar,"para6")) {para6[i] = fitted; para6err[i] = error;}
@@ -79,6 +101,16 @@ void fitAccPars() {
 
   }
   
+  TF1 *myfunc1 = new TF1("myfunc1",slope1,200,1100,3);
+  myfunc1->SetParameter(0,800);
+  TF1 *myfunc2 = new TF1("myfunc2",slope121,200,1100,7);
+  myfunc2->FixParameter(0,500);
+  myfunc2->FixParameter(1,800);
+  // TF1 *mypol2 = new TF1("mypol2","pol2");
+  TF1 *mypol3 = new TF1("mypol3","pol3");
+  // TF1 *mypol4 = new TF1("mypol4","pol4");
+
+ 
   // A - Cos(theta*)
   TCanvas cosThetaStar("cosThetaStar","cosThetaStar",10,10,1000,600);
   cosThetaStar.Divide(2,2);
@@ -90,6 +122,14 @@ void fitAccPars() {
   para2fit->SetMarkerStyle(20);
   para2fit->SetMarkerColor(kRed);
   para2fit->Draw("AP"); 
+  para2fit->Fit("myfunc2","","PSAME"); 
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "[Acceptance] \n";
+    *of[i] << "para2 = " << myfunc2->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 5; j++) {
+    *allParams << "para2_" << j << " " << myfunc2->GetParameter(j+2) << "\n";
+  }
 
   cosThetaStar.cd(2);
   
@@ -99,7 +139,14 @@ void fitAccPars() {
   para4fit->SetMarkerStyle(20);
   para4fit->SetMarkerColor(kRed);
   para4fit->Draw("AP"); 
-  
+  para4fit->Fit("myfunc2","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "para4 = " << myfunc2->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 5; j++) {
+    *allParams << "para4_" << j << " " << myfunc2->GetParameter(j+2) << "\n";
+  }
+
   cosThetaStar.cd(3);
   
   TGraphErrors *para6fit = new TGraphErrors(Nmasspoints,masspoints,para6,masspointserr,para6err);
@@ -108,15 +155,26 @@ void fitAccPars() {
   para6fit->SetMarkerStyle(20);
   para6fit->SetMarkerColor(kRed);
   para6fit->Draw("AP");
-
+  para6fit->Fit("myfunc1","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "para6 = " << myfunc1->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 2; j++) {
+    *allParams << "para6_" << j << " " << myfunc1->GetParameter(j+1) << "\n";
+  }
+ 
   cosThetaStar.cd(4);
   
-  TGraphErrors *para8fit = new TGraphErrors(Nmasspoints,masspoints,para8,masspointserr,para8err);
+  /* TGraphErrors *para8fit = new TGraphErrors(Nmasspoints,masspoints,para8,masspointserr,para8err);
 
   para8fit->SetTitle("para8");
   para8fit->SetMarkerStyle(20);
   para8fit->SetMarkerColor(kRed);
   para8fit->Draw("AP");
+  para8fit->Fit("myfunc2","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "para8 = " << myfunc2->Eval(masspoints[i]) << " C \n";
+  }  */
 
   cosThetaStar.SaveAs("fitPar_cosThetaStar.ps");
 
@@ -131,6 +189,13 @@ void fitAccPars() {
   b2fit->SetMarkerStyle(20);
   b2fit->SetMarkerColor(kRed);
   b2fit->Draw("AP"); 
+  b2fit->Fit("mypol3","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "b2 = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "b2_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
 
   cosTheta1.cd(2);
   
@@ -140,6 +205,13 @@ void fitAccPars() {
   b4fit->SetMarkerStyle(20);
   b4fit->SetMarkerColor(kRed);
   b4fit->Draw("AP"); 
+  b4fit->Fit("mypol3","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "b4 = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "b4_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
 
   cosTheta1.SaveAs("fitPar_cosTheta1.ps");
 
@@ -154,6 +226,13 @@ void fitAccPars() {
   a2fit->SetMarkerStyle(20);
   a2fit->SetMarkerColor(kRed);
   a2fit->Draw("AP"); 
+  a2fit->Fit("mypol3","","PSAME"); 
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "a2 = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "a2_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
 
   cosTheta2.cd(2);
   
@@ -163,7 +242,14 @@ void fitAccPars() {
   a4fit->SetMarkerStyle(20);
   a4fit->SetMarkerColor(kRed);
   a4fit->Draw("AP"); 
-  
+  a4fit->Fit("mypol3","","PSAME"); 
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "a4 = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "a4_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
+
   cosTheta2.cd(3);
   
   TGraphErrors *gfit = new TGraphErrors(Nmasspoints,masspoints,g,masspointserr,gerr);
@@ -172,6 +258,13 @@ void fitAccPars() {
   gfit->SetMarkerStyle(20);
   gfit->SetMarkerColor(kRed);
   gfit->Draw("AP");
+  gfit->Fit("mypol3","","PSAME"); 
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "g = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "g_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
 
   cosTheta2.cd(4);
   
@@ -181,6 +274,13 @@ void fitAccPars() {
   cutOfffit->SetMarkerStyle(20);
   cutOfffit->SetMarkerColor(kRed);
   cutOfffit->Draw("AP");
+  cutOfffit->Fit("mypol3","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "cutOff = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "cutOff_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
 
   cosTheta2.SaveAs("fitPar_cosTheta2.ps");
 
@@ -194,8 +294,20 @@ void fitAccPars() {
   acca2fit->SetMarkerStyle(20);
   acca2fit->SetMarkerColor(kRed);
   acca2fit->Draw("AP"); 
- 
+  acca2fit->Fit("mypol3","","PSAME");
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    *of[i] << "acca2 = " << mypol3->Eval(masspoints[i]) << " C \n";
+  }
+  for (unsigned int j = 0; j < 4; j++) {
+    *allParams << "acca2_" << j << " " << mypol3->GetParameter(j) << "\n";
+  }
+
   phi1.SaveAs("fitPar_phi1.ps");
+
+  for (unsigned int i = 0; i < Nmasspoints; i++) {
+    of[i]->close();
+  }
+  allParams->close();
 
   return;
 }
