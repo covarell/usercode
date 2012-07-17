@@ -32,4 +32,9 @@ make FitAcc_ZZ
 
 This step takes a VERY long time to draw the output plots.
 
- 
+3. Fit the acceptance parameters as a function of mZZ.
+
+The interactive macro fitAccPars.C (just run .x fitAccPars.C) takes all the
+output from step 2, i.e. one textfile per mass point, fits all parameters
+as a function of mZZ and outputs allParams.txt, which is the input for
+the LDProducer in the CMG code.
