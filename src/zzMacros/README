@@ -1,0 +1,35 @@
+DETERMINE SIGNAL ACCEPTANCE PARAMETERS FOR GRAVITON
+---------------------------------------------------
+
+1. Determine acceptance 1D functions using nominal datasets divided by 
+toy datasets generated according to the gen-level distributions (simplified
+way)
+
+make RooPentaSpinTwo.o
+make FitAccSimp_ZZ
+./FitAccSimp_ZZ -f <file containing the RooDataSet> -m <graviton mass>
+
+(other options are:
+-a <minimum acceptance> to restrict the fit only to a minimum value of the
+acceptance avaioding values close to 0
+- c1 / c2 / cs <maximum value> to restrict the fit only to the range of
+cosTheta1 / cosTheta2 / cosThetaStar in [-maximum value, maximum value]
+)
+
+N.B. The theoretical parameters (fz1, fz2, f++, f+-, f0+, f0-, f00) are 
+computed for a RS graviton, following http://arxiv.org/abs/1001.3396. 
+For other spin models (SM Higgs, pseudoscalar etc.) they must be changed 
+according to that paper.
+
+2. Determine acceptance 1D functions from a complete 5D fit (assumes the
+previous step has been run on the corresponding mass point, acceptance 
+parameters are used as starting values)
+
+make FitAcc_ZZ
+./FitAcc_ZZ -f <file containing the RooDataSet> -m <graviton mass>
+
+(other options are the same as before)
+
+This step takes a VERY long time to draw the output plots.
+
+ 
