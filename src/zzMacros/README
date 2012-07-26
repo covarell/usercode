@@ -38,3 +38,24 @@ The interactive macro fitAccPars.C (just run .x fitAccPars.C) takes all the
 output from step 2, i.e. one textfile per mass point, fits all parameters
 as a function of mZZ and outputs allParams.txt, which is the input for
 the LDProducer in the CMG code.
+
+FIT PT DISTRIBUTIONS FOR MELA
+-----------------------------
+
+1. Fit pT distributions for signal (H) and background (ZZ)
+
+root -l -b
+
+.L PDFs/RooTsallis.cc+
+.L PDFs/RooTsallis2.cc+
+.L PDFs/RooTsallis3.cc+
+.L fitPt.C++
+fitPt(<Higgsmass>,<spread>)
+
+Only events with Higgsmass-spread<mZZ<Higgsmass+spread will be considered.
+More options are available inside the macro. You need two direrctories figs/
+and text/ if you want to save figures and/or fitted parameters.
+
+.x fitParsPt.C will fit the Tsallis parameters as a function of mZZ.
+
+ 
