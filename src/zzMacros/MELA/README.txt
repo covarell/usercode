@@ -43,6 +43,12 @@ PDFs:
 RooXZsZs_5D.cxx  RooXZsZs_5D.h 
 -> 5D PDF for signal
 
+RooRapidityBkg.cxx RooRapidityBkg.h
+-> PDF for bkg Rapidity
+
+RooRapiditySig.cxx RooRapiditySig.h
+-> PDF for sig Rapidity
+
 src:
 AngularPdfFactory.cc  
 -> Utility class to initialize properly the 5D signal PDF
@@ -63,6 +69,8 @@ root
 .L ../src/AngularPdfFactory.cc+
 .L ../PDFs/RooqqZZ_JHU.cxx+
 .L ../PDFs/RooTsallis.cc+              <-- ***RC***
+.L ../PDFs/RooRapiditySig.cxx+	       <-- ***CM&CY***
+.L ../PDFs/RooRapidityBkg.cxx+	       <-- ***CM&CY***
 .L MELA.C+
 
 addDtoTree("nameOfYourFile")
@@ -99,13 +107,27 @@ addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>)
 will only consider events in the range minimumMzz<mZZ<maximumMzz, overwriting
 the default. 
 
+will write the original MELA discriminant to the file.
+
 addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>,true)
 
-will add a second discriminant to the output file called "melaLDWithPt" that
+will write discriminant to the output file called "melaLDWithPt" that
 also includes pT variable in it.
 
 In this case, the input file must also contain a branch like:
  sigTree->SetBranchAddress("ZZPt",&ZZPt);
+
+***CM&CY***
+
+More options are available:
+
+addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>,false,true)
+
+will write a discriminant to the output file called "melaLDWithY" and
+ if both true then "melapTY" that includes Y  and pT variable in it.
+
+In this case, the input file must also contain a branch like:
+ sigTree->SetBranchAddress("ZZRapidity",&ZZY);
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

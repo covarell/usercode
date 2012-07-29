@@ -12,6 +12,8 @@
 #include "../src/AngularPdfFactory.cc"
 #include "../PDFs/RooqqZZ_JHU.h"
 #include "../PDFs/RooTsallis.h"
+#include "../PDFs/RooRapidityBkg.h"
+#include "../PDFs/RooRapiditySig.h"
 
 /* - - - - - - - - - - - - - - - - - - - - - - - 
 ================================================
@@ -23,6 +25,9 @@ gSystem->AddIncludePath("-I/$ROOFITSYS/include/");
 .L ../PDFs/RooXZsZs_5D.cxx+
 .L ../src/AngularPdfFactory.cc+
 .L ../PDFs/RooqqZZ_JHU.cxx+
+.L ../PDFs/RooTsallis.cc+              <-- ***RC***
+.L ../PDFs/RooRapidityBkg.cxx+	       <-- ***CM&CY***
+.L ../PDFs/RooRapiditySig.cxx+	       <-- ***CM&CY***
 .L MELA.C+
  - -  - - - - - - - - - - - - - - -  - - -  -  -
 ===============================================*/
@@ -162,7 +167,7 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
 
 //=======================================================================
 
-pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1,bool withPtY = false, double pt = 0.0, double absy = 0.0, double scaleFactor=5.0){
+pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1,bool withPt = false, double pt = 0.0,bool withY = false, double y = 0.0, double scaleFactor=5.0){
 
   RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",0,180);
   RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",0,120); 
@@ -172,7 +177,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   RooRealVar* costhetastar_rrv = new RooRealVar("costhetastar","cos#theta^{*}",-1,1); 
   RooRealVar* phi1_rrv= new RooRealVar("phi1","#Phi^{*}_{1}",-3.1415,3.1415);
   RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",80,1000);
-  RooRealVar* absy_rrv= new RooRealVar("absy","|y_{ZZ}|",0.0,4.0);
+  RooRealVar* y_rrv= new RooRealVar("y","y_{ZZ}",-4.0,4.0);
   RooRealVar* pt_rrv= new RooRealVar("pt","p_{T,ZZ}",0.0,1000.);
 
   static const int Nptparams = 11;
@@ -203,16 +208,20 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 				     *ptparamsS[3],*ptparamsS[4],*ptparamsS[5],
 				     *ptparamsS[6],*ptparamsS[7],*ptparamsS[8],
 				     *ptparamsS[9],*ptparamsS[10]);
-  if (withPtY) allparamsS->readFromFile("../datafiles/allParamsSig.txt",0);
+  if (withPt) allparamsS->readFromFile("../datafiles/allParamsSig.txt",0);
 
   RooTsallis* bkgPt = new RooTsallis("bkgPt","bkgPt",*pt_rrv,*mzz_rrv,
 				     *ptparamsB[0],*ptparamsB[1],*ptparamsB[2],
 				     *ptparamsB[3],*ptparamsB[4],*ptparamsB[5],
 				     *ptparamsB[6],*ptparamsB[7],*ptparamsB[8],
 				     *ptparamsB[9],*ptparamsB[10]);
-  if (withPtY) allparamsB->readFromFile("../datafiles/allParamsBkg.txt",0);
+  if (withPt) allparamsB->readFromFile("../datafiles/allParamsBkg.txt",0);
 
-  checkZorder<double>(m1,m2,costhetastar,costheta1,costheta2,phi,phi1,pt,absy);
+  RooRapiditySig* sigY = new RooRapiditySig("sigY", "sigY", *y_rrv, *mzz_rrv);
+
+  RooRapidityBkg* bkgY = new RooRapidityBkg("bkgY", "bkgY", *y_rrv, *mzz_rrv);
+
+  checkZorder<double>(m1,m2,costhetastar,costheta1,costheta2,phi,phi1,pt,y);
 
   z1mass_rrv->setVal(m1);  
   z2mass_rrv->setVal(m2);
@@ -223,7 +232,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   phi1_rrv->setVal(phi1);
   mzz_rrv->setVal(mZZ);
   pt_rrv->setVal(pt);
-  absy_rrv->setVal(absy);
+  y_rrv->setVal(y);
 
   vector <double> P=my8DTemplate(1, mZZ,  m1,  m2,  costhetastar,  costheta1,  costheta2,  phi,  phi1);
 
@@ -245,10 +254,15 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
     Psig = SMHiggs->PDF->getVal()/(SMHiggs->PDF->createIntegral(RooArgSet(*costheta1_rrv,*costheta2_rrv,*phi_rrv))->getVal());
   }
 
-  if (withPtY) {
+  if (withPt) {
     Pbackg *= bkgPt->getVal()/(bkgPt->createIntegral(RooArgSet(*pt_rrv))->getVal());
     Psig *= sigPt->getVal()/(sigPt->createIntegral(RooArgSet(*pt_rrv))->getVal());
   }
+  if(withY)
+    {
+      Pbackg *= bkgY->getVal()/(bkgY->createIntegral(RooArgSet(*y_rrv))->getVal());
+      Psig *= sigY->getVal()/(sigY->createIntegral(RooArgSet(*y_rrv))->getVal());
+    }
 
   // - - - - - - - - - - - - - - - - - - - - - Whitbeck 
   // check whether P[i] is zero and print warning
@@ -271,9 +285,11 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   delete phi1_rrv;
   delete mzz_rrv;
   delete pt_rrv;
-  delete absy_rrv;
+  delete y_rrv;
   delete sigPt;
   delete bkgPt;
+  delete sigY;
+  delete bkgY;
   delete SMZZ;
   delete SMHiggs;
 
@@ -282,7 +298,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 
 //=======================================================================
 
-void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool containsPtY = false){
+void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool containsPt = false, bool containsY = false){
 
   RooMsgService::instance().getStream(1).removeTopic(NumIntegration);
 
@@ -290,7 +306,22 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   char outputFileName[150];
   sprintf(inputFileName,"%s.root",inputFile);
 
-  sprintf(outputFileName,"%s_%d-%d_withDiscriminants.root",inputFile,int(minMzz),int(maxMzz));
+  if(!containsPt && !containsY)
+    {
+      sprintf(outputFileName,"%s_%d-%d_withDiscriminants.root",inputFile,int(minMzz),int(maxMzz));
+    }
+  else if(containsPt && !containsY)
+    {
+      sprintf(outputFileName,"%s_%d-%d_withDiscriminantsPt.root",inputFile,int(minMzz),int(maxMzz));
+    }
+  else if(!containsPt && containsY)
+    {
+      sprintf(outputFileName,"%s_%d-%d_withDiscriminantsY.root",inputFile,int(minMzz),int(maxMzz));
+    }
+  else if(containsPt && containsY)
+    {
+      sprintf(outputFileName,"%s_%d-%d_withDiscriminantsPtY.root",inputFile,int(minMzz),int(maxMzz));
+    }
 
   TFile* sigFile = new TFile(inputFileName);
   TTree* sigTree=0;
@@ -339,7 +370,7 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   TTree* newTree = new TTree("newTree","SelectedTree"); 
 
   float m1,m2,mzz,h1,h2,hs,phi,phi1,D;
-  float ZZPt, ZZY, Dpt, w;
+  float ZZPt, ZZY, Dpt,Dy, DptY, w;
   
   sigTree->SetBranchAddress("Z1Mass",&m1);
   sigTree->SetBranchAddress("Z2Mass",&m2);
@@ -354,10 +385,13 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   sigTree->SetBranchAddress("helphi",&phi);  
   sigTree->SetBranchAddress("phistarZ1",&phi1);
 
-  if (containsPtY) {
+  if (containsPt) {
     sigTree->SetBranchAddress("ZZPt",&ZZPt);
-    // newTree->SetBranchAddress("ZZY",&ZZY);
   }
+  if (containsY)
+    {
+      sigTree->SetBranchAddress("ZZRapidity", &ZZY);
+    }
   sigTree->SetBranchAddress("MC_weight",&w);
 
   newTree->Branch("z1mass",&m1,"z1mass/F");
@@ -368,12 +402,29 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   newTree->Branch("costhetastar",&hs,"costhetastar/F");
   newTree->Branch("phi",&phi,"phi/F");  
   newTree->Branch("phistar1",&phi1,"phistar1/F");
-  if (containsPtY) {
+  if (containsPt) {
     newTree->Branch("ZZPt",&ZZPt,"ZZPt/F");
-    // newTree->Branch("ZZY",&ZZY,"ZZY/F");
-    newTree->Branch("melaLDWithPt",&Dpt,"melaLDWithPt/F");
+    if(!containsY)
+      {
+	newTree->Branch("melaLDWithPt",&Dpt,"melaLDWithPt/F");
+      }
   }
-  newTree->Branch("melaLD",&D,"melaLD/F");
+  if (containsY)
+    {
+      newTree->Branch("ZZY", &ZZY, "ZZY/F");
+      if(!containsPt)
+	{
+	  newTree->Branch("melaLDWithY", &Dy, "melaLDWithY/F");
+	}
+    }
+  if (containsPt && containsY)
+    {
+      newTree->Branch("melapTY", &DptY, "melapTY/F");
+    }
+  if (!containsPt && containsY)
+    {
+      newTree->Branch("melaLD",&D,"melaLD/F");
+    }
   newTree->Branch("MC_weight",&w,"MC_weight/F");
 
   for(int iEvt=0; iEvt<sigTree->GetEntries(); iEvt++){
@@ -389,17 +440,34 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
       {
 
       //MELA LD
-	pair<double,double> P;
-	P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
-	D=P.first/(P.first+P.second);
+	if(!containsPt && !containsY)
+	  {
+	    pair<double,double> P;
+	    P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
+	    D=P.first/(P.first+P.second);
+	  }
 
-	if (containsPtY) {
+	else if (containsPt && !containsY) {
 	  pair<double,double> P2;
-	  P2 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, fabs(ZZY));
+	  P2 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, false, ZZY);
  
 	  Dpt=P2.first/(P2.first+P2.second);
 	}
+	else if(!containsPt && containsY)
+	  {
+	    pair<double,double> P3;
+	    P3 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, ZZPt, true, ZZY);
 
+	    Dy=P3.first/(P3.first+P3.second);
+	  }
+	else if(containsPt && containsY)
+	  {
+
+	    pair<double,double> P4;
+	    P4 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, true, ZZY);
+
+	    DptY=P4.first/(P4.first+P4.second);
+	  }
       newTree->Fill();
 
     }
