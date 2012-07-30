@@ -385,13 +385,8 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   sigTree->SetBranchAddress("helphi",&phi);  
   sigTree->SetBranchAddress("phistarZ1",&phi1);
 
-  if (containsPt) {
-    sigTree->SetBranchAddress("ZZPt",&ZZPt);
-  }
-  if (containsY)
-    {
-      sigTree->SetBranchAddress("ZZRapidity", &ZZY);
-    }
+  if (containsPt) sigTree->SetBranchAddress("ZZPt",&ZZPt);
+  if (containsY) sigTree->SetBranchAddress("ZZRapidity", &ZZY);
   sigTree->SetBranchAddress("MC_weight",&w);
 
   newTree->Branch("z1mass",&m1,"z1mass/F");
@@ -405,26 +400,15 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   if (containsPt) {
     newTree->Branch("ZZPt",&ZZPt,"ZZPt/F");
     if(!containsY)
-      {
-	newTree->Branch("melaLDWithPt",&Dpt,"melaLDWithPt/F");
-      }
+      newTree->Branch("melaLDWithPt",&D,"melaLDWithPt/F");
+    else newTree->Branch("melaLDWithPtY", &D,"melaLDWithPtY/F");
   }
-  if (containsY)
-    {
-      newTree->Branch("ZZY", &ZZY, "ZZY/F");
-      if(!containsPt)
-	{
-	  newTree->Branch("melaLDWithY", &Dy, "melaLDWithY/F");
-	}
-    }
-  if (containsPt && containsY)
-    {
-      newTree->Branch("melapTY", &DptY, "melapTY/F");
-    }
-  if (!containsPt && containsY)
-    {
-      newTree->Branch("melaLD",&D,"melaLD/F");
-    }
+  if (containsY) {
+    newTree->Branch("ZZY", &ZZY, "ZZY/F");
+    if(!containsPt) newTree->Branch("melaLDWithY", &Dy, "melaLDWithY/F");
+  }
+  if (!containsPt && containsY) newTree->Branch("melaLD",&D,"melaLD/F");
+   
   newTree->Branch("MC_weight",&w,"MC_weight/F");
 
   for(int iEvt=0; iEvt<sigTree->GetEntries(); iEvt++){
@@ -440,38 +424,21 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
       {
 
       //MELA LD
+	pair<double,double> P;
 	if(!containsPt && !containsY)
-	  {
-	    pair<double,double> P;
-	    P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
-	    D=P.first/(P.first+P.second);
-	  }
-
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
 	else if (containsPt && !containsY) {
-	  pair<double,double> P2;
-	  P2 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, false, ZZY);
- 
-	  Dpt=P2.first/(P2.first+P2.second);
-	}
-	else if(!containsPt && containsY)
-	  {
-	    pair<double,double> P3;
-	    P3 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, ZZPt, true, ZZY);
-
-	    Dy=P3.first/(P3.first+P3.second);
-	  }
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, false);
+	else if (!containsPt && containsY)
+          P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, 0., true, ZZY);
 	else if(containsPt && containsY)
-	  {
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, true, ZZY);
 
-	    pair<double,double> P4;
-	    P4 = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, true, ZZY);
-
-	    DptY=P4.first/(P4.first+P4.second);
-	  }
-      newTree->Fill();
-
-    }
-   }
+	D=P.first/(P.first+P.second);
+	newTree->Fill();
+	
+      }
+  }
 
   newFile->cd();
   newTree->Write("angles"); 
