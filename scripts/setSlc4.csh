@@ -1,1 +1,0 @@
-setenv SCRAM_ARCH slc5_ia32_gcc434

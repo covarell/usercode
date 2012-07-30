@@ -1,2 +1,0 @@
-voms-proxy-init -voms cms:/cms/Role=priorityuser
-voms-proxy-info -fqan
