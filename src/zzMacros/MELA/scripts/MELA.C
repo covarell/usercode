@@ -370,7 +370,7 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   TTree* newTree = new TTree("newTree","SelectedTree"); 
 
   float m1,m2,mzz,h1,h2,hs,phi,phi1,D;
-  float ZZPt, ZZY, Dpt,Dy, DptY, w;
+  float ZZPt, ZZY, w;
   
   sigTree->SetBranchAddress("Z1Mass",&m1);
   sigTree->SetBranchAddress("Z2Mass",&m2);
@@ -405,7 +405,7 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
   }
   if (containsY) {
     newTree->Branch("ZZY", &ZZY, "ZZY/F");
-    if(!containsPt) newTree->Branch("melaLDWithY", &Dy, "melaLDWithY/F");
+    if(!containsPt) newTree->Branch("melaLDWithY", &D, "melaLDWithY/F");
   }
   if (!containsPt && containsY) newTree->Branch("melaLD",&D,"melaLD/F");
    
@@ -417,23 +417,23 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
       cout << "event: " << iEvt << endl;
 
     sigTree->GetEntry(iEvt);
-
+    
     checkZorder<float>(m1,m2,hs,h1,h2,phi,phi1,ZZPt,ZZY);
-
+    
     if(mzz>minMzz && mzz<maxMzz && m2>12. ) 
       {
-
-      //MELA LD
+	
+	//MELA LD
 	pair<double,double> P;
 	if(!containsPt && !containsY)
 	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
-	else if (containsPt && !containsY) {
+	else if (containsPt && !containsY) 
 	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, false);
 	else if (!containsPt && containsY)
-          P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, 0., true, ZZY);
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, 0., true, ZZY);
 	else if(containsPt && containsY)
 	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, true, ZZY);
-
+	
 	D=P.first/(P.first+P.second);
 	newTree->Fill();
 	
