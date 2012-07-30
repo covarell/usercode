@@ -36,12 +36,12 @@ void makeSimpleROCCurve2(string sigfile, string bkgfile) {
      float cutval = 0.01*i;
      sprintf(cutstr,"MC_weight*(melaLD > %f)",cutval);
      tsig->Draw("melaLD >> ldh",cutstr);
-     sprintf(cutstr,"MC_weight*(melaLD > 0.0)",cutval);
+     sprintf(cutstr,"MC_weight*(melaLD > 0.0)");
      tsig->Draw("melaLD >> ldh2",cutstr);
      effsig[i] = (float)ldh->Integral()/(float)ldh2->Integral();
      sprintf(cutstr,"MC_weight*(melaLD > %f)",cutval);
      tbkg->Draw("melaLD >> ldh",cutstr);
-     sprintf(cutstr,"MC_weight*(melaLD > 0.0)",cutval);
+     sprintf(cutstr,"MC_weight*(melaLD > 0.0)");
      tbkg->Draw("melaLD >> ldh2",cutstr);
      effbkg[i] = (float)ldh->Integral()/(float)ldh2->Integral();
   }	
@@ -70,12 +70,12 @@ void makeSimpleROCCurve2(string sigfile, string bkgfile) {
     float cutval = 0.01*i;
     sprintf(cutstr,"MC_weight*(melaLDWithPt > %f)",cutval);
     tsig->Draw("melaLDWithPt >> ldh",cutstr);
-    sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)",cutval);
+    sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)");
     tsig->Draw("melaLDWithPt >> ldh2",cutstr);
     effsig2[i] = (float)ldh->Integral()/(float)ldh2->Integral();
     sprintf(cutstr,"MC_weight*(melaLDWithPt > %f)",cutval);
     tbkg->Draw("melaLDWithPt >> ldh",cutstr);
-    sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)",cutval);
+    sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)");
     tbkg->Draw("melaLDWithPt >> ldh2",cutstr);
     effbkg2[i] = (float)ldh->Integral()/(float)ldh2->Integral();
   }	
@@ -86,12 +86,13 @@ void makeSimpleROCCurve2(string sigfile, string bkgfile) {
   groc2.GetXaxis()->SetTitle("#epsilon_{sig}");
   groc2.GetYaxis()->SetTitle("#epsilon_{bkg}");
 
-  TFile fchris("Roc_curves_120_130.root");
+  TFile fchris("../datafiles/Roc_curves_120_130.root");
   TGraph* chris1 = (TGraph*)fchris.Get("MELAroc");
   chris1->SetName("chris1");
   chris1->SetMarkerStyle(5);
   chris1->SetMarkerColor(kBlack);
   TGraph* chris2 = (TGraph*)fchris.Get("MELApTroc");
+  // TGraph* chris2 = (TGraph*)fchris.Get("pTroc");
   chris2->SetName("chris2");
   chris2->SetMarkerStyle(5);
   chris2->SetMarkerColor(kBlack);
@@ -117,11 +118,33 @@ void makeSimpleROCCurve2(string sigfile, string bkgfile) {
   leg2->SetFillStyle(0);
   leg2->SetBorderSize(0);
   leg2->SetShadowColor(0);
-  leg2->AddEntry(&groc2,"RC: w/ pT","p");
-  leg2->AddEntry(chris2,"CM: w/ pT","p");
+  // leg2->AddEntry(&groc2,"RC: w/ pT","p");
+  // leg2->AddEntry(chris2,"CM: w/ pT","p");
+  leg2->AddEntry(&groc2,"RC: pT only","p");
+  leg2->AddEntry(chris2,"CM: pT only","p");
   leg2->Draw("same");
   
   d.SaveAs("comparMelaPt.gif");
+
+  sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)");
+  tsig->Draw("melaLDWithPt",cutstr);
+
+  TH1F* chris3 = (TH1F*)fchris.Get("p_{T sig}");
+  chris3->SetName("chris3");
+  chris3->SetLineStyle(kDashed);
+  // chris3->Draw("SAME");
+
+  d.SaveAs("comparPsig.gif");
+
+  sprintf(cutstr,"MC_weight*(melaLDWithPt > 0.0)");
+  tbkg->Draw("melaLDWithPt",cutstr);  
+
+  TH1F* chris4 = (TH1F*)fchris.Get("p_{T bkg}");
+  chris4->SetName("chris4");
+  chris4->SetLineStyle(kDashed);
+  // chris4->Draw("SAME");
+
+  d.SaveAs("comparPbkg.gif");
 
   return;
 }

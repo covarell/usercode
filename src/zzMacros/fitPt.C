@@ -32,8 +32,10 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
 {
 
   // range limits
-  float varMin = 1.;
-  float varMax = 120.;
+  float varMinBkg = 1.;
+  float varMaxBkg = 100.;
+  float varMinSig = 0.;
+  float varMaxSig = 100.;
   float binWidthBkg = 1.;
   float binWidthSig = 2.;
   float scaleErrorSig = 1.;  /// ???
@@ -59,27 +61,28 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   gROOT->ProcessLine("setTDRStyle()");
   
   // Build datasets
-  RooRealVar pt("pt","p_{T}^{H}",varMin, varMax,"GeV/c");
-  int nbins = int((varMax-varMin)/binWidthBkg);
+  RooRealVar pt("pt","p_{T}^{H}",varMinBkg, varMaxBkg,"GeV/c");
+  int nbins = int((varMaxBkg-varMinBkg)/binWidthBkg);
   pt.setBins(nbins);
 
   RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt),bkgH);
 
-  int nbins2 = int((varMax-varMin)/binWidthSig);
-  pt.setBins(nbins2);
+  RooRealVar pts("pts","p_{T}^{H}",varMinSig, varMaxSig,"GeV/c");
+  int nbins2 = int((varMaxSig-varMinSig)/binWidthSig);
+  pts.setBins(nbins2);
 
-  RooDataHist* sig = new RooDataHist("sig","Signal dataset",RooArgList(pt));
+  RooDataHist* sig = new RooDataHist("sig","Signal dataset",RooArgList(pts));
   
   for (Int_t i=1; i<=sigH->GetNbinsX(); i++) {
 
-    float thispt = sigH->GetXaxis()->GetBinCenter(i);
-    if (thispt > varMin && thispt < varMax) {
-      pt.setVal(thispt);
+    float thispts = sigH->GetXaxis()->GetBinCenter(i);
+    if (thispts > varMinSig && thispts < varMaxSig) {
+      pts.setVal(thispts);
       cout << "Entries in bin " << i << " = " << sigH->GetBinContent(i)*nSigWeight << endl;
       float weightsum = sigH->GetBinError(i)*nSigWeight*scaleErrorSig;
       // avoid negative entries
       if (weightsum > sigH->GetBinContent(i)*nSigWeight) weightsum = sigH->GetBinContent(i)*nSigWeight - 1;
-      sig->add(RooArgSet(pt),sigH->GetBinContent(i)*nSigWeight,weightsum*weightsum);
+      sig->add(RooArgSet(pts),sigH->GetBinContent(i)*nSigWeight,weightsum*weightsum);
     }
   }
 
@@ -102,7 +105,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   RooRealVar n2s("n2s","enne2 signal", 0.75, 0.5, 15.); 
   RooRealVar bbs("bbs","bibi signal",0.02, 0.0005, 0.1);
   RooRealVar Ts("Ts","tti signal",0.2,0.0005,1.);
-  ms.setVal(1066.2);   ms.setConstant(kTRUE);
+  ms.setVal(1803.8);   ms.setConstant(kTRUE);
   ns.setVal(0.733);    ns.setConstant(kTRUE);
   n2s.setVal(0.95);   n2s.setConstant(kTRUE);
   bbs.setVal(0.0323); // bbs.setConstant(kTRUE);
@@ -110,7 +113,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
 
   // RooTsallis* rt = new RooTsallis("rt","rt",pt,m,n,T);
   // ws->import(*rt);
-  RooTsallis3* rt2 = new RooTsallis3("rt2","rt2",pt,ms,ns,n2s,bbs,Ts);
+  RooTsallis3* rt2 = new RooTsallis3("rt2","rt2",pts,ms,ns,n2s,bbs,Ts);
   ws->import(*rt2);
   RooTsallis3* rt3 = new RooTsallis3("rt3","rt3",pt,m,n,n2,bb,T);
   ws->import(*rt3);
@@ -125,7 +128,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   RooPlot *framebkg = pt.frame();
 
   char reducestr[300];
-  sprintf(reducestr,"pt < %f && pt > %f",varMax,varMin);
+  sprintf(reducestr,"pt < %f && pt > %f",varMaxBkg,varMinBkg);
   
   bkg->plotOn(framebkg,DataError(RooAbsData::SumW2),Cut(reducestr));
   ws->pdf("rt3")->plotOn(framebkg,LineColor(kBlue),Normalization(bkg->sumEntries(),RooAbsReal::NumEvent));
@@ -140,7 +143,8 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
 
   RooFitResult* sigfit = ws->pdf("rt2")->fitTo(*sig,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));  
 
-  RooPlot *framesig = pt.frame();
+  RooPlot *framesig = pts.frame();
+  sprintf(reducestr,"pts < %f && pts > %f",varMaxSig,varMinSig);
 
   sig->plotOn(framesig,DataError(RooAbsData::SumW2),Cut(reducestr));
   ws->pdf("rt2")->plotOn(framesig,LineColor(kBlue),Normalization(sig->sumEntries(),RooAbsReal::NumEvent));
@@ -186,8 +190,8 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   double *yressig = hresidsig->GetY();
   for (int i = 0; i < nbins2; i++) {
  
-    pt.setVal(xsig[i]);
-    float thisweight = sig->weight(RooArgSet(pt));
+    pts.setVal(xsig[i]);
+    float thisweight = sig->weight(RooArgSet(pts));
     double thiserrup, thiserrdown;
     sig->weightError(thiserrup, thiserrdown, RooAbsData::SumW2);
     // cout << "yres[" << i << "] = " << yressig[i] << " x = " << xsig[i] << " weight = " << thisweight << endl;
@@ -215,7 +219,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
 
   }
  
-  RooPlot* ressig = pt.frame(Title("Residuals Distribution")) ;
+  RooPlot* ressig = pts.frame(Title("Residuals Distribution")) ;
   ressig->GetYaxis()->SetTitle("Ratio");
   /* ressig->SetLabelSize(0.08,"XYZ");
   ressig->SetTitleSize(0.08,"XYZ");
@@ -245,7 +249,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   gPad->SetGridy();
   resbkg->Draw();
 
-  RooPlot* pulsig = pt.frame(Title("Pull Distribution")) ;
+  RooPlot* pulsig = pts.frame(Title("Pull Distribution")) ;
   pulsig->GetYaxis()->SetTitle("Pull");
   /* pulsig->SetLabelSize(0.08,"XYZ");
   pulsig->SetTitleSize(0.08,"XYZ");
