@@ -28,19 +28,22 @@
 
 using namespace RooFit;
 
-void fitPt(float mZZcenter = 126., float mZZspread = 5.)
+void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7)
 {
 
   // range limits
-  float varMinBkg = 1.;
+  float varMinBkg = 0.;        // all in GeV
   float varMaxBkg = 100.;
   float varMinSig = 0.;
   float varMaxSig = 100.;
   float binWidthBkg = 1.;
-  float binWidthSig = 2.;
+  float binWidthSig = 1.;
+  float scaleErrorBkg = 1.;
   float scaleErrorSig = 1.;  /// ???
 
-  TFile* file = new TFile("PT_Y_Temp.root");
+  char fileToOpen[200];
+  sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
+  TFile* file = new TFile(fileToOpen);
   TH1F* massH = (TH1F*)((TH2F*)file->Get("Pt_bkg"))->ProjectionX();
   float mZZmin = mZZcenter - mZZspread;
   float mZZmax = mZZcenter + mZZspread;
@@ -48,13 +51,13 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   int binMax = massH->FindBin(mZZmax);
 
   TH1F* bkgH = (TH1F*)((TH2F*)file->Get("Pt_bkg"))->ProjectionY("bkgH",binMin,binMax);
-  // TH1F* sigH = (TH1F*)((TH2F*)file->Get("Pt_sig"))->ProjectionY("sigH",binMin,binMax);
-  
-  char fileToOpen[200];
-  sprintf(fileToOpen,"PT_%d_Temp.root",int(mZZcenter));
+  TH1F* sigH = (TH1F*)((TH2F*)file->Get("Pt_sig"))->ProjectionY("sigH",binMin,binMax);
+ 
+  /* sprintf(fileToOpen,"PT_%d_Temp.root",int(mZZcenter));
   TFile* file2 = new TFile(fileToOpen);
-  TH1F* sigH = (TH1F*)file2->Get("Pt_sig");
+  TH1F* sigH = (TH1F*)file2->Get("Pt_sig");  */
 
+  float nBkgWeight = bkgH->GetEntries();
   float nSigWeight = sigH->GetEntries(); 
  
   gROOT->ProcessLine(".L mytdrstyle.C");
@@ -65,7 +68,23 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   int nbins = int((varMaxBkg-varMinBkg)/binWidthBkg);
   pt.setBins(nbins);
 
-  RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt),bkgH);
+  // RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt),bkgH);
+  RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt));
+  
+  for (Int_t i=1; i<=bkgH->GetNbinsX(); i++) {
+
+    float thispt = bkgH->GetXaxis()->GetBinCenter(i);
+    if (thispt > varMinBkg && thispt < varMaxBkg) {
+      pt.setVal(thispt);
+      float weight = bkgH->GetBinContent(i)*nBkgWeight;
+      float weightsum = bkgH->GetBinError(i)*nBkgWeight*scaleErrorBkg;
+      cout << "Entries in bin " << i << " = " << weight << " +/- " << weightsum << endl;      
+      // avoid negative entries
+      if (weight <= 0) weight = 1.; 
+      if (weightsum > weight) weightsum = weight - 1.;
+      bkg->add(RooArgSet(pt),weight,weightsum*weightsum);
+    }
+  }
 
   RooRealVar pts("pts","p_{T}^{H}",varMinSig, varMaxSig,"GeV/c");
   int nbins2 = int((varMaxSig-varMinSig)/binWidthSig);
@@ -78,11 +97,13 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
     float thispts = sigH->GetXaxis()->GetBinCenter(i);
     if (thispts > varMinSig && thispts < varMaxSig) {
       pts.setVal(thispts);
-      cout << "Entries in bin " << i << " = " << sigH->GetBinContent(i)*nSigWeight << endl;
+      float weight = sigH->GetBinContent(i)*nSigWeight;
       float weightsum = sigH->GetBinError(i)*nSigWeight*scaleErrorSig;
+      cout << "Entries in bin " << i << " = " << weight << " +/- " << weightsum << endl; 
       // avoid negative entries
-      if (weightsum > sigH->GetBinContent(i)*nSigWeight) weightsum = sigH->GetBinContent(i)*nSigWeight - 1;
-      sig->add(RooArgSet(pts),sigH->GetBinContent(i)*nSigWeight,weightsum*weightsum);
+      if (weight <= 0) weight = 1.; 
+      if (weightsum > weight) weightsum = weight - 1.;
+      sig->add(RooArgSet(pts),weight,weightsum*weightsum);
     }
   }
 
@@ -136,7 +157,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   RooHist *hresidbkg = framebkg->residHist();
  
   char fileToSave[200];
-  sprintf(fileToSave,"text/paramsBkg_%dGeV_all.txt",int(mZZcenter));
+  sprintf(fileToSave,"text/paramsBkg_%dGeV_%dTeV_all.txt",int(mZZcenter),LHCsqrts);
   ofstream os1(fileToSave);
   (RooArgSet(bkgfit->floatParsFinal())).writeToStream(os1,false);
   os1.close();
@@ -151,7 +172,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   RooHist *hpullsig = framesig->pullHist();
   RooHist *hresidsig = framesig->residHist();
 
-  sprintf(fileToSave,"text/paramsSig_%dGeV_all.txt",int(mZZcenter));
+  sprintf(fileToSave,"text/paramsSig_%dGeV_%dTeV_all.txt",int(mZZcenter),LHCsqrts);
   ofstream os2(fileToSave);
   (RooArgSet(sigfit->floatParsFinal())).writeToStream(os2,false);
   os2.close();
@@ -280,7 +301,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.)
   pulbkg->Draw();
 
   
-  sprintf(fileToSave,"figs/fitSigBkg_%dGeV_all.pdf",int(mZZcenter));
+  sprintf(fileToSave,"figs/fitSigBkg_%dGeV_%dTeV_all.pdf",int(mZZcenter),LHCsqrts);
   can.SaveAs(fileToSave);
  
 

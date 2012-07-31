@@ -3,6 +3,7 @@
 #include <string>
 #include <stdio.h>
 #include <sstream>
+#include <stdlib.h>
 
 // ROOT includes
 #include <TROOT.h>
@@ -12,7 +13,7 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void fitParsPt() {
+void fitParsPt(int LHCsqrts = 7) {
 
   static const unsigned int Nmasspoints = 5;
 
@@ -35,15 +36,17 @@ void fitParsPt() {
 
   ofstream *allParamsSig;
   ofstream *allParamsBkg;
-  char fileout[200];
+  char fileName[200];
 
   for (unsigned int i = 0; i < Nmasspoints; i++) {
     masspoints[i] = (double)atof(masspointsS[i].c_str());
   }
-  allParamsSig = new ofstream("allParamsSig.txt");
-  allParamsBkg = new ofstream("allParamsBkg.txt");
+  
+  sprintf(fileName,"allParamsSig_%dTeV.txt",LHCsqrts);
+  allParamsSig = new ofstream(fileName);
+  sprintf(fileName,"allParamsBkg_%dTeV.txt",LHCsqrts);
+  allParamsBkg = new ofstream(fileName);
 
-  string fileName;  
   char thePar[10];
   char equalS[1];
   char dashS[1];
@@ -55,8 +58,8 @@ void fitParsPt() {
   // Inizia
   for (unsigned int i = 0; i < Nmasspoints; i++) {
   
-    fileName = "text/paramsSig_" + masspointsS[i] + "GeV_all.txt";
-    ifstream theFile(fileName.c_str());
+    sprintf(fileName,"text/paramsSig_%dGeV_%dTeV_all.txt",int(masspoints[i]),LHCsqrts);
+    ifstream theFile(fileName);
 	
     while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
       cout << thePar << " " << fitted << " " << error << endl;
@@ -70,8 +73,8 @@ void fitParsPt() {
 
   for (unsigned int i = 0; i < Nmasspoints; i++) {
   
-    fileName = "text/paramsBkg_" + masspointsS[i] + "GeV_all.txt";
-    ifstream theFile(fileName.c_str());
+    sprintf(fileName,"text/paramsBkg_%dGeV_%dTeV_all.txt",int(masspoints[i]),LHCsqrts);
+    ifstream theFile(fileName);
 	
     while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >>  dashS >> theLimit2) {
       cout << thePar << " " << fitted << " " << error << endl;

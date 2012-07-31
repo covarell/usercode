@@ -167,7 +167,7 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
 
 //=======================================================================
 
-pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1,bool withPt = false, double pt = 0.0,bool withY = false, double y = 0.0, double scaleFactor=5.0){
+pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1, int LHCsqrts, bool withPt = false, double pt = 0.0, bool withY = false, double y = 0.0, double scaleFactor=5.0){
 
   RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",0,180);
   RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",0,120); 
@@ -203,20 +203,25 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   SMHiggs->makeParamsConst(true);
   RooqqZZ_JHU* SMZZ = new RooqqZZ_JHU("SMZZ","SMZZ",*z1mass_rrv,*z2mass_rrv,*costheta1_rrv,*costheta2_rrv,*phi_rrv,*costhetastar_rrv,*phi1_rrv,*mzz_rrv);
 
+  char fileName[200];
+  sprintf(fileName,"../datafiles/allParamsSig_%dTeV.txt",LHCsqrts);
+
   RooTsallis* sigPt = new RooTsallis("sigPt","sigPt",*pt_rrv,*mzz_rrv,
 				     *ptparamsS[0],*ptparamsS[1],*ptparamsS[2],
 				     *ptparamsS[3],*ptparamsS[4],*ptparamsS[5],
 				     *ptparamsS[6],*ptparamsS[7],*ptparamsS[8],
 				     *ptparamsS[9],*ptparamsS[10]);
-  if (withPt) allparamsS->readFromFile("../datafiles/allParamsSig.txt",0);
+  if (withPt) allparamsS->readFromFile(fileName,0);
 
+  sprintf(fileName,"../datafiles/allParamsBkg_%dTeV.txt",LHCsqrts);
   RooTsallis* bkgPt = new RooTsallis("bkgPt","bkgPt",*pt_rrv,*mzz_rrv,
 				     *ptparamsB[0],*ptparamsB[1],*ptparamsB[2],
 				     *ptparamsB[3],*ptparamsB[4],*ptparamsB[5],
 				     *ptparamsB[6],*ptparamsB[7],*ptparamsB[8],
 				     *ptparamsB[9],*ptparamsB[10]);
-  if (withPt) allparamsB->readFromFile("../datafiles/allParamsBkg.txt",0);
+  if (withPt) allparamsB->readFromFile(fileName,0);
 
+  // CM-CY: Change here to switch from 7 to 8 TeV!
   RooRapiditySig* sigY = new RooRapiditySig("sigY", "sigY", *y_rrv, *mzz_rrv);
 
   RooRapidityBkg* bkgY = new RooRapidityBkg("bkgY", "bkgY", *y_rrv, *mzz_rrv);
@@ -298,9 +303,14 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 
 //=======================================================================
 
-void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool containsPt = false, bool containsY = false){
+void addDtoTree(char* inputFile, int LHCsqrts = 7, float minMzz = 100., float maxMzz = 1000., bool containsPt = false, bool containsY = false){
 
   RooMsgService::instance().getStream(1).removeTopic(NumIntegration);
+
+  if (LHCsqrts < 7 || LHCsqrts > 8) {
+    cout << "LHC energy must be 7 or 8 TeV!" << endl;
+    return;
+  }
 
   char inputFileName[100];
   char outputFileName[150];
@@ -407,7 +417,7 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
     newTree->Branch("ZZY", &ZZY, "ZZY/F");
     if(!containsPt) newTree->Branch("melaLDWithY", &D, "melaLDWithY/F");
   }
-  if (!containsPt && containsY) newTree->Branch("melaLD",&D,"melaLD/F");
+  if (!containsPt && !containsY) newTree->Branch("melaLD",&D,"melaLD/F");
    
   newTree->Branch("MC_weight",&w,"MC_weight/F");
 
@@ -426,13 +436,13 @@ void addDtoTree(char* inputFile, float minMzz = 100., float maxMzz = 1000., bool
 	//MELA LD
 	pair<double,double> P;
 	if(!containsPt && !containsY)
-	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, LHCsqrts);
 	else if (containsPt && !containsY) 
-	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, false);
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, LHCsqrts, true, ZZPt, false);
 	else if (!containsPt && containsY)
-	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, false, 0., true, ZZY);
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, LHCsqrts, false, 0., true, ZZY);
 	else if(containsPt && containsY)
-	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, true, ZZPt, true, ZZY);
+	  P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1, LHCsqrts, true, ZZPt, true, ZZY);
 	
 	D=P.first/(P.first+P.second);
 	newTree->Fill();
@@ -491,7 +501,7 @@ vector<TH1F*> LDDistributionBackground(TTree* chain){
 
       checkZorder<float>(m1,m2,costhetastar,costheta1,costheta2,phi,phi1,pt,y);
       
-      pair<double,double> P =  likelihoodDiscriminant(mZZ, m1, m2, costhetastar, costheta1, costheta2, phi, phi1);
+      pair<double,double> P =  likelihoodDiscriminant(mZZ, m1, m2, costhetastar, costheta1, costheta2, phi, phi1 ,7);
       
       mela=P.first/(P.first+P.second);
     }
@@ -555,7 +565,7 @@ vector<TH1F*> LDDistributionSignal(TTree* chain){
 
       checkZorder<float>(m1,m2,costhetastar,costheta1,costheta2,phi,phi1,pt,y);
       
-      pair<double,double> P =  likelihoodDiscriminant(mZZ, m1, m2, costhetastar, costheta1, costheta2, phi, phi1);
+      pair<double,double> P =  likelihoodDiscriminant(mZZ, m1, m2, costhetastar, costheta1, costheta2, phi, phi1, 7);
 
       mela=P.first/(P.first+P.second);
 
