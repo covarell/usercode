@@ -179,6 +179,8 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",80,1000);
   RooRealVar* y_rrv= new RooRealVar("y","y_{ZZ}",-4.0,4.0);
   RooRealVar* pt_rrv= new RooRealVar("pt","p_{T,ZZ}",0.0,1000.);
+  RooRealVar* sqrtS_rrv = new RooRealVar("LHCsqrts","#sqrt{s}",LHCsqrts*1000);
+  sqrtS_rrv->setConstant(kTRUE);
 
   static const int Nptparams = 11;
 
@@ -221,10 +223,9 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 				     *ptparamsB[9],*ptparamsB[10]);
   if (withPt) allparamsB->readFromFile(fileName,0);
 
-  // CM-CY: Change here to switch from 7 to 8 TeV!
-  RooRapiditySig* sigY = new RooRapiditySig("sigY", "sigY", *y_rrv, *mzz_rrv);
+  RooRapiditySig* sigY = new RooRapiditySig("sigY", "sigY", *y_rrv, *mzz_rrv, *sqrtS_rrv);
 
-  RooRapidityBkg* bkgY = new RooRapidityBkg("bkgY", "bkgY", *y_rrv, *mzz_rrv);
+  RooRapidityBkg* bkgY = new RooRapidityBkg("bkgY", "bkgY", *y_rrv, *mzz_rrv, *sqrtS_rrv);
 
   checkZorder<double>(m1,m2,costhetastar,costheta1,costheta2,phi,phi1,pt,y);
 
@@ -291,6 +292,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   delete mzz_rrv;
   delete pt_rrv;
   delete y_rrv;
+  delete sqrtS_rrv;
   delete sigPt;
   delete bkgPt;
   delete sigY;

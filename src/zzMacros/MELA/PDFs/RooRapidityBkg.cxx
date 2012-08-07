@@ -20,10 +20,12 @@ ClassImp(RooRapidityBkg)
 
 RooRapidityBkg::RooRapidityBkg(const char *name, const char *title, 
 									   RooAbsReal& _Y,
-									   RooAbsReal& _m) :
+			                                                   RooAbsReal& _m,
+                                                                           RooAbsReal& _sqrtS) :
 RooAbsPdf(name,title), 
 Y("Y","Y",this,_Y),
-m("m","m",this,_m)
+m("m","m",this,_m),
+sqrtS("sqrtS","sqrtS",this,_sqrtS)
 { 
 } 
 
@@ -31,7 +33,8 @@ m("m","m",this,_m)
 RooRapidityBkg::RooRapidityBkg(const RooRapidityBkg& other, const char* name) :  
 RooAbsPdf(other,name), 
 Y("Y",this,other.Y),
-m("m",this,other.m)
+m("m",this,other.m),
+sqrtS("sqrtS",this,other.sqrtS)
 { 
 } 
 
@@ -39,9 +42,7 @@ m("m",this,other.m)
 
 Double_t RooRapidityBkg::evaluate() const 
 { 
-	
-
-	Double_t s0 = 7000*7000;
+        Double_t s0 = sqrtS*sqrtS;
 	Double_t s = m*m;
 	Double_t Q = m;
 	Double_t xa = exp(Y)*sqrt(s/s0);
@@ -171,6 +172,41 @@ Double_t RooRapidityBkg::evaluate() const
 			       +(FuncABs)*weights
 			       +(FuncABb)*weightb
 			       );
+
+	if(( m <= 600. && TMath::Abs(Y) > 20*pow(m,-0.32)) || ( m > 600. && TMath::Abs(Y) > 2.5))
+	  {
+	    //Find totSec when mZZ, Y=0
+	    Double_t xa0 = sqrt(s/s0); //at Y=0 xa=xb
+
+	    //up
+	    //if xa=xb then FuncAu1=FuncAu2 and FuncBu1=FuncBu2
+	    FuncAu1 = (up0+up1*xa0+up2*pow(xa0,2))*pow((1-xa0),4)*pow(xa0,up3)*exp(1.0+up4*xa0);
+	    FuncBu1 = (antiup0+antiup1*xa0+antiup2*pow(xa0,2)+antiup3*pow(xa0,3))*pow((1-xa0),4)*pow(xa0,antiup4)*exp(1.0+antiup5*xa0);
+	    FuncABu = 2*(FuncAu1/xa0*FuncBu1/xa0);
+
+	    //down
+	    //if xa=xb then FuncAd1=FuncAd2 and FuncBd1=FuncBd2
+	    FuncAd1 = (down0+down1*xa0+down2*pow(xa0,2))*pow((1-xa0),4)*pow(xa0,down3)*exp(1.0+down4*xa0);
+	    FuncBd1 = (antidown0+antidown1*xa0+antidown2*pow(xa0,2)+antidown3*pow(xa0,3))*pow((1-xa0),4)*pow(xa0,antidown4)*exp(1.0+antidown5*xa0);
+	    FuncABd = 2*(FuncAd1/xa0*FuncBd1/xa0);
+
+	    //sea
+	    Funcca = (charm0+charm1*xa0+charm2*pow(xa0,2)+charm3*pow(xa0,3))*pow((1-xa0),4)*pow(xa0,charm4)*exp(1.0+charm5*xa0); //Funcca=Funccb
+	    Funcsa = (strange0+strange1*xa0+strange2*pow(xa0,2))*pow((1-xa0),4)*pow(xa0,strange3)*exp(1.0+strange4*xa0); //Funcsa=Funcsb
+	    Funcba = (bottom0+bottom1*xa0+bottom2*pow(xa0,2))*pow((1-xa0),4)*pow(xa0,bottom3)*exp(1.0+bottom4*xa0); //Funcba=Funcbb
+	    FuncABc = Funcsa*Funcsa/xa0/xa0;
+	    FuncABs = Funcca*Funcca/xa0/xa0;
+	    FuncABb = Funcba*Funcba/xa0/xa0;
+	    Double_t totSec0 = 2*m*(
+				    (FuncABu)*weightu
+				    +(FuncABd)*weightd
+				    +(FuncABc)*weightc
+				    +(FuncABs)*weights
+				    +(FuncABb)*weightb
+				    );
+	    totSec = 1.e-5*totSec0;
+	    }
+
 	return totSec;
 
 } 

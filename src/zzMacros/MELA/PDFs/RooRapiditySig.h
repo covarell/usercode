@@ -16,7 +16,7 @@
 class RooRapiditySig : public RooAbsPdf {
 public:
 	RooRapiditySig() {} ; 
-	RooRapiditySig(const char *name, const char *title,RooAbsReal& _Y,RooAbsReal& _m);
+	RooRapiditySig(const char *name, const char *title,RooAbsReal& _Y,RooAbsReal& _m,RooAbsReal& _sqrtS);
 						
 	RooRapiditySig(const RooRapiditySig& other, const char* name=0) ;
 	virtual TObject* clone(const char* newname) const { return new RooRapiditySig(*this,newname); }
@@ -27,6 +27,7 @@ protected:
 	
 	RooRealProxy Y ;
 	RooRealProxy m ;
+	RooRealProxy sqrtS ;
 
 	
 	Double_t evaluate() const ;
