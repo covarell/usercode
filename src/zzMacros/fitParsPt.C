@@ -13,11 +13,12 @@
 #include <TGraphErrors.h>
 #include <TH2F.h>
 
-void fitParsPt(int LHCsqrts = 7) {
+void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
 
   static const unsigned int Nmasspoints = 5;
 
   string masspointsS[Nmasspoints] = {"125","150","200","300","400"};
+  if (isVBFsignal && LHCsqrts == 7) masspointsS[0] = "120";  
 
   double masspoints[Nmasspoints] = {0.,0.,0.,0.,0.};
   double masspointserr[Nmasspoints] = {0.,0.,0.,0.,0.};
@@ -27,12 +28,14 @@ void fitParsPt(int LHCsqrts = 7) {
   double enne[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double bbs[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tis[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double ennes[Nmasspoints] = {0.,0.,0.,0.,0.}; 
 
   double bberr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tierr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double enneerr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double bbserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tiserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double enneserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
 
   ofstream *allParamsSig;
   ofstream *allParamsBkg;
@@ -42,7 +45,8 @@ void fitParsPt(int LHCsqrts = 7) {
     masspoints[i] = (double)atof(masspointsS[i].c_str());
   }
   
-  sprintf(fileName,"allParamsSig_%dTeV.txt",LHCsqrts);
+  if (isVBFsignal) sprintf(fileName,"allParamsVbf_%dTeV.txt",LHCsqrts);
+  else sprintf(fileName,"allParamsSig_%dTeV.txt",LHCsqrts);
   allParamsSig = new ofstream(fileName);
   sprintf(fileName,"allParamsBkg_%dTeV.txt",LHCsqrts);
   allParamsBkg = new ofstream(fileName);
@@ -58,13 +62,18 @@ void fitParsPt(int LHCsqrts = 7) {
   // Inizia
   for (unsigned int i = 0; i < Nmasspoints; i++) {
   
-    sprintf(fileName,"text/paramsSig_%dGeV_%dTeV_all.txt",int(masspoints[i]),LHCsqrts);
+    if (isVBFsignal) sprintf(fileName,"text/paramsVbf_%dGeV_%dTeV_all.txt",int(masspoints[i]),LHCsqrts);
+    else sprintf(fileName,"text/paramsSig_%dGeV_%dTeV_all.txt",int(masspoints[i]),LHCsqrts);
     ifstream theFile(fileName);
 	
     while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
       cout << thePar << " " << fitted << " " << error << endl;
+      // limit the error to meaningful values
+      if (fabs(error/fitted) > 0.3) error = 0.3*fitted;
+      if (fabs(error/fitted) < 0.01) error = 0.01*fitted;
       if (!strcmp(thePar,"bbs")) {bbs[i] = fitted; bbserr[i] = error;}
       if (!strcmp(thePar,"Ts")) {Tis[i] = fitted; Tiserr[i] = error;}
+      if (!strcmp(thePar,"ns")) {ennes[i] = fitted; enneserr[i] = error;}
     }
 
     theFile.close();
@@ -78,9 +87,12 @@ void fitParsPt(int LHCsqrts = 7) {
 	
     while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >>  dashS >> theLimit2) {
       cout << thePar << " " << fitted << " " << error << endl;
-      if (!strcmp(thePar,"bb")) {bb[i] = fitted; bberr[i] = error/10.;}
-      if (!strcmp(thePar,"T")) {Ti[i] = fitted; Tierr[i] = error/10.;}
-      if (!strcmp(thePar,"n")) {enne[i] = fitted; enneerr[i] = error/10.;}
+      // limit the error to meaningful values
+      if (fabs(error/fitted) > 0.3) error = 0.3*fitted;
+      if (fabs(error/fitted) < 0.01) error = 0.01*fitted;
+      if (!strcmp(thePar,"bb")) {bb[i] = fitted; bberr[i] = error;}
+      if (!strcmp(thePar,"T")) {Ti[i] = fitted; Tierr[i] = error;}
+      if (!strcmp(thePar,"n")) {enne[i] = fitted; enneerr[i] = error;}
     }
 
     theFile.close();
@@ -148,21 +160,9 @@ void fitParsPt(int LHCsqrts = 7) {
   Signal.Divide(2,1);
 
   Signal.cd(1);
-  
-  TGraphErrors *Tisfit = new TGraphErrors(Nmasspoints,masspoints,Tis,masspointserr,Tiserr);
 
-  Tisfit->SetTitle("Tis");
-  Tisfit->SetMarkerStyle(20);
-  Tisfit->SetMarkerColor(kRed);
-  Tisfit->Draw("AP"); 
-  Tisfit->Fit("mypol2","","PSAME");
-  for (unsigned int j = 0; j < 3; j++) {
-    *allParamsSig << "Ts" << j << " = " << mypol2->GetParameter(j) << " C \n";
-  }
-
-  Signal.cd(2);
   TGraphErrors *bbsfit = new TGraphErrors(Nmasspoints,masspoints,bbs,masspointserr,bbserr);
-
+  
   bbsfit->SetTitle("bbs");
   bbsfit->SetMarkerStyle(20);
   bbsfit->SetMarkerColor(kRed);
@@ -171,11 +171,46 @@ void fitParsPt(int LHCsqrts = 7) {
   for (unsigned int j = 0; j < 3; j++) {
     *allParamsSig << "bbs" << j << " = " << mypol2->GetParameter(j) << " C \n";
   }
-  *allParamsSig << "ns0 = 0.733 C \n";
-  *allParamsSig << "ns1 = 0. C \n";
-  *allParamsSig << "ns2 = 0. C \n";
-  *allParamsSig << "ms = 1066.2 C \n";
-  *allParamsSig << "ndues = 0.95 C \n";
+
+  Signal.cd(2);
+  
+  if (!isVBFsignal) {
+    TGraphErrors *Tisfit = new TGraphErrors(Nmasspoints,masspoints,Tis,masspointserr,Tiserr);
+    
+    Tisfit->SetTitle("Tis");
+    Tisfit->SetMarkerStyle(20);
+    Tisfit->SetMarkerColor(kRed);
+    Tisfit->Draw("AP"); 
+    Tisfit->Fit("mypol2","","PSAME");
+    for (unsigned int j = 0; j < 3; j++) {
+      *allParamsSig << "Ts" << j << " = " << mypol2->GetParameter(j) << " C \n";
+    }
+    
+    *allParamsSig << "ns0 = 0.733 C \n";
+    *allParamsSig << "ns1 = 0. C \n";
+    *allParamsSig << "ns2 = 0. C \n";
+    *allParamsSig << "ms = 1066.2 C \n";
+    *allParamsSig << "ndues = 0.95 C \n";
+
+  } else {
+
+    TGraphErrors *ennesfit = new TGraphErrors(Nmasspoints,masspoints,ennes,masspointserr,enneserr);
+    
+    ennesfit->SetTitle("ennes");
+    ennesfit->SetMarkerStyle(20);
+    ennesfit->SetMarkerColor(kRed);
+    ennesfit->Draw("AP"); 
+    ennesfit->Fit("mypol2","","PSAME");
+    for (unsigned int j = 0; j < 3; j++) {
+      *allParamsSig << "ns" << j << " = " << mypol2->GetParameter(j) << " C \n";
+    }
+    
+    *allParamsSig << "Ts0 = 0.0064 C \n";
+    *allParamsSig << "Ts1 = 0. C \n";
+    *allParamsSig << "Ts2 = 0. C \n";
+    *allParamsSig << "ms = 263.9 C \n";
+    *allParamsSig << "ndues = 3.948 C \n";
+  }
 
   Signal.SaveAs("fitPar_Signal.ps");
 

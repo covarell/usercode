@@ -50,10 +50,10 @@ root -l -b
 .L PDFs/RooTsallis2.cc+
 .L PDFs/RooTsallis3.cc+
 .L fitPt.C++
-fitPt(<Higgsmass>,<spread>)
+fitPt(<Higgsmass>,<spread>,<sqrts = 7 or 8>,<isVBF = true or false>)
 
 Only events with Higgsmass-spread<mZZ<Higgsmass+spread will be considered.
-More options are available inside the macro. You need two direrctories figs/
+More options are available inside the macro. You need two directories figs/
 and text/ if you want to save figures and/or fitted parameters.
 
 .x fitParsPt.C will fit the Tsallis parameters as a function of mZZ.
