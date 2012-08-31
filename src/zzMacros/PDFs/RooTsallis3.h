@@ -26,7 +26,9 @@ public:
               	  RooAbsReal& _n,
 	          RooAbsReal& _n2,
                   RooAbsReal& _bb,
-                  RooAbsReal& _T);
+	          RooAbsReal& _bb2,
+	          RooAbsReal& _T,
+	          RooAbsReal& _fexp);
 
   RooTsallis3(const RooTsallis3& other, const char* name=0) ;
   virtual TObject* clone(const char* newname) const { return new RooTsallis3(*this,newname); }
@@ -41,8 +43,10 @@ protected:
   RooRealProxy n ;
   RooRealProxy n2 ;
   RooRealProxy bb ;
+  RooRealProxy bb2 ;
   RooRealProxy T ;
- 
+  RooRealProxy fexp ;
+
   Double_t evaluate() const ;
 
 private:

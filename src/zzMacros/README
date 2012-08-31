@@ -46,8 +46,6 @@ FIT PT DISTRIBUTIONS FOR MELA
 
 root -l -b
 
-.L PDFs/RooTsallis.cc+
-.L PDFs/RooTsallis2.cc+
 .L PDFs/RooTsallis3.cc+
 .L fitPt.C++
 fitPt(<Higgsmass>,<spread>,<sqrts = 7 or 8>,<isVBF = true or false>)

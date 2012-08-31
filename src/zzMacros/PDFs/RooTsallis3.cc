@@ -16,7 +16,9 @@ ClassImp(RooTsallis3)
 				  RooAbsReal& _n,
                                   RooAbsReal& _n2,
                                   RooAbsReal& _bb,
-                                  RooAbsReal& _T):
+			          RooAbsReal& _bb2,
+			          RooAbsReal& _T,
+                                  RooAbsReal& _fexp):
    
    RooAbsPdf(name,title), 
    x("x","x",this,_x),
@@ -24,7 +26,9 @@ ClassImp(RooTsallis3)
    n("n","n",this,_n),
    n2("n2","n2",this,_n2),
    bb("bb","bb",this,_bb),
-   T("T","T",this,_T)
+   bb2("bb2","bb2",this,_bb2),
+   T("T","T",this,_T),
+   fexp("fexp","fexp",this,_fexp)
  { 
  } 
 
@@ -36,7 +40,9 @@ ClassImp(RooTsallis3)
    n("n",this,other.n),
    n2("n2",this,other.n2),
    bb("bb",this,other.bb),
-   T("T",this,other.T)
+   bb2("bb2",this,other.bb2),
+   T("T",this,other.T),
+   fexp("fexp",this,other.fexp)
  {
  } 
 
@@ -45,7 +51,7 @@ ClassImp(RooTsallis3)
  double RooTsallis3::evaluate() const 
  { 
    // cout<<"In rooTsallis3::evaluate()"<<endl;
-   return pow(x,n2)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(n*T),-n);
+   return pow(x,n2)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(n*T),-n) + fexp*exp(-bb2*x);
  } 
 
 
