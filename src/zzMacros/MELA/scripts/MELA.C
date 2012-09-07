@@ -12,6 +12,7 @@
 #include "../src/AngularPdfFactory.cc"
 #include "../PDFs/RooqqZZ_JHU.h"
 #include "../PDFs/RooTsallis.h"
+#include "../PDFs/RooTsallisExp.h"
 #include "../PDFs/RooRapidityBkg.h"
 #include "../PDFs/RooRapiditySig.h"
 
@@ -25,7 +26,8 @@ gSystem->AddIncludePath("-I/$ROOFITSYS/include/");
 .L ../PDFs/RooXZsZs_5D.cxx+
 .L ../src/AngularPdfFactory.cc+
 .L ../PDFs/RooqqZZ_JHU.cxx+
-.L ../PDFs/RooTsallis.cc+              <-- ***RC***
+.L ../PDFs/RooTsallis.cxx+              <-- ***RC***
+.L ../PDFs/RooTsallisExp.cxx+              <-- ***RC***
 .L ../PDFs/RooRapidityBkg.cxx+	       <-- ***CM&CY***
 .L ../PDFs/RooRapiditySig.cxx+	       <-- ***CM&CY***
 .L MELA.C+
@@ -179,23 +181,24 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",80,1000);
   RooRealVar* y_rrv= new RooRealVar("y","y_{ZZ}",-4.0,4.0);
   RooRealVar* pt_rrv= new RooRealVar("pt","p_{T,ZZ}",0.0,1000.);
-  RooRealVar* sqrtS_rrv = new RooRealVar("LHCsqrts","#sqrt{s}",LHCsqrts*1000);
+  RooRealVar* sqrtS_rrv = new RooRealVar("LHCsqrts","#sqrt{s}",LHCsqrts*1000.);
   sqrtS_rrv->setConstant(kTRUE);
 
-  static const int Nptparams = 11;
+  static const int NptparamsS = 17;
+  static const int NptparamsB = 11;
 
-  char* rrvnamesB[Nptparams] = {"m","n0","n1","n2","ndue","bb0","bb1","bb2","T0","T1","T2"};
-  RooRealVar *ptparamsB[Nptparams];
+  char* rrvnamesB[NptparamsB] = {"m","n0","n1","n2","ndue","bb0","bb1","bb2","T0","T1","T2"};
+  RooRealVar *ptparamsB[NptparamsB];
   RooArgSet* allparamsB = new RooArgSet();
-  for (int i = 0; i < Nptparams; i++) {
+  for (int i = 0; i < NptparamsB; i++) {
     ptparamsB[i] = new RooRealVar(rrvnamesB[i],rrvnamesB[i],-10000.,10000.);
     allparamsB->add(*ptparamsB[i]);
   }
 
-  char* rrvnamesS[Nptparams] = {"ms","ns0","ns1","ns2","ndues","bbs0","bbs1","bbs2","Ts0","Ts1","Ts2"};
-  RooRealVar *ptparamsS[Nptparams];
+  char* rrvnamesS[NptparamsS] = {"ms","ns0","ns1","ns2","ndues","bbs0","bbs1","bbs2","Ts0","Ts1","Ts2","bbdues0","bbdues1","bbdues2","fexps0","fexps1","fexps2"};
+  RooRealVar *ptparamsS[NptparamsS];
   RooArgSet* allparamsS = new RooArgSet();
-  for (int i = 0; i < Nptparams; i++) {
+  for (int i = 0; i < NptparamsS; i++) {
     ptparamsS[i] = new RooRealVar(rrvnamesS[i],rrvnamesS[i],-10000.,10000.);
     allparamsS->add(*ptparamsS[i]);
   }
@@ -208,11 +211,14 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   char fileName[200];
   sprintf(fileName,"../datafiles/allParamsSig_%dTeV.txt",LHCsqrts);
 
-  RooTsallis* sigPt = new RooTsallis("sigPt","sigPt",*pt_rrv,*mzz_rrv,
-				     *ptparamsS[0],*ptparamsS[1],*ptparamsS[2],
-				     *ptparamsS[3],*ptparamsS[4],*ptparamsS[5],
-				     *ptparamsS[6],*ptparamsS[7],*ptparamsS[8],
-				     *ptparamsS[9],*ptparamsS[10]);
+  RooTsallisExp* sigPt = new RooTsallisExp("sigPt","sigPt",*pt_rrv,*mzz_rrv,
+					   *ptparamsS[0],*ptparamsS[1],*ptparamsS[2],
+					   *ptparamsS[3],*ptparamsS[4],*ptparamsS[5],
+					   *ptparamsS[6],*ptparamsS[7],*ptparamsS[8],
+					   *ptparamsS[9],*ptparamsS[10],*ptparamsS[11],
+					   *ptparamsS[12],*ptparamsS[13],*ptparamsS[14],
+					   *ptparamsS[15],*ptparamsS[16]);
+
   if (withPt) allparamsS->readFromFile(fileName,0);
 
   sprintf(fileName,"../datafiles/allParamsBkg_%dTeV.txt",LHCsqrts);

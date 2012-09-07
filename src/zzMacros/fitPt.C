@@ -30,7 +30,7 @@
 
 using namespace RooFit;
 
-RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float max, int type) {
+RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float max, float minWeight, float sizeSig, int type) {
   
   // DEFINE BINNING
   // type:
@@ -46,7 +46,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
     highlimits.push_back(max);
   } else if (type == 1) {
     lowlimit = min;
-    sizes.push_back(4.);        
+    sizes.push_back(sizeSig);        
     // sizes.push_back(8.);        
     // sizes.push_back(4.);
     // sizes.push_back(8.);
@@ -56,7 +56,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
     highlimits.push_back(max);
   } else {
     lowlimit = min;
-    sizes.push_back(4.);
+    sizes.push_back(sizeSig);
     highlimits.push_back(max);
   }
 
@@ -86,15 +86,18 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
 
     float thispt = source->GetXaxis()->GetBinCenter(i);
     if (thispt > lowlimit && thispt < highlimits.back()) {
+      bool lastbin = false;
+      if (source->GetXaxis()->GetBinCenter(i+1) >= highlimits.back()) lastbin = true;
       if (thispt > highlimits.at(whichInterval)) whichInterval++;
       var->setVal(thispt);
       thisWeight += source->GetBinContent(i)*nWeight;
       thisWeightsum += source->GetBinError(i)*nWeight*source->GetBinError(i)*nWeight;
       j++;
       cout << "Entries in TH1 bin " << i << " = " << source->GetBinContent(i)*nWeight << " +/- " << source->GetBinError(i)*nWeight << endl;   
-      if (binWidth*j >= sizes.at(whichInterval)) {
-	cout << "Entro" << endl; 
-	if (thisWeight <= 0) thisWeight = 0.1; 
+      if (binWidth*j >= sizes.at(whichInterval) || lastbin) {
+        cout << "Entro" << endl; 
+	if (thisWeight <= 0) thisWeight = minWeight; 
+        if (fabs(thisWeight/sizes.at(whichInterval) - 0.0829038) < 0.00001) thisWeight /= 10.;
 	if (sqrt(thisWeightsum) > thisWeight) thisWeightsum = thisWeight*thisWeight*0.9;
 	cout << " " << var->getVal() << " " << thisWeight << " " << thisWeightsum << " " << sizes.at(whichInterval) << endl; 
 	result->add(RooArgSet(*var),
@@ -126,9 +129,12 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
 {
 
   float varMinBkg = 1.;        // all in GeV
-  float varMaxBkg = 180.;
-  float varMinSig = 3.;
-  float varMaxSig = 400.;
+  float varMaxBkg = 142. + (mZZcenter/5.);
+  if (LHCsqrts == 8 && fabs(mZZcenter - 125.) < 0.1) varMaxBkg = 170.;
+  float varMinSig = 1.;
+  float varMaxSig = 401.;
+  float sizeSig = 4.;
+  float minWeight = 0.1;
 
   char fileToOpen[200];
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
@@ -178,7 +184,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   // RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt),Import(*bkgH,kTRUE),Weight(nBkgWeight));
   
   cout << endl << "Background " << endl; 
-  RooDataHist* bkg = withSmartBinning(bkgH,pt,varMinBkg,varMaxBkg,0);
+  RooDataHist* bkg = withSmartBinning(bkgH,pt,varMinBkg,varMaxBkg,minWeight,sizeSig,0);
   bkg->SetName("bkg");
 
   for (Int_t i=0; i<bkg->numEntries(); i++) {
@@ -197,7 +203,11 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
 
   int whichSig = 1;
   if (isVBFsignal) whichSig = 2;
-  RooDataHist* sig = withSmartBinning(sigH,pts,varMinSig,varMaxSig,whichSig);
+  if (!isVBFsignal && LHCsqrts == 7 && mZZcenter > 299. && mZZcenter < 301.) {
+    sizeSig = 16.;
+    minWeight = 0.005;
+  }
+  RooDataHist* sig = withSmartBinning(sigH,pts,varMinSig,varMaxSig,minWeight,sizeSig,whichSig);
   sig->SetName("sig");
  
   for (Int_t i=0; i<sig->numEntries(); i++) {
@@ -222,7 +232,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   n.setVal(1.255);   // n.setConstant(kTRUE);
   n2.setVal(1.73);   n2.setConstant(kTRUE);
   bb.setVal(0.020); // bb.setConstant(kTRUE);
-  bb2.setVal(0.020);  bb2.setConstant(kTRUE);
+  bb2.setVal(0.20);  bb2.setConstant(kTRUE);
   T.setVal(0.20);   // T.setConstant(kTRUE);
   fexp.setVal(0.0);    fexp.setConstant(kTRUE);
 
@@ -230,7 +240,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   RooRealVar ns("ns","enne signal", 0.93, 0.5, 15.);
   RooRealVar n2s("n2s","enne2 signal", 0.75, 0.5, 15.); 
   RooRealVar bbs("bbs","bibi signal",0.02, 0.0005, 0.1);
-  RooRealVar Ts("Ts","tti signal",0.2,0.00000005,1.);
+  RooRealVar Ts("Ts","tti signal",0.02,0.00000005,0.2);
   RooRealVar bb2s("bb2s","bibi2 signal",0.02, 0.0005, 0.1);
   RooRealVar fexps("fexps","f_exp signal",0.02, 0.0, 1.0);
   if (isVBFsignal) {

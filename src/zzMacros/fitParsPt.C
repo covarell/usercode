@@ -28,14 +28,18 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
   double enne[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double bbs[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tis[Nmasspoints] = {0.,0.,0.,0.,0.}; 
-  double ennes[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  // double ennes[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double bb2s[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double fexps[Nmasspoints] = {0.,0.,0.,0.,0.}; 
 
   double bberr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tierr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double enneerr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double bbserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
   double Tiserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
-  double enneserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  // double enneserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double bb2serr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
+  double fexpserr[Nmasspoints] = {0.,0.,0.,0.,0.}; 
 
   ofstream *allParamsSig;
   ofstream *allParamsBkg;
@@ -73,7 +77,9 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
       if (fabs(error/fitted) < 0.01) error = 0.01*fitted;
       if (!strcmp(thePar,"bbs")) {bbs[i] = fitted; bbserr[i] = error;}
       if (!strcmp(thePar,"Ts")) {Tis[i] = fitted; Tiserr[i] = error;}
-      if (!strcmp(thePar,"ns")) {ennes[i] = fitted; enneserr[i] = error;}
+      // if (!strcmp(thePar,"ns")) {ennes[i] = fitted; enneserr[i] = error;}
+      if (!strcmp(thePar,"bb2s")) {bb2s[i] = fitted; bb2serr[i] = error;}
+      if (!strcmp(thePar,"fexps")) {fexps[i] = fitted; fexpserr[i] = error;}
     }
 
     theFile.close();
@@ -153,11 +159,12 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
   *allParamsBkg << "m = 54.47 C \n";
   *allParamsBkg << "ndue = 1.73 C \n";
 
-  Background.SaveAs("fitPar_Background.ps");
+  sprintf(fileName,"fitPar_Background_%dTeV.ps",LHCsqrts);
+  Background.SaveAs(fileName);
 
   // B - Signal
-  TCanvas Signal("Signal","Signal",10,10,1000,300);
-  Signal.Divide(2,1);
+  TCanvas Signal("Signal","Signal",10,10,1000,600);
+  Signal.Divide(2,2);
 
   Signal.cd(1);
 
@@ -173,6 +180,32 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
   }
 
   Signal.cd(2);
+
+  TGraphErrors *bb2sfit = new TGraphErrors(Nmasspoints,masspoints,bb2s,masspointserr,bb2serr);
+  
+  bb2sfit->SetTitle("bb2s");
+  bb2sfit->SetMarkerStyle(20);
+  bb2sfit->SetMarkerColor(kRed);
+  bb2sfit->Draw("AP"); 
+  bb2sfit->Fit("mypol2","","PSAME"); 
+  for (unsigned int j = 0; j < 3; j++) {
+    *allParamsSig << "bbdues" << j << " = " << mypol2->GetParameter(j) << " C \n";
+  }
+
+  Signal.cd(3);
+
+  TGraphErrors *fexpsfit = new TGraphErrors(Nmasspoints,masspoints,fexps,masspointserr,fexpserr);
+  
+  fexpsfit->SetTitle("fexps");
+  fexpsfit->SetMarkerStyle(20);
+  fexpsfit->SetMarkerColor(kRed);
+  fexpsfit->Draw("AP"); 
+  fexpsfit->Fit("mypol2","","PSAME"); 
+  for (unsigned int j = 0; j < 3; j++) {
+    *allParamsSig << "fexps" << j << " = " << mypol2->GetParameter(j) << " C \n";
+  }
+
+  Signal.cd(4);
   
   if (!isVBFsignal) {
     TGraphErrors *Tisfit = new TGraphErrors(Nmasspoints,masspoints,Tis,masspointserr,Tiserr);
@@ -189,7 +222,7 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
     *allParamsSig << "ns0 = 0.733 C \n";
     *allParamsSig << "ns1 = 0. C \n";
     *allParamsSig << "ns2 = 0. C \n";
-    *allParamsSig << "ms = 1066.2 C \n";
+    *allParamsSig << "ms = 1803.8 C \n";
     *allParamsSig << "ndues = 0.95 C \n";
 
   } else {
@@ -212,7 +245,8 @@ void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
     *allParamsSig << "ndues = 3.948 C \n";
   }
 
-  Signal.SaveAs("fitPar_Signal.ps");
+  sprintf(fileName,"fitPar_Signal_%dTeV.ps",LHCsqrts);
+  Signal.SaveAs(fileName);
 
   allParamsSig->close();
   allParamsBkg->close();
