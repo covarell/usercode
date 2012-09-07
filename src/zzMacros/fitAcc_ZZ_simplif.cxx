@@ -32,7 +32,7 @@
 #include "RooWorkspace.h"
 #include "RooRandom.h"
 
-#include "RooJetsPentaSpinTwo.h"
+// #include "RooJetsPentaSpinTwo.h"
 #include "RooPentaSpinTwo.h"
 
 using namespace RooFit;

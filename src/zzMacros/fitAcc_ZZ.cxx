@@ -30,7 +30,7 @@
 #include "RooAddPdf.h"
 #include "RooWorkspace.h"
 
-#include "RooJetsPentaSpinTwo.h"
+// #include "RooJetsPentaSpinTwo.h"
 #include "RooPentaSpinTwo.h"
 
 using namespace RooFit;

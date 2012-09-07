@@ -51,7 +51,7 @@ CXX	         += -I$(INCLUDEDIR)
 # CXX	         += -I/afs/cern.ch/cms/sw/slc5_ia32_gcc434/lcg/roofit/5.26.00-cms6/include
 # CMSSW 4_2
 CXX	         += -I/afs/cern.ch/cms/slc5_amd64_gcc434/lcg/roofit/5.28.00a-cms7/include
-OUTLIB	         = ../../../../lib/
+OUTLIB	         = lib/
 
 .SUFFIXES: .cc,.C,.hh,.h
 .PREFIXES: ../../../../lib/
