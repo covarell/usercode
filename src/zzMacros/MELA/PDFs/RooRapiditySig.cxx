@@ -69,7 +69,7 @@ Double_t RooRapiditySig::evaluate() const
 	
 	Double_t totSec = 2*m*((FuncABg)*weightg);
 
-	if(( m <= 600. && TMath::Abs(Y) > 20*pow(m,-0.32)) || ( m > 600. && TMath::Abs(Y) > 2.5))
+	if(( m <= 600. && TMath::Abs(Y) > 20*pow(m,-0.32)) || ( m > 600. && TMath::Abs(Y) > 21*pow(m,-0.34)))
 	  {
 	    //Find totSec when mZZ, Y=0
 	    Double_t xa0 = sqrt(s/s0); //at Y=0 xa=xb

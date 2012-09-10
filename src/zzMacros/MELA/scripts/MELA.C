@@ -357,18 +357,18 @@ void addDtoTree(char* inputFile, int LHCsqrts = 7,
     }
 
   TFile* sigFile = new TFile(inputFileName);
-  /* TTree* sigTree=0;
+  TTree* sigTree=0;
      if(sigFile)
         sigTree = (TTree*) sigFile->Get("SelectedTree");
     if(!sigTree){
       cout<<"ERROR could not find the tree!"<<endl;
       return;
-      } */
+      }
 
-  TChain* sigTree = new TChain("SelectedTree");
-  sigTree->Add("../datafiles/4e/HZZ4lTree_H125.root");
-  sigTree->Add("../datafiles/4mu/HZZ4lTree_H125.root");
-  sigTree->Add("../datafiles/2mu2e/HZZ4lTree_H125.root"); 
+    //TChain* sigTree = new TChain("SelectedTree");
+    //sigTree->Add("../datafiles/4e/HZZ4lTree_H125.root");
+    //sigTree->Add("../datafiles/4mu/HZZ4lTree_H125.root");
+    //sigTree->Add("../datafiles/2mu2e/HZZ4lTree_H125.root"); 
   // sigTree->Add("../datafiles/4e/HZZ4lTree_ggZZ2l2l.root");
   // sigTree->Add("../datafiles/4e/HZZ4lTree_ggZZ4l.root");
   /* sigTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2mu.root");
