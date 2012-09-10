@@ -5,6 +5,7 @@ DETERMINE SIGNAL ACCEPTANCE PARAMETERS FOR GRAVITON
 toy datasets generated according to the gen-level distributions (simplified
 way)
 
+mkdir lib
 make RooPentaSpinTwo.o
 make FitAccSimp_ZZ
 ./FitAccSimp_ZZ -f <file containing the RooDataSet> -m <graviton mass>

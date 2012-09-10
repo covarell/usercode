@@ -39,22 +39,24 @@ CXXFLAGS      += $(ROOTCFLAGS)
 
 NGLIBS         = $(ROOTGLIBS) 
 # Hack here, because RooFit is removed from ROOT:
-# NGLIBS        += -L/afs/cern.ch/cms/sw/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_6_3/external/slc5_ia32_gcc434/lib -lMinuit -lRooFit
-# CMSSW 4_2
-NGLIBS        += -L/afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_4/external/slc5_amd64_gcc434/lib -lMinuit -lMinuit2 -lRooFit -lRooFitCore
+#### CMSSW 4_2
+# NGLIBS        += -L/afs/cern.ch/cms/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_2_4/external/slc5_amd64_gcc434/lib -lMinuit -lMinuit2 -lRooFit -lRooFitCore
+#### CMSSW 5_2
+NGLIBS        += -L/afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/ -lMinuit -lMinuit2 -lRooFit -lRooFitCore
 # NGLIBS        += -lMinuit -lRooFit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
 INCLUDEDIR       = ./
 CXX	         += -I$(INCLUDEDIR)
 # Hack here, because RooFit is removed from ROOT:
-# CXX	         += -I/afs/cern.ch/cms/sw/slc5_ia32_gcc434/lcg/roofit/5.26.00-cms6/include
-# CMSSW 4_2
-CXX	         += -I/afs/cern.ch/cms/slc5_amd64_gcc434/lcg/roofit/5.28.00a-cms7/include
+#### CMSSW 4_2
+# CXX	         += -I/afs/cern.ch/cms/slc5_amd64_gcc434/lcg/roofit/5.28.00a-cms7/include
+#### CMSSW 5_2
+CXX	         += -I/afs/cern.ch/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms6/include
 OUTLIB	         = lib/
 
 .SUFFIXES: .cc,.C,.hh,.h
-.PREFIXES: ../../../../lib/
+.PREFIXES: ./lib/
 
 RooJetsPentaSpinTwo.o: $(INCLUDEDIR)RooJetsPentaSpinTwo.cc
 	$(CXX) $(CXXFLAGS) -c -o $(OUTLIB)/libRooJetsPentaSpinTwo.o $<
