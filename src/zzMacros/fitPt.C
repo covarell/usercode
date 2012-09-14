@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "TFile.h"
+#include "TF1.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TROOT.h"
@@ -35,7 +36,8 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
   // DEFINE BINNING
   // type:
   // 0 = background
-  // 1 = gg signal
+  // 1 = HRes gg signal
+  // 2 = POWHEG gg signal
   // 2 = VBF signal
   float lowlimit;
   std::vector<float> sizes;
@@ -44,7 +46,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
     lowlimit = min;
     sizes.push_back(1.);
     highlimits.push_back(max);
-  } else if (type == 1) {
+  } else if (type == 1 || type == 2) {
     lowlimit = min;
     sizes.push_back(sizeSig);        
     // sizes.push_back(8.);        
@@ -76,6 +78,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
   // FILL ROODATAHIST
   RooDataHist* result = new RooDataHist("result","A dataset",RooArgList(*var));
   float nWeight = source->GetEntries();
+  if (type == 2) nWeight = 0.00215;
   float binWidth = source->GetBinWidth(1);
 
   float thisWeight = 0.;
@@ -95,7 +98,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
       j++;
       cout << "Entries in TH1 bin " << i << " = " << source->GetBinContent(i)*nWeight << " +/- " << source->GetBinError(i)*nWeight << endl;   
       if (binWidth*j >= sizes.at(whichInterval) || lastbin) {
-        cout << "Entro" << endl; 
+        // cout << "Entro" << endl; 
 	if (thisWeight <= 0) thisWeight = minWeight; 
         if (fabs(thisWeight/sizes.at(whichInterval) - 0.0829038) < 0.00001) thisWeight /= 10.;
 	if (sqrt(thisWeightsum) > thisWeight) thisWeightsum = thisWeight*thisWeight*0.9;
@@ -125,7 +128,7 @@ TH1F* NNLOLowPtReweight(TH1F* toReweight, TH1F* weighter, float upTo) {
   return toReweight; 
 }
 
-void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool isVBFsignal = false)
+void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool isVBFsignal = false, bool writeWeightHisto = false)
 {
 
   float varMinBkg = 1.;        // all in GeV
@@ -139,16 +142,31 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   char fileToOpen[200];
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* fileb = new TFile(fileToOpen);
-  // sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* files = new TFile(fileToOpen);
-  
+  TFile* filegg;
+  if (writeWeightHisto) {
+    sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
+    filegg = new TFile(fileToOpen);  
+  }
+
   TH1F* massH = (TH1F*)((TH2F*)fileb->Get("Pt_bkg"))->ProjectionX();
   float mZZmin = mZZcenter - mZZspread;
   float mZZmax = mZZcenter + mZZspread;
   int binMin = massH->FindBin(mZZmin);
   int binMax = massH->FindBin(mZZmax);
 
+  RooRealVar* pt = new RooRealVar("pt","p_{T}^{H}",varMinBkg,varMaxBkg,"GeV/c");
+  RooRealVar* pts = new RooRealVar("pts","p_{T}^{H}",varMinSig,varMaxSig,"GeV/c");
+ 
+  TH1F* ggH = new TH1F();
+  RooDataHist* gg = new RooDataHist();
+  if (writeWeightHisto) {
+    ggH = (TH1F*)((TH2F*)filegg->Get("Pt_sig"))->ProjectionY("ggH",binMin,binMax);
+    gg = withSmartBinning(ggH,pts,varMinSig,varMaxSig,minWeight,sizeSig,2);
+    gg->SetName("gg");
+  }
+  
   // Check strange way of filling histos (CM)
   int binMean = (binMin+binMax)/2;
   if ((fabs(massH->GetBinContent(binMean) - 1.) < 0.01 || 
@@ -178,7 +196,6 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   gROOT->ProcessLine("setTDRStyle()");
   
   // Build datasets
-  RooRealVar* pt = new RooRealVar("pt","p_{T}^{H}",varMinBkg,varMaxBkg,"GeV/c");
   
   // TH1F* bkgHtest = new TH1F("bkgHtest","bkgHtest",nbins,varMinBkg,varMaxBkg);
   // RooDataHist* bkg = new RooDataHist("bkg","Background dataset",RooArgList(pt),Import(*bkgH,kTRUE),Weight(nBkgWeight));
@@ -195,14 +212,13 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
     cout << "Entries in RooDataSet bin " << i << " = " << bkg->weight() << " +/- " << bkg->weightError(RooAbsData::SumW2) << endl;  
   } 
 
-  RooRealVar* pts = new RooRealVar("pts","p_{T}^{H}",varMinSig,varMaxSig,"GeV/c");
-
+ 
   cout << endl << "Signal " << endl;   
 
   // RooDataHist* sig = new RooDataHist("sig","Signal dataset",RooArgList(pts),Import(*sigH,kTRUE),Weight(nSigWeight));
 
   int whichSig = 1;
-  if (isVBFsignal) whichSig = 2;
+  if (isVBFsignal) whichSig = 3;
   if (!isVBFsignal && LHCsqrts == 7 && mZZcenter > 299. && mZZcenter < 301.) {
     sizeSig = 16.;
     minWeight = 0.005;
@@ -296,6 +312,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   RooPlot *framesig = pts->frame();
   sprintf(reducestr,"pts > %f && pts < %f",pts->getMin(),pts->getMax());
 
+  if (writeWeightHisto) gg->plotOn(framesig,DataError(RooAbsData::SumW2),Cut(reducestr),LineColor(kRed),MarkerColor(kRed));
   sig->plotOn(framesig,DataError(RooAbsData::SumW2),Cut(reducestr));
   // ws->pdf("rt2")->plotOn(framesig,LineColor(kBlue),Normalization(sig->sumEntries(),RooAbsReal::NumEvent));
   ws->pdf("rt2")->plotOn(framesig,LineColor(kBlue));
@@ -436,11 +453,38 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5., int LHCsqrts = 7, bool 
   gPad->SetTopMargin(0.0);
   gPad->SetGridy();
   pulbkg->Draw();
-
   
   if (isVBFsignal) sprintf(fileToSave,"figs/fitVbfBkg_%dGeV_%dTeV_all.pdf",int(mZZcenter),LHCsqrts);
   else sprintf(fileToSave,"figs/fitSigBkg_%dGeV_%dTeV_all.pdf",int(mZZcenter),LHCsqrts);
   can.SaveAs(fileToSave);
- 
+
+  if (writeWeightHisto) {
+    TFile fout("weightHisto.root","RECREATE");
+    ws->var("pts")->setMin(0.);
+    ws->var("pts")->setMax(500.);
+
+    TH1F* ggHRes = (TH1F*)ggH->Clone();
+    ggH->SetName("ggH");   ggH->SetTitle("POWHEG pT histo");
+    ggHRes->SetName("ggHRes");   ggHRes->SetTitle("HRes pT fit histo");
+    ggH->Sumw2();
+    ggHRes->Sumw2();
+    ggH->Scale(1./ggH->Integral());
+
+    TH1F* wH = (TH1F*)ggH->Clone();
+    wH->SetName("wH");   wH->SetTitle("HRes to POWHEG pT weight histo");  
+    for (Int_t i=1; i<=ggH->GetNbinsX(); i++) {
+      ws->var("pts")->setVal(ggH->GetXaxis()->GetBinCenter(i));
+      ggHRes->SetBinContent(i,ws->pdf("rt2")->getVal());
+      ggHRes->SetBinError(i,0.00000001);
+      // cout << i << " " << ws->var("pts")->getVal() << " " << ggH->GetBinContent(i) << " " << ggHRes->GetBinContent(i) << endl;
+    }
+    ggHRes->Scale(1./ggHRes->Integral());
+    wH->Divide(ggHRes,ggH);
+
+    ggH->Write();
+    ggHRes->Write();
+    wH->Write();
+    fout.Close();
+  }
 
 }
