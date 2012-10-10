@@ -14,6 +14,7 @@
 
 void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
+  // -3 - effect of finite top mass
   // -2 - mu_Q in gg signal shape
   // -1 - fraction of VBF (NOT for VBF fraction fitting)
   // 1 - Z+X in background
@@ -26,36 +27,28 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
  
   // READ TREES
   TChain* ggTree = new TChain("angles");
-  ggTree->Add("../datafiles/4e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
-  ggTree->Add("../datafiles/4mu/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
-  ggTree->Add("../datafiles/2mu2e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root"); 
   if (also7TeV) {
     ggTree->Add("../datafiles/4e/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
     ggTree->Add("../datafiles/4mu/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
     ggTree->Add("../datafiles/2mu2e/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
+  } else {
+    ggTree->Add("../datafiles/4e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
+    ggTree->Add("../datafiles/4mu/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
+    ggTree->Add("../datafiles/2mu2e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root"); 
   }
 
   TChain* VBFTree = new TChain("angles");
-  VBFTree->Add("../datafiles/4e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
-  VBFTree->Add("../datafiles/4mu/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
-  VBFTree->Add("../datafiles/2mu2e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root"); 
   if (also7TeV) {
     VBFTree->Add("../datafiles/4e/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
     VBFTree->Add("../datafiles/4mu/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
     VBFTree->Add("../datafiles/2mu2e/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
+  } else {
+    VBFTree->Add("../datafiles/4e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
+    VBFTree->Add("../datafiles/4mu/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
+    VBFTree->Add("../datafiles/2mu2e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root"); 
   }
 
   TChain* zzTree = new TChain("angles");
-  zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4e_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4mu_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2mu_105-1000_withDiscriminantsPtY.root"); 
-  zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
-  zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
   if (also7TeV) {
     zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4e_105-1000_7TeV_withDiscriminantsPtY.root");
     zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2tau_105-1000_7TeV_withDiscriminantsPtY.root");
@@ -67,16 +60,28 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau_105-1000_7TeV_withDiscriminantsPtY.root");
     zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau_105-1000_7TeV_withDiscriminantsPtY.root");
     zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo4tau_105-1000_7TeV_withDiscriminantsPtY.root");
-  } 
-
+  } else {
+    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4e_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4mu_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2mu_105-1000_withDiscriminantsPtY.root"); 
+    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
+  }
+   
   TChain* dataTree = new TChain("angles");
-  dataTree->Add("../datafiles/data/HZZ4lTree_DoubleEle_105-1000_withDiscriminantsPtY.root");
-  dataTree->Add("../datafiles/data/HZZ4lTree_DoubleMu_105-1000_withDiscriminantsPtY.root");
-  dataTree->Add("../datafiles/data/HZZ4lTree_DoubleOr_105-1000_withDiscriminantsPtY.root"); 
   if (also7TeV) {
     dataTree->Add("../datafiles/data/HZZ4lTree_DoubleEle_105-1000_7TeV_withDiscriminantsPtY.root");
     dataTree->Add("../datafiles/data/HZZ4lTree_DoubleMu_105-1000_7TeV_withDiscriminantsPtY.root");
     dataTree->Add("../datafiles/data/HZZ4lTree_DoubleOr_105-1000_7TeV_withDiscriminantsPtY.root");
+  } else {
+    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleEle_105-1000_withDiscriminantsPtY.root");
+    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleMu_105-1000_withDiscriminantsPtY.root");
+    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleOr_105-1000_withDiscriminantsPtY.root"); 
   }
 
   TChain* crTree = new TChain("angles");
@@ -188,8 +193,12 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   crzjTree->SetBranchAddress("ZZPt",&ptzj);
   crzjTree->SetBranchAddress("melaLDWithPtY",&nlozj);
 
+  char nameSyst[200]; 
+  char nameFile[200];
 
-  TFile weightsSig("../../weightHisto_125GeV_8TeV_all.root");
+  sprintf(nameFile,"../../weightHisto_125GeV_8TeV_all.root");
+  if (also7TeV) sprintf(nameFile,"../../weightHisto_125GeV_7TeV_all.root");
+  TFile weightsSig(nameFile);
   TH1F* wHalf = (TH1F*)weightsSig.Get("wH");
   TFile weightsSig1("../../weightHisto_125GeV_8TeV_One.root");
   TH1F* wOne = (TH1F*)weightsSig1.Get("wH");
@@ -200,14 +209,19 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   can.Divide(1,2);
 
   // Standard pT binning
-  TH1F* pth = new TH1F("pth","pt",50,0.,200.);
+  // TH1F* pth = new TH1F("pth","pt",50,0.,200.);
   TH1F* pth1 = new TH1F("pth1","pt",50,0.,200.);
-  TH1F* pth2 = new TH1F("pth2","pt",50,0.,200.);
+  // TH1F* pth2 = new TH1F("pth2","pt",50,0.,200.);
+  //Extended ranges
+  TH1F* pth = new TH1F("pth","pt",160,0.,400.);
+  TH1F* pth2 = new TH1F("pth2","pt",160,0.,400.);
+  TH1F* ptvbf = new TH1F("ptvbf","pt",160,0.,400.);
   pth->Sumw2();
   pth1->Sumw2();
   pth2->Sumw2();
-
-  //Alternative pT binning
+  ptvbf->Sumw2();
+ 
+  //Alternative pT binnings
   const int nbins = 10;
   float binlimits[nbins+1] = {0.,10.,20.,30.,40.,50.,70.,90.,110.,150.,190.}; 
   TH1F* ptalt = new TH1F("ptalt","pt",nbins,binlimits);
@@ -222,8 +236,89 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   nloh1->Sumw2();
   nloh2->Sumw2();
 
-  char nameSyst[200]; 
-  char nameFile[200];
+  if (whichtype == -3) {
+
+    TFile pwhgNoMass("ggH125_infiniteMT.root");
+    TFile pwhgMass("ggH125_finiteMT.root");
+    
+    TH1F* nmH = (TH1F*)((TH2F*)pwhgNoMass.Get("Pt_sig"))->ProjectionY("nmH");
+    TH1F* mH = (TH1F*)((TH2F*)pwhgMass.Get("Pt_sig"))->ProjectionY("mH");
+ 
+    nmH->Rebin(4);   nmH->Sumw2();
+    mH->Rebin(4);    mH->Sumw2();
+    nmH->GetXaxis()->SetRange(1,80);
+    mH->GetXaxis()->SetRange(1,80);
+    nmH->Scale(1./nmH->Integral());
+    mH->Scale(1./mH->Integral());
+
+    // Grazzini's matching
+    for (Int_t iBin = 1; iBin <= nmH->GetNbinsX() ; ++iBin) {
+      float thept = nmH->GetBinCenter(iBin); 
+      float matchw = 0.;   // should be zero, but allow division
+      if (thept > 149.8) matchw = 1.;
+      if (thept < 149.8 && thept > 89.8) 
+	matchw = 0.5*(1 - cos(3.1416*(thept-89.8)/60.));
+      // cout << matchw << endl;
+      nmH->SetBinContent(iBin,nmH->GetBinContent(iBin)*matchw);
+      mH->SetBinContent(iBin,mH->GetBinContent(iBin)*matchw);
+    }
+
+    // nmH->Scale(1./nmH->Integral());
+    // mH->Scale(1./mH->Integral());
+
+    mH->SetMarkerColor(1);    mH->SetLineColor(1);    mH->SetLineWidth(2);
+    nmH->SetMarkerColor(2);   nmH->SetLineColor(2);   nmH->SetLineWidth(2);
+
+    can.cd(1);
+    gPad->SetBottomMargin(0.0);
+    mH->GetXaxis()->SetLabelColor(kWhite);
+    mH->GetYaxis()->SetTitle("Normalized entries");
+    mH->Draw();
+    nmH->Draw("SAME");
+
+    TH1F* diffpt = (TH1F*)mH->Clone();
+    TH1F* pullpt = (TH1F*)mH->Clone();
+    diffpt->Add(nmH,mH,1,-1);
+    pullpt->Divide(diffpt,nmH);
+    can.cd(2);
+    gPad->SetTopMargin(0.0);
+    pullpt->SetMinimum(-1.);
+    pullpt->SetMaximum(1.);
+    pullpt->GetXaxis()->SetLabelColor(kBlack);
+    pullpt->GetXaxis()->SetTitle("p_{T} [GeV/c]");
+    pullpt->GetYaxis()->SetTitle("Relative difference");
+    pullpt->Draw("E");
+
+    can.SaveAs("pt_systTopMass_corr.pdf");
+    sprintf(nameSyst,"TopMass");
+    
+    mH->Divide(mH,nmH);
+
+    for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
+      ggTree->GetEntry(iEvt);
+      if (mgg < 140. && mgg > 105. && ptgg < 500.) {
+        float newW = 1.;
+	if (ptgg > 90.) newW = mH->GetBinContent(mH->FindBin(ptgg));
+	pth->Fill(ptgg,wgg);
+	pth2->Fill(ptgg,wgg*newW);
+        nloh->Fill(nlogg,wgg);
+	nloh2->Fill(nlogg,wgg*newW);
+      }
+    } 
+
+    for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
+      VBFTree->GetEntry(iEvt);
+      if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
+	pth->Fill(ptVBF,wVBF);
+	pth2->Fill(ptVBF,wVBF);
+        nloh->Fill(nloVBF,wVBF);
+	nloh2->Fill(nloVBF,wVBF);
+      }
+    }
+
+    // return;
+
+  }  
 
   if (whichtype == -2) {
 
@@ -240,17 +335,32 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
       }
     } 
 
+    sprintf(nameFile,"PT_gg_SEL_8TeV.root");
+    if (also7TeV) sprintf(nameFile,"PT_gg_SEL_7TeV.root");
+    TFile f(nameFile,"RECREATE");
+    pth->SetName("ptH");
+    pth->Write();
+    f.Close();
+
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
       if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
 	pth->Fill(ptVBF,wVBF);
         pth1->Fill(ptVBF,wVBF);
 	pth2->Fill(ptVBF,wVBF);
+	ptvbf->Fill(ptVBF,wVBF);
         nloh->Fill(nloVBF,wVBF);
 	nloh1->Fill(nloVBF,wVBF);
 	nloh2->Fill(nloVBF,wVBF);
       }
     }
+
+    sprintf(nameFile,"PT_vbf_SEL_8TeV.root");
+    if (also7TeV) sprintf(nameFile,"PT_vbf_SEL_7TeV.root");
+    TFile f1(nameFile,"RECREATE");
+    ptvbf->SetName("ptH");
+    ptvbf->Write();
+    f1.Close();
 
     sprintf(nameSyst,"Resummation");
  
@@ -263,8 +373,8 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
       if (mgg < 140. && mgg > 105. && ptgg < 500.) {
 	int theBin = wHalf->FindBin(ptgg);
 	pth->Fill(ptgg,wgg*wHalf->GetBinContent(theBin));
-	pth1->Fill(ptgg,wgg*0.84*wHalf->GetBinContent(theBin)); // gg: +/-16%
-	pth2->Fill(ptgg,wgg*1.16*wHalf->GetBinContent(theBin));
+	pth1->Fill(ptgg,wgg*0.84*wHalf->GetBinContent(theBin));  // gg: +/-16%
+	pth2->Fill(ptgg,wgg*1.16*wHalf->GetBinContent(theBin));  
         nloh->Fill(nlogg,wgg*wHalf->GetBinContent(theBin));
 	nloh1->Fill(nlogg,wgg*0.84*wHalf->GetBinContent(theBin));
 	nloh2->Fill(nlogg,wgg*1.16*wHalf->GetBinContent(theBin));
@@ -315,6 +425,13 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
       }
     } 
 
+    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
+    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
+    TFile f2(nameFile,"RECREATE");
+    pth2->SetName("ptH");
+    pth2->Write();
+    f2.Close();
+
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
       if (mcr < 140. && mcr > 105. && ptcr < 500.) {
@@ -322,6 +439,13 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
         nloh->Fill(nlocr);
       }
     } 
+
+    sprintf(nameFile,"PT_zx_SEL_8TeV.root");
+    if (also7TeV) sprintf(nameFile,"PT_zx_SEL_7TeV.root");
+    TFile f3(nameFile,"RECREATE");
+    pth->SetName("ptH");
+    pth->Write();
+    f3.Close();
 
     sprintf(nameSyst,"ZplusX");
  
@@ -389,7 +513,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullpt->GetYaxis()->SetTitle("Relative difference");
     pullpt->Draw("E");
 
-    can.SaveAs("pt_systUnbRegion.gif");
+    can.SaveAs("pt_systUnbRegion.pdf");
     return;
 
   }
@@ -430,7 +554,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullpt->GetYaxis()->SetTitle("Relative difference");
     pullpt->Draw("E");
 
-    can.SaveAs("pt_systSingleZ.gif");
+    can.SaveAs("pt_systSingleZ.pdf");
     return;
   }
 
@@ -451,10 +575,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   
   can.cd(1);
   gPad->SetBottomMargin(0.0);
+  if (whichtype == -3) gPad->SetLogy();
   pth2->GetXaxis()->SetLabelColor(kWhite);
   pth2->GetYaxis()->SetTitle("Normalized entries");
   pth2->Draw();
-  pth1->Draw("SAME");
+  if (whichtype != -3) pth1->Draw("SAME");
   pth->Draw("SAME");
   
   TH1F* diffpt = (TH1F*)pth->Clone();
@@ -469,7 +594,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   pullpt->GetYaxis()->SetTitle("Relative difference");
   pullpt->Draw("E");
   
-  sprintf(nameFile,"pt_syst%s.gif",nameSyst);
+  sprintf(nameFile,"pt_syst%s.pdf",nameSyst);
   can.SaveAs(nameFile);
   
   can.cd(1);
@@ -479,11 +604,10 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   nloh2->GetXaxis()->SetLabelColor(kWhite);
   nloh2->GetYaxis()->SetTitle("Normalized entries");
   if (whichtype == 2) nloh2->Draw();
-  else {
-    nloh1->Draw();
-    nloh2->Draw("SAME");
-  }
-  nloh->Draw("SAME");
+  else nloh->Draw();
+  if (whichtype != -3) nloh1->Draw();
+  if (whichtype == 2) nloh->Draw("SAME");
+  nloh2->Draw("SAME");
   
   TH1F* diffnlo = (TH1F*)nloh->Clone();
   TH1F* pullnlo = (TH1F*)nloh->Clone();
@@ -497,7 +621,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   pullnlo->GetYaxis()->SetTitle("Relative difference");
   pullnlo->Draw("E");
   
-  sprintf(nameFile,"nlo_syst%s.gif",nameSyst);
+  sprintf(nameFile,"nlo_syst%s.pdf",nameSyst);
   can.SaveAs(nameFile);
   
   if (whichtype == 1) {
@@ -522,7 +646,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullpt->SetMaximum(2.);
     pullpt->Draw("E");
        
-    sprintf(nameFile,"pt_balanced%s.gif",nameSyst);
+    sprintf(nameFile,"pt_balanced%s.pdf",nameSyst);
     can.SaveAs(nameFile);
     
     TH1F* balnlo = (TH1F*)nloh->Clone();
@@ -545,7 +669,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullnlo->SetMaximum(1.);
     pullnlo->Draw("E");
 
-    sprintf(nameFile,"nlo_balanced%s.gif",nameSyst);
+    sprintf(nameFile,"nlo_balanced%s.pdf",nameSyst);
     can.SaveAs(nameFile);
   }
 

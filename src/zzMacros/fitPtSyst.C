@@ -390,11 +390,11 @@ void Run2D(RooWorkspace *ws, int mZZcenter) {
   return; 
 }
 
-void fitPt(float mZZcenter = 126., float mZZspread = 5., 
-	   int LHCsqrts = 7, 
-	   bool isVBFsignal = false, 
-	   bool writeWeightHisto = false, 
-	   bool run2D = false)
+void fitPtSyst(float mZZcenter = 126., float mZZspread = 5., 
+	       int LHCsqrts = 7, 
+	       bool isVBFsignal = false, 
+	       bool writeWeightHisto = false, 
+	       bool run2D = false, string typeSyst = "half")
 {
 
   float varMinBkg = 1.;        // all in GeV
@@ -408,7 +408,8 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
   char fileToOpen[200];
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* fileb = new TFile(fileToOpen);
-  sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
+  // sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
+  sprintf(fileToOpen,"HResSystemtics_125.root");
   TFile* files = new TFile(fileToOpen);
   TFile* filegg;
   if (writeWeightHisto) {
@@ -454,7 +455,9 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
     TFile* files2 = new TFile(fileToOpen);
     sigVBFH = (TH1F*)((TH2F*)files2->Get("Pt_sigVBF"))->ProjectionY("sigVBFH",binMin,binMax); 
   } 
-  sigH = (TH1F*)((TH2F*)files->Get("Pt_sig"))->ProjectionY("sigH",binMin,binMax);
+  // sigH = (TH1F*)((TH2F*)files->Get("Pt_sig"))->ProjectionY("sigH",binMin,binMax);
+  sprintf(fileToOpen,"pt_%sQ",typeSyst.c_str());
+  sigH = (TH1F*)(files->Get(fileToOpen));
  
   /* sprintf(fileToOpen,"PT_%d_Temp.root",int(mZZcenter));
   TFile* file2 = new TFile(fileToOpen);
@@ -512,17 +515,12 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
   RooRealVar n("n","enne", 0.93, 0.5, 15.);
   RooRealVar n2("n2","enne2", 0.75, 0.5, 15.);
   RooRealVar bb("bb","bibi",0.02, 0.0005, 0.1);
-  RooRealVar T("T","tti",0.2,0.000005,1.);
+  RooRealVar T("T","tti",0.2,0.0005,1.);
   RooRealVar bb2("bb2","bibi2",0.02, 0.0005, 0.1);
   RooRealVar fexp("fexp","f_exp",0.02, 0.0, 1.0);
-  if (LHCsqrts == 8) {
-    m.setVal(54.47);   m.setConstant(kTRUE);    
-    n2.setVal(1.73);   n2.setConstant(kTRUE);
-  } else {
-    m.setVal(83.54);   m.setConstant(kTRUE);    
-    n2.setVal(1.31);   n2.setConstant(kTRUE);
-  }
+  m.setVal(54.47);   m.setConstant(kTRUE);
   n.setVal(1.255);   // n.setConstant(kTRUE);
+  n2.setVal(1.73);   n2.setConstant(kTRUE);
   bb.setVal(0.020); // bb.setConstant(kTRUE);
   bb2.setVal(0.20);  bb2.setConstant(kTRUE);
   T.setVal(0.20);   // T.setConstant(kTRUE);
@@ -553,15 +551,9 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
     fexpv.setVal(0.1);   fexpv.setConstant(kTRUE);
   }
 
-  if (LHCsqrts == 8) {
-    ms.setVal(1803.8);   ms.setConstant(kTRUE);
-    ns.setVal(0.733);   ns.setConstant(kTRUE);
-    n2s.setVal(0.95);   n2s.setConstant(kTRUE);
-  } else {
-    ms.setVal(609.5);   ms.setConstant(kTRUE);
-    ns.setVal(1.551);   ns.setConstant(kTRUE);
-    n2s.setVal(2.362);   n2s.setConstant(kTRUE);
-  }
+  ms.setVal(1803.8);   ms.setConstant(kTRUE);
+  ns.setVal(0.733);   ns.setConstant(kTRUE);
+  n2s.setVal(0.95);   n2s.setConstant(kTRUE);
   bbs.setVal(0.0323); // bbs.setConstant(kTRUE);
   Ts.setVal(0.064);   // Ts.setConstant(kTRUE);
   bb2s.setVal(0.020);   // bb2s.setConstant(kTRUE);
@@ -699,7 +691,6 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
     yresbkg[i] = thisweight/(thisweight-yresbkg[i]);
     float yerrbkgup = thiserrup/(thisweight-yresbkg[i]);
     float yerrbkgdown = thiserrdown/(thisweight-yresbkg[i]);
-    if (yerrbkgup < 0.0001 || yerrbkgup > 1.) yresbkg[i] = -999.;
     hresidbkg->SetPoint(i,xbkg[i],yresbkg[i]);
     hresidbkg->SetPointError(i,0.,0.,yerrbkgdown,yerrbkgup);
 
@@ -784,7 +775,7 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
   
 
   if (writeWeightHisto) {
-    sprintf(fileToSave,"weightHisto_%dGeV_%dTeV_all.root",int(mZZcenter),LHCsqrts);
+    sprintf(fileToSave,"weightHisto_%dGeV_%dTeV_%s.root",int(mZZcenter),LHCsqrts,typeSyst.c_str());
     TFile fout(fileToSave,"RECREATE");
     ws->var("pts")->setMin(0.);
     ws->var("pts")->setMax(500.);
@@ -798,9 +789,9 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
     ggH->Sumw2();
     ggHRes->Sumw2();
     // Correct by hand nonsense low pT
-    /* ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
+    ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
     ggH->SetBinContent(2,ggH->GetBinContent(4)/4.);
-    ggH->SetBinContent(3,ggH->GetBinContent(4)/2.); */
+    ggH->SetBinContent(3,ggH->GetBinContent(4)/2.);
     ggH->Scale(1./ggH->Integral());
 
     TH1F* wH = (TH1F*)ggH->Clone();
