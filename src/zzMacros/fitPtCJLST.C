@@ -120,277 +120,8 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
   return result;
 }
 
-void Run2D(RooWorkspace *ws, int mZZcenter) {
-  
-  float minZZ = 105.;
-  float maxZZ = 150.;
-
-  char fileToSave[200];
-  // TOYS TO ESTIMATE f_VBF UNCERTAINTY
-
-  // Read data files
-  TChain* sigTree = new TChain("SelectedTree");
-  sigTree->Add("MELA/datafiles/4e/HZZ4lTree_H125.root");
-  sigTree->Add("MELA/datafiles/4mu/HZZ4lTree_H125.root");
-  sigTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_H125.root"); 
-
-  TChain* bkgTree = new TChain("SelectedTree");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo2e2mu.root");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo2e2tau.root");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo2mu2tau.root");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo4e.root");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo4mu.root");
-  bkgTree->Add("MELA/datafiles/4e/HZZ4lTree_ZZTo4tau.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo2e2mu.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo2e2tau.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo2mu2tau.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo4e.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo4mu.root");
-  bkgTree->Add("MELA/datafiles/4mu/HZZ4lTree_ZZTo4tau.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo2e2mu.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo4e.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo4mu.root");
-  bkgTree->Add("MELA/datafiles/2mu2e/HZZ4lTree_ZZTo4tau.root"); 
-
-  /// Fit mass distributions
-  RooRealVar ZZMass("ZZMass","ZZMass", 110.,minZZ,maxZZ,"GeV/c");
-  ws->import(ZZMass);
-  sprintf(fileToSave,"ZZMass > %f && ZZMass < %f",minZZ,maxZZ);
-  RooDataSet* sigM = new RooDataSet("sigM","signal mass",sigTree,RooArgSet(ZZMass),fileToSave); 
-  RooDataSet* bkgM = new RooDataSet("bkgM","ZZ mass",bkgTree,RooArgSet(ZZMass),fileToSave); 
-
-  /* ws->factory("CBShape::sigCB1(ZZMass,meanSig[125.,105.,140.],sigmaSig1[2.,1.,10.],alpha[1.7,0.3,3.0],enne[2.,1.5,50.])");
-  ws->factory("Gaussian::sigCB2(ZZMass,meanSig,sigmaSig2[8.,4.,15.])");
-  ws->factory("SUM::sigCB(fCB1[0.5,0.001.,0.999]*sigCB1,sigCB2)"); */  
-  RooDataHist* sigMH = new RooDataHist("sigMH","sigMH",RooArgSet(ZZMass),*sigM); 
-  RooHistPdf* sigCB = new RooHistPdf("sigCB","sigCB",RooArgSet(ZZMass),*sigMH);
-  ws->import(*sigCB);
-  ws->factory("Chebychev::bkgCh(ZZMass,{a0[0.1,-1.,1.],a1[0.1,-1.,1.],a2[0.1,-1.,1.]})");
-
-  // ws->pdf("sigCB")->fitTo(*sigM,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));
-  ws->pdf("bkgCh")->fitTo(*bkgM,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1)); 
-
-  RooPlot *framebkgM = ZZMass.frame();
-
-  bkgM->plotOn(framebkgM,DataError(RooAbsData::SumW2));
-  ws->pdf("bkgCh")->plotOn(framebkgM,LineColor(kBlue),Normalization(bkgM->sumEntries(),RooAbsReal::NumEvent));
-  
-  RooPlot *framesigM = ZZMass.frame();
- 
-  sigM->plotOn(framesigM,DataError(RooAbsData::SumW2));
-  ws->pdf("sigCB")->plotOn(framesigM,LineColor(kBlue),Normalization(sigM->sumEntries(),RooAbsReal::NumEvent));
-  
-  TCanvas can2("can2","The canvas",5.,5.,800.,500.); 
-  can2.Divide(2,1);
-
-  TLatex *t = new TLatex();
-  t->SetNDC();
-  t->SetTextAlign(22);
-  t->SetTextSize(0.06);
-
-  can2.cd(1);  framesigM->Draw();
-  can2.cd(2);  framebkgM->Draw();
-
-  sprintf(fileToSave,"figs/fitMass_%dGeV.pdf",int(mZZcenter));
-  can2.SaveAs(fileToSave);
-
-  /// Fix all shapes
-  ws->var("a0")->setConstant(kTRUE);
-  ws->var("a1")->setConstant(kTRUE);
-  ws->var("a2")->setConstant(kTRUE);
-  ws->var("m")->setConstant(kTRUE);
-  ws->var("n")->setConstant(kTRUE);
-  ws->var("bb")->setConstant(kTRUE);
-  ws->var("n2")->setConstant(kTRUE);
-  ws->var("bb2")->setConstant(kTRUE);
-  ws->var("T")->setConstant(kTRUE);
-  ws->var("fexp")->setConstant(kTRUE);
-  ws->var("ms")->setConstant(kTRUE);
-  ws->var("ns")->setConstant(kTRUE);
-  ws->var("bbs")->setConstant(kTRUE);
-  ws->var("n2s")->setConstant(kTRUE);
-  ws->var("bb2s")->setConstant(kTRUE);
-  ws->var("Ts")->setConstant(kTRUE);
-  ws->var("fexps")->setConstant(kTRUE);
-  ws->var("mv")->setConstant(kTRUE);
-  ws->var("nv")->setConstant(kTRUE);
-  ws->var("bbv")->setConstant(kTRUE);
-  ws->var("n2v")->setConstant(kTRUE);
-  ws->var("bb2v")->setConstant(kTRUE);
-  ws->var("Tv")->setConstant(kTRUE);
-  ws->var("fexpv")->setConstant(kTRUE);
-
-  // Generate and fit toys
-
-  //1D
-  ws->factory("SUM::ptSig(fVBF[0.5,0.,1.]*rt,rt2)");
-  ws->factory("SUM::massPdf(fBkg[0.5,0.,1.]*bkgCh,sigCB)");
-  ws->factory("SUM::ptPdf(fBkg*rt4,ptSig)");
-
-  //2D
-  ws->factory("PROD::allGG(sigCB,rt2)");  
-  ws->factory("PROD::allVBF(sigCB,rt)");
-  ws->factory("PROD::allZZ(bkgCh,rt4)");  
-  ws->factory("PROD::allSig(sigCB,ptSig)");
-  ws->factory("SUM::all(fBkg*allZZ,allSig)");
-
-  ifstream theFile("configToys.txt");
-  char thePar[10];
-  float theVal;	
-  int nToys;
-  float fBkgVal, fVBFVal, lumiVal;
-
-  // fBkg and fVBF from Mike's files for 20 fb-1: can be overwritten
-  // *** ee
-  // process	ttH	ZH	WH	qqH	ggH	QQZZ	GGZZ	FAKES	
-  // rate	0.0109615892	0.0400934661727	0.0727344736236	0.17448742481	 1.94373327139	3.44729957187	0.0691200171852	0.966791503492	
-  // *** emu
-  // process	ttH	ZH	WH	qqH	ggH	QQZZ	GGZZ	FAKES	
-  // rate	0.0297855894832	0.108944743558	0.197639150046	0.449271834373	 5.28164668738	9.12046958147	0.171200846394	2.409869007	
-  // ** mumu
-  // process	ttH	ZH	WH	qqH	ggH	QQZZ	GGZZ	FAKES	
-  // rate	0.0208474338004	0.0762522538126	0.138330956964	0.334468868705	 3.69671312815	7.94918247279	0.137969786197	1.51563994758	
-  
-  fVBFVal = (0.1745+0.4493+0.3345)/(0.1745+0.4493+0.3345+2.0667+5.6201+3.9321);  
-  float allEvents = 4.4822+11.7015+9.6028+0.1745+0.4493+0.3345+2.0667+5.6201+3.9321;  
-  fBkgVal = (4.4822+11.7015+9.6028)/allEvents;
-  float scaleBkg = (maxZZ-minZZ)/35.;  // Mike's numbers are for 105-140 GeV
-  fBkgVal = scaleBkg*fBkgVal/(1. + fBkgVal*(scaleBkg-1.));
-
-  while (theFile >> thePar >> theVal) {
-    if (!strcmp(thePar,"n")) {nToys = int(theVal);}
-    if (!strcmp(thePar,"fVBF")) {fVBFVal = theVal;}
-    if (!strcmp(thePar,"fBkg")) {fBkgVal = theVal;}
-    if (!strcmp(thePar,"lumi")) {lumiVal = theVal;}
-  }
-
-  cout << "fBkg GEN = " << fBkgVal << endl;
-  cout << "fVBF GEN = " << fVBFVal << endl;
-  cout << "lumi = " << lumiVal << " fb-1" << endl;
-
-  float howManyEvents = allEvents*lumiVal/20.;
-  cout << "Total number of expected events = " << howManyEvents << endl;
-  cout << "Number of expected signal events = " << howManyEvents*(1-fBkgVal) << endl;
-  int howManyEventsGG = int(howManyEvents*(1-fBkgVal)*(1-fVBFVal));
-  int howManyEventsVBF = int(howManyEvents*(1-fBkgVal)*fVBFVal);
-  int howManyEventsBKG = int(howManyEvents*fBkgVal);
-  
-  // Store results
-  TH1F* fVBFRes = new TH1F("fVBFRes","fVBF",11,-0.05,1.05);
-  TH1F* fVBFErr = new TH1F("fVBFErr","fVBF",10,-0.05,0.4);
-  TH1F* fVBFPull = new TH1F("fVBFPull","fVBF",10,-5.,5.);
-  TH1F* nll = new TH1F("nll","fVBF",11,-100000.,100000.);
-
-  for (unsigned int iToy = 0; iToy < nToys; iToy++) {
-
-    cout << endl << "####" << endl;
-    cout << "Generating toy experiment n. " << iToy+1 << endl;
-
-    ws->var("fVBF")->setVal(fVBFVal);
-    ws->var("fVBF")->setConstant(kFALSE);
-    ws->var("fBkg")->setVal(fBkgVal);
-    ws->var("fBkg")->setConstant(kFALSE);
-
-    TDatime *now = new TDatime();
-    Int_t seed = now->GetDate() + now->GetTime();
-    cout << "RooFit Generation Seed = " << seed << endl;
-    RooRandom::randomGenerator()->SetSeed(seed);
-    cout << "####" << endl << endl;
-
-    RooDataSet *dataToy = ws->pdf("allGG")->generate(RooArgSet(*(ws->var("ZZMass")),*(ws->var("pts"))),howManyEventsGG,Extended());
-    RooDataSet *dataToy2 = ws->pdf("allVBF")->generate(RooArgSet(*(ws->var("ZZMass")),*(ws->var("pts"))),howManyEventsVBF,Extended());
-    RooDataSet *dataToy3 = ws->pdf("allZZ")->generate(RooArgSet(*(ws->var("ZZMass")),*(ws->var("pts"))),howManyEventsBKG,Extended());
-    dataToy->append(*dataToy2);
-    dataToy->append(*dataToy3);
-
-    // int nFitPar;  
-    Double_t theNLL;
-    ws->pdf("massPdf")->fitTo(*dataToy,Minos(0),SumW2Error(kTRUE),NumCPU(1));  
-    ws->var("fBkg")->setConstant(kTRUE);
-  
-    // RooFitResult *rfr = ws->pdf("all")->fitTo(*dataToy,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));      
-    RooFitResult *rfr = ws->pdf("ptPdf")->fitTo(*dataToy,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));
-
-    // nFitPar = rfr->floatParsFinal().getSize();  
-    theNLL = rfr->minNll();  
-    float fVBF_static = ws->var("fVBF")->getVal();
-    float fVBFErr_static = ws->var("fVBF")->getError();
-    fVBFRes->Fill(fVBF_static);
-    fVBFErr->Fill(fVBFErr_static);
-    fVBFPull->Fill(fVBF_static/fVBFErr_static);
-    nll->Fill(theNLL);
-
-    if (iToy == 0) { // JUST DRAW THE FIRST EXPERIMENT
-
-      RooHist *hresid = new RooHist();
-      cout << "OK qui" << endl;
-
-      RooPlot *mframe = ws->var("ZZMass")->frame();
-
-      TCanvas can3("can3","The canvas",5.,5.,1000.,800.); 
-      can3.Divide(2,2);
-
-      dataToy->plotOn(mframe,DataError(RooAbsData::SumW2),Binning(14));      
-      ws->pdf("all")->plotOn(mframe,Components("allZZ"),LineColor(kBlue),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      ws->pdf("all")->plotOn(mframe,Components("allZZ,allVBF"),LineColor(kRed),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      ws->pdf("all")->plotOn(mframe,LineColor(kBlack),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      hresid = mframe->pullHist();
-
-      RooPlot* mframeres = ws->var("ZZMass")->frame(Title("Residuals Distribution")) ;
-      mframeres->addPlotable(hresid,"P") ;  
-      
-      can3.cd(1);mframe->Draw();
-      can3.cd(3);mframeres->Draw();
-      
-      RooBinning myRb(ws->var("pts")->getMin(), ws->var("pts")->getMax());
-      myRb.addBoundary(2.);
-      myRb.addBoundary(5.);
-      myRb.addBoundary(7.5);
-      myRb.addBoundary(10.);
-      myRb.addBoundary(12.5);
-      myRb.addBoundary(15.);
-      myRb.addBoundary(18.);
-      myRb.addBoundary(30.);
-      myRb.addBoundary(50.);
-      myRb.addBoundary(100.);
-      myRb.addBoundary(200.);
-    
-      RooPlot *tframe = ws->var("pts")->frame();      
-      
-      dataToy->plotOn(tframe,DataError(RooAbsData::SumW2),Binning(myRb));
-      ws->pdf("all")->plotOn(tframe,Components("allZZ"),LineColor(kBlue),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      ws->pdf("all")->plotOn(tframe,Components("allZZ,allVBF"),LineColor(kRed),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      ws->pdf("all")->plotOn(tframe,LineColor(kBlack),Normalization(dataToy->sumEntries(),RooAbsReal::NumEvent));
-      hresid = tframe->pullHist();
-
-      RooPlot* tframeres =  ws->var("pts")->frame(Title("Residuals Distribution")) ;
-      tframeres->addPlotable(hresid,"P") ;  
-	
-      can3.cd(2);gPad->SetLogx();gPad->SetLogy();tframe->Draw();
-      can3.cd(4);gPad->SetLogx();tframeres->Draw();
-
-      sprintf(fileToSave,"figs/fit2D_%dGeV.pdf",int(mZZcenter));
-      can3.SaveAs(fileToSave);
-
-    } 
-
-  }
-
-  TCanvas can4("can4","The canvas",5.,5.,1000.,800.); 
-  can4.Divide(2,2);
-  can4.cd(1);fVBFRes->Draw();
-  can4.cd(2);fVBFErr->Draw();
-  can4.cd(3);fVBFPull->Draw();
-  can4.cd(4);nll->Draw();
-  sprintf(fileToSave,"figs/toyResults_%dGeV.pdf",int(mZZcenter));
-  can4.SaveAs(fileToSave);
-
-  return; 
-}
-
-void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
+void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1, 
+		bool correctErrors = false, string systString = "Default")
 
 // whichtype
 // 0 - gg Signal
@@ -413,7 +144,9 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
   RooRealVar* pt = new RooRealVar("pt","p_{T}^{H}",0.,maxType[whichtype],"GeV/c");
  
   TFile input(fileToOpen);
-  TH1F* ptH = (TH1F*)input.Get("ptH");
+  sprintf(fileToOpen,"ptH_%s",systString.c_str());
+  TH1F* ptH = (TH1F*)input.Get(fileToOpen);
+  
   if (rebinType[whichtype] > 1) ptH->Rebin(rebinType[whichtype]);
   if (maxType[whichtype] < ptH->GetBinLowEdge(ptH->GetNbinsX() + 1) - ptH->GetBinWidth(1)) {
     int theBin = ptH->FindBin(maxType[whichtype]);
@@ -424,13 +157,14 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
   gROOT->ProcessLine("setTDRStyle()");
   
   // cout << endl << "Signal " << endl;   
+  pt->setBins(ptH->GetNbinsX());
 
   RooDataHist* rdh = new RooDataHist("rdh","Some dataset",RooArgList(*pt),Import(*ptH,kFALSE));
  
   // fit definitions
   RooWorkspace *ws = new RooWorkspace("ws");
 
-  RooRealVar m("m","emme", 110.,10., 600.,"GeV/c");
+  RooRealVar m("m","emme", 110.,10., 1200.);
   RooRealVar n("n","enne", 0.93, 0.5, 15.);
   RooRealVar n2("n2","enne2", 0.75, 0.5, 15.);
   RooRealVar bb("bb","bibi",0.02, 0.0005, 0.1);
@@ -441,27 +175,27 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
     if (LHCsqrts == 8) {
       m.setVal(79.885);   // m.setConstant(kTRUE);    
       bb.setVal(0.020); // bb.setConstant(kTRUE);
-      n2.setVal(1.0678);   n2.setConstant(kTRUE);
-      n.setVal(1.010);   n.setConstant(kTRUE);
+      n2.setVal(1.0678);  // n2.setConstant(kTRUE);
+      n.setVal(1.010);    // n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.20);   // T.setConstant(kTRUE);
+      T.setVal(0.088077);   T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     } else {
       m.setVal(83.54);   // m.setConstant(kTRUE);    
       bb.setVal(0.020); // bb.setConstant(kTRUE);
-      n2.setVal(1.0803);   n2.setConstant(kTRUE);
-      n.setVal(1.0207);    n.setConstant(kTRUE);
+      n2.setVal(1.0803);  // n2.setConstant(kTRUE);
+      n.setVal(1.0207);   //  n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.20);   // T.setConstant(kTRUE);
+      T.setVal(0.22341);    T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     }
   }
   else if (whichtype == 1) {
     m.setVal(235.3);   // m.setConstant(kTRUE);
-    n.setVal(1.1705);   n.setConstant(kTRUE);
+    n.setVal(1.1705);   // n.setConstant(kTRUE);
     n2.setVal(4.086);   n2.setConstant(kTRUE);
     bb.setVal(0.0294); // bb.setConstant(kTRUE);
-    T.setVal(0.000109);   // T.setConstant(kTRUE);
+    T.setVal(0.0000703);    T.setConstant(kTRUE);
     bb2.setVal(0.0203);   bb2.setConstant(kTRUE);
     fexp.setVal(0.100);   fexp.setConstant(kTRUE);
   }
@@ -476,15 +210,16 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
   } else {
     if (LHCsqrts == 8) {
       m.setVal(591.06);   // m.setConstant(kTRUE);
-      n.setVal(0.6048);   n.setConstant(kTRUE);
+      n.setVal(0.6048);   // if (systString == "Default") n.setConstant(kTRUE);
       n2.setVal(0.9086);   n2.setConstant(kTRUE);
       bb.setVal(0.0280);   // bb.setConstant(kTRUE);
       T.setVal(0.0866);   // T.setConstant(kTRUE);
       bb2.setVal(0.00657);   bb2.setConstant(kTRUE);
-      fexp.setVal(0.0849);   fexp.setConstant(kTRUE);
+      fexp.setVal(0.0849);   // if (systString == "Default") fexp.setConstant(kTRUE);
     } else {
+      if (systString == "Resummation") m.setMax(800.);
       m.setVal(456.99);   // m.setConstant(kTRUE);
-      n.setVal(1.068);   n.setConstant(kTRUE);
+      n.setVal(1.068);   // n.setConstant(kTRUE);
       n2.setVal(0.9649);   n2.setConstant(kTRUE);
       bb.setVal(0.0149);   // bb.setConstant(kTRUE);
       T.setVal(0.2330);   // T.setConstant(kTRUE);
@@ -524,11 +259,82 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
   } 
   int nFitPar = fit->floatParsFinal().getSize() - 1;
 
+  if (correctErrors) {
+    // Tsallis errors not reliable, use toy MC
+
+    float mVal = m.getVal();
+    float nVal = n.getVal();
+    float n2Val = n2.getVal();
+    float bbVal = bb.getVal();
+    float bb2Val = bb2.getVal();
+    float fexpVal = fexp.getVal();
+    float TVal = T.getVal();
+
+    TH1F* mHist = new TH1F("mHist","m",21,-0.5*mVal,0.5*mVal);
+    TH1F* nHist = new TH1F("nHist","n",21,-0.2*nVal,0.2*nVal);
+    TH1F* n2Hist = new TH1F("n2Hist","n2",21,-0.2*n2Val,0.2*n2Val);
+    TH1F* bbHist = new TH1F("bbHist","bb",21,-0.2*bbVal,0.2*bbVal);
+    TH1F* bb2Hist = new TH1F("bb2Hist","bb2",21,-0.2*bb2Val,0.2*bb2Val);
+    TH1F* fexpHist = new TH1F("fexpHist","fexp",21,-0.2*fexpVal-0.000001,0.2*fexpVal+0.000001);
+    TH1F* THist = new TH1F("THist","T",21,-0.5*TVal,0.5*TVal);
+
+    for (unsigned int iToy = 0; iToy < 200; iToy++) {
+
+      cout << endl << "####" << endl;
+      cout << "Generating toy experiment n. " << iToy+1 << endl;
+
+      m.setVal(mVal);
+      n.setVal(nVal);
+      n2.setVal(n2Val);
+      bb.setVal(bbVal);
+      bb2.setVal(bb2Val);
+      fexp.setVal(fexpVal);
+      T.setVal(TVal);
+
+      TDatime *now = new TDatime();
+      Int_t seed = now->GetDate() + now->GetTime();
+      cout << "RooFit Generation Seed = " << seed+iToy << endl;
+      RooRandom::randomGenerator()->SetSeed(seed+iToy);
+      cout << "####" << endl << endl;
+
+      RooDataSet *dataToy = rt3->generate(RooArgSet(*pt),ptH->GetEntries());
+      RooDataHist *dataToyH = new RooDataHist("dataToyH","toy",RooArgSet(*pt),*dataToy);
+      
+      rt3->fitTo(*dataToyH,Minos(0),SumW2Error(kTRUE),NumCPU(1));  
+  
+      if (fit->floatParsFinal().find("m")) mHist->Fill(m.getVal()-mVal);
+      if (fit->floatParsFinal().find("n")) nHist->Fill(n.getVal()-nVal);
+      if (fit->floatParsFinal().find("n2")) n2Hist->Fill(n2.getVal()-n2Val);
+      if (fit->floatParsFinal().find("bb")) bbHist->Fill(bb.getVal()-bbVal);
+      if (fit->floatParsFinal().find("bb2")) bbHist->Fill(bb2.getVal()-bb2Val);
+      if (fit->floatParsFinal().find("fexp")) fexpHist->Fill(fexp.getVal()-fexpVal);
+      if (fit->floatParsFinal().find("T")) THist->Fill(T.getVal()-TVal);
+    }
+
+    TCanvas cant("cant","Test canvas",5.,5.,900.,500.);
+    cant.Divide(4,2);
+    cant.cd(1);   mHist->Draw();
+    cant.cd(2);   nHist->Draw();
+    cant.cd(3);   n2Hist->Draw();
+    cant.cd(4);   bbHist->Draw();
+    cant.cd(5);   bb2Hist->Draw();
+    cant.cd(6);   fexpHist->Draw();
+    cant.cd(7);   THist->Draw();
+    cant.SaveAs("figs/testToys.pdf");
+
+    if (fit->floatParsFinal().find("m")) m.setError(mHist->GetRMS());
+    if (fit->floatParsFinal().find("n")) n.setError(nHist->GetRMS());
+    if (fit->floatParsFinal().find("n2")) n2.setError(n2Hist->GetRMS());
+    if (fit->floatParsFinal().find("bb")) bb.setError(bbHist->GetRMS());
+    if (fit->floatParsFinal().find("bb2")) bb2.setError(bb2Hist->GetRMS());
+    if (fit->floatParsFinal().find("fexp")) fexp.setError(fexpHist->GetRMS());
+    if (fit->floatParsFinal().find("T")) T.setError(THist->GetRMS());
+  }
+
   char fileToSave[200];
-  sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_all.txt",nameSample[whichtype].c_str(),LHCsqrts);
+  sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
   ofstream os1(fileToSave);
-  (RooArgSet(fit->floatParsFinal())).writeToStream(os1,false);
-  (RooArgSet(fit->constPars())).writeToStream(os1,false);
+  (RooArgSet(m,n,n2,bb,bb2,fexp,T)).writeToStream(os1,false);
   os1.close();
 
   TCanvas can("can","The canvas",5.,5.,500.,900.); 
@@ -568,7 +374,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1)
   sprintf(fileToSave,"#chi^{2}/n_{DoF} = %4.1f/%d",chi2,nFullBins - nFitPar);
   if (chi2 < 1000.) t->DrawLatex(0.80,0.86,fileToSave);
 
-  sprintf(fileToSave,"figs/fitCJLST_%s_%dTeV.pdf",nameSample[whichtype].c_str(),LHCsqrts);
+  sprintf(fileToSave,"figs/fitCJLST_%s_%dTeV_%s.pdf",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
   can.SaveAs(fileToSave);
 
 }
