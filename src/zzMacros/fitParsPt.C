@@ -15,10 +15,14 @@
 
 void fitParsPt(int LHCsqrts = 7, bool isVBFsignal = false) {
 
-  static const unsigned int Nmasspoints = 5;
-
+  // 7 TeV
+  /* static const unsigned int Nmasspoints = 5;
   string masspointsS[Nmasspoints] = {"125","150","200","300","400"};
-  if (isVBFsignal && LHCsqrts == 7) masspointsS[0] = "120";  
+  if (isVBFsignal && LHCsqrts == 7) masspointsS[0] = "120";  */
+
+  // 8 TeV
+  static const unsigned int Nmasspoints = 16;
+  string masspointsS[Nmasspoints] = {"100","110","120","125","130","140","150","160","170","180","190","200","250","300","350","400"};
 
   double masspoints[Nmasspoints] = {0.,0.,0.,0.,0.};
   double masspointserr[Nmasspoints] = {0.,0.,0.,0.,0.};

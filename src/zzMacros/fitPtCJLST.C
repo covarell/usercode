@@ -121,13 +121,14 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
 }
 
 void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1, 
-		bool correctErrors = false, string systString = "Default")
+		bool correctErrors = false, string changeParName = "",
+		string systString = "Default")
 
 // whichtype
 // 0 - gg Signal
 // 1 - VBF Signal
 // 2 - ZZ
-// 3 = ZX
+// 3 - ZX
 
 // So far only for 125 GeV...
 
@@ -332,8 +333,20 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
   }
 
   char fileToSave[200];
-  sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
+  if (changeParName != "") 
+    sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str(),changeParName.c_str()); 
+  else 
+    sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
   ofstream os1(fileToSave);
+  if (changeParName != "") {
+    sprintf(fileToSave,"m%s",changeParName.c_str());  m.SetName(fileToSave);
+    sprintf(fileToSave,"n%s",changeParName.c_str());  n.SetName(fileToSave);
+    sprintf(fileToSave,"n2%s",changeParName.c_str());  n2.SetName(fileToSave);
+    sprintf(fileToSave,"bb%s",changeParName.c_str());  bb.SetName(fileToSave);
+    sprintf(fileToSave,"bb2%s",changeParName.c_str());  bb2.SetName(fileToSave);
+    sprintf(fileToSave,"fexp%s",changeParName.c_str());  fexp.SetName(fileToSave);
+    sprintf(fileToSave,"T%s",changeParName.c_str());  T.SetName(fileToSave);
+  }
   (RooArgSet(m,n,n2,bb,bb2,fexp,T)).writeToStream(os1,false);
   os1.close();
 
