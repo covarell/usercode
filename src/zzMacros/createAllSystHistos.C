@@ -1,23 +1,25 @@
 {
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(-2,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(-3,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(-5,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(-4,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(1,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(3,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(4,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(5,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(6,false)");
-  gROOT->ProcessLine(".x studyPtOverMsyst.C(7,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(0,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-2,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-3,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-5,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-4,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(1,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(3,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(4,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(5,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(6,false,false)");
+  gROOT->ProcessLine(".x studyPtSyst.C(7,false,false)");
 
-  //gROOT->ProcessLine(".x studyPtSyst.C(-2,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(-3,true)");
-  // gROOT->ProcessLine(".x studyPtSyst.C(-5,true)");  nun g'e'
-  // gROOT->ProcessLine(".x studyPtSyst.C(-4,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(1,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(3,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(4,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(5,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(6,true)");
-  //gROOT->ProcessLine(".x studyPtSyst.C(7,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(0,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-2,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(-3,false,true)");
+  // gROOT->ProcessLine(".x studyPtSyst.C(-5,false,true)");  nun g'e'
+  // gROOT->ProcessLine(".x studyPtSyst.C(-4,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(1,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(3,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(4,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(5,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(6,false,true)");
+  gROOT->ProcessLine(".x studyPtSyst.C(7,false,true)");
 }

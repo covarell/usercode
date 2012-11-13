@@ -12,13 +12,36 @@
 #include <TGraphErrors.h>
 #include <TH1F.h>
 
-void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
+float ptVar(float pt, float m, bool overM = false) {
+  if (overM) return pt/m;
+  return pt;	
+}
+
+void evalBinMigration(TH1F* def, TH1F* var, char fileName[200], bool syst = true, int binlimit = 20) { // i.e. 50 GeV
+  
+  char outpStr[200];
+  sprintf(outpStr,"MCstatistics");
+  // TH1F* def = (TH1F*)theFile->Get("ptH_Default");
+  if (!def) return;
+  float theErr;
+  if (syst) {
+    theErr = (def->Integral(binlimit,160)/def->Integral() - var->Integral(binlimit,160)/var->Integral())*(def->Integral()/def->Integral(binlimit,160));
+    sprintf(outpStr,"%s",fileName);
+  } else {
+    theErr = 1./sqrt(def->GetEntries()*def->Integral(binlimit,160)/def->Integral());
+  }
+  cout << outpStr << " : " << int(theErr*10000)/100. << "%" << endl;
+  return;
+}
+
+void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
   // -5 - PDF : VBF
   // -4 - scales : VBF
   // -3 - effect of finite top mass
   // -2 - mu_Q in gg signal shape
   // -1 - fraction of VBF (NOT for VBF fraction fitting)
+  // 0 - DEFAULTS: ALWAYS RUN FIRST
   // 1 - Z+X in background
   // 2 - Cross-check Z+X vs. Z+jets
   // 3 - low pT shape in background: nonblinded
@@ -216,11 +239,24 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
   char nameSyst[200]; 
   char nameFile[200];
+  char UcasePt[8] = "PT";
+  if (overM) sprintf(UcasePt,"PToverM");
+  char LcasePt[8] = "pt";
+  if (overM) sprintf(LcasePt,"ptoverm");
+
+  cout << LcasePt << endl;
 
   sprintf(nameFile,"../../weightHisto_125GeV_8TeV_all.root");
   if (also7TeV) sprintf(nameFile,"../../weightHisto_125GeV_7TeV_all.root");
   TFile weightsSig(nameFile);
   TH1F* wHalf = (TH1F*)weightsSig.Get("wH");
+  TH1F* wRenorm;
+  if (also7TeV) {
+    TFile weights8("../../weightHisto_125GeV_8TeV_all.root");
+    wRenorm = (TH1F*)weights8.Get("wH");
+  } else {
+    wRenorm = (TH1F*)weightsSig.Get("wH");
+  }
   TFile weightsSig1("../../weightHisto_125GeV_8TeV_One.root");
   TH1F* wOne = (TH1F*)weightsSig1.Get("wH");
   TFile weightsSig2("../../weightHisto_125GeV_8TeV_Two.root");
@@ -246,15 +282,18 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
   int nbins2 = 160;
   float theMax = 400.;
+  if (overM == true) theMax = 3.2;
 
   // Standard pT binning
   // TH1F* pth = new TH1F("pth","pt",50,0.,200.);
-  TH1F* pth1 = new TH1F("pth1","pt",nbins2,0.,theMax);
+  // TH1F* pth1 = new TH1F("pth1","pt",50,0.,200.);
   // TH1F* pth2 = new TH1F("pth2","pt",50,0.,200.);
   //Extended ranges
   TH1F* pth = new TH1F("pth","pt",nbins2,0.,theMax);
+  TH1F* pth1 = new TH1F("pth1","pt",nbins2,0.,theMax);
   TH1F* pth2 = new TH1F("pth2","pt",nbins2,0.,theMax);
   TH1F* ptvbf = new TH1F("ptvbf","pt",nbins2,0.,theMax);
+
   pth->Sumw2();
   pth1->Sumw2();
   pth2->Sumw2();
@@ -299,11 +338,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     // Draw and take the maximum difference per bin
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptVBF < 500.) {
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
 	int theBin = pdfh[0]->FindBin(ptVBF);
- 	pth->Fill(ptVBF,wVBF);
-	pth1->Fill(ptVBF,wVBF*ratiopdf[1]->GetBinContent(theBin));
-	pth2->Fill(ptVBF,wVBF*ratiopdf[0]->GetBinContent(theBin));
+ 	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF*ratiopdf[1]->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF*ratiopdf[0]->GetBinContent(theBin));
         nloh->Fill(nloVBF,wVBF);
 	nloh1->Fill(nloVBF,wVBF*ratiopdf[1]->GetBinContent(theBin));
 	nloh2->Fill(nloVBF,wVBF*ratiopdf[0]->GetBinContent(theBin));
@@ -311,20 +350,23 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 	for (int i = 0; i < 2; i++) {
 	  if (fabs(ratiopdf[i]->GetBinContent(theBin) - 1.) > fabs(thisDiff - 1.)) thisDiff = ratiopdf[i]->GetBinContent(theBin);
 	}
-	ptvbf->Fill(ptVBF,wVBF*thisDiff); 
+	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF*thisDiff); 
       }
     } 
 
-    sprintf(nameFile,"PT_vbf_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_vbf_SEL_7TeV.root");
-    TFile f1(nameFile,"UPDATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    ptvbf->SetName("ptH_PDF");
-    ptvbf->Write();
-    f1.Close();
-
     sprintf(nameSyst,"PDF-VBF");
+
+    sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
+    TFile f1(nameFile,"UPDATE");
+    // pth->SetName("ptH_Default");
+    // pth->Write();
+    // evalBinMigration(pth,pth,"",false);
+    sprintf(nameFile,"%sH_PDF",LcasePt);
+    ptvbf->SetName(nameFile);
+    ptvbf->Write();
+    evalBinMigration(pth,ptvbf,nameSyst,true);
+    f1.Close();
 
   }
 
@@ -356,11 +398,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     // Draw and take the maximum difference per bin
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptVBF < 500.) {
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
 	int theBin = scaleh[0]->FindBin(ptVBF);
- 	pth->Fill(ptVBF,wVBF);
-	pth1->Fill(ptVBF,wVBF*ratioscale[1]->GetBinContent(theBin));
-	pth2->Fill(ptVBF,wVBF*ratioscale[0]->GetBinContent(theBin));
+ 	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF*ratioscale[1]->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF*ratioscale[0]->GetBinContent(theBin));
         nloh->Fill(nloVBF,wVBF);
 	nloh1->Fill(nloVBF,wVBF*ratioscale[1]->GetBinContent(theBin));
 	nloh2->Fill(nloVBF,wVBF*ratioscale[0]->GetBinContent(theBin));
@@ -368,18 +410,21 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 	for (int i = 0; i < 6; i++) {
 	  if (fabs(ratioscale[i]->GetBinContent(theBin) - 1.) > fabs(thisDiff - 1.)) thisDiff = ratioscale[i]->GetBinContent(theBin);
 	}
-	ptvbf->Fill(ptVBF,wVBF*thisDiff); 
+	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF*thisDiff); 
       }
     } 
 
-    sprintf(nameFile,"PT_vbf_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_vbf_SEL_7TeV.root");
-    TFile f1(nameFile,"UPDATE");
-    ptvbf->SetName("ptH_scale");
-    ptvbf->Write();
-    f1.Close();
-
     sprintf(nameSyst,"scale-VBF");
+
+    sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
+    TFile f1(nameFile,"UPDATE");
+    sprintf(nameFile,"%sH_scale",LcasePt);
+    ptvbf->SetName(nameFile);
+    ptvbf->Write();
+    TH1F* def = (TH1F*)f1.Get("ptH_Default");
+    evalBinMigration(def,ptvbf,nameSyst,true);
+    f1.Close();
 
   }  
 
@@ -424,36 +469,41 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullpt->GetYaxis()->SetTitle("Relative difference");
     pullpt->Draw("E");
 
-    can.SaveAs("pt_systTopMass_corr.pdf");
+    // if (!also7TeV) can.SaveAs("pt_systTopMass_corr.gif");
+    // if (!also7TeV) can.SaveAs("pt_systTopMass_corr.pdf");
     sprintf(nameSyst,"TopMass");
 
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
-      if (mgg < 140. && mgg > 105. && ptgg < 500.) {
+      if (mgg < 140. && mgg > 105. && ptgg < 400.) {
 	int theBin = wHalf->FindBin(ptgg);
         float newW = 1.;
 	// if (ptgg > 90.) 
 	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
-	pth->Fill(ptgg,wgg*wHalf->GetBinContent(theBin));
-	pth2->Fill(ptgg,wgg*newW*wHalf->GetBinContent(theBin));
-	ptvbf->Fill(ptgg,wgg*newW*wHalf->GetBinContent(theBin));
+	pth->Fill(ptVar(ptgg,mgg,overM),wgg*wHalf->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
+	ptvbf->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
         nloh->Fill(nlogg,wgg*wHalf->GetBinContent(theBin));
 	nloh2->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
       }
     } 
 
-    sprintf(nameFile,"PT_gg_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_gg_SEL_7TeV.root");
+    sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
     TFile f(nameFile,"UPDATE");
-    pth2->SetName("ptH_TopMass");
-    pth2->Write();
+    sprintf(nameFile,"%sH_TopMass",LcasePt);
+    pth->SetName(nameFile);
+    pth->Write();
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f.Get(nameFile);
+    evalBinMigration(def,pth,nameSyst,true);
     f.Close();
 
     /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
-	pth->Fill(ptVBF,wVBF);
-	pth2->Fill(ptVBF,wVBF);
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
+	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
         nloh->Fill(nloVBF,wVBF);
 	nloh2->Fill(nloVBF,wVBF);
       }
@@ -467,60 +517,63 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
-      if (mgg < 140. && mgg > 105. && ptgg < 500.) {
+      if (mgg < 140. && mgg > 105. && ptgg < 400.) {
 	int theBin = wHalf->FindBin(ptgg);
 	float newW = 1.;
 	// if (ptgg > 90.) 
 	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
-	pth->Fill(ptgg,wgg*newW*wHalf->GetBinContent(theBin));
-	pth1->Fill(ptgg,wgg*newW*wOne->GetBinContent(theBin));
-	pth2->Fill(ptgg,wgg*newW*wTwo->GetBinContent(theBin));
-	ptvbf->Fill(ptgg,wgg*newW*wTwo->GetBinContent(theBin));
+	pth->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
+	pth1->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wOne->GetBinContent(theBin)*wHalf->GetBinContent(theBin)/wRenorm->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wTwo->GetBinContent(theBin)*wHalf->GetBinContent(theBin)/wRenorm->GetBinContent(theBin));
+	ptvbf->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wTwo->GetBinContent(theBin));
         nloh->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
-	nloh1->Fill(nlogg,wgg*newW*wOne->GetBinContent(theBin));
-	nloh2->Fill(nlogg,wgg*newW*wTwo->GetBinContent(theBin));
+	nloh1->Fill(nlogg,wgg*newW*wOne->GetBinContent(theBin)*wHalf->GetBinContent(theBin)/wRenorm->GetBinContent(theBin));
+	nloh2->Fill(nlogg,wgg*newW*wTwo->GetBinContent(theBin)*wHalf->GetBinContent(theBin)/wRenorm->GetBinContent(theBin));
       }
     } 
 
-    sprintf(nameFile,"PT_gg_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_gg_SEL_7TeV.root");
+    sprintf(nameSyst,"Resummation");
+
+    sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
     TFile f(nameFile,"UPDATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    pth2->SetName("ptH_Resummation");
+    // pth->SetName("ptH_Default");
+    // pth->Write();
+    // evalBinMigration(pth,pth,"",false);  
+    sprintf(nameFile,"%sH_Resummation",LcasePt);
+    pth2->SetName(nameFile);
     pth2->Write();
+    evalBinMigration(pth,pth2,nameSyst,true);
     f.Close();
 
     /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
-	pth->Fill(ptVBF,wVBF);
-        pth1->Fill(ptVBF,wVBF);
-	pth2->Fill(ptVBF,wVBF);
-	ptvbf->Fill(ptVBF,wVBF);
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
+	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+        pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
         nloh->Fill(nloVBF,wVBF);
 	nloh1->Fill(nloVBF,wVBF);
 	nloh2->Fill(nloVBF,wVBF);
       }
       }*/
 
-    sprintf(nameSyst,"Resummation");
- 
   }
 
   if (whichtype == -1) {
 
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
-      if (mgg < 140. && mgg > 105. && ptgg < 500.) {
+      if (mgg < 140. && mgg > 105. && ptgg < 400.) {
 	int theBin = wHalf->FindBin(ptgg);
 	float newW = 1.;
 	// if (ptgg > 90.) 
 	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
-	pth->Fill(ptgg,wgg*newW*wHalf->GetBinContent(theBin));
-	pth1->Fill(ptgg,wgg*newW*0.84*wHalf->GetBinContent(theBin));  // gg: +/-16%
-	pth2->Fill(ptgg,wgg*newW*1.16*wHalf->GetBinContent(theBin));
-	ptvbf->Fill(ptgg,wgg*newW*1.16*wHalf->GetBinContent(theBin));  
+	pth->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
+	pth1->Fill(ptVar(ptgg,mgg,overM),wgg*newW*0.84*wHalf->GetBinContent(theBin));  // gg: +/-16%
+	pth2->Fill(ptVar(ptgg,mgg,overM),wgg*newW*1.16*wHalf->GetBinContent(theBin));
+	ptvbf->Fill(ptVar(ptgg,mgg,overM),wgg*newW*1.16*wHalf->GetBinContent(theBin));  
         nloh->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
 	nloh1->Fill(nlogg,wgg*newW*0.84*wHalf->GetBinContent(theBin));
 	nloh2->Fill(nlogg,wgg*newW*1.16*wHalf->GetBinContent(theBin));
@@ -529,11 +582,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
-	pth->Fill(ptVBF,wVBF);
-        pth1->Fill(ptVBF,wVBF*1.02);             // VBF: +/-2%
-	pth2->Fill(ptVBF,wVBF*0.98);
-	ptvbf->Fill(ptVBF,wVBF*0.98);
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
+	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+        pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF*1.02);             // VBF: +/-2%
+	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF*0.98);
+	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF*0.98);
         nloh->Fill(nloVBF,wVBF);
 	nloh1->Fill(nloVBF,wVBF*1.02);
 	nloh2->Fill(nloVBF,wVBF*0.98);
@@ -544,59 +597,145 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
  
   }
 
+  if (whichtype == 0) {
+
+    for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
+      ggTree->GetEntry(iEvt);
+      if (mgg < 140. && mgg > 105. && ptgg < 400.) {
+	int theBin = wHalf->FindBin(ptgg);
+	float newW = 1.;
+	// if (ptgg > 90.) 
+	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
+	pth->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
+        nloh->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
+      }
+    } 
+
+    sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
+    TFile f4(nameFile,"RECREATE");
+    pth->SetName("ptH_Default");
+    pth->Write();
+    evalBinMigration(pth,pth,"",false);
+    f4.Close();
+
+    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
+      pth->SetBinContent(i,0.0);
+    }
+
+    for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
+      VBFTree->GetEntry(iEvt);
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
+	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+        nloh->Fill(nloVBF,wVBF);
+      }
+    }
+
+    sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
+    TFile f(nameFile,"RECREATE");
+    pth->SetName("ptH_Default");
+    pth->Write();
+    evalBinMigration(pth,pth,"",false);
+    f.Close();
+
+    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
+      pth->SetBinContent(i,0.0);
+    }
+
+    for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
+      zzTree->GetEntry(iEvt);
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
+	pth->Fill(ptVar(ptzz,mzz,overM),wzz);
+	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz);
+        nloh->Fill(nlozz,wzz);
+      }
+    } 
+
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
+    TFile f2(nameFile,"RECREATE");
+    pth->SetName("ptH_Default");
+    pth->Write();
+    evalBinMigration(pth,pth,"",false);
+    f2.Close();
+
+    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
+      pth->SetBinContent(i,0.0);
+    }
+
+    for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
+      crTree->GetEntry(iEvt);
+      if (mcr < 140. && mcr > 105. && ptcr < 400.) {
+	pth->Fill(ptVar(ptcr,mcr,overM));
+        nloh->Fill(nlocr);
+      }
+    } 
+
+    sprintf(nameFile,"%s_zx_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zx_SEL_7TeV.root",UcasePt);
+    TFile f3(nameFile,"RECREATE");
+    pth->SetName("ptH_Default");
+    pth->Write();
+    evalBinMigration(pth,pth,"",false);
+    f3.Close();
+ 
+  }
 
   if (whichtype == 1) {
 
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
-      if (mgg < 140. && mgg > 105. && ptgg < 500.) {
+      if (mgg < 140. && mgg > 105. && ptgg < 400.) {
 	int theBin = wHalf->FindBin(ptgg);
 	float newW = 1.;
 	// if (ptgg > 90.) 
 	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
-	pth1->Fill(ptgg,wgg*newW*wHalf->GetBinContent(theBin));
+	pth1->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
         nloh1->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
       }
     } 
 
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
-      if (mVBF < 140. && mVBF > 105. && ptgg < 500.) {
-	pth1->Fill(ptVBF,wVBF);
+      if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
+	pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
         nloh1->Fill(nloVBF,wVBF);
       }
     }
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
-	pth2->Fill(ptzz,wzz);
-	ptvbf->Fill(ptzz,wzz);
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
+	pth2->Fill(ptVar(ptzz,mzz,overM),wzz);
+	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz);
         nloh2->Fill(nlozz,wzz);
       }
     } 
 
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
+    /* sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
     TFile f2(nameFile,"UPDATE");
     pth2->SetName("ptH_Default");
     pth2->Write();
-    f2.Close();
+    evalBinMigration(pth2,pth2,"",false);
+    f2.Close(); */
 
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
-      if (mcr < 140. && mcr > 105. && ptcr < 500.) {
-	pth->Fill(ptcr);
+      if (mcr < 140. && mcr > 105. && ptcr < 400.) {
+	pth->Fill(ptVar(ptcr,mcr,overM));
         nloh->Fill(nlocr);
       }
     } 
 
-    sprintf(nameFile,"PT_zx_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zx_SEL_7TeV.root");
+    /* sprintf(nameFile,"%s_zx_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zx_SEL_7TeV.root",UcasePt);
     TFile f3(nameFile,"UPDATE");
     pth->SetName("ptH_Default");
     pth->Write();
-    f3.Close();
+    evalBinMigration(pth,pth,"",false);
+    f3.Close(); */
 
     sprintf(nameSyst,"ZplusX");
  
@@ -606,17 +745,17 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
-      if (ptcr < 500.) {          // do it in the whole mass range
-	pth->Fill(ptcr);
+      if (ptcr < 400.) {          // do it in the whole mass range
+	pth->Fill(ptVar(ptcr,mcr,overM));
         nloh->Fill(nlocr);
       }
     } 
 
     for (Int_t iEvt = 0; iEvt < crzjTree->GetEntries() ; ++iEvt) {
       crzjTree->GetEntry(iEvt);
-      if (ptzj < 500.) {
-	pth2->Fill(ptzj,wzj);
-	ptvbf->Fill(ptzj,wzj);
+      if (ptzj < 400.) {
+	pth2->Fill(ptVar(ptzj,mzj,overM),wzj);
+	ptvbf->Fill(ptVar(ptzj,mzj,overM),wzj);
         nloh2->Fill(nlozj,wzj);	
       }
     }
@@ -630,9 +769,10 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     sprintf(nameSyst,"histograms8TeV.root");
     if (also7TeV) sprintf(nameSyst,"histograms7TeV.root");
     TFile fileMike(nameSyst);
+    fileMike.ls();
 
-    sprintf(nameSyst,"tmpTH1");
-    if (also7TeV) sprintf(nameSyst,"DATA");
+    sprintf(nameSyst,"DATA");
+    // if (also7TeV) sprintf(nameSyst,"tmpTH1");
     TH1F* dataUnb = (TH1F*)fileMike.Get(nameSyst);
     dataUnb->GetXaxis()->SetRange(1,20);
     TH1F* zzUnb = (TH1F*)fileMike.Get("ZZ");
@@ -669,19 +809,28 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
-	pth->Fill(ptzz,wzz*(1. + mypol1->Eval(ptzz)));
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
+	pth->Fill(ptVar(ptzz,mzz,overM),wzz*(1. + mypol1->Eval(ptzz)));
       }
     } 
     
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
+    sprintf(nameSyst,"UnbRegion");
+
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
     TFile f2(nameFile,"UPDATE");
-    pth->SetName("ptH_UnbRegion");
+    sprintf(nameFile,"%sH_UnbRegion",LcasePt);
+    pth->SetName(nameFile);
     pth->Write();
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f2.Get(nameFile);
+    evalBinMigration(def,pth,nameSyst,true);
     f2.Close();
 
-    can.SaveAs("pt_systUnbRegion.pdf");
+    sprintf(nameFile,"%s_systUnbRegion.gif",LcasePt);
+    if (!also7TeV) can.SaveAs(nameFile);
+    sprintf(nameFile,"%s_systUnbRegion.pdf",LcasePt);
+    if (!also7TeV) can.SaveAs(nameFile);
     return;
 
   }
@@ -726,19 +875,28 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
-	pth->Fill(ptzz,wzz*(1. + mypol1->Eval(ptzz)));
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
+	pth->Fill(ptVar(ptzz,mzz,overM),wzz*(1. + mypol1->Eval(ptzz)));
       }
     } 
-    
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
+
+    sprintf(nameSyst,"SingleZ");    
+
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
     TFile f2(nameFile,"UPDATE");
-    pth->SetName("ptH_SingleZ");
+    sprintf(nameFile,"%sH_SingleZ",LcasePt);
+    pth->SetName(nameFile);
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f2.Get(nameFile);
+    evalBinMigration(def,pth,nameSyst,true);
     pth->Write();
     f2.Close();
 
-    can.SaveAs("pt_systSingleZ.pdf");
+    sprintf(nameFile,"%s_systSingleZ.gif",LcasePt);
+    if (!also7TeV) can.SaveAs(nameFile);
+    sprintf(nameFile,"%s_systSingleZ.pdf",LcasePt);
+    if (!also7TeV) can.SaveAs(nameFile);
     return;
   }
 
@@ -746,33 +904,38 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
-	pth->Fill(ptzz,wzz);
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
+	pth->Fill(ptVar(ptzz,mzz,overM),wzz);
         nloh->Fill(nlozz,wzz);
-	pth2->Fill(ptzz,wzz);
-	ptvbf->Fill(ptzz,wzz);
+	pth2->Fill(ptVar(ptzz,mzz,overM),wzz);
+	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz);
         nloh2->Fill(nlozz,wzz);
       }
     } 
 
     for (Int_t iEvt = 0; iEvt < ggzzTree->GetEntries() ; ++iEvt) {
       ggzzTree->GetEntry(iEvt);
-      if (mggzz < 140. && mggzz > 105. && ptggzz < 500.) {
-	pth1->Fill(ptggzz,wggzz);
+      if (mggzz < 140. && mggzz > 105. && ptggzz < 400.) {
+	pth1->Fill(ptVar(ptggzz,mggzz,overM),wggzz);
         nloh1->Fill(nloggzz,wggzz);
-	pth->Fill(ptggzz,wggzz);
+	pth->Fill(ptVar(ptggzz,mggzz,overM),wggzz);
         nloh->Fill(nloggzz,wggzz);
       }
     } 
 
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
+    sprintf(nameSyst,"ggZZ");
+
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
     TFile f4(nameFile,"UPDATE");
-    pth->SetName("ptH_ggZZ");
+    sprintf(nameFile,"%sH_ggZZ",LcasePt);
+    pth->SetName(nameFile);
     pth->Write();
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f4.Get(nameFile);
+    evalBinMigration(def,pth,nameSyst,true);
     f4.Close();
 
-    sprintf(nameSyst,"ggZZ");
   }
 
   if (whichtype == 6) {
@@ -799,11 +962,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     // Draw and take the maximum difference per bin
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
 	int theBin = pdfh[0]->FindBin(ptzz);
- 	pth->Fill(ptzz,wzz);
-	pth1->Fill(ptzz,wzz*ratiopdf[1]->GetBinContent(theBin));
-	pth2->Fill(ptzz,wzz*ratiopdf[0]->GetBinContent(theBin));
+ 	pth->Fill(ptVar(ptzz,mzz,overM),wzz);
+	pth1->Fill(ptVar(ptzz,mzz,overM),wzz*ratiopdf[1]->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptzz,mzz,overM),wzz*ratiopdf[0]->GetBinContent(theBin));
         nloh->Fill(nlozz,wzz);
 	nloh1->Fill(nlozz,wzz*ratiopdf[1]->GetBinContent(theBin));
 	nloh2->Fill(nlozz,wzz*ratiopdf[0]->GetBinContent(theBin));
@@ -811,18 +974,22 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 	for (int i = 0; i < 2; i++) {
 	  if (fabs(ratiopdf[i]->GetBinContent(theBin) - 1.) > fabs(thisDiff - 1.)) thisDiff = ratiopdf[i]->GetBinContent(theBin);
 	}
-	ptvbf->Fill(ptzz,wzz*thisDiff); 
+	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz*thisDiff); 
       }
     } 
 
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
-    TFile f1(nameFile,"UPDATE");
-    ptvbf->SetName("ptH_PDF");
-    ptvbf->Write();
-    f1.Close();
-
     sprintf(nameSyst,"PDF-ZZ");
+
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
+    TFile f1(nameFile,"UPDATE");
+    sprintf(nameFile,"%sH_PDF",LcasePt);
+    ptvbf->SetName(nameFile);
+    ptvbf->Write();
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f1.Get(nameFile);
+    evalBinMigration(def,ptvbf,nameSyst,true);
+    f1.Close();
 
   }
 
@@ -854,11 +1021,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     // Draw and take the maximum difference per bin
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
-      if (mzz < 140. && mzz > 105. && ptzz < 500.) {
+      if (mzz < 140. && mzz > 105. && ptzz < 400.) {
 	int theBin = scaleh[0]->FindBin(ptzz);
- 	pth->Fill(ptzz,wzz);
-	pth1->Fill(ptzz,wzz*ratioscale[1]->GetBinContent(theBin));
-	pth2->Fill(ptzz,wzz*ratioscale[0]->GetBinContent(theBin));
+ 	pth->Fill(ptVar(ptzz,mzz,overM),wzz);
+	pth1->Fill(ptVar(ptzz,mzz,overM),wzz*ratioscale[1]->GetBinContent(theBin));
+	pth2->Fill(ptVar(ptzz,mzz,overM),wzz*ratioscale[0]->GetBinContent(theBin));
         nloh->Fill(nlozz,wzz);
 	nloh1->Fill(nlozz,wzz*ratioscale[1]->GetBinContent(theBin));
 	nloh2->Fill(nlozz,wzz*ratioscale[0]->GetBinContent(theBin));
@@ -866,20 +1033,26 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
 	for (int i = 0; i < 6; i++) {
 	  if (fabs(ratioscale[i]->GetBinContent(theBin) - 1.) > fabs(thisDiff - 1.)) thisDiff = ratioscale[i]->GetBinContent(theBin);
 	}
-	ptvbf->Fill(ptzz,wzz*thisDiff); 
+	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz*thisDiff); 
       }
     } 
 
-    sprintf(nameFile,"PT_zz_SEL_8TeV.root");
-    if (also7TeV) sprintf(nameFile,"PT_zz_SEL_7TeV.root");
-    TFile f1(nameFile,"UPDATE");
-    ptvbf->SetName("ptH_scale");
-    ptvbf->Write();
-    f1.Close();
-
     sprintf(nameSyst,"scale-ZZ");
 
+    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
+    TFile f1(nameFile,"UPDATE");
+    sprintf(nameFile,"%sH_scale",LcasePt);
+    ptvbf->SetName(nameFile);
+    ptvbf->Write();
+    sprintf(nameFile,"%sH_Default",LcasePt);
+    TH1F* def = (TH1F*)f1.Get(nameFile);
+    evalBinMigration(def,ptvbf,nameSyst,true);
+    f1.Close();
+
   }
+
+  if (whichtype == 0) return;
 
   pth->Scale(1./pth->Integral());
   pth1->Scale(1./pth1->Integral());
@@ -918,9 +1091,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   pullpt->GetYaxis()->SetTitle("Relative difference");
   pullpt->Draw("E");
   
-  sprintf(nameFile,"pt_syst%s.pdf",nameSyst);
-  can.SaveAs(nameFile);
-  
+  sprintf(nameFile,"%s_syst%s.gif",LcasePt,nameSyst);
+  if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
+  sprintf(nameFile,"%s_syst%s.pdf",LcasePt,nameSyst);
+  if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
+
   can.cd(1);
   gPad->SetBottomMargin(0.0);
   nloh1->GetXaxis()->SetLabelColor(kWhite);
@@ -945,9 +1120,11 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
   pullnlo->GetYaxis()->SetTitle("Relative difference");
   pullnlo->Draw("E");
   
+  sprintf(nameFile,"nlo_syst%s.gif",nameSyst);
+  if (!also7TeV || (whichtype == 5 && also7TeV)) can.SaveAs(nameFile);
   sprintf(nameFile,"nlo_syst%s.pdf",nameSyst);
-  can.SaveAs(nameFile);
-  
+  if (!also7TeV || (whichtype == 5 && also7TeV)) can.SaveAs(nameFile);
+
   if (whichtype == 1) {
 
     TH1F* balpt = (TH1F*)pth->Clone();
@@ -970,8 +1147,8 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullpt->SetMaximum(2.);
     pullpt->Draw("E");
        
-    sprintf(nameFile,"pt_balanced%s.pdf",nameSyst);
-    can.SaveAs(nameFile);
+    sprintf(nameFile,"%s_balanced%s.pdf",LcasePt,nameSyst);
+    if (!also7TeV) can.SaveAs(nameFile);
     
     TH1F* balnlo = (TH1F*)nloh->Clone();
     balnlo->Add(nloh2,nloh,20.516,4.193);
@@ -994,7 +1171,7 @@ void studyPtSyst(int whichtype = 1, bool also7TeV = true) {
     pullnlo->Draw("E");
 
     sprintf(nameFile,"nlo_balanced%s.pdf",nameSyst);
-    can.SaveAs(nameFile);
+    if (!also7TeV) can.SaveAs(nameFile);
   }
 
   return;
