@@ -410,8 +410,8 @@ void fitPToverM(float mZZcenter = 126., float mZZspread = 5.,
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* files = new TFile(fileToOpen);
   TFile* filegg;
-  if (writeWeightHisto) {
-    sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
+  if (writeWeightHisto && mZZcenter == 125. && LHCsqrts == 8) {
+    sprintf(fileToOpen,"old_weightHisto.root");
     filegg = new TFile(fileToOpen);  
   }
 
@@ -426,10 +426,11 @@ void fitPToverM(float mZZcenter = 126., float mZZspread = 5.,
  
   TH1F* ggH = new TH1F();
   RooDataHist* gg = new RooDataHist();
-  if (writeWeightHisto) {
-    ggH = (TH1F*)((TH2F*)filegg->Get("Pt_sig"))->ProjectionY("ggH",binMin,binMax);
-    gg = withSmartBinning(ggH,mZZcenter,pts_m,varMinSig,varMaxSig,minWeight,sizeSig,2);
+  if (writeWeightHisto && mZZcenter == 125. && LHCsqrts ==8) {
+    ggH = (TH1F*)filegg->Get("ggH");
+    gg = withSmartBinning(ggH,mZZcenter,pts_m,varMinSig,varMaxSig,minWeight,sizeSig,1);
     gg->SetName("gg");
+    ggH = (TH1F*)gg->createHistogram("pts_m",40);
   }
   
   // Check strange way of filling histos (CM)
@@ -786,7 +787,7 @@ void fitPToverM(float mZZcenter = 126., float mZZspread = 5.,
     sprintf(fileToSave,"weightHisto_%dGeV_%dTeV_all.root",int(mZZcenter),LHCsqrts);
     TFile fout(fileToSave,"RECREATE");
     ws->var("pts_m")->setMin(0.);
-    ws->var("pts_m")->setMax(500.);
+    ws->var("pts_m")->setMax(2.);
 
     TH1F* ggHRes = (TH1F*)ggH->Clone();
     ggH->SetName("ggH");   ggH->SetTitle("POWHEG gg pT histo");
