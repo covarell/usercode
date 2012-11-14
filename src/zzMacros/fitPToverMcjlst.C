@@ -129,23 +129,24 @@ void fitPToverMcjlst(int LHCsqrts = 7, int whichtype = 1,
 // 1 - VBF Signal
 // 2 - ZZ
 // 3 - ZX
+// 4 - ggZZ
 
 // So far only for 125 GeV...
 
 {
 
-  string nameSample[4] = {"gg","vbf","zz","zx"};
-  float maxType[4] = {2.,2.,2.,2.};   // GeV
-  float rebinType[4] = {1,1,1,1};
+  string nameSample[5] = {"gg","vbf","zz","zx","ggzz"};
+  float maxType[5] = {3.,3.,3.,3.,3.};   // GeV
+  float rebinType[5] = {1,1,1,1,1};
   
   char fileToOpen[200];
-  sprintf(fileToOpen,"PT_%s_SEL_%dTeV.root",nameSample[whichtype].c_str(),LHCsqrts);
-  if (whichtype == 3) sprintf(fileToOpen,"PT_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
+  sprintf(fileToOpen,"PToverM_%s_SEL_%dTeV.root",nameSample[whichtype].c_str(),LHCsqrts);
+  //if (whichtype == 3) sprintf(fileToOpen,"PToverM_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
 
   RooRealVar* pt_m = new RooRealVar("pt_m","p_{T}^{H}/M_{4l}",0.,maxType[whichtype],"");
  
   TFile input(fileToOpen);
-  sprintf(fileToOpen,"pt_m_H_%s",systString.c_str());
+  sprintf(fileToOpen,"ptovermH_%s",systString.c_str());
   TH1F* pt_m_H = (TH1F*)input.Get(fileToOpen);
   
   if (rebinType[whichtype] > 1) pt_m_H->Rebin(rebinType[whichtype]);
@@ -174,84 +175,116 @@ void fitPToverMcjlst(int LHCsqrts = 7, int whichtype = 1,
   RooRealVar T("T","tti",0.5,0.000005,2.);
   RooRealVar bb2("bb2","bibi2",0.02, 0.0005, 0.1);
   RooRealVar fexp("fexp","f_exp",0.02, 0.0, 1.0);
-
-    /*
+  
+  /*
   //ggH
-  RooRealVar m("m","emme signal", 5.,0.1, 10.,"");
+  RooRealVar m("m","emme signal", 5.,0.01, 10.,"");
   RooRealVar n("n","enne signal", 0.93, 0.3, 15.);
   RooRealVar n2("n2","enne2 signal", 0.75, 0.3, 15.); 
   RooRealVar bb("bb","bibi signal",0.02, 0.0005, 0.3);
-  RooRealVar T("Ts","tti signal",0.005,0.00000005,0.2);
-  RooRealVar bb2("bb2s","bibi2 signal",0.02, 0.0005, 0.1);
+  RooRealVar T("T","tti signal",0.005,0.00000005,0.2);
+  RooRealVar bb2("bb2","bibi2 signal",0.02, 0.0005, 0.1);
   RooRealVar fexp("fexp","f_exp signal",0.02, 0.0, 1.0);
   
   //qqH
-  RooRealVar m("m","emme signal", 0.2,0.1, 2.,"GeV/c");
+  RooRealVar m("m","emme signal", 0.2,0.01, 2.,"");
   RooRealVar n("n","enne signal", 0.93, 0.5, 15.);
   RooRealVar n2("n2","enne2 signal", 0.75, 0.5, 15.); 
   RooRealVar bb("bb","bibi signal",0.02, 0.0005, 0.1);
   RooRealVar T("T","tti signal",0.02,0.00000005,0.2);
   RooRealVar bb2("bb2","bibi2 signal",0.02, 0.0005, 0.1);
-  RooRealVar fexp("fexp","f_exp signal",0.02, 0.0, 1.0);*/
-
-  if (whichtype == 2) {
-    if (LHCsqrts == 8) {
-      m.setVal(0.38652);   // m.setConstant(kTRUE);    
-      bb.setVal(5.4436); // bb.setConstant(kTRUE);
-      n2.setVal(1.3424);  // n2.setConstant(kTRUE);
-      n.setVal(1.000);    // n.setConstant(kTRUE);
-      bb2.setVal(.100000);  //bb2.setConstant(kTRUE);
-      T.setVal(0.00082021);   //T.setConstant(kTRUE);
-      fexp.setVal(0.0);    //fexp.setConstant(kTRUE);
-    } else {
-      /*m.setVal(83.54);   // m.setConstant(kTRUE);    
-      bb.setVal(0.020); // bb.setConstant(kTRUE);
-      n2.setVal(1.0803);  // n2.setConstant(kTRUE);
-      n.setVal(1.0207);   //  n.setConstant(kTRUE);
-      bb2.setVal(100000.);  //bb2.setConstant(kTRUE);
-      T.setVal(0.22341);    //T.setConstant(kTRUE);
-      fexp.setVal(0.0);    //fexp.setConstant(kTRUE);*/
+  RooRealVar fexp("fexp","f_exp signal",0.02, 0.0, 1.0);
+  */
+  if(whichtype == 0)
+    {
+      if(LHCsqrts == 8)
+	{
+	  m.setVal(0.1);
+	  n.setVal(3.7);
+	  n2.setVal(0.77);
+	  bb.setVal(0.3);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.07);
+	}
+      else
+	{
+	  m.setVal(0.1);
+	  n.setVal(3.7);
+	  n2.setVal(0.77);
+	  bb.setVal(0.3);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.07);
+	}
     }
-  }
-  else if (whichtype == 1) {
-    m.setVal(1.39);   // m.setConstant(kTRUE);
-    n.setVal(5.4838);   // n.setConstant(kTRUE);
-    n2.setVal(0.91);   //n2.setConstant(kTRUE);
-    bb.setVal(0.09984); // bb.setConstant(kTRUE);
-    T.setVal(0.12461);    //T.setConstant(kTRUE);
-    bb2.setVal(0.09195);   //bb2.setConstant(kTRUE);
-    fexp.setVal(0.0);   //fexp.setConstant(kTRUE);
-  }
-  else if (whichtype == 3) {
-    m.setVal(0.38652);   // m.setConstant(kTRUE);    
-    bb.setVal(5.4436); // bb.setConstant(kTRUE);
-    n2.setVal(1.3424);  // n2.setConstant(kTRUE);
-    n.setVal(1.000);    // n.setConstant(kTRUE);
-    bb2.setVal(.100000);  //bb2.setConstant(kTRUE);
-    T.setVal(0.00082021);   //T.setConstant(kTRUE);
-    fexp.setVal(0.0);    //fexp.setConstant(kTRUE);
-  } else {
-    if (LHCsqrts == 8) {
-      m.setVal(0.1);   // m.setConstant(kTRUE);
-      n.setVal(3.7025);   // if (systString == "Default") n.setConstant(kTRUE);
-      n2.setVal(0.773258);   //n2.setConstant(kTRUE);
-      bb.setVal(0.3000);   // bb.setConstant(kTRUE);
-      T.setVal(0.070433);   // T.setConstant(kTRUE);
-      bb2.setVal(0.099637);   //bb2.setConstant(kTRUE);
-      fexp.setVal(0.0);   // if (systString == "Default") fexp.setConstant(kTRUE);
-    } else {
-      if (systString == "Resummation") m.setMax(800.);
-      m.setVal(456.99);   // m.setConstant(kTRUE);
-      n.setVal(1.068);   // n.setConstant(kTRUE);
-      n2.setVal(0.9649);   n2.setConstant(kTRUE);
-      bb.setVal(0.0149);   // bb.setConstant(kTRUE);
-      T.setVal(0.2330);   // T.setConstant(kTRUE);
-      bb2.setVal(0.00253);    bb2.setConstant(kTRUE);
-      fexp.setVal(0.0202);   fexp.setConstant(kTRUE);
+  else if(whichtype == 1)
+    {
+      if(LHCsqrts == 8)
+	{
+  	  m.setVal(1.4);
+	  n.setVal(5.4);
+	  n2.setVal(0.9);
+	  bb.setVal(0.09);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.12);
+	}
+      else
+	{
+	  n.setVal(5.4);
+	  n2.setVal(0.9);
+	  bb.setVal(0.09);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.12);
+	}
     }
-  }
-  
-
+  else if(whichtype == 3)
+    {
+      if(LHCsqrts == 8)
+	{
+  	  m.setVal(1.4);
+	  n.setVal(5.4);
+	  n2.setVal(0.9);
+	  bb.setVal(0.09);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.12);
+	}
+      else
+	{
+	  n.setVal(5.4);
+	  n2.setVal(0.9);
+	  bb.setVal(0.09);
+	  bb2.setVal(0.09);
+	  fexp.setVal(0.0);
+	  T.setVal(0.12);
+	}
+    }
+  else
+    {
+      if(LHCsqrts == 8)
+	{
+  	  m.setVal(0.3);
+	  n.setVal(1.0);
+	  n2.setVal(1.34);
+	  bb.setVal(5.44);
+	  bb2.setVal(0.1);
+	  fexp.setVal(0.0);
+	  T.setVal(0.0008);
+	}
+      else
+	{
+   	  m.setVal(0.3);
+	  n.setVal(1.0);
+	  n2.setVal(1.34);
+	  bb.setVal(5.44);
+	  bb2.setVal(0.1);
+	  fexp.setVal(0.0);
+	  T.setVal(0.0008);
+	}
+    }
   RooTsallis3* rt3 = new RooTsallis3("rt3","rt3",*pt_m,m,n,n2,bb,bb2,T,fexp);
   ws->import(*rt3);
 
