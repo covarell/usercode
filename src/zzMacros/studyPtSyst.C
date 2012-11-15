@@ -34,6 +34,16 @@ void evalBinMigration(TH1F* def, TH1F* var, char fileName[200], bool syst = true
   return;
 }
 
+void adjustHistogram(TH1F* hist) {
+  
+  float a, b;
+  for (Int_t iBin = 1; iBin <= hist->GetNbinsX() ; ++iBin) {
+    if (hist->GetBinContent(iBin) < hist->GetBinError(iBin)) hist->SetBinError(iBin,0.9*hist->GetBinContent(iBin));
+    if (iBin == 3) a = hist->GetBinContent(iBin);
+    if (iBin == 4) b = hist->GetBinContent(iBin);
+  }
+}
+
 void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
   // -5 - PDF : VBF
@@ -50,201 +60,232 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   // 6 - PDF : ZZ
   // 7 - scales : ZZ
 
+  bool withNLOMela = false;
+  char nameFile[200] = "SelectedTree";
+  if (withNLOMela) sprintf(nameFile,"angles");
+
   gROOT->ProcessLine(".L mytdrstyle.C");
   gROOT->ProcessLine("setTDRStyle()");
  
   // READ TREES
-  TChain* ggTree = new TChain("angles");
+  TChain* ggTree = new TChain(nameFile);
   if (also7TeV) {
-    ggTree->Add("../datafiles/4e/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
-    ggTree->Add("../datafiles/4mu/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
-    ggTree->Add("../datafiles/2mu2e/HZZ4lTree_H125_105-1000_7TeV_withDiscriminantsPtY.root");
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_H125.root");
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_H125.root");
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_H125.root");
   } else {
-    ggTree->Add("../datafiles/4e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
-    ggTree->Add("../datafiles/4mu/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root");
-    ggTree->Add("../datafiles/2mu2e/HZZ4lTree_H125_105-1000_withDiscriminantsPtY.root"); 
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_H125.root");
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_H125.root");
+    ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_H125.root"); 
   }
 
-  TChain* VBFTree = new TChain("angles");
+  TChain* VBFTree = new TChain(nameFile);
   if (also7TeV) {
-    VBFTree->Add("../datafiles/4e/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
-    VBFTree->Add("../datafiles/4mu/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
-    VBFTree->Add("../datafiles/2mu2e/HZZ4lTree_VBFH125_105-1000_7TeV_withDiscriminantsPtY.root");
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_VBFH125.root");
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_VBFH125.root");
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_VBFH125.root");
   } else {
-    VBFTree->Add("../datafiles/4e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
-    VBFTree->Add("../datafiles/4mu/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root");
-    VBFTree->Add("../datafiles/2mu2e/HZZ4lTree_VBFH125_105-1000_withDiscriminantsPtY.root"); 
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_VBFH125.root");
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH125.root");
+    VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH125.root"); 
   }
 
-  TChain* zzTree = new TChain("angles");
+  TChain* VHTree = new TChain(nameFile);
   if (also7TeV) {
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4e_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4mu_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo2mu2tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2mu_105-1000_7TeV_withDiscriminantsPtY.root"); 
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau_105-1000_7TeV_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo4tau_105-1000_7TeV_withDiscriminantsPtY.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/4e/HZZ4lTree_VH120.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/4mu/HZZ4lTree_VH120.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/2mu2e/HZZ4lTree_VH120.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/4e/HZZ4lTree_VH130.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/4mu/HZZ4lTree_VH130.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR/2mu2e/HZZ4lTree_VH130.root");
   } else {
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4e_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4mu_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/4mu/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2mu_105-1000_withDiscriminantsPtY.root"); 
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2e2tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo2mu2tau_105-1000_withDiscriminantsPtY.root");
-    zzTree->Add("../datafiles/2mu2e/HZZ4lTree_ZZTo4tau_105-1000_withDiscriminantsPtY.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR_8TeV/4e/HZZ4lTree_VH125.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR_8TeV/4mu/HZZ4lTree_VH125.root");
+    VHTree->Add("root://lxcms02//data/Higgs/rootuplesOut/131112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH125.root"); 
   }
 
-  TChain* ggzzTree = new TChain("angles");
+  TChain* zzTree = new TChain(nameFile);
   if (also7TeV) {
-    ggzzTree->Add("../datafiles/4e/HZZ4lTree_ggZZ4l_105-1000_7TeV_withDiscriminantsPtY.root");
-    ggzzTree->Add("../datafiles/4mu/HZZ4lTree_ggZZ4l_105-1000_7TeV_withDiscriminantsPtY.root");
-    ggzzTree->Add("../datafiles/2mu2e/HZZ4lTree_ggZZ2l2l_105-1000_7TeV_withDiscriminantsPtY.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_ZZTo4e.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_ZZTo4mu.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_ZZTo4tau.root");
   } else {
-    ggzzTree->Add("../datafiles/4e/HZZ4lTree_ggZZ4l_105-1000_withDiscriminantsPtY.root");
-    ggzzTree->Add("../datafiles/4mu/HZZ4lTree_ggZZ4l_105-1000_withDiscriminantsPtY.root");
-    ggzzTree->Add("../datafiles/2mu2e/HZZ4lTree_ggZZ2l2l_105-1000_withDiscriminantsPtY.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4e.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4mu.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo4tau.root");
+  }
+
+  TChain* ggzzTree = new TChain(nameFile);
+  if (also7TeV) {
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4e/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/4mu/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/2mu2e/HZZ4lTree_ggZZ2l2l.root");
+  } else {
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4e/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/4mu/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/2mu2e/HZZ4lTree_ggZZ2l2l.root");
   }
    
-  TChain* dataTree = new TChain("angles");
+  TChain* dataTree = new TChain(nameFile);
   if (also7TeV) {
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleEle_105-1000_7TeV_withDiscriminantsPtY.root");
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleMu_105-1000_7TeV_withDiscriminantsPtY.root");
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleOr_105-1000_7TeV_withDiscriminantsPtY.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/data/HZZ4lTree_DoubleEle.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/data/HZZ4lTree_DoubleMu.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/data/HZZ4lTree_DoubleOr.root");
   } else {
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleEle_105-1000_withDiscriminantsPtY.root");
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleMu_105-1000_withDiscriminantsPtY.root");
-    dataTree->Add("../datafiles/data/HZZ4lTree_DoubleOr_105-1000_withDiscriminantsPtY.root"); 
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root"); 
   }
 
-  TChain* crTree = new TChain("angles");
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEEEssTree_105-1000_withDiscriminantsPtY.root");
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEMMssTree_105-1000_withDiscriminantsPtY.root");
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMMMssTree_105-1000_withDiscriminantsPtY.root"); 
+  TChain* crTree = new TChain(nameFile);
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
+  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root"); 
   if (also7TeV) {
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMEEssTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMMMssTree_105-1000_7TeV_withDiscriminantsPtY.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root");
   }
 
-  TChain* crosTree = new TChain("angles");
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEEEosTree_105-1000_withDiscriminantsPtY.root");
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEMMosTree_105-1000_withDiscriminantsPtY.root");
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMEEosTree_105-1000_withDiscriminantsPtY.root");
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMMMosTree_105-1000_withDiscriminantsPtY.root");
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEEEosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEMMosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMEEosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMMMosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEEEosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEMMosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMEEosTree_105-1000_withDiscriminantsPtY.root");	
-  crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMMMosTree_105-1000_withDiscriminantsPtY.root");	
+  TChain* crosTree = new TChain(nameFile);
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
   if (also7TeV) {
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CREEMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleEle_CRMMMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CREEMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleMu_CRMMMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CREEMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMEEosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
-    crosTree->Add("../datafiles/CR/HZZ4lTree_DoubleOr_CRMMMMosTree_105-1000_7TeV_withDiscriminantsPtY.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
   }
 
-  TChain* crzjTree = new TChain("angles");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEEEssTree_105-1000_withDiscriminantsPtY.root");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEMMssTree_105-1000_withDiscriminantsPtY.root");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEMMssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMEEssTree_105-1000_withDiscriminantsPtY.root");	
-  crzjTree->Add("../datafiles/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMMMssTree_105-1000_withDiscriminantsPtY.root");
+  TChain* crzjTree = new TChain(nameFile);
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEEEssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMEEssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/261012/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMMMssTree.root");
 
-  float mgg, mVBF, mzz, mggzz, mdata, mcr, mcros, mzj;
-  float wgg, wVBF, wzz, wggzz, wzj;
-  float nlogg, nloVBF, nlozz, nloggzz, nlodata, nlocr, nlozj; 
-  float ptgg, ptVBF, ptzz, ptggzz, ptdata, ptcr, ptzj;
+  float mgg, mVBF, mzz, mggzz, mdata, mcr, mcros, mzj, mvh;
+  float wgg, wVBF, wzz, wggzz, wzj, wvh;
+  float ptgg, ptVBF, ptzz, ptggzz, ptdata, ptcr, ptzj, ptvh;
+  float nlogg = -999.;
+  float nloVBF = -999.;
+  float nlozz = -999.; 
+  float nloggzz = -999.;
+  float nlodata = -999.; 
+  float nlocr = -999.; 
+  float nlozj = -999.; 
+  float nlovh = -999.; 
+  int gprIdvh; 
 
-  ggTree->SetBranchAddress("zzmass",&mgg);
+  ggTree->SetBranchAddress("ZZMass",&mgg);
   ggTree->SetBranchAddress("MC_weight",&wgg);
   ggTree->SetBranchAddress("ZZPt",&ptgg);
-  ggTree->SetBranchAddress("melaLDWithPtY",&nlogg);
+  if (withNLOMela) ggTree->SetBranchAddress("melaLDWithPtY",&nlogg);
 
-  VBFTree->SetBranchAddress("zzmass",&mVBF);
+  VBFTree->SetBranchAddress("ZZMass",&mVBF);
   VBFTree->SetBranchAddress("MC_weight",&wVBF);
   VBFTree->SetBranchAddress("ZZPt",&ptVBF);
-  VBFTree->SetBranchAddress("melaLDWithPtY",&nloVBF);
+  if (withNLOMela) VBFTree->SetBranchAddress("melaLDWithPtY",&nloVBF);
 
-  zzTree->SetBranchAddress("zzmass",&mzz);
+  VHTree->SetBranchAddress("ZZMass",&mvh);
+  VHTree->SetBranchAddress("MC_weight",&wvh);
+  VHTree->SetBranchAddress("ZZPt",&ptvh);
+  VHTree->SetBranchAddress("genProcessId",&gprIdvh);
+  if (withNLOMela) VHTree->SetBranchAddress("melaLDWithPtY",&nlovh);
+
+  zzTree->SetBranchAddress("ZZMass",&mzz);
   zzTree->SetBranchAddress("MC_weight",&wzz);
   zzTree->SetBranchAddress("ZZPt",&ptzz);
-  zzTree->SetBranchAddress("melaLDWithPtY",&nlozz);
+  if (withNLOMela) zzTree->SetBranchAddress("melaLDWithPtY",&nlozz);
 
-  ggzzTree->SetBranchAddress("zzmass",&mggzz);
+  ggzzTree->SetBranchAddress("ZZMass",&mggzz);
   ggzzTree->SetBranchAddress("MC_weight",&wggzz);
   ggzzTree->SetBranchAddress("ZZPt",&ptggzz);
-  ggzzTree->SetBranchAddress("melaLDWithPtY",&nloggzz);
+  if (withNLOMela) ggzzTree->SetBranchAddress("melaLDWithPtY",&nloggzz);
 
-  dataTree->SetBranchAddress("zzmass",&mdata);
+  dataTree->SetBranchAddress("ZZMass",&mdata);
   dataTree->SetBranchAddress("ZZPt",&ptdata);
-  dataTree->SetBranchAddress("melaLDWithPtY",&nlodata);
+  if (withNLOMela) dataTree->SetBranchAddress("melaLDWithPtY",&nlodata);
 
-  crTree->SetBranchAddress("zzmass",&mcr);
+  crTree->SetBranchAddress("ZZMass",&mcr);
   crTree->SetBranchAddress("ZZPt",&ptcr);
-  crTree->SetBranchAddress("melaLDWithPtY",&nlocr);
+  if (withNLOMela) crTree->SetBranchAddress("melaLDWithPtY",&nlocr);
 
-  crosTree->SetBranchAddress("zzmass",&mcros);
+  crosTree->SetBranchAddress("ZZMass",&mcros);
 
-  crzjTree->SetBranchAddress("zzmass",&mzj);
+  crzjTree->SetBranchAddress("ZZMass",&mzj);
   crzjTree->SetBranchAddress("MC_weight",&wzj);
   crzjTree->SetBranchAddress("ZZPt",&ptzj);
-  crzjTree->SetBranchAddress("melaLDWithPtY",&nlozj);
+  if (withNLOMela) crzjTree->SetBranchAddress("melaLDWithPtY",&nlozj);
 
   char nameSyst[200]; 
-  char nameFile[200];
   char UcasePt[8] = "PT";
   if (overM) sprintf(UcasePt,"PToverM");
   char LcasePt[8] = "pt";
   if (overM) sprintf(LcasePt,"ptoverm");
 
-  cout << LcasePt << endl;
+  // cout << LcasePt << endl;
 
   sprintf(nameFile,"../../weightHisto_125GeV_8TeV_all.root");
   if (also7TeV) sprintf(nameFile,"../../weightHisto_125GeV_7TeV_all.root");
@@ -288,15 +329,21 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   // TH1F* pth = new TH1F("pth","pt",50,0.,200.);
   // TH1F* pth1 = new TH1F("pth1","pt",50,0.,200.);
   // TH1F* pth2 = new TH1F("pth2","pt",50,0.,200.);
-  //Extended ranges
+  // Extended ranges
   TH1F* pth = new TH1F("pth","pt",nbins2,0.,theMax);
   TH1F* pth1 = new TH1F("pth1","pt",nbins2,0.,theMax);
   TH1F* pth2 = new TH1F("pth2","pt",nbins2,0.,theMax);
+  TH1F* pth3 = new TH1F("pth3","pt",nbins2,0.,theMax);
+  TH1F* pth4 = new TH1F("pth4","pt",nbins2,0.,theMax);
+  TH1F* pth5 = new TH1F("pth5","pt",nbins2,0.,theMax);
+  TH1F* pth6 = new TH1F("pth6","pt",nbins2,0.,theMax);
   TH1F* ptvbf = new TH1F("ptvbf","pt",nbins2,0.,theMax);
 
   pth->Sumw2();
   pth1->Sumw2();
   pth2->Sumw2();
+  pth3->Sumw2();
+  pth4->Sumw2();
   ptvbf->Sumw2();
  
   //Alternative pT binnings
@@ -355,19 +402,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     } 
 
     sprintf(nameSyst,"PDF-VBF");
-
-    sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
-    TFile f1(nameFile,"UPDATE");
-    // pth->SetName("ptH_Default");
-    // pth->Write();
-    // evalBinMigration(pth,pth,"",false);
-    sprintf(nameFile,"%sH_PDF",LcasePt);
-    ptvbf->SetName(nameFile);
-    ptvbf->Write();
-    evalBinMigration(pth,ptvbf,nameSyst,true);
-    f1.Close();
-
   }
 
   if (whichtype == -4) {
@@ -415,16 +449,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     } 
 
     sprintf(nameSyst,"scale-VBF");
-
-    sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
-    TFile f1(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_scale",LcasePt);
-    ptvbf->SetName(nameFile);
-    ptvbf->Write();
-    TH1F* def = (TH1F*)f1.Get("ptH_Default");
-    evalBinMigration(def,ptvbf,nameSyst,true);
-    f1.Close();
 
   }  
 
@@ -488,17 +512,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
       }
     } 
 
-    sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
-    TFile f(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_TopMass",LcasePt);
-    pth->SetName(nameFile);
-    pth->Write();
-    sprintf(nameFile,"%sH_Default",LcasePt);
-    TH1F* def = (TH1F*)f.Get(nameFile);
-    evalBinMigration(def,pth,nameSyst,true);
-    f.Close();
-
     /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
       if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
@@ -533,18 +546,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     } 
 
     sprintf(nameSyst,"Resummation");
-
-    sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
-    TFile f(nameFile,"UPDATE");
-    // pth->SetName("ptH_Default");
-    // pth->Write();
-    // evalBinMigration(pth,pth,"",false);  
-    sprintf(nameFile,"%sH_Resummation",LcasePt);
-    pth2->SetName(nameFile);
-    pth2->Write();
-    evalBinMigration(pth,pth2,nameSyst,true);
-    f.Close();
 
     /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
@@ -599,6 +600,11 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
   if (whichtype == 0) {
 
+    TH2F* ptmhgg = new TH2F("ptmhgg","pt vs m",16,100.,180.,50.,0.,theMax);
+    ptmhgg->Sumw2();
+    TH2F* ptmhggLarge = new TH2F("ptmhggLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
+    ptmhggLarge->Sumw2();
+
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
       if (mgg < 140. && mgg > 105. && ptgg < 400.) {
@@ -609,77 +615,196 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 	pth->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
         nloh->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
       }
+      ptmhgg->Fill(mgg,ptVar(ptgg,mgg,overM));
+      ptmhggLarge->Fill(mgg,ptVar(ptgg,mgg,overM));
     } 
 
     sprintf(nameFile,"%s_gg_SEL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"%s_gg_SEL_7TeV.root",UcasePt);
-    TFile f4(nameFile,"RECREATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    evalBinMigration(pth,pth,"",false);
-    f4.Close();
+    TFile f(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth->SetName(nameFile);
+    pth->Scale(1./pth->Integral());
+    adjustHistogram(pth);   pth->Write();
 
-    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
-      pth->SetBinContent(i,0.0);
-    }
+    ptmhgg->SetName("ptVsM");   ptmhgg->Write();
+    TProfile* tpgg = (TProfile*)ptmhgg->ProfileX();
+    tpgg->SetName("ptVsMProf");   tpgg->Write();
+
+    ptmhggLarge->SetName("ptVsMLarge");   ptmhggLarge->Write();
+    TProfile* tpggLarge = (TProfile*)ptmhggLarge->ProfileX();
+    tpggLarge->SetName("ptVsMLargeProf");   tpggLarge->Write();
+
+    evalBinMigration(pth,pth,"",false);
+    f.Close();
+
+    TH2F* ptmhvbf = new TH2F("ptmhvbf","pt vs m",16,100.,180.,50.,0.,theMax);
+    ptmhvbf->Sumw2();
+    TH2F* ptmhvbfLarge = new TH2F("ptmhvbfLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
+    ptmhvbfLarge->Sumw2();
 
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
       if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
-	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
+	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
         nloh->Fill(nloVBF,wVBF);
       }
+      ptmhvbf->Fill(mVBF,ptVar(ptVBF,mVBF,overM));
+      ptmhvbfLarge->Fill(mVBF,ptVar(ptVBF,mVBF,overM));
     }
 
     sprintf(nameFile,"%s_vbf_SEL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"%s_vbf_SEL_7TeV.root",UcasePt);
-    TFile f(nameFile,"RECREATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    evalBinMigration(pth,pth,"",false);
-    f.Close();
+    TFile f1(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    ptvbf->SetName(nameFile);
+    ptvbf->Scale(1./ptvbf->Integral());
+    adjustHistogram(ptvbf);   ptvbf->Write();
 
-    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
-      pth->SetBinContent(i,0.0);
-    }
+    ptmhvbf->SetName("ptVsM");   ptmhvbf->Write();
+    TProfile* tpvbf = (TProfile*)ptmhvbf->ProfileX();
+    tpvbf->SetName("ptVsMProf");   tpvbf->Write();
+
+    ptmhvbfLarge->SetName("ptVsMLarge");   ptmhvbfLarge->Write();
+    TProfile* tpvbfLarge = (TProfile*)ptmhvbfLarge->ProfileX();
+    tpvbfLarge->SetName("ptVsMLargeProf");   tpvbfLarge->Write();
+
+    evalBinMigration(ptvbf,ptvbf,"",false);
+    f1.Close();
+
+    TH2F* ptmhzz = new TH2F("ptmhzz","pt vs m",16,100.,180.,50.,0.,theMax);
+    ptmhzz->Sumw2();
+    TH2F* ptmhzzLarge = new TH2F("ptmhzzLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
+    ptmhzzLarge->Sumw2();
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
       if (mzz < 140. && mzz > 105. && ptzz < 400.) {
-	pth->Fill(ptVar(ptzz,mzz,overM),wzz);
+	pth1->Fill(ptVar(ptzz,mzz,overM),wzz);
 	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz);
         nloh->Fill(nlozz,wzz);
       }
+      ptmhzz->Fill(mzz,ptVar(ptzz,mzz,overM));
+      ptmhzzLarge->Fill(mzz,ptVar(ptzz,mzz,overM));
     } 
 
     sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
     TFile f2(nameFile,"RECREATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    evalBinMigration(pth,pth,"",false);
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth1->SetName(nameFile);
+    pth1->Scale(1./pth1->Integral());
+    adjustHistogram(pth1);   pth1->Write();
+
+    ptmhzz->SetName("ptVsM");   ptmhzz->Write();
+    TProfile* tpzz = (TProfile*)ptmhzz->ProfileX();
+    tpzz->SetName("ptVsMProf");   tpzz->Write();
+
+    ptmhzzLarge->SetName("ptVsMLarge");   ptmhzzLarge->Write();
+    TProfile* tpzzLarge = (TProfile*)ptmhzzLarge->ProfileX();
+    tpzzLarge->SetName("ptVsMLargeProf");   tpzzLarge->Write();
+
+    evalBinMigration(pth1,pth1,"",false);
     f2.Close();
 
-    for (unsigned int i = 0; i < pth->GetNbinsX(); i++) {
-      pth->SetBinContent(i,0.0);
-    }
+    TH2F* ptmhcr = new TH2F("ptmhcr","pt vs m",16,100.,180.,50.,0.,theMax);
+    ptmhcr->Sumw2();
+    TH2F* ptmhcrLarge = new TH2F("ptmhcrLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
+    ptmhcrLarge->Sumw2();
 
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
       if (mcr < 140. && mcr > 105. && ptcr < 400.) {
-	pth->Fill(ptVar(ptcr,mcr,overM));
+	pth2->Fill(ptVar(ptcr,mcr,overM));
         nloh->Fill(nlocr);
       }
+      ptmhcr->Fill(mcr,ptVar(ptcr,mcr,overM));
+      ptmhcrLarge->Fill(mcr,ptVar(ptcr,mcr,overM));
     } 
 
     sprintf(nameFile,"%s_zx_SEL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"%s_zx_SEL_7TeV.root",UcasePt);
     TFile f3(nameFile,"RECREATE");
-    pth->SetName("ptH_Default");
-    pth->Write();
-    evalBinMigration(pth,pth,"",false);
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth2->SetName(nameFile);
+    pth2->Scale(1./pth2->Integral());
+    adjustHistogram(pth2);   pth2->Write();
+
+    ptmhcr->SetName("ptVsM");   ptmhcr->Write();
+    TProfile* tpcr = (TProfile*)ptmhcr->ProfileX();
+    tpcr->SetName("ptVsMProf");   tpcr->Write();
+
+    ptmhcrLarge->SetName("ptVsMLarge");   ptmhcrLarge->Write();
+    TProfile* tpcrLarge = (TProfile*)ptmhcrLarge->ProfileX();
+    tpcrLarge->SetName("ptVsMLargeProf");   tpcrLarge->Write();
+
+    evalBinMigration(pth2,pth2,"",false);
     f3.Close();
+
+    for (Int_t iEvt = 0; iEvt < ggzzTree->GetEntries() ; ++iEvt) {
+      ggzzTree->GetEntry(iEvt);
+      if (mggzz < 140. && mggzz > 105. && ptggzz < 400.) {
+	pth3->Fill(ptVar(ptggzz,mggzz,overM),wggzz);
+        nloh->Fill(nloggzz,wggzz);
+      }
+    } 
+
+    sprintf(nameFile,"%s_ggzz_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_ggzz_SEL_7TeV.root",UcasePt);
+    TFile f4(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth3->SetName(nameFile);
+    pth3->Scale(1./pth3->Integral());
+    adjustHistogram(pth3);   pth3->Write();
+    evalBinMigration(pth3,pth3,"",false);
+    f4.Close();
+
+    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
+      VHTree->GetEntry(iEvt);
+      if (mvh < 140. && mvh > 105. && ptvh < 400.) {
+	if (gprIdvh == 24) {
+	  pth4->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  nloh->Fill(nlovh,wvh);
+	} else if (gprIdvh == 26) {
+	  pth5->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  nloh->Fill(nlovh,wvh);
+	} else {
+	  pth6->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  nloh->Fill(nlovh,wvh);
+	}
+      }
+    } 
+
+    sprintf(nameFile,"%s_wh_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_wh_SEL_7TeV.root",UcasePt);
+    TFile f5(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth4->SetName(nameFile);
+    pth4->Scale(1./pth4->Integral());
+    adjustHistogram(pth4);   pth4->Write();
+    evalBinMigration(pth4,pth4,"",false);
+    f5.Close();
+
+    sprintf(nameFile,"%s_zh_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_zh_SEL_7TeV.root",UcasePt);
+    TFile f6(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth5->SetName(nameFile);
+    pth5->Scale(1./pth5->Integral());
+    adjustHistogram(pth5);   pth5->Write();
+    evalBinMigration(pth5,pth5,"",false);
+    f6.Close();
  
+    sprintf(nameFile,"%s_tth_SEL_8TeV.root",UcasePt);
+    if (also7TeV) sprintf(nameFile,"%s_tth_SEL_7TeV.root",UcasePt);
+    TFile f7(nameFile,"RECREATE");
+    sprintf(nameFile,"%sH_Default",LcasePt);   
+    pth6->SetName(nameFile);
+    pth6->Scale(1./pth6->Integral());
+    adjustHistogram(pth6);   pth6->Write();
+    evalBinMigration(pth6,pth6,"",false);
+    f7.Close();
+
   }
 
   if (whichtype == 1) {
@@ -766,13 +891,14 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
   if (whichtype == 3) {
 
-    sprintf(nameSyst,"histograms8TeV.root");
+    // DO NOT USE UGLY HISTOGRAMS, USE THE TREES INSTEAD
+    /* sprintf(nameSyst,"histograms8TeV.root");
     if (also7TeV) sprintf(nameSyst,"histograms7TeV.root");
     TFile fileMike(nameSyst);
     fileMike.ls();
 
     sprintf(nameSyst,"DATA");
-    // if (also7TeV) sprintf(nameSyst,"tmpTH1");
+    if (!also7TeV) sprintf(nameSyst,"tmpTH1");
     TH1F* dataUnb = (TH1F*)fileMike.Get(nameSyst);
     dataUnb->GetXaxis()->SetRange(1,20);
     TH1F* zzUnb = (TH1F*)fileMike.Get("ZZ");
@@ -780,23 +906,76 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     zzUnb->GetXaxis()->SetRange(1,20);
     TH1F* zxUnb = (TH1F*)fileMike.Get("FAKES");
     zxUnb->Scale(1.7/zxUnb->GetBinContent(4));
-    zxUnb->GetXaxis()->SetRange(1,20);
+    zxUnb->GetXaxis()->SetRange(1,20); */
+
+    float unbMaxBin = 200.;
+    if (overM) unbMaxBin = 1.0;
+
+    TH1F* dataUnb = new TH1F("dataUnb","data",20,0.,unbMaxBin);
+    TH1F* zzUnb = new TH1F("zzUnb","zz",20,0.,unbMaxBin);
+    TH1F* zxUnb = new TH1F("zxUnb","zx",20,0.,unbMaxBin);
+    dataUnb->Sumw2();
+    zzUnb->Sumw2();
+    zxUnb->Sumw2();
+
+    for (Int_t iEvt = 0; iEvt < dataTree->GetEntries() ; ++iEvt) {
+      dataTree->GetEntry(iEvt);
+      if (mdata < 400. && mdata > 140. && ptdata < 200.) {
+	dataUnb->Fill(ptVar(ptdata,mdata,overM));
+      }
+    } 
+
+    float lumi = 12.2;
+    if (also7TeV) lumi = 5.1;
+
+    for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
+      zzTree->GetEntry(iEvt);
+      if (mzz < 400. && mzz > 140. && ptzz < 200.) {
+	zzUnb->Fill(ptVar(ptzz,mzz,overM),wzz*lumi);
+      }
+    } 
+
+    for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
+      crTree->GetEntry(iEvt);
+      if (mcr < 400. && mcr > 140. && ptcr < 200.) {
+	zxUnb->Fill(ptVar(ptcr,mcr,overM));
+      }
+    } 
 
     // Subtract fakes 
-    dataUnb->Add(dataUnb,zxUnb,1,-1);
+    float weightZX = (4.193/20.516)*(zzUnb->Integral()/zxUnb->Integral());
+    dataUnb->Add(dataUnb,zxUnb,1,-weightZX);
     dataUnb->SetMarkerColor(1);    dataUnb->SetLineColor(1);    dataUnb->SetLineWidth(2);
     zzUnb->SetMarkerColor(2);   zzUnb->SetLineColor(2);   zzUnb->SetLineWidth(2);
+    // zxUnb->SetMarkerColor(3);   zxUnb->SetLineColor(3);   zxUnb->SetLineWidth(2);
+
     can.cd(1);
     gPad->SetBottomMargin(0.0);
     dataUnb->GetXaxis()->SetLabelColor(kWhite);
     dataUnb->GetYaxis()->SetTitle("Entries");
     dataUnb->Draw();
     zzUnb->Draw("SAME");
+    // zxUnb->Draw("SAME");
 
     TH1F* diffpt = (TH1F*)zxUnb->Clone();
     TH1F* pullpt = (TH1F*)zxUnb->Clone();
     diffpt->Add(dataUnb,zzUnb,1,-1);
     pullpt->Divide(diffpt,dataUnb);
+    // remove outliers
+    float xp[20];     float yp[20];
+    float xperr[20];  float yperr[20];
+    for (Int_t iBin = 1; iBin <= pullpt->GetNbinsX() ; ++iBin) {
+      xperr[iBin-1] = 0.;
+      if (fabs(pullpt->GetBinContent(iBin)) > 2.) {
+	xp[iBin-1] = 999.;   yp[iBin-1] = 0.;     yperr[iBin-1] = 0.;
+      } else {
+	xp[iBin-1] = pullpt->GetBinCenter(iBin);   
+	yp[iBin-1] = pullpt->GetBinContent(iBin);     
+	yperr[iBin-1] = pullpt->GetBinError(iBin);;
+      }
+    }
+    TGraphErrors* pullg = new TGraphErrors(20,xp,yp,xperr,yperr);
+
     can.cd(2);
     gPad->SetTopMargin(0.0);
     pullpt->SetMinimum(-2.);
@@ -805,33 +984,23 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     pullpt->GetYaxis()->SetTitle("Relative difference");
     pullpt->Draw("E");
     TF1 *mypol1 = new TF1("mypol1","pol1");
-    pullpt->Fit("mypol1","","",0.,110.);
+    pullg->Fit("mypol1","","",0.,11.*unbMaxBin/20.);
+    pullg->Draw("PSAME");
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
       zzTree->GetEntry(iEvt);
       if (mzz < 140. && mzz > 105. && ptzz < 400.) {
-	pth->Fill(ptVar(ptzz,mzz,overM),wzz*(1. + mypol1->Eval(ptzz)));
+	pth->Fill(ptVar(ptzz,mzz,overM),wzz*(1. + mypol1->Eval(ptVar(ptzz,mzz,overM))));
       }
     } 
     
     sprintf(nameSyst,"UnbRegion");
 
-    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
-    TFile f2(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_UnbRegion",LcasePt);
-    pth->SetName(nameFile);
-    pth->Write();
-    sprintf(nameFile,"%sH_Default",LcasePt);
-    TH1F* def = (TH1F*)f2.Get(nameFile);
-    evalBinMigration(def,pth,nameSyst,true);
-    f2.Close();
-
     sprintf(nameFile,"%s_systUnbRegion.gif",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
     sprintf(nameFile,"%s_systUnbRegion.pdf",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
-    return;
+    // return;
 
   }
 
@@ -925,17 +1094,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
     sprintf(nameSyst,"ggZZ");
 
-    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
-    TFile f4(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_ggZZ",LcasePt);
-    pth->SetName(nameFile);
-    pth->Write();
-    sprintf(nameFile,"%sH_Default",LcasePt);
-    TH1F* def = (TH1F*)f4.Get(nameFile);
-    evalBinMigration(def,pth,nameSyst,true);
-    f4.Close();
-
   }
 
   if (whichtype == 6) {
@@ -979,18 +1137,6 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     } 
 
     sprintf(nameSyst,"PDF-ZZ");
-
-    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
-    TFile f1(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_PDF",LcasePt);
-    ptvbf->SetName(nameFile);
-    ptvbf->Write();
-    sprintf(nameFile,"%sH_Default",LcasePt);
-    TH1F* def = (TH1F*)f1.Get(nameFile);
-    evalBinMigration(def,ptvbf,nameSyst,true);
-    f1.Close();
-
   }
 
   if (whichtype == 7) {
@@ -1039,16 +1185,7 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
     sprintf(nameSyst,"scale-ZZ");
 
-    sprintf(nameFile,"%s_zz_SEL_8TeV.root",UcasePt);
-    if (also7TeV) sprintf(nameFile,"%s_zz_SEL_7TeV.root",UcasePt);
-    TFile f1(nameFile,"UPDATE");
-    sprintf(nameFile,"%sH_scale",LcasePt);
-    ptvbf->SetName(nameFile);
-    ptvbf->Write();
-    sprintf(nameFile,"%sH_Default",LcasePt);
-    TH1F* def = (TH1F*)f1.Get(nameFile);
-    evalBinMigration(def,ptvbf,nameSyst,true);
-    f1.Close();
+  
 
   }
 
@@ -1058,10 +1195,41 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   pth1->Scale(1./pth1->Integral());
   pth2->Scale(1./pth2->Integral());
   ptvbf->Scale(1./ptvbf->Integral());
-  nloh->Scale(1./nloh->Integral());
-  nloh1->Scale(1./nloh1->Integral());
-  nloh2->Scale(1./nloh2->Integral());
+  if (withNLOMela) {
+    nloh->Scale(1./nloh->Integral());
+    nloh1->Scale(1./nloh1->Integral());
+    nloh2->Scale(1./nloh2->Integral());
+  }
+
+  // Save histos
   
+  char whichSample[4] = "gg";
+  if (whichtype == -4 || whichtype == -5) sprintf(whichSample,"vbf");
+  if (whichtype > 0) sprintf(whichSample,"zz");
+
+  sprintf(nameFile,"%s_%s_SEL_8TeV.root",UcasePt,whichSample);
+  if (also7TeV) sprintf(nameFile,"%s_%s_SEL_7TeV.root",UcasePt,whichSample);
+  TFile f1(nameFile,"UPDATE");
+  sprintf(nameFile,"%sH_%s",LcasePt,nameSyst);
+  if (whichtype == -4 || whichtype == -5 || whichtype == 6 || whichtype == 7) {
+    ptvbf->SetName(nameFile);
+    adjustHistogram(ptvbf);   ptvbf->Write();
+  } else if (whichtype == -3 || whichtype == 3 ||  whichtype == 4 || whichtype == 5) {
+    pth->SetName(nameFile);
+    adjustHistogram(pth);   pth->Write();
+  } else if (whichtype == -2) {
+    pth2->SetName(nameFile);
+    adjustHistogram(pth2);  pth2->Write();
+  }
+  sprintf(nameFile,"%sH_Default",LcasePt);
+  TH1F* def = (TH1F*)f1.Get(nameFile);
+  if (whichtype == -4 || whichtype == -5 || whichtype == 6 || whichtype == 7) evalBinMigration(def,ptvbf,nameSyst,true);
+  else if (whichtype == -3 || whichtype == 3 ||  whichtype == 4 || whichtype == 5) evalBinMigration(def,pth,nameSyst,true);
+  else if (whichtype == -2) evalBinMigration(def,pth2,nameSyst,true);
+  f1.Close();
+
+  if (whichtype == 3) return;
+
   pth->SetMarkerColor(1);    pth->SetLineColor(1);    pth->SetLineWidth(2);
   pth1->SetMarkerColor(2);   pth1->SetLineColor(2);   pth1->SetLineWidth(2);
   pth2->SetMarkerColor(4);   pth2->SetLineColor(4);   pth2->SetLineWidth(2);
