@@ -69,7 +69,8 @@ ClassImp(RooTsallis)
    double T = T0 + mzz*T1 + mzz*mzz*T2;
    double n = n0 + mzz*n1 + mzz*mzz*n2;
    double bb = bb0 + mzz*bb1 + mzz*mzz*bb2;
-   return pow(x,ndue)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(n*T),-n);
+   double result =  pow(x,ndue)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(fabs(n*T)),-n);
+   return result;
  } 
 
 

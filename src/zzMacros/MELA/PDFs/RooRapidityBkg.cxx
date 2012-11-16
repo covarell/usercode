@@ -207,6 +207,7 @@ Double_t RooRapidityBkg::evaluate() const
 	    totSec = 1.e-5*totSec0;
 	    }
 
+        if (totSec <= 0.) totSec = 0.00001;
 	return totSec;
 
 } 

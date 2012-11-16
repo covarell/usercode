@@ -35,6 +35,11 @@ Adding script for generating 2d PDF.  Instead of hard coding
 template as 2d array, PDF is built as a prod PDF between 
 1D mZZ shape (RooMzzBkg) and 2D RooHistPdf.  
 
+Add_pT_y
+
+Adding possibility to include pT and rapidity in MELA 
+evaluation (aka nloMELA)
+
 ==================
 
 Content:
@@ -49,6 +54,9 @@ RooRapidityBkg.cxx RooRapidityBkg.h
 RooRapiditySig.cxx RooRapiditySig.h
 -> PDF for sig Rapidity
 
+RooTsallis(Exp).cxx RooTsallis(Exp).h
+-> PDF for pT
+
 src:
 AngularPdfFactory.cc  
 -> Utility class to initialize properly the 5D signal PDF
@@ -56,6 +64,9 @@ AngularPdfFactory.cc
 datafiles:
 my8DTemplateNotNorm.root
 -> 8D template PDF for qq->ZZ background (m2>4 GeV, mZZ 80-185 GeV)
+
+allParams*.txt
+-> parameters for signal/background pT description
 
 scripts:
 MELA.C  
@@ -68,66 +79,67 @@ root
 .L ../PDFs/RooXZsZs_5D.cxx+
 .L ../src/AngularPdfFactory.cc+
 .L ../PDFs/RooqqZZ_JHU.cxx+
-.L ../PDFs/RooTsallis.cc+              <-- ***RC***
+.L ../PDFs/RooTsallis.cxx+              <-- ***RC***
+.L ../PDFs/RooTsallisExp.cxx+           <-- ***RC***
 .L ../PDFs/RooRapiditySig.cxx+	       <-- ***CM&CY***
 .L ../PDFs/RooRapidityBkg.cxx+	       <-- ***CM&CY***
 .L MELA.C+
 
-addDtoTree("nameOfYourFile")
+addDtoTree("nameOfYourFile",LHCenergy)
 
 Where nameOfYourFiles.root is the name of the file which contain
 your tree. A new file will be created containing
-a new tree where the value of LD has been added.
+a new tree where the value of LD has been added. LHC energy is either
+7 or 8 (TeV).
 
 Notice the tree format should be:
-  sigTree->SetBranchAddress("z1mass",&m1);
-  sigTree->SetBranchAddress("z2mass",&m2);
-  sigTree->SetBranchAddress("zzmass",&mzz);
-  sigTree->SetBranchAddress("costheta1",&h1); 
-  sigTree->SetBranchAddress("costheta2",&h2);
+  sigTree->SetBranchAddress("Z1Mass",&m1); 
+  sigTree->SetBranchAddress("Z2Mass",&m2);
+  sigTree->SetBranchAddress("ZZMass",&mzz);
+  sigTree->SetBranchAddress("helcosthetaZ1",&h1);
+  sigTree->SetBranchAddress("helcosthetaZ2",&h2);
   sigTree->SetBranchAddress("costhetastar",&hs);
-  sigTree->SetBranchAddress("phi",&phi);  
-  sigTree->SetBranchAddress("phistar1",&phi1);
+  sigTree->SetBranchAddress("helphi",&phi);
+  sigTree->SetBranchAddress("phistarZ1",&phi1);
+  sigTree->SetBranchAddress("MC_weight",&w);
+
+  if (containsPt) sigTree->SetBranchAddress("ZZPt",&ZZPt);
+  if (containsY) sigTree->SetBranchAddress("ZZRapidity", &ZZY);
+  [see below]
 
 Or you may change the macro addDtoTree to adapt to the
 format of your tree
 
-note: by defualt this function only write events which pass the 
+note: by default this function only write events which pass the 
 following (loose) cuts:
 
 80<mZZ<1000
 mz2>4
 
-***RC***
-
 More options are available:
 
-addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>)
+addDtoTree("nameOfYourFile",LHCenergy,<minimumMzz>,<maximumMzz>)
 
 will only consider events in the range minimumMzz<mZZ<maximumMzz, overwriting
 the default. 
 
 will write the original MELA discriminant to the file.
 
-addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>,true)
+addDtoTree("nameOfYourFile",LHCenergy,<minimumMzz>,<maximumMzz>,true)
 
 will write discriminant to the output file called "melaLDWithPt" that
 also includes pT variable in it.
 
-In this case, the input file must also contain a branch like:
- sigTree->SetBranchAddress("ZZPt",&ZZPt);
+addDtoTree("nameOfYourFile",LHCenergy,<minimumMzz>,<maximumMzz>,false,true)
 
-***CM&CY***
+will write a discriminant to the output file called "melaLDWithY" 
+that includes Y variable in it.
 
-More options are available:
+addDtoTree("nameOfYourFile",LHCenergy,<minimumMzz>,<maximumMzz>,true,true)
 
-addDtoTree("nameOfYourFile",<minimumMzz>,<maximumMzz>,false,true)
+will write a discriminant to the output file called "melaLDWithPtY" 
+that includes Y  and pT variable in it.
 
-will write a discriminant to the output file called "melaLDWithY" and
- if both true then "melapTY" that includes Y  and pT variable in it.
-
-In this case, the input file must also contain a branch like:
- sigTree->SetBranchAddress("ZZRapidity",&ZZY);
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

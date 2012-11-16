@@ -91,7 +91,8 @@ ClassImp(RooTsallisExp)
    double bb = bb0 + mzz*bb1 + mzz*mzz*bb2;
    double fexp = fexp0 + mzz*fexp1 + mzz*mzz*fexp2;
    double bbdue = bbdue0 + mzz*bbdue1 + mzz*mzz*bbdue2;
-   return pow(x,ndue)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(n*T),-n) + fexp*exp(-bbdue*x);;
+   double result = pow(x,ndue)*exp(-bb*x)*pow(1 + (sqrt(x*x + m*m) - m)/(fabs(n*T)),-n) + fexp*exp(-bbdue*x);;
+   return result;
  } 
 
 

@@ -2,7 +2,7 @@
 #include "TLorentzVector.h"
 #include "RooWorkspace.h"
 
-void initAllFunctions(RooWorkspace *ws, int LHCsqrts);
+// void initAllFunctions(RooWorkspace *ws, int LHCsqrts);
 
 template <typename U>
 void checkZorder(U& z1mass, U& z2mass,

@@ -111,10 +111,11 @@ void setTDRStyle() {
 
   gStyle->SetTitleFont(42, "XYZ");
   gStyle->SetLabelFont(42, "XYZ");
-  gStyle->SetLabelOffset(0.007, "XYZ");
-  // gStyle->SetTitleSize(0.06, "XYZ");
+  gStyle->SetLabelSize(0.05, "XYZ");
+  gStyle->SetLabelOffset(0.01, "XYZ");
+  gStyle->SetTitleSize(0.06, "XYZ");
   gStyle->SetAxisColor(1, "XYZ");
-  gStyle->SetTitleYOffset(1.5);
+  gStyle->SetTitleYOffset(1.1);
   gStyle->SetStripDecimals(kTRUE);
   gStyle->SetTickLength(0.03, "XYZ");
   gStyle->SetNdivisions(510, "XYZ");
