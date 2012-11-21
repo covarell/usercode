@@ -242,35 +242,42 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   ggTree->SetBranchAddress("MC_weight",&wgg);
   ggTree->SetBranchAddress("ZZPt",&ptgg);
   if (withNLOMela) ggTree->SetBranchAddress("melaLDWithPtY",&nlogg);
+  else ggTree->SetBranchAddress("ZZLD",&nlogg);
 
   VBFTree->SetBranchAddress("ZZMass",&mVBF);
   VBFTree->SetBranchAddress("MC_weight",&wVBF);
   VBFTree->SetBranchAddress("ZZPt",&ptVBF);
   if (withNLOMela) VBFTree->SetBranchAddress("melaLDWithPtY",&nloVBF);
+  else VBFTree->SetBranchAddress("ZZLD",&nloVBF);  
 
   VHTree->SetBranchAddress("ZZMass",&mvh);
   VHTree->SetBranchAddress("MC_weight",&wvh);
   VHTree->SetBranchAddress("ZZPt",&ptvh);
   VHTree->SetBranchAddress("genProcessId",&gprIdvh);
   if (withNLOMela) VHTree->SetBranchAddress("melaLDWithPtY",&nlovh);
+  else VHTree->SetBranchAddress("ZZLD",&nlovh);
 
   zzTree->SetBranchAddress("ZZMass",&mzz);
   zzTree->SetBranchAddress("MC_weight",&wzz);
   zzTree->SetBranchAddress("ZZPt",&ptzz);
   if (withNLOMela) zzTree->SetBranchAddress("melaLDWithPtY",&nlozz);
+  else zzTree->SetBranchAddress("ZZLD",&nlozz);
 
   ggzzTree->SetBranchAddress("ZZMass",&mggzz);
   ggzzTree->SetBranchAddress("MC_weight",&wggzz);
   ggzzTree->SetBranchAddress("ZZPt",&ptggzz);
   if (withNLOMela) ggzzTree->SetBranchAddress("melaLDWithPtY",&nloggzz);
+  else ggzzTree->SetBranchAddress("ZZLD",&nloggzz);
 
   dataTree->SetBranchAddress("ZZMass",&mdata);
   dataTree->SetBranchAddress("ZZPt",&ptdata);
   if (withNLOMela) dataTree->SetBranchAddress("melaLDWithPtY",&nlodata);
+  else dataTree->SetBranchAddress("ZZLD",&nlodata);
 
   crTree->SetBranchAddress("ZZMass",&mcr);
   crTree->SetBranchAddress("ZZPt",&ptcr);
   if (withNLOMela) crTree->SetBranchAddress("melaLDWithPtY",&nlocr);
+  else crTree->SetBranchAddress("ZZLD",&nlocr);
 
   crosTree->SetBranchAddress("ZZMass",&mcros);
 
@@ -278,6 +285,7 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   crzjTree->SetBranchAddress("MC_weight",&wzj);
   crzjTree->SetBranchAddress("ZZPt",&ptzj);
   if (withNLOMela) crzjTree->SetBranchAddress("melaLDWithPtY",&nlozj);
+  else crzjTree->SetBranchAddress("ZZLD",&nlozj);
 
   char nameSyst[200]; 
   char UcasePt[8] = "PT";
@@ -329,22 +337,55 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
   // TH1F* pth = new TH1F("pth","pt",50,0.,200.);
   // TH1F* pth1 = new TH1F("pth1","pt",50,0.,200.);
   // TH1F* pth2 = new TH1F("pth2","pt",50,0.,200.);
-  // Extended ranges
+  // Extended ranges 
+
+  // gg 
   TH1F* pth = new TH1F("pth","pt",nbins2,0.,theMax);
+  TH1F* pthMassUp = new TH1F("pthMassUp","pt",nbins2,0.,theMax);
+  TH1F* pthMassDown = new TH1F("pthMassDown","pt",nbins2,0.,theMax);
+  TH1F* pthMelaUp = new TH1F("pthMelaUp","pt",nbins2,0.,theMax);
+  TH1F* pthMelaDown = new TH1F("pthMelaDown","pt",nbins2,0.,theMax);
+  pth->Sumw2();
+  pthMassUp->Sumw2();
+  pthMassDown->Sumw2();
+  pthMelaUp->Sumw2();
+  pthMelaDown->Sumw2();
+
+  // vbf
+  TH1F* ptvbf = new TH1F("ptvbf","pt",nbins2,0.,theMax);
+  TH1F* ptvbfMassUp = new TH1F("ptvbfMassUp","pt",nbins2,0.,theMax);
+  TH1F* ptvbfMassDown = new TH1F("ptvbfMassDown","pt",nbins2,0.,theMax);
+  TH1F* ptvbfMelaUp = new TH1F("ptvbfMelaUp","pt",nbins2,0.,theMax);
+  TH1F* ptvbfMelaDown = new TH1F("ptvbfMelaDown","pt",nbins2,0.,theMax);
+  ptvbf->Sumw2();
+  ptvbfMassUp->Sumw2();
+  ptvbfMassDown->Sumw2();
+  ptvbfMelaUp->Sumw2();
+  ptvbfMelaDown->Sumw2();
+
+  // zz
   TH1F* pth1 = new TH1F("pth1","pt",nbins2,0.,theMax);
+  TH1F* pth1MassUp = new TH1F("pth1MassUp","pt",nbins2,0.,theMax);
+  TH1F* pth1MassDown = new TH1F("pth1MassDown","pt",nbins2,0.,theMax);
+  TH1F* pth1MelaUp = new TH1F("pth1MelaUp","pt",nbins2,0.,theMax);
+  TH1F* pth1MelaDown = new TH1F("pth1MelaDown","pt",nbins2,0.,theMax);
+  pth1->Sumw2();
+  pth1MassUp->Sumw2();
+  pth1MassDown->Sumw2();
+  pth1MelaUp->Sumw2();
+  pth1MelaDown->Sumw2();
+
+  // other
   TH1F* pth2 = new TH1F("pth2","pt",nbins2,0.,theMax);
   TH1F* pth3 = new TH1F("pth3","pt",nbins2,0.,theMax);
   TH1F* pth4 = new TH1F("pth4","pt",nbins2,0.,theMax);
   TH1F* pth5 = new TH1F("pth5","pt",nbins2,0.,theMax);
   TH1F* pth6 = new TH1F("pth6","pt",nbins2,0.,theMax);
-  TH1F* ptvbf = new TH1F("ptvbf","pt",nbins2,0.,theMax);
-
-  pth->Sumw2();
-  pth1->Sumw2();
   pth2->Sumw2();
   pth3->Sumw2();
   pth4->Sumw2();
-  ptvbf->Sumw2();
+  pth5->Sumw2();
+  pth6->Sumw2();
  
   //Alternative pT binnings
   const int nbins = 10;
@@ -600,6 +641,8 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 
   if (whichtype == 0) {
 
+    TH2F* ptkdgg = new TH2F("ptkdgg","pt vs mela",16,0.,1.,50.,0.,theMax);
+    ptkdgg->Sumw2();
     TH2F* ptmhgg = new TH2F("ptmhgg","pt vs m",16,100.,180.,50.,0.,theMax);
     ptmhgg->Sumw2();
     TH2F* ptmhggLarge = new TH2F("ptmhggLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
@@ -614,6 +657,11 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 	newW = ratio->GetBinContent(ratio->FindBin(ptgg));
 	pth->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
         nloh->Fill(nlogg,wgg*newW*wHalf->GetBinContent(theBin));
+        ptkdgg->Fill(nlogg,ptVar(ptgg,mgg,overM));
+        if (mgg <= 126.) pthMassDown->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));	  
+	else pthMassUp->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));	  
+	if (nlogg <= 0.5) pthMelaDown->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));	  
+	else pthMelaUp->Fill(ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
       }
       ptmhgg->Fill(mgg,ptVar(ptgg,mgg,overM));
       ptmhggLarge->Fill(mgg,ptVar(ptgg,mgg,overM));
@@ -626,10 +674,30 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     pth->SetName(nameFile);
     pth->Scale(1./pth->Integral());
     adjustHistogram(pth);   pth->Write();
+    sprintf(nameFile,"%sH_MassUp",LcasePt);   
+    pthMassUp->SetName(nameFile);
+    pthMassUp->Scale(1./pthMassUp->Integral());
+    adjustHistogram(pthMassUp);   pthMassUp->Write();
+    sprintf(nameFile,"%sH_MassDown",LcasePt);   
+    pthMassDown->SetName(nameFile);
+    pthMassDown->Scale(1./pthMassDown->Integral());
+    adjustHistogram(pthMassDown);   pthMassDown->Write();
+    sprintf(nameFile,"%sH_MelaUp",LcasePt);   
+    pthMelaUp->SetName(nameFile);
+    pthMelaUp->Scale(1./pthMelaUp->Integral());
+    adjustHistogram(pthMelaUp);   pthMelaUp->Write();
+    sprintf(nameFile,"%sH_MelaDown",LcasePt);   
+    pthMelaDown->SetName(nameFile);
+    pthMelaDown->Scale(1./pthMelaDown->Integral());
+    adjustHistogram(pthMelaDown);   pthMelaDown->Write();
 
     ptmhgg->SetName("ptVsM");   ptmhgg->Write();
     TProfile* tpgg = (TProfile*)ptmhgg->ProfileX();
     tpgg->SetName("ptVsMProf");   tpgg->Write();
+
+    ptkdgg->SetName("ptVsMELA");   ptkdgg->Write();
+    TProfile* tpkdgg = (TProfile*)ptkdgg->ProfileX();
+    tpkdgg->SetName("ptVsMELAProf");   tpkdgg->Write();
 
     ptmhggLarge->SetName("ptVsMLarge");   ptmhggLarge->Write();
     TProfile* tpggLarge = (TProfile*)ptmhggLarge->ProfileX();
@@ -638,6 +706,8 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     evalBinMigration(pth,pth,"",false);
     f.Close();
 
+    TH2F* ptkdvbf = new TH2F("ptkdvbf","pt vs mela",16,0.,1.,50.,0.,theMax);
+    ptkdvbf->Sumw2();
     TH2F* ptmhvbf = new TH2F("ptmhvbf","pt vs m",16,100.,180.,50.,0.,theMax);
     ptmhvbf->Sumw2();
     TH2F* ptmhvbfLarge = new TH2F("ptmhvbfLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
@@ -648,6 +718,11 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
       if (mVBF < 140. && mVBF > 105. && ptVBF < 400.) {
 	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
         nloh->Fill(nloVBF,wVBF);
+        ptkdvbf->Fill(nloVBF,ptVar(ptVBF,mVBF,overM));
+        if (mVBF <= 126.) ptvbfMassDown->Fill(ptVar(ptVBF,mVBF,overM),wVBF);	  
+	else ptvbfMassUp->Fill(ptVar(ptVBF,mVBF,overM),wVBF);	  
+	if (nloVBF <= 0.5) ptvbfMelaDown->Fill(ptVar(ptVBF,mVBF,overM),wVBF);	  
+	else ptvbfMelaUp->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
       }
       ptmhvbf->Fill(mVBF,ptVar(ptVBF,mVBF,overM));
       ptmhvbfLarge->Fill(mVBF,ptVar(ptVBF,mVBF,overM));
@@ -660,10 +735,30 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     ptvbf->SetName(nameFile);
     ptvbf->Scale(1./ptvbf->Integral());
     adjustHistogram(ptvbf);   ptvbf->Write();
+    sprintf(nameFile,"%sH_MassUp",LcasePt);   
+    ptvbfMassUp->SetName(nameFile);
+    ptvbfMassUp->Scale(1./ptvbfMassUp->Integral());
+    adjustHistogram(ptvbfMassUp);   ptvbfMassUp->Write();
+    sprintf(nameFile,"%sH_MassDown",LcasePt);   
+    ptvbfMassDown->SetName(nameFile);
+    ptvbfMassDown->Scale(1./ptvbfMassDown->Integral());
+    adjustHistogram(ptvbfMassDown);   ptvbfMassDown->Write();
+    sprintf(nameFile,"%sH_MelaUp",LcasePt);   
+    ptvbfMelaUp->SetName(nameFile);
+    ptvbfMelaUp->Scale(1./ptvbfMelaUp->Integral());
+    adjustHistogram(ptvbfMelaUp);   ptvbfMelaUp->Write();
+    sprintf(nameFile,"%sH_MelaDown",LcasePt);   
+    ptvbfMelaDown->SetName(nameFile);
+    ptvbfMelaDown->Scale(1./ptvbfMelaDown->Integral());
+    adjustHistogram(ptvbfMelaDown);   ptvbfMelaDown->Write();
 
     ptmhvbf->SetName("ptVsM");   ptmhvbf->Write();
     TProfile* tpvbf = (TProfile*)ptmhvbf->ProfileX();
     tpvbf->SetName("ptVsMProf");   tpvbf->Write();
+
+    ptkdvbf->SetName("ptVsMELA");   ptkdvbf->Write();
+    TProfile* tpkdvbf = (TProfile*)ptkdvbf->ProfileX();
+    tpkdvbf->SetName("ptVsMELAProf");   tpkdvbf->Write();
 
     ptmhvbfLarge->SetName("ptVsMLarge");   ptmhvbfLarge->Write();
     TProfile* tpvbfLarge = (TProfile*)ptmhvbfLarge->ProfileX();
@@ -672,6 +767,8 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     evalBinMigration(ptvbf,ptvbf,"",false);
     f1.Close();
 
+    TH2F* ptkdzz = new TH2F("ptkdzz","pt vs mela",16,0.,1.,50.,0.,theMax);
+    ptkdzz->Sumw2();
     TH2F* ptmhzz = new TH2F("ptmhzz","pt vs m",16,100.,180.,50.,0.,theMax);
     ptmhzz->Sumw2();
     TH2F* ptmhzzLarge = new TH2F("ptmhzzLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
@@ -683,6 +780,11 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
 	pth1->Fill(ptVar(ptzz,mzz,overM),wzz);
 	ptvbf->Fill(ptVar(ptzz,mzz,overM),wzz);
         nloh->Fill(nlozz,wzz);
+        ptkdzz->Fill(nlozz,ptVar(ptzz,mzz,overM));
+        if (mzz <= 126.) pth1MassDown->Fill(ptVar(ptzz,mzz,overM),wzz);	  
+	else pth1MassUp->Fill(ptVar(ptzz,mzz,overM),wzz);	  
+	if (nlozz <= 0.5) pth1MelaDown->Fill(ptVar(ptzz,mzz,overM),wzz);	  
+	else pth1MelaUp->Fill(ptVar(ptzz,mzz,overM),wzz);
       }
       ptmhzz->Fill(mzz,ptVar(ptzz,mzz,overM));
       ptmhzzLarge->Fill(mzz,ptVar(ptzz,mzz,overM));
@@ -695,10 +797,30 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     pth1->SetName(nameFile);
     pth1->Scale(1./pth1->Integral());
     adjustHistogram(pth1);   pth1->Write();
+    sprintf(nameFile,"%sH_MassUp",LcasePt);   
+    pth1MassUp->SetName(nameFile);
+    pth1MassUp->Scale(1./pth1MassUp->Integral());
+    adjustHistogram(pth1MassUp);   pth1MassUp->Write();
+    sprintf(nameFile,"%sH_MassDown",LcasePt);   
+    pth1MassDown->SetName(nameFile);
+    pth1MassDown->Scale(1./pth1MassDown->Integral());
+    adjustHistogram(pth1MassDown);   pth1MassDown->Write();
+    sprintf(nameFile,"%sH_MelaUp",LcasePt);   
+    pth1MelaUp->SetName(nameFile);
+    pth1MelaUp->Scale(1./pth1MelaUp->Integral());
+    adjustHistogram(pth1MelaUp);   pth1MelaUp->Write();
+    sprintf(nameFile,"%sH_MelaDown",LcasePt);   
+    pth1MelaDown->SetName(nameFile);
+    pth1MelaDown->Scale(1./pth1MelaDown->Integral());
+    adjustHistogram(pth1MelaDown);   pth1MelaDown->Write();
 
     ptmhzz->SetName("ptVsM");   ptmhzz->Write();
     TProfile* tpzz = (TProfile*)ptmhzz->ProfileX();
     tpzz->SetName("ptVsMProf");   tpzz->Write();
+
+    ptkdzz->SetName("ptVsMELA");   ptkdzz->Write();
+    TProfile* tpkdzz = (TProfile*)ptkdzz->ProfileX();
+    tpkdzz->SetName("ptVsMELAProf");   tpkdzz->Write();
 
     ptmhzzLarge->SetName("ptVsMLarge");   ptmhzzLarge->Write();
     TProfile* tpzzLarge = (TProfile*)ptmhzzLarge->ProfileX();
@@ -707,6 +829,8 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     evalBinMigration(pth1,pth1,"",false);
     f2.Close();
 
+    TH2F* ptkdcr = new TH2F("ptkdcr","pt vs mela",16,0.,1.,50.,0.,theMax);
+    ptkdcr->Sumw2();
     TH2F* ptmhcr = new TH2F("ptmhcr","pt vs m",16,100.,180.,50.,0.,theMax);
     ptmhcr->Sumw2();
     TH2F* ptmhcrLarge = new TH2F("ptmhcrLarge","pt vs m",90,100.,1000.,50.,0.,theMax);
@@ -717,6 +841,7 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
       if (mcr < 140. && mcr > 105. && ptcr < 400.) {
 	pth2->Fill(ptVar(ptcr,mcr,overM));
         nloh->Fill(nlocr);
+        ptkdcr->Fill(nlocr,ptVar(ptcr,mcr,overM));
       }
       ptmhcr->Fill(mcr,ptVar(ptcr,mcr,overM));
       ptmhcrLarge->Fill(mcr,ptVar(ptcr,mcr,overM));
@@ -733,6 +858,10 @@ void studyPtSyst(int whichtype = 1, bool overM = false, bool also7TeV = true) {
     ptmhcr->SetName("ptVsM");   ptmhcr->Write();
     TProfile* tpcr = (TProfile*)ptmhcr->ProfileX();
     tpcr->SetName("ptVsMProf");   tpcr->Write();
+
+    ptkdcr->SetName("ptVsMELA");   ptkdcr->Write();
+    TProfile* tpkdcr = (TProfile*)ptkdcr->ProfileX();
+    tpkdcr->SetName("ptVsMELAProf");   tpkdcr->Write();
 
     ptmhcrLarge->SetName("ptVsMLarge");   ptmhcrLarge->Write();
     TProfile* tpcrLarge = (TProfile*)ptmhcrLarge->ProfileX();

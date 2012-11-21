@@ -122,7 +122,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
 
 void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1, 
 		     bool correctErrors = false, /* string changeParName = "", */
-		     string systString = "Default")
+		     bool showErrorPDFs = false, string systString = "Default")
 
 // whichtype
 // 0 - gg Signal
@@ -134,7 +134,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
 // 6 - ZH
 // 7 - ttH
 
-// So far only for 125 GeV...
+// So far only for 125-126 GeV...
 
 {
 
@@ -152,7 +152,11 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   RooRealVar* ptoverm = new RooRealVar("ptoverm","p_{T}/M^{4l}",0.,maxType[whichtype],"GeV/c");
  
   TFile input(fileToOpen);
-  sprintf(fileToOpen,"ptovermH_%s",systString.c_str());
+  if (systString == "Mass" || systString == "Mela") {
+    sprintf(fileToOpen,"ptovermH_%sUp",systString.c_str());
+  } else {
+    sprintf(fileToOpen,"ptovermH_%s",systString.c_str());
+  }
   TH1F* ptovermH = (TH1F*)input.Get(fileToOpen);
   
   if (rebinType[whichtype] > 1) ptovermH->Rebin(rebinType[whichtype]);
@@ -406,11 +410,15 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
     bb2down.setVal(fabs(3*bb2up.getVal() - 2*bb2.getVal()));
     fexpdown.setVal(fabs(3*fexpup.getVal() - 2*fexp.getVal()));
 
-    rt3->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-    hpull = frame->pullHist();
-    rt3up->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-    rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-
+    if (showErrorPDFs) {
+      rt3->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      hpull = frame->pullHist();
+      rt3up->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    } else {
+      rt3->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      hpull = frame->pullHist();
+    }
   } else {
     mup.setVal(m.getVal() + m.getError());   cout << "mup = " << mup.getVal() << endl;
     nup.setVal(n.getVal() + n.getError());
@@ -430,8 +438,10 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
 
     rt3->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
     hpull = frame->pullHist();
-    rt3up->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-    rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    if (showErrorPDFs) {
+      rt3up->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    }
   }
 
   double *ypulls = hpull->GetY();
