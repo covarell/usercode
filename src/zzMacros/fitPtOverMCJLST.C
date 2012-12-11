@@ -142,7 +142,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   if (systString == "Default") changeParName = "up";
 
   string nameSample[8] = {"gg","vbf","zz","zx","ggzz","wh","zh","tth"};
-  float maxType[8] = {2.4,3.2,2.0,1.6,1.6,3.2,3.2,3.2};   
+  float maxType[8] = {2.4,3.2,1.6,1.6,1.6,3.2,3.2,3.2};   
   float rebinType[8] = {1,2,1,1,4,20,20,40};
   
   char fileToOpen[200];
@@ -152,11 +152,11 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   RooRealVar* ptoverm = new RooRealVar("ptoverm","p_{T}/M^{4l}",0.,maxType[whichtype],"GeV/c");
  
   TFile input(fileToOpen);
-  if (systString == "Mass" || systString == "Mela") {
-    sprintf(fileToOpen,"ptovermH_%sUp",systString.c_str());
-  } else {
-    sprintf(fileToOpen,"ptovermH_%s",systString.c_str());
-  }
+  // if (systString == "Mass" || systString == "Mela") {
+  //  sprintf(fileToOpen,"ptovermH_%sUp",systString.c_str());
+  // } else {
+  sprintf(fileToOpen,"ptovermH_%s",systString.c_str());
+  //}
   TH1F* ptovermH = (TH1F*)input.Get(fileToOpen);
   
   if (rebinType[whichtype] > 1) ptovermH->Rebin(rebinType[whichtype]);
@@ -176,40 +176,40 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   // fit definitions
   // RooWorkspace *ws = new RooWorkspace("ws");
 
-  RooRealVar m("m","emme", 1.,0.01, 30.);
+  RooRealVar m("m","emme", 1.,0.01, 40.);
   RooRealVar n("n","enne", 0.93, 0.05, 15.);
   RooRealVar n2("n2","enne2", 0.75, 0.5, 15.);
-  RooRealVar bb("bb","bibi",0.02, 0.00005, 20.0);
+  RooRealVar bb("bb","bibi",0.02, 0.000005, 20.0);
   RooRealVar T("T","tti",0.2,0.00000005,1.);
   RooRealVar bb2("bb2","bibi2",0.02, 0.0005, 10.0);
   RooRealVar fexp("fexp","f_exp",0.02, 0.0, 1.0);
   if (whichtype == 0) {
     if (LHCsqrts == 8) {
-      m.setVal(1.0511);   // m.setConstant(kTRUE);
-      n.setVal(0.750);    // n.setConstant(kTRUE);
-      n2.setVal(0.7883);   n2.setConstant(kTRUE);
-      bb.setVal(2.327);   // bb.setConstant(kTRUE);
-      T.setVal(0.000573);   // T.setConstant(kTRUE);
-      bb2.setVal(0.391);   bb2.setConstant(kTRUE);
-      fexp.setVal(0.1);   // fexp.setConstant(kTRUE);
+      m.setVal(3.319);   // m.setConstant(kTRUE);
+      n.setVal(0.77);    // n.setConstant(kTRUE);
+      n2.setVal(0.8061);   n2.setConstant(kTRUE);
+      bb.setVal(3.728);   // bb.setConstant(kTRUE);
+      T.setVal(0.00333);   // T.setConstant(kTRUE);
+      bb2.setVal(1.7172);    bb2.setConstant(kTRUE);
+      fexp.setVal(0.002);   // fexp.setConstant(kTRUE);
     } else {
       // if (systString == "Resummation") m.setMax(800.);
-      m.setVal(1.078);   // m.setConstant(kTRUE);
-      n.setVal(2.155);   // n.setConstant(kTRUE);
+      m.setVal(0.061);   // m.setConstant(kTRUE);
+      n.setVal(1.6141);   if (systString == "Resummation" || systString == "TopMass")  n.setConstant(kTRUE);
       n2.setVal(1.3294);   n2.setConstant(kTRUE);
-      bb.setVal(2.3047);   // bb.setConstant(kTRUE);
-      T.setVal(0.0406);   // T.setConstant(kTRUE);
+      bb.setVal(4.2761);   // bb.setConstant(kTRUE);
+      T.setVal(0.0361);   // T.setConstant(kTRUE);
       bb2.setVal(1.6643);   bb2.setConstant(kTRUE);
-      fexp.setVal(0.1);   // fexp.setConstant(kTRUE);
+      fexp.setVal(0.0004);   // fexp.setConstant(kTRUE);
     }
   } else if (whichtype == 1) {
-    m.setVal(1.411);   // m.setConstant(kTRUE);
-    n.setVal(5.534);    n.setConstant(kTRUE);
-    n2.setVal(0.8738);   n2.setConstant(kTRUE);
-    bb.setVal(0.00039);  bb.setConstant(kTRUE);
-    T.setVal(0.118);   // T.setConstant(kTRUE);
-    bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
-    fexp.setVal(0.0);   fexp.setConstant(kTRUE);
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);   n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(0.311);   // bb.setConstant(kTRUE);
+    T.setVal(0.1009);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); T.setConstant(kTRUE); // T.setConstant(kTRUE);
+    bb2.setVal(1.0024);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   } else if (whichtype == 2) {
     if (LHCsqrts == 8) {
       m.setVal(1.028);   // m.setConstant(kTRUE);    
@@ -217,7 +217,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
       n2.setVal(0.7146);   n2.setConstant(kTRUE);
       n.setVal(0.9518);     n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.002248);    // T.setConstant(kTRUE);
+      T.setVal(0.002248);    if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     } else {
       m.setVal(1.028);   // m.setConstant(kTRUE);    
@@ -225,7 +225,8 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
       n2.setVal(0.7146);  n2.setConstant(kTRUE);
       n.setVal(0.9518);     n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.002248);    // T.setConstant(kTRUE);
+      T.setVal(0.002248);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE);
+      cout << systString.find("Mela") << endl;
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     }
   } else if (whichtype == 3) {
@@ -414,7 +415,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
       rt3->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
       hpull = frame->pullHist();
       rt3up->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-      rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      if (systString.find("Mela") == string::npos) rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
     } else {
       rt3->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
       hpull = frame->pullHist();

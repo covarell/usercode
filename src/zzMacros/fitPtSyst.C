@@ -409,11 +409,13 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* fileb = new TFile(fileToOpen);
   // sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
-  sprintf(fileToOpen,"HResSystemtics_125.root");
+  // sprintf(fileToOpen,"HResSystemtics_125.root");
+  sprintf(fileToOpen,"HResSystv2_125.root");
   TFile* files = new TFile(fileToOpen);
   TFile* filegg;
   if (writeWeightHisto) {
-    sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
+    // sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
+    sprintf(fileToOpen,"PT_Y_gg125withPythia_%dTeV.root",LHCsqrts);
     filegg = new TFile(fileToOpen);  
   }
 
@@ -456,7 +458,7 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
     sigVBFH = (TH1F*)((TH2F*)files2->Get("Pt_sigVBF"))->ProjectionY("sigVBFH",binMin,binMax); 
   } 
   // sigH = (TH1F*)((TH2F*)files->Get("Pt_sig"))->ProjectionY("sigH",binMin,binMax);
-  sprintf(fileToOpen,"pt_%sQ",typeSyst.c_str());
+  sprintf(fileToOpen,"pt_%s",typeSyst.c_str());
   sigH = (TH1F*)(files->Get(fileToOpen));
  
   /* sprintf(fileToOpen,"PT_%d_Temp.root",int(mZZcenter));
@@ -789,9 +791,9 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
     ggH->Sumw2();
     ggHRes->Sumw2();
     // Correct by hand nonsense low pT
-    ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
-    ggH->SetBinContent(2,ggH->GetBinContent(4)/4.);
-    ggH->SetBinContent(3,ggH->GetBinContent(4)/2.);
+    // ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
+    // ggH->SetBinContent(2,ggH->GetBinContent(4)/4.);
+    // ggH->SetBinContent(3,ggH->GetBinContent(4)/2.);
     ggH->Scale(1./ggH->Integral());
 
     TH1F* wH = (TH1F*)ggH->Clone();
@@ -809,7 +811,7 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
     TH1F* ggHMod = (TH1F*)ggH->Clone();
     float totalFirstBins = 0.;
     float totalFirstBinsRes = 0.;
-    int nBinsToSmooth = 6;
+    int nBinsToSmooth = 0;
     for (Int_t i=1; i<=nBinsToSmooth; i++) {
       totalFirstBins += ggH->GetBinContent(i);
       totalFirstBinsRes += ggHRes->GetBinContent(i);

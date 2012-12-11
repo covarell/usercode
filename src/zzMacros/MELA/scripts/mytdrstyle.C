@@ -77,8 +77,8 @@ void setTDRStyle() {
 
 // For the statistics box:
   gStyle->SetOptFile(0);
-  //gStyle->SetOptStat(0);
-  gStyle->SetOptStat("mr");
+  gStyle->SetOptStat(0);
+  // gStyle->SetOptStat("mr");
   gStyle->SetStatColor(kWhite);
   gStyle->SetStatFont(42);
   gStyle->SetStatFontSize(0.04);///---> gStyle->SetStatFontSize(0.025);
@@ -89,7 +89,7 @@ void setTDRStyle() {
   gStyle->SetStatW(0.2);///---> gStyle->SetStatW(0.15);
 
   // gStyle->SetStatStyle(Style_t style = 1001);
-  // gStyle->SetStatX(Float_t x = 0);
+  gStyle->SetStatX(0.6);
   // gStyle->SetStatY(Float_t y = 0);
 
 // Margins:

@@ -21,15 +21,18 @@ void produceOtherMikeTables(int LHCsqrts = 7, string sample = "gg") {
   if (sample == "gg") {
     Sources[0] = "Resummation";
     Sources[1] = "TopMass";
+    Sources[2] = "Mela";
   }
   if (sample == "vbf") {
     Sources[0] = "PDF-VBF";
     Sources[1] = "scale-VBF";
+    Sources[2] = "Mela";
   }
   if (sample == "zz") {
     Sources[0] = "SingleZ";
-    Sources[1] = "PDF";
-    Sources[2] = "scale";
+    Sources[1] = "PDF-ZZ";
+    Sources[2] = "scale-ZZ";
+    Sources[3] = "Mela";
   }
   // if (sample == "zz" && LHCsqrts == 8) {
   //  Sources[0] = "UnbRegion";
@@ -85,19 +88,45 @@ void produceOtherMikeTables(int LHCsqrts = 7, string sample = "gg") {
       
       cout << "Systematics n. " << jj+1 << " : " << Sources[jj] << endl;
 
-      // sprintf(fileName,"MELA/scripts/chris/paramsCJLST_%s_%dTeV_%s.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
-      sprintf(fileName,"text/paramsPTOverMCJLST_%s_%dTeV_%s.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
-      ifstream theFile(fileName);
-
       sprintf(fileName,"text/paramShifts_%s_%dTeV_%s.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
       mikeFile = new ofstream(fileName);
 
-      while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
-	cout << thePar << " " << fitted << " " << error << endl;
-	for (int ii = 0; ii < nPars; ii++) {
-	  if (!strcmp(thePar,parNames[ii].c_str())) {
-	    upVar[ii] = fitted;
-	    downVar[ii] = fabs(2*parVal[ii] - fitted);
+      if (Sources[jj] == "Mela") {
+	
+	sprintf(fileName,"text/paramsPTOverMCJLST_%s_%dTeV_%s00-03.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
+	ifstream theFiledown(fileName);
+	sprintf(fileName,"text/paramsPTOverMCJLST_%s_%dTeV_%s06-10.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
+	ifstream theFileup(fileName);
+	
+	while (theFileup >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
+	  cout << thePar << " " << fitted << " " << error << endl;
+	  for (int ii = 0; ii < nPars; ii++) {
+	    if (!strcmp(thePar,parNames[ii].c_str())) {
+	      upVar[ii] = fitted;
+	    }
+	  }
+	}
+	while (theFiledown >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
+	  cout << thePar << " " << fitted << " " << error << endl;
+	  for (int ii = 0; ii < nPars; ii++) {
+	    if (!strcmp(thePar,parNames[ii].c_str())) {
+	      downVar[ii] = fitted;
+	    }
+	  }
+	}
+
+      } else {
+	
+	sprintf(fileName,"text/paramsPTOverMCJLST_%s_%dTeV_%s.txt",sample.c_str(),LHCsqrts,Sources[jj].c_str());
+	ifstream theFile(fileName);
+
+	while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
+	  cout << thePar << " " << fitted << " " << error << endl;
+	  for (int ii = 0; ii < nPars; ii++) {
+	    if (!strcmp(thePar,parNames[ii].c_str())) {
+	      upVar[ii] = fitted;
+	      downVar[ii] = fabs(2*parVal[ii] - fitted);
+	    }
 	  }
 	}
       }
