@@ -120,7 +120,7 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
   return result;
 }
 
-void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1, 
+void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1, 
 		     bool correctErrors = false, /* string changeParName = "", */
 		     bool showErrorPDFs = false, string systString = "Default")
 
@@ -134,8 +134,6 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
 // 6 - ZH
 // 7 - ttH
 
-// So far only for 125-126 GeV...
-
 {
 
   string changeParName = "";
@@ -146,7 +144,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   float rebinType[8] = {1,2,1,1,4,20,20,40};
   
   char fileToOpen[200];
-  sprintf(fileToOpen,"PToverM_%s_SEL_%dTeV.root",nameSample[whichtype].c_str(),LHCsqrts);
+  sprintf(fileToOpen,"selRootFiles/PToverM_%s%d_SEL_%dTeV.root",nameSample[whichtype].c_str(),mass,LHCsqrts);
   // if (whichtype == 3) sprintf(fileToOpen,"PTOVERM_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
 
   RooRealVar* ptoverm = new RooRealVar("ptoverm","p_{T}/M^{4l}",0.,maxType[whichtype],"GeV/c");
@@ -193,7 +191,6 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
       bb2.setVal(1.7172);    bb2.setConstant(kTRUE);
       fexp.setVal(0.002);   // fexp.setConstant(kTRUE);
     } else {
-      // if (systString == "Resummation") m.setMax(800.);
       m.setVal(0.061);   // m.setConstant(kTRUE);
       n.setVal(1.6141);   if (systString == "Resummation" || systString == "TopMass")  n.setConstant(kTRUE);
       n2.setVal(1.3294);   n2.setConstant(kTRUE);
@@ -207,17 +204,17 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
     n.setVal(10.939);   n.setConstant(kTRUE);
     n2.setVal(1.1448);   n2.setConstant(kTRUE);
     bb.setVal(0.311);   // bb.setConstant(kTRUE);
-    T.setVal(0.1009);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); T.setConstant(kTRUE); // T.setConstant(kTRUE);
+    T.setVal(0.1009);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); // T.setConstant(kTRUE);
     bb2.setVal(1.0024);   bb2.setConstant(kTRUE);
     fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   } else if (whichtype == 2) {
     if (LHCsqrts == 8) {
-      m.setVal(1.028);   // m.setConstant(kTRUE);    
-      bb.setVal(2.91);  // bb.setConstant(kTRUE);
+      m.setVal(1.0476);   // m.setConstant(kTRUE);    
+      bb.setVal(3.3088);  // if (mass != 140) bb.setConstant(kTRUE);
       n2.setVal(0.7146);   n2.setConstant(kTRUE);
-      n.setVal(0.9518);     n.setConstant(kTRUE);
+      n.setVal(0.9518);      n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.002248);    if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); T.setConstant(kTRUE);
+      T.setVal(0.0021889);    if (systString.find("Mela") != string::npos || mass != 140) T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     } else {
       m.setVal(1.028);   // m.setConstant(kTRUE);    
@@ -226,7 +223,6 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
       n.setVal(0.9518);     n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
       T.setVal(0.002248);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE);
-      cout << systString.find("Mela") << endl;
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     }
   } else if (whichtype == 3) {
@@ -353,7 +349,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   // if (changeParName != "") 
   //  sprintf(fileToSave,"text/paramsPTOverMCJLST_%s_%dTeV_%s_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str(),changeParName.c_str()); 
   // else 
-  sprintf(fileToSave,"text/paramsPTOverMCJLST_%s_%dTeV_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
+  sprintf(fileToSave,"text/paramsPTOverMCJLST_%s%d_%dTeV_%s.txt",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
   ofstream os1(fileToSave);
   if (changeParName != "") {
     sprintf(fileToSave,"m%s",changeParName.c_str());  m.SetName(fileToSave);
@@ -399,7 +395,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   float chi2 = 0.;
 
   if (changeParName == "") {
-    sprintf(fileToSave,"text/paramsPTOverMCJLST_%s_%dTeV_Default.txt",nameSample[whichtype].c_str(),LHCsqrts);
+    sprintf(fileToSave,"text/paramsPTOverMCJLST_%s%d_%dTeV_Default.txt",nameSample[whichtype].c_str(),mass,LHCsqrts);
     ifstream is1(fileToSave);
     (RooArgSet(mup,nup,n2up,bbup,bb2up,fexpup,Tup)).readFromStream(is1,false);
 
@@ -473,7 +469,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   frame->Draw();
   // gPad->SetLogy(); 
   // Htest->Draw();
-  sprintf(fileToSave,"%s - %d TeV",nameSample[whichtype].c_str(),LHCsqrts);
+  sprintf(fileToSave,"%s %d GeV at %d TeV",nameSample[whichtype].c_str(),mass,LHCsqrts);
   t->DrawLatex(0.6,0.8,fileToSave); 
 
   can.cd(2);
@@ -497,7 +493,7 @@ void fitPtOverMCJLST(int LHCsqrts = 7, int whichtype = 1,
   sprintf(fileToSave,"#chi^{2}/n_{DoF} = %4.1f/%d",chi2,nFullBins - nFitPar);
   if (chi2 < 1000.) t->DrawLatex(0.80,0.86,fileToSave);
 
-  sprintf(fileToSave,"figs/fitPTOverMCJLST_%s_%dTeV_%s.pdf",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
+  sprintf(fileToSave,"figs/fitPTOverMCJLST_%s%d_%dTeV_%s.pdf",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
   can.SaveAs(fileToSave);
 
 }
