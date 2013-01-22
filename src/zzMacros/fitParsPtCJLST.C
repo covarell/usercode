@@ -36,26 +36,29 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
 
   static const unsigned int Nmasspoints = 9;
   string masspointsS[Nmasspoints] = {"115","120","125","130","140","200","400","700","1000"};
+
+  // static const unsigned int Nmasspoints = 7;
+  // string masspointsS[Nmasspoints] = {"120","130","140","200","400","700","1000"};
   string nameSample[8] = {"gg","vbf","zz","zx","ggzz","wh","zh","tth"};
 
-  double masspoints[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.};
-  double masspointserr[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.};
+  double masspoints[Nmasspoints] = {Nmasspoints*0.};
+  double masspointserr[Nmasspoints] = {Nmasspoints*0.};
 
-  double bb[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double T[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double n[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double bbdue[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double ndue[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double m[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
-  double fexp[Nmasspoints] = {0.,0.,0.,0.,0.,0.,0.,0.,0.}; 
+  double bb[Nmasspoints] = {Nmasspoints*0.}; 
+  double T[Nmasspoints] = {Nmasspoints*0.}; 
+  double n[Nmasspoints] = {Nmasspoints*0.}; 
+  double bbdue[Nmasspoints] = {Nmasspoints*0.}; 
+  double ndue[Nmasspoints] = {Nmasspoints*0.}; 
+  double m[Nmasspoints] = {Nmasspoints*0.}; 
+  double fexp[Nmasspoints] = {Nmasspoints*0.}; 
 
-  double bberr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double Terr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double nerr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double bbdueerr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double ndueerr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double merr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
-  double fexperr[Nmasspoints] = {0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001,0.000000001}; 
+  double bberr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double Terr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double nerr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double bbdueerr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double ndueerr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double merr[Nmasspoints] = {Nmasspoints*0.000000001}; 
+  double fexperr[Nmasspoints] = {Nmasspoints*0.000000001}; 
 
   ofstream *allParams;
   char fileName[200];
@@ -110,9 +113,15 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
 
   Background.cd(1);
   
+  int nPointsRemoved = 0;
+
   TGraphErrors *bbfit = new TGraphErrors(Nmasspoints,masspoints,bb,masspointserr,bberr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(bb[i]) < 0.0000001) bbfit->RemovePoint(i);
+    if (fabs(bb[i]) < 0.0000001) {
+      cout << "Point of mass " << masspointsS[i] << " is not there, removed" << endl; 
+      bbfit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   bbfit->SetTitle("bb");
@@ -120,7 +129,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   bbfit->SetMarkerColor(kRed);
   bbfit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (bberr[1] > 0.0000001 && bberr[2] > 0.0000001) {  
+  if (bberr[1] > 0.0000001 && bberr[Nmasspoints-1] > 0.0000001) {  
     bbfit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "bb [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -131,10 +140,14 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(2);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *Tfit = new TGraphErrors(Nmasspoints,masspoints,T,masspointserr,Terr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(T[i]) < 0.0000001) Tfit->RemovePoint(i);
+    if (fabs(T[i]) < 0.0000001) {
+      Tfit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;     
+    }
   }
   
   Tfit->SetTitle("T");
@@ -142,7 +155,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   Tfit->SetMarkerColor(kRed);
   Tfit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (Terr[1] > 0.0000001 && Terr[2] > 0.0000001) { 
+  if (Terr[1] > 0.0000001 && Terr[Nmasspoints-1] > 0.0000001) { 
     Tfit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "T [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -153,10 +166,14 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(3);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *bbduefit = new TGraphErrors(Nmasspoints,masspoints,bbdue,masspointserr,bbdueerr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(bbdue[i]) < 0.0000001) bbduefit->RemovePoint(i);
+    if (fabs(bbdue[i]) < 0.0000001) {
+      bbduefit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   bbduefit->SetTitle("bb2");
@@ -164,7 +181,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   bbduefit->SetMarkerColor(kRed);
   bbduefit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (bbdueerr[1] > 0.0000001 && bbdueerr[2] > 0.0000001) { 
+  if (bbdueerr[1] > 0.0000001 && bbdueerr[Nmasspoints-1] > 0.0000001) { 
     bbduefit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "bbdue [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -175,10 +192,14 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(4);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *fexpfit = new TGraphErrors(Nmasspoints,masspoints,fexp,masspointserr,fexperr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(fexp[i]) < 0.0000001) fexpfit->RemovePoint(i);
+    if (fabs(fexp[i]) < 0.0000001) {
+      fexpfit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   fexpfit->SetTitle("fexp");
@@ -186,7 +207,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   fexpfit->SetMarkerColor(kRed);
   fexpfit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (fexperr[1] > 0.0000001 && fexperr[2] > 0.0000001) { 
+  if (fexperr[1] > 0.0000001 && fexperr[Nmasspoints-1] > 0.0000001) { 
     fexpfit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "fexp [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -197,10 +218,15 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(5);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *nfit = new TGraphErrors(Nmasspoints,masspoints,n,masspointserr,nerr);
+  nfit->Print();
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(n[i]) < 0.0000001) nfit->RemovePoint(i);
+    if (fabs(n[i]) < 0.0000001) {
+      nfit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   nfit->SetTitle("n");
@@ -208,7 +234,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   nfit->SetMarkerColor(kRed);
   nfit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (nerr[1] > 0.0000001 && nerr[2] > 0.0000001) { 
+  if (nerr[1] > 0.0000001 && nerr[Nmasspoints-1] > 0.0000001) { 
     nfit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "n [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -219,10 +245,14 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(6);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *mfit = new TGraphErrors(Nmasspoints,masspoints,m,masspointserr,merr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(m[i]) < 0.0000001) mfit->RemovePoint(i);
+    if (fabs(m[i]) < 0.0000001) {
+      mfit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   mfit->SetTitle("m");
@@ -230,7 +260,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   mfit->SetMarkerColor(kRed);
   mfit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (merr[1] > 0.0000001 && merr[2] > 0.0000001) { 
+  if (merr[1] > 0.0000001 && merr[Nmasspoints-1] > 0.0000001) { 
     mfit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "m [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";
@@ -241,10 +271,14 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   }
 
   Background.cd(7);
-  
+  nPointsRemoved = 0;
+
   TGraphErrors *nduefit = new TGraphErrors(Nmasspoints,masspoints,ndue,masspointserr,ndueerr);
   for (unsigned int i = 0; i < Nmasspoints; i++) {
-    if (fabs(ndue[i]) < 0.0000001) nduefit->RemovePoint(i);
+    if (fabs(ndue[i]) < 0.0000001) {
+      nduefit->RemovePoint(i-nPointsRemoved);
+      nPointsRemoved++;
+    }
   }
   
   nduefit->SetTitle("n2");
@@ -252,7 +286,7 @@ void fitParsPtCJLST(int LHCsqrts = 7, int whichtype = 1) {
   nduefit->SetMarkerColor(kRed);
   nduefit->Draw("AP"); 
   // gPad->SetLogx(); 
-  if (ndueerr[1] > 0.0000001 && ndueerr[2] > 0.0000001) { 
+  if (ndueerr[1] > 0.0000001 && ndueerr[Nmasspoints-1] > 0.0000001) { 
     nduefit->Fit("myZZfunc","","PSAME"); 
     for (unsigned int j = 0; j < 5; j++) {
       *allParams << "ndue [" << j << "] = " << myZZfunc->GetParameter(j) << "\n";

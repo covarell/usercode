@@ -777,7 +777,11 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
   
 
   if (writeWeightHisto) {
-    sprintf(fileToSave,"weightHisto_%dGeV_%dTeV_%s.root",int(mZZcenter),LHCsqrts,typeSyst.c_str());
+
+    TFile fue("weights/gg125_weightsUE.root");
+    TH1F* wei = (TH1F*)fue.Get("wei");
+
+    sprintf(fileToSave,"weights/weightHisto_%dGeV_%dTeV_%s.root",int(mZZcenter),LHCsqrts,typeSyst.c_str());
     TFile fout(fileToSave,"RECREATE");
     ws->var("pts")->setMin(0.);
     ws->var("pts")->setMax(500.);
@@ -790,10 +794,6 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
     ggHRes->SetName("ggHRes");   ggHRes->SetTitle("HRes gg pT fit histo");
     ggH->Sumw2();
     ggHRes->Sumw2();
-    // Correct by hand nonsense low pT
-    // ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
-    // ggH->SetBinContent(2,ggH->GetBinContent(4)/4.);
-    // ggH->SetBinContent(3,ggH->GetBinContent(4)/2.);
     ggH->Scale(1./ggH->Integral());
 
     TH1F* wH = (TH1F*)ggH->Clone();
@@ -806,12 +806,13 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
     }
     ggHRes->Scale(1./ggHRes->Integral());
 
-    // Smooth low pt
+    // MODIFY SPECTRUM
+    // 1) Smooth low pt?
     TH1F* ggHResMod = (TH1F*)ggHRes->Clone();
     TH1F* ggHMod = (TH1F*)ggH->Clone();
     float totalFirstBins = 0.;
     float totalFirstBinsRes = 0.;
-    int nBinsToSmooth = 0;
+    int nBinsToSmooth = 0;  // no Smoothing
     for (Int_t i=1; i<=nBinsToSmooth; i++) {
       totalFirstBins += ggH->GetBinContent(i);
       totalFirstBinsRes += ggHRes->GetBinContent(i);
@@ -820,10 +821,13 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
       ggHMod->SetBinContent(i,totalFirstBins/nBinsToSmooth);
       ggHResMod->SetBinContent(i,totalFirstBinsRes/nBinsToSmooth);
     }
-    wH->Divide(ggHResMod,ggHMod);
+    
+    // 2) Reweight for PS+UE/PS only (suggested in YR2)
+    ggHResMod->Multiply(ggHResMod,wei);
 
-    ggH->Write();
-    ggHRes->Write();
+    wH->Divide(ggHResMod,ggHMod);
+    ggHMod->Write();
+    ggHResMod->Write();
     if (isVBFsignal) sigVBFH->Write();
     wH->Write();
     fout.Close();

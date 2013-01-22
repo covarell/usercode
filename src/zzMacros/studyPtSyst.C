@@ -56,6 +56,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 		 bool also7TeV = true, bool moreFiles = false) { 
                                        // NEVER use moreFiles = true!
 
+  // -7 - NLO/LO : ZH
+  // -6 - NLO/LO : WH
   // -5 - PDF : VBF
   // -4 - scales : VBF
   // -3 - effect of finite top mass
@@ -128,13 +130,24 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
-    /* sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH130.root");
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH130.root");
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH130.root"); */
+    // Augment statistics
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
   } else {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH%d.root",mass);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH%d.root",mass);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH%d.root",mass); 
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH%d.root",mass);   VHTree->Add(nameFile2);
+     // Augment statistics
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH%d.root",mass-5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH%d.root",mass+5);   VHTree->Add(nameFile2);
   }
 
   TChain* zzTree = new TChain(nameFile);
@@ -270,7 +283,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   float nlocr = -999.; 
   float nlozj = -999.; 
   float nlovh = -999.; 
-  float genptgg;
+  float genptgg, genptvh;
   int gprIdvh; 
 
   ggTree->SetBranchAddress("ZZMass",&mgg);
@@ -293,6 +306,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   VHTree->SetBranchAddress("ZZPt",&ptvh);
   VHTree->SetBranchAddress("NJets",&njvh);
   VHTree->SetBranchAddress("genProcessId",&gprIdvh);
+  VHTree->SetBranchAddress("GenHPt",&genptvh);
   if (withNLOMela) VHTree->SetBranchAddress("melaLDWithPtY",&nlovh);
   else VHTree->SetBranchAddress("ZZLD",&nlovh);
 
@@ -339,28 +353,31 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 
   // cout << LcasePt << endl;
 
-  sprintf(nameFile,"../../weightHisto_125GeV_8TeV_Default.root");
-  if (also7TeV) sprintf(nameFile,"../../weightHisto_125GeV_7TeV_Default.root");
+  sprintf(nameFile,"weights/weightHisto_125GeV_8TeV_Default.root");
+  if (also7TeV) sprintf(nameFile,"weights/weightHisto_125GeV_7TeV_Default.root");
   TFile weightsSig(nameFile);
   TH1F* wHalf = (TH1F*)weightsSig.Get("wH");
   TH1F* wRenorm;
   if (also7TeV) {
-    TFile weights8("../../weightHisto_125GeV_8TeV_Default.root");
+    TFile weights8("weights/weightHisto_125GeV_8TeV_Default.root");
     wRenorm = (TH1F*)weights8.Get("wH");
   } else {
     wRenorm = (TH1F*)weightsSig.Get("wH");
   }
-  TFile weightsSig1("../../weightHisto_125GeV_8TeV_up.root");
+  TFile weightsSig1("weights/weightHisto_125GeV_8TeV_up.root");
   TH1F* wOne = (TH1F*)weightsSig1.Get("wH");
-  TFile weightsSig2("../../weightHisto_125GeV_8TeV_down.root");
+  TFile weightsSig2("weights/weightHisto_125GeV_8TeV_down.root");
   TH1F* wQuar = (TH1F*)weightsSig2.Get("wH");
 
-  TFile pwhgNoMass("ggH125_infiniteMT.root");
-  TFile pwhgMass("ggH125_finiteMT.root");
+  TFile pwhgNoMass("weights/ggH125_infiniteMT.root");
+  TFile pwhgMass("weights/ggH125_finiteMT.root");
     
   TH1F* nmH = (TH1F*)((TH2F*)pwhgNoMass.Get("Pt_sig"))->ProjectionY("nmH");
   TH1F* mH = (TH1F*)((TH2F*)pwhgMass.Get("Pt_sig"))->ProjectionY("mH");
  
+  TFile nlolovh("weights/wh125_weightsNLO.root");
+  TH1F* wVH = (TH1F*)nlolovh.Get("wei");
+
   nmH->Rebin(4);   nmH->Sumw2();
   mH->Rebin(4);    mH->Sumw2();
   nmH->GetXaxis()->SetRange(1,80);
@@ -466,12 +483,48 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   nloh1->Sumw2();
   nloh2->Sumw2();
 
+  if (whichtype == -7) {
+
+    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
+      VHTree->GetEntry(iEvt);
+      if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
+	if (gprIdvh == 26) {
+	  int theBin = wVH->FindBin(genptvh);
+	  pth->Fill(ptVar(ptvh,mvh,overM),wvh*wVH->GetBinContent(theBin));
+	  pth2->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  ptvbf->Fill(ptVar(ptvh,mvh,overM),wvh);
+	}
+      }
+    } 
+
+    sprintf(nameSyst,"NLOLO_ZH");
+
+  }
+
+  if (whichtype == -6) {
+
+    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
+      VHTree->GetEntry(iEvt);
+      if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
+	if (gprIdvh == 24) {
+	  int theBin = wVH->FindBin(genptvh);
+	  pth->Fill(ptVar(ptvh,mvh,overM),wvh*wVH->GetBinContent(theBin));
+	  pth2->Fill(ptVar(ptvh,mvh,overM),wvh);
+          ptvbf->Fill(ptVar(ptvh,mvh,overM),wvh);
+	}
+      }
+    } 
+
+    sprintf(nameSyst,"NLOLO_WH");
+
+  }
+
   if (whichtype == -5) {
 
     TFile* pdfsfile[3];
-    pdfsfile[0] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_standard.root");
-    pdfsfile[1] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_MSTW.root");
-    pdfsfile[2] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_NNPDF.root");
+    pdfsfile[0] = TFile::Open("weights/VBF_standard.root");
+    pdfsfile[1] = TFile::Open("weights/VBF_MSTW.root");
+    pdfsfile[2] = TFile::Open("weights/VBF_NNPDF.root");
 
     TH1F* pdfh[3];
     TH1F* ratiopdf[2];
@@ -512,13 +565,13 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   if (whichtype == -4) {
 
     TFile* scalesfile[7];
-    scalesfile[0] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_standard.root");
-    scalesfile[1] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_mufdouble.root");
-    scalesfile[2] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_mufhalf.root");
-    scalesfile[3] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_murdouble.root");
-    scalesfile[4] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_murhalf.root");
-    scalesfile[5] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_mufdouble_murdouble.root");
-    scalesfile[6] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/VBF_mufhalf_murhalf.root");
+    scalesfile[0] = TFile::Open("weights/VBF_standard.root");
+    scalesfile[1] = TFile::Open("weights/VBF_mufdouble.root");
+    scalesfile[2] = TFile::Open("weights/VBF_mufhalf.root");
+    scalesfile[3] = TFile::Open("weights/VBF_murdouble.root");
+    scalesfile[4] = TFile::Open("weights/VBF_murhalf.root");
+    scalesfile[5] = TFile::Open("weights/VBF_mufdouble_murdouble.root");
+    scalesfile[6] = TFile::Open("weights/VBF_mufhalf_murhalf.root");
 
     TH1F* scaleh[7];
     TH1F* ratioscale[6];
@@ -617,18 +670,6 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       }
     } 
 
-    /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
-      VBFTree->GetEntry(iEvt);
-      if (mVBF < massLimits[massRanges] && mVBF > massLimits[0] && ptVBF < 400. && notVBFtagged(njVBF)) {
-	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-        nloh->Fill(nloVBF,wVBF);
-	nloh2->Fill(nloVBF,wVBF);
-      }
-      }*/
-
-    // return;
-
   }  
 
   if (whichtype == -2) {
@@ -651,19 +692,6 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     } 
 
     sprintf(nameSyst,"Resummation");
-
-    /* for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
-      VBFTree->GetEntry(iEvt);
-      if (mVBF < massLimits[massRanges] && mVBF > massLimits[0] && ptVBF < 400. && notVBFtagged(njVBF)) {
-	pth->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-        pth1->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-	pth2->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-	ptvbf->Fill(ptVar(ptVBF,mVBF,overM),wVBF);
-        nloh->Fill(nloVBF,wVBF);
-	nloh1->Fill(nloVBF,wVBF);
-	nloh2->Fill(nloVBF,wVBF);
-      }
-      }*/
 
   }
 
@@ -734,8 +762,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       ptmhggLarge->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*newW*wHalf->GetBinContent(theBin));
     } 
 
-    sprintf(nameFile,"../../selRootFiles/%s_gg%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_gg%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_gg%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_gg%d_SEL_7TeV.root",UcasePt,mass);
     TFile f(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth->SetName(nameFile);
@@ -796,8 +824,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       ptmhvbfLarge->Fill(mVBF,ptVar(ptVBF,mVBF,overM),wVBF);
     }
 
-    sprintf(nameFile,"../../selRootFiles/%s_vbf%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_vbf%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_vbf%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_vbf%d_SEL_7TeV.root",UcasePt,mass);
     TFile f1(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     ptvbf->SetName(nameFile);
@@ -859,8 +887,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       ptmhzzLarge->Fill(mzz,ptVar(ptzz,mzz,overM),wzz);
     } 
 
-    sprintf(nameFile,"../../selRootFiles/%s_zz%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_zz%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_zz%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_zz%d_SEL_7TeV.root",UcasePt,mass);
     TFile f2(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth1->SetName(nameFile);
@@ -913,8 +941,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       ptmhcrLarge->Fill(mcr,ptVar(ptcr,mcr,overM));
     } 
 
-    sprintf(nameFile,"../../selRootFiles/%s_zx%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_zx%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_zx%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_zx%d_SEL_7TeV.root",UcasePt,mass);
     TFile f3(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth2->SetName(nameFile);
@@ -944,8 +972,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       }
     } 
 
-    sprintf(nameFile,"../../selRootFiles/%s_ggzz%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_ggzz%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_ggzz%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_ggzz%d_SEL_7TeV.root",UcasePt,mass);
     TFile f4(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth3->SetName(nameFile);
@@ -957,11 +985,12 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
       VHTree->GetEntry(iEvt);
       if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
+	int theBin = wVH->FindBin(genptvh);
 	if (gprIdvh == 24) {
-	  pth4->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  pth4->Fill(ptVar(ptvh,mvh,overM),wvh*wVH->GetBinContent(theBin));
 	  nloh->Fill(nlovh,wvh);
 	} else if (gprIdvh == 26) {
-	  pth5->Fill(ptVar(ptvh,mvh,overM),wvh);
+	  pth5->Fill(ptVar(ptvh,mvh,overM),wvh*wVH->GetBinContent(theBin));
 	  nloh->Fill(nlovh,wvh);
 	} else {
 	  pth6->Fill(ptVar(ptvh,mvh,overM),wvh);
@@ -970,8 +999,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
       }
     } 
 
-    sprintf(nameFile,"../../selRootFiles/%s_wh%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_wh%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_wh%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_wh%d_SEL_7TeV.root",UcasePt,mass);
     TFile f5(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth4->SetName(nameFile);
@@ -980,8 +1009,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     evalBinMigration(pth4,pth4,"",false);
     f5.Close();
 
-    sprintf(nameFile,"../../selRootFiles/%s_zh%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_zh%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_zh%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_zh%d_SEL_7TeV.root",UcasePt,mass);
     TFile f6(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth5->SetName(nameFile);
@@ -990,8 +1019,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     evalBinMigration(pth5,pth5,"",false);
     f6.Close();
  
-    sprintf(nameFile,"../../selRootFiles/%s_tth%d_SEL_8TeV.root",UcasePt,mass);
-    if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_tth%d_SEL_7TeV.root",UcasePt,mass);
+    sprintf(nameFile,"selRootFiles/%s_tth%d_SEL_8TeV.root",UcasePt,mass);
+    if (also7TeV) sprintf(nameFile,"selRootFiles/%s_tth%d_SEL_7TeV.root",UcasePt,mass);
     TFile f7(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth6->SetName(nameFile);
@@ -1191,9 +1220,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     
     sprintf(nameSyst,"UnbRegion");
 
-    sprintf(nameFile,"%s_systUnbRegion.gif",LcasePt);
+    sprintf(nameFile,"figs/%s_systUnbRegion.gif",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
-    sprintf(nameFile,"%s_systUnbRegion.pdf",LcasePt);
+    sprintf(nameFile,"figs/%s_systUnbRegion.pdf",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
     // return;
 
@@ -1246,9 +1275,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 
     sprintf(nameSyst,"SingleZ");    
     
-    sprintf(nameFile,"%s_systSingleZ.gif",LcasePt);
+    sprintf(nameFile,"figs/%s_systSingleZ.gif",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
-    sprintf(nameFile,"%s_systSingleZ.pdf",LcasePt);
+    sprintf(nameFile,"figs/%s_systSingleZ.pdf",LcasePt);
     if (!also7TeV) can.SaveAs(nameFile);
 
   }
@@ -1283,9 +1312,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   if (whichtype == 6) {
 
     TFile* pdfsfile[3];
-    pdfsfile[0] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_standard.root");
-    pdfsfile[1] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_MSTW.root");
-    pdfsfile[2] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_NNPDF.root");
+    pdfsfile[0] = TFile::Open("weights/ZZ_standard.root");
+    pdfsfile[1] = TFile::Open("weights/ZZ_MSTW.root");
+    pdfsfile[2] = TFile::Open("weights/ZZ_NNPDF.root");
 
     TH1F* pdfh[3];
     TH1F* ratiopdf[2];
@@ -1326,13 +1355,13 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   if (whichtype == 7) {
 
     TFile* scalesfile[7];
-    scalesfile[0] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_standard.root");
-    scalesfile[1] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_mufdouble.root");
-    scalesfile[2] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_mufhalf.root");
-    scalesfile[3] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_murdouble.root");
-    scalesfile[4] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_murhalf.root");
-    scalesfile[5] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_mufdouble_murdouble.root");
-    scalesfile[6] = TFile::Open("../../../../src/GeneratorInterface/ExternalDecays/test/ZZ_mufhalf_murhalf.root");
+    scalesfile[0] = TFile::Open("weights/ZZ_standard.root");
+    scalesfile[1] = TFile::Open("weights/ZZ_mufdouble.root");
+    scalesfile[2] = TFile::Open("weights/ZZ_mufhalf.root");
+    scalesfile[3] = TFile::Open("weights/ZZ_murdouble.root");
+    scalesfile[4] = TFile::Open("weights/ZZ_murhalf.root");
+    scalesfile[5] = TFile::Open("weights/ZZ_mufdouble_murdouble.root");
+    scalesfile[6] = TFile::Open("weights/ZZ_mufhalf_murhalf.root");
 
     TH1F* scaleh[7];
     TH1F* ratioscale[6];
@@ -1386,11 +1415,13 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   // Save histos
   
   char whichSample[4] = "gg";
+  if (whichtype == -7) sprintf(whichSample,"zh");
+  if (whichtype == -6) sprintf(whichSample,"wh");
   if (whichtype == -4 || whichtype == -5) sprintf(whichSample,"vbf");
   if (whichtype > 0) sprintf(whichSample,"zz");
 
-  sprintf(nameFile,"../../selRootFiles/%s_%s%d_SEL_8TeV.root",UcasePt,whichSample,mass);
-  if (also7TeV) sprintf(nameFile,"../../selRootFiles/%s_%s%d_SEL_7TeV.root",UcasePt,whichSample,mass);
+  sprintf(nameFile,"selRootFiles/%s_%s%d_SEL_8TeV.root",UcasePt,whichSample,mass);
+  if (also7TeV) sprintf(nameFile,"selRootFiles/%s_%s%d_SEL_7TeV.root",UcasePt,whichSample,mass);
   TFile f1(nameFile,"UPDATE");
   sprintf(nameFile,"%sH_%s",LcasePt,nameSyst);
   // cout << whichtype << " " << nameFile << endl;
@@ -1400,7 +1431,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   } else if (whichtype == -3 || whichtype == 3 || whichtype == 4 || whichtype == 5) {
     pth->SetName(nameFile);
     adjustHistogram(pth);   pth->Write();
-  } else if (whichtype == -2) {
+  } else if (whichtype == -2 || whichtype == -6 || whichtype == -7) {
     pth2->SetName(nameFile);
     adjustHistogram(pth2);  pth2->Write();
   }
@@ -1408,7 +1439,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   TH1F* def = (TH1F*)f1.Get(nameFile);
   if (whichtype == -4 || whichtype == -5 || whichtype == 6 || whichtype == 7) evalBinMigration(def,ptvbf,nameSyst,true);
   else if (whichtype == -3 || whichtype == 3 ||  whichtype == 4 || whichtype == 5) evalBinMigration(def,pth,nameSyst,true);
-  else if (whichtype == -2) evalBinMigration(def,pth2,nameSyst,true);
+  else if (whichtype == -2 || whichtype == -6 || whichtype == -7) evalBinMigration(def,pth2,nameSyst,true);
   f1.Close();
 
   if (whichtype == 3 || whichtype == 4) return;
@@ -1427,7 +1458,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   pth2->GetXaxis()->SetLabelColor(kWhite);
   pth2->GetYaxis()->SetTitle("Normalized entries");
   pth2->Draw();
-  if (whichtype != -3) pth1->Draw("SAME");
+  if (whichtype != -3 && whichtype != -6 && whichtype != -7) pth1->Draw("SAME");
   pth->Draw("SAME");
   
   TH1F* diffpt = (TH1F*)pth->Clone();
@@ -1442,9 +1473,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   pullpt->GetYaxis()->SetTitle("Relative difference");
   pullpt->Draw("E");
   
-  sprintf(nameFile,"%s_syst%s.gif",LcasePt,nameSyst);
+  sprintf(nameFile,"figs/%s_syst%s.gif",LcasePt,nameSyst);
   if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
-  sprintf(nameFile,"%s_syst%s.pdf",LcasePt,nameSyst);
+  sprintf(nameFile,"figs/%s_syst%s.pdf",LcasePt,nameSyst);
   if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
 
   can.cd(1);
@@ -1471,9 +1502,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   pullnlo->GetYaxis()->SetTitle("Relative difference");
   pullnlo->Draw("E");
   
-  sprintf(nameFile,"nlo_syst%s.gif",nameSyst);
+  sprintf(nameFile,"figs/nlo_syst%s.gif",nameSyst);
   if (!also7TeV || (whichtype == 5 && also7TeV)) can.SaveAs(nameFile);
-  sprintf(nameFile,"nlo_syst%s.pdf",nameSyst);
+  sprintf(nameFile,"figs/nlo_syst%s.pdf",nameSyst);
   if (!also7TeV || (whichtype == 5 && also7TeV)) can.SaveAs(nameFile);
 
   if (whichtype == 1) {
@@ -1498,7 +1529,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     pullpt->SetMaximum(2.);
     pullpt->Draw("E");
        
-    sprintf(nameFile,"%s_balanced%s.pdf",LcasePt,nameSyst);
+    sprintf(nameFile,"figs/%s_balanced%s.pdf",LcasePt,nameSyst);
     if (!also7TeV) can.SaveAs(nameFile);
     
     TH1F* balnlo = (TH1F*)nloh->Clone();
@@ -1521,7 +1552,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     pullnlo->SetMaximum(1.);
     pullnlo->Draw("E");
 
-    sprintf(nameFile,"nlo_balanced%s.pdf",nameSyst);
+    sprintf(nameFile,"figs/nlo_balanced%s.pdf",nameSyst);
     if (!also7TeV) can.SaveAs(nameFile);
   }
 

@@ -797,10 +797,6 @@ void fitPt(float mZZcenter = 126., float mZZspread = 5.,
     ggHRes->SetName("ggHRes");   ggHRes->SetTitle("HRes gg pT fit histo");
     ggH->Sumw2();
     ggHRes->Sumw2();
-    // Correct by hand nonsense low pT
-    /* ggH->SetBinContent(1,ggH->GetBinContent(4)/8.);
-    ggH->SetBinContent(2,ggH->GetBinContent(4)/4.);
-    ggH->SetBinContent(3,ggH->GetBinContent(4)/2.); */
     ggH->Scale(1./ggH->Integral());
 
     TH1F* wH = (TH1F*)ggH->Clone();

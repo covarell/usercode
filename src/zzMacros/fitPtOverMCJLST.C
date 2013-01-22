@@ -141,8 +141,10 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
 
   string nameSample[8] = {"gg","vbf","zz","zx","ggzz","wh","zh","tth"};
   float maxType[8] = {2.4,3.2,1.6,1.6,1.6,3.2,3.2,3.2};   
-  float rebinType[8] = {1,2,1,1,4,20,20,40};
+  float rebinType[8] = {1,2,1,1,4,10,10,40};
   
+  if (mass >= 150) maxType[1] = 3.2*(7.07/sqrt(mass-100.));
+
   char fileToOpen[200];
   sprintf(fileToOpen,"selRootFiles/PToverM_%s%d_SEL_%dTeV.root",nameSample[whichtype].c_str(),mass,LHCsqrts);
   // if (whichtype == 3) sprintf(fileToOpen,"PTOVERM_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
@@ -207,6 +209,9 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     T.setVal(0.1009);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); // T.setConstant(kTRUE);
     bb2.setVal(1.0024);   bb2.setConstant(kTRUE);
     fexp.setVal(0.01);   fexp.setConstant(kTRUE);
+    if (mass >= 150) {
+      fexp.setVal(0.0);   fexp.setConstant(kFALSE);
+    }
   } else if (whichtype == 2) {
     if (LHCsqrts == 8) {
       m.setVal(1.0476);   // m.setConstant(kTRUE);    
@@ -241,14 +246,22 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     T.setVal(0.118);   // T.setConstant(kTRUE);
     bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
     fexp.setVal(0.0);   fexp.setConstant(kTRUE);
-  } else {
+  } else if (whichtype == 5 && LHCsqrts == 8) {
     m.setVal(1.411);   // m.setConstant(kTRUE);
-    n.setVal(5.756);    n.setConstant(kTRUE);
-    n2.setVal(0.8738);   n2.setConstant(kTRUE);
+    n.setVal(5.756);    // n.setConstant(kTRUE);
+    n2.setVal(0.8738);   // n2.setConstant(kTRUE);
     bb.setVal(0.00039);  // bb.setConstant(kTRUE);
     T.setVal(0.118);   // T.setConstant(kTRUE);
     bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
     fexp.setVal(0.0);   fexp.setConstant(kTRUE);
+  } else {
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);    n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(0.311);  // bb.setConstant(kTRUE);
+    T.setVal(0.1009);    T.setConstant(kTRUE);
+    bb2.setVal(1.0224);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   }
  
   
