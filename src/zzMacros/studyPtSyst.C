@@ -59,8 +59,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   // -7 - NLO/LO : ZH
   // -6 - NLO/LO : WH
   // -5 - PDF : VBF
-  // -4 - scales : VBF
-  // -3 - effect of finite top mass
+  // -4 - scales : VBF  // -3 - effect of finite top mass
   // -2 - mu_Q in gg signal shape
   // -1 - fraction of VBF (NOT for VBF fraction fitting)
   // 0 - DEFAULTS: ALWAYS RUN FIRST
@@ -91,18 +90,16 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H%d.root",mass);  ggTree->Add(nameFile2);
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H%d.root",mass);  ggTree->Add(nameFile2);
     if (moreFiles) {
-      /* ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H115.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H115.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H115.root"); 
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H120.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H120.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H120.root"); 
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H130.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H130.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H130.root"); 
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H135.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H135.root");
-      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H135.root"); */
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H150.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H150.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H150.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H160.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H160.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H160.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H180.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H180.root");
+      ggTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H180.root");
+
     } 
   }
 
@@ -116,12 +113,15 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH%d.root",mass);  VBFTree->Add(nameFile2);
     sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH%d.root",mass);  VBFTree->Add(nameFile2);
     if (moreFiles) {
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH126.root");
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH126.root");
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH126.root"); 
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH127.root");
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH127.root");
-      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH127.root"); 
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH150.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH150.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH150.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH160.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH160.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH160.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH180.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH180.root");
+      VBFTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH180.root");
     }
   }
 
@@ -398,7 +398,10 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   float melaLimits[melaRanges+1] = {0.0,0.3,0.6,1.0}; 
 
   // Decide the width (un po' a vacca)
-  if (mass <= 250) {massLimits[0] = mass-20.;  massLimits[massRanges] = mass+15.;}
+  if (mass <= 250) {
+    if (moreFiles) { massLimits[0] = mass-20.;  massLimits[massRanges] = mass+55.;} 
+    else { massLimits[0] = mass-20.;  massLimits[massRanges] = mass+15.;}
+  }
   else if (mass <= 500) {massLimits[0] = mass*0.85;  massLimits[massRanges] = mass*1.15;}
   else if (mass <= 850) {massLimits[0] = mass*0.657;  massLimits[massRanges] = mass*1.571;}
   else {massLimits[0] = mass*0.4;  massLimits[massRanges] = mass*1.6;}
