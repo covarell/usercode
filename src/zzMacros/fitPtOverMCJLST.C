@@ -143,7 +143,9 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   float maxType[8] = {2.4,3.2,1.6,1.6,1.6,3.2,3.2,3.2};   
   float rebinType[8] = {1,2,1,1,4,10,10,40};
   
-  if (mass >= 150) maxType[1] = 3.2*(7.07/sqrt(mass-100.));
+  for (int t = 0; t < 8; t++) {
+    if (mass > 150) maxType[t] = int(117.90*maxType[t]/sqrt(mass-10.91))/10.;
+  }
 
   char fileToOpen[200];
   sprintf(fileToOpen,"selRootFiles/PToverM_%s%d_SEL_%dTeV.root",nameSample[whichtype].c_str(),mass,LHCsqrts);
@@ -186,12 +188,12 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   if (whichtype == 0) {
     if (LHCsqrts == 8) {
       m.setVal(3.319);   // m.setConstant(kTRUE);
-      n.setVal(0.77);    // n.setConstant(kTRUE);
+      n.setVal(0.7606);    if (systString != "Default" || mass != 125) n.setConstant(kTRUE); 
       n2.setVal(0.8061);   n2.setConstant(kTRUE);
       bb.setVal(3.728);   // bb.setConstant(kTRUE);
       T.setVal(0.00333);   // T.setConstant(kTRUE);
-      bb2.setVal(1.7172);    bb2.setConstant(kTRUE);
-      fexp.setVal(0.002);   // fexp.setConstant(kTRUE);
+      bb2.setVal(1.7172);    // bb2.setConstant(kTRUE);
+      fexp.setVal(0.002144);   if (systString != "Default" || mass != 125) fexp.setConstant(kTRUE);
     } else {
       m.setVal(0.061);   // m.setConstant(kTRUE);
       n.setVal(1.6141);   if (systString == "Resummation" || systString == "TopMass")  n.setConstant(kTRUE);
@@ -205,12 +207,18 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     m.setVal(1.006);   // m.setConstant(kTRUE);
     n.setVal(10.939);   n.setConstant(kTRUE);
     n2.setVal(1.1448);   n2.setConstant(kTRUE);
-    bb.setVal(0.311);   // bb.setConstant(kTRUE);
-    T.setVal(0.1009);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); // T.setConstant(kTRUE);
+    bb.setVal(0.02048);   bb.setConstant(kTRUE);
+    T.setVal(0.16115);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); // T.setConstant(kTRUE);
     bb2.setVal(1.0024);   bb2.setConstant(kTRUE);
-    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
-    if (mass >= 150) {
+    fexp.setVal(0.005);   fexp.setConstant(kTRUE);
+    if (mass > 300) {
       fexp.setVal(0.0);   fexp.setConstant(kFALSE);
+    }
+    if (mass > 500) {
+      bb2.setVal(5.0);  //  bb2.setConstant(kFALSE);
+    }
+    if (mass > 500) {
+      bb.setVal(15.0);  //  bb.setConstant(kFALSE);
     }
   } else if (whichtype == 2) {
     if (LHCsqrts == 8) {
@@ -247,19 +255,20 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
     fexp.setVal(0.0);   fexp.setConstant(kTRUE);
   } else if (whichtype == 5 && LHCsqrts == 8) {
-    m.setVal(1.411);   // m.setConstant(kTRUE);
-    n.setVal(5.756);    // n.setConstant(kTRUE);
-    n2.setVal(0.8738);   // n2.setConstant(kTRUE);
-    bb.setVal(0.00039);  // bb.setConstant(kTRUE);
-    T.setVal(0.118);   // T.setConstant(kTRUE);
-    bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
-    fexp.setVal(0.0);   fexp.setConstant(kTRUE);
-  } else {
     m.setVal(1.006);   // m.setConstant(kTRUE);
     n.setVal(10.939);    n.setConstant(kTRUE);
     n2.setVal(1.1448);   n2.setConstant(kTRUE);
-    bb.setVal(0.311);  // bb.setConstant(kTRUE);
-    T.setVal(0.1009);    T.setConstant(kTRUE);
+    bb.setVal(3.897);   bb.setConstant(kTRUE);
+    T.setVal(0.1009);  // T.setConstant(kTRUE);
+    bb2.setVal(1.0224);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
+  } else {
+    // cout << "Entro qui" << endl;
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);    n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(0.0129);  bb.setConstant(kTRUE);
+    T.setVal(0.1009);    // T.setConstant(kTRUE);
     bb2.setVal(1.0224);   bb2.setConstant(kTRUE);
     fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   }
@@ -325,7 +334,7 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
       if (fit->floatParsFinal().find("n")) nHist->Fill(n.getVal()-nVal);
       if (fit->floatParsFinal().find("n2")) n2Hist->Fill(n2.getVal()-n2Val);
       if (fit->floatParsFinal().find("bb")) bbHist->Fill(bb.getVal()-bbVal);
-      if (fit->floatParsFinal().find("bb2")) bbHist->Fill(bb2.getVal()-bb2Val);
+      if (fit->floatParsFinal().find("bb2")) bb2Hist->Fill(bb2.getVal()-bb2Val);
       if (fit->floatParsFinal().find("fexp")) fexpHist->Fill(fexp.getVal()-fexpVal);
       if (fit->floatParsFinal().find("T")) THist->Fill(T.getVal()-TVal);
     }

@@ -352,30 +352,44 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   if (overM) sprintf(LcasePt,"ptoverm");
 
   // cout << LcasePt << endl;
+  int whatToUseHere = 125;
+  if (mass > 190) whatToUseHere = 200;
+  if (mass > 390) whatToUseHere = 400;
 
-  sprintf(nameFile,"weights/weightHisto_125GeV_8TeV_Default.root");
+  sprintf(nameFile,"weights/weightHisto_%dGeV_8TeV_Default.root",whatToUseHere);
   if (also7TeV) sprintf(nameFile,"weights/weightHisto_125GeV_7TeV_Default.root");
   TFile weightsSig(nameFile);
   TH1F* wHalf = (TH1F*)weightsSig.Get("wH");
   TH1F* wRenorm;
   if (also7TeV) {
-    TFile weights8("weights/weightHisto_125GeV_8TeV_Default.root");
+    sprintf(nameFile,"weights/weightHisto_%dGeV_8TeV_Default.root",whatToUseHere);
+    TFile weights8(nameFile);
     wRenorm = (TH1F*)weights8.Get("wH");
   } else {
     wRenorm = (TH1F*)weightsSig.Get("wH");
   }
-  TFile weightsSig1("weights/weightHisto_125GeV_8TeV_up.root");
+  sprintf(nameFile,"weights/weightHisto_%dGeV_8TeV_up.root",whatToUseHere);
+  TFile weightsSig1(nameFile);
   TH1F* wOne = (TH1F*)weightsSig1.Get("wH");
-  TFile weightsSig2("weights/weightHisto_125GeV_8TeV_down.root");
+  sprintf(nameFile,"weights/weightHisto_%dGeV_8TeV_down.root",whatToUseHere);
+  TFile weightsSig2(nameFile);
   TH1F* wQuar = (TH1F*)weightsSig2.Get("wH");
 
-  TFile pwhgNoMass("weights/ggH125_infiniteMT.root");
-  TFile pwhgMass("weights/ggH125_finiteMT.root");
+  if (mass < 200) sprintf(nameFile,"weights/ggH125_infiniteMT.root");
+  else sprintf(nameFile,"weights/ggH%d_infiniteMT.root",mass);
+  TFile pwhgNoMass(nameFile);
+  if (mass < 200) sprintf(nameFile,"weights/ggH125_finiteMT.root");
+  else sprintf(nameFile,"weights/ggH%d_finiteMT.root",mass);
+  TFile pwhgMass(nameFile);
     
   TH1F* nmH = (TH1F*)((TH2F*)pwhgNoMass.Get("Pt_sig"))->ProjectionY("nmH");
   TH1F* mH = (TH1F*)((TH2F*)pwhgMass.Get("Pt_sig"))->ProjectionY("mH");
  
-  TFile nlolovh("weights/wh125_weightsNLO.root");
+  sprintf(nameFile,"weights/wh125_weightsNLO.root");
+  if (mass < 120) sprintf(nameFile,"weights/wh115_weightsNLO.root");
+  if (mass > 130) sprintf(nameFile,"weights/wh140_weightsNLO.root");
+  TFile nlolovh(nameFile);
+
   TH1F* wVH = (TH1F*)nlolovh.Get("wei");
 
   nmH->Rebin(4);   nmH->Sumw2();
@@ -392,7 +406,10 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 
   int nbins2 = 160;
   float theMax = 400.;
-  if (overM == true) theMax = 3.2;
+  if (overM == true) {
+    if (mass < 150) theMax = 3.2;
+    else theMax = int(377.3/sqrt(mass-10.91))/10.;
+  }
 
   float massLimits[massRanges+1] = {0.,0.,0.,0.,0.};   // fill after  
   float melaLimits[melaRanges+1] = {0.0,0.3,0.6,1.0}; 
@@ -1476,9 +1493,9 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   pullpt->GetYaxis()->SetTitle("Relative difference");
   pullpt->Draw("E");
   
-  sprintf(nameFile,"figs/%s_syst%s.gif",LcasePt,nameSyst);
+  sprintf(nameFile,"figs/%s_syst%s%d.gif",LcasePt,nameSyst,mass);
   if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
-  sprintf(nameFile,"figs/%s_syst%s.pdf",LcasePt,nameSyst);
+  sprintf(nameFile,"figs/%s_syst%s%d.pdf",LcasePt,nameSyst,mass);
   if (!also7TeV || (whichtype == 5 && also7TeV) ) can.SaveAs(nameFile);
 
   can.cd(1);

@@ -394,7 +394,7 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
 	       int LHCsqrts = 7, 
 	       bool isVBFsignal = false, 
 	       bool writeWeightHisto = false, 
-	       bool run2D = false, string typeSyst = "half")
+	       bool run2D = false, string typeSyst = "Default")
 {
 
   float varMinBkg = 1.;        // all in GeV
@@ -409,13 +409,17 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
   sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
   TFile* fileb = new TFile(fileToOpen);
   // sprintf(fileToOpen,"PT_Y_%dTeV.root",LHCsqrts);
-  // sprintf(fileToOpen,"HResSystemtics_125.root");
-  sprintf(fileToOpen,"HResSystv2_125.root");
+  // sprintf(fileToOpen,"HRes/HResSystemtics_125.root");
+  sprintf(fileToOpen,"HRes/HResSystv2_125.root");
+  if (mZZcenter > 190.) sprintf(fileToOpen,"HRes/HResSystv2_200.root");
+  if (mZZcenter > 390.) sprintf(fileToOpen,"HRes/HResSystv2_400.root");
   TFile* files = new TFile(fileToOpen);
   TFile* filegg;
   if (writeWeightHisto) {
     // sprintf(fileToOpen,"PT_Y_gg125-200_%dTeV.root",LHCsqrts);
     sprintf(fileToOpen,"PT_Y_gg125withPythia_%dTeV.root",LHCsqrts);
+    if (mZZcenter > 190.) sprintf(fileToOpen,"PT_Y_gg200withPythia_%dTeV.root",LHCsqrts);
+    if (mZZcenter > 390.) sprintf(fileToOpen,"PT_Y_gg400withPythia_%dTeV.root",LHCsqrts);
     filegg = new TFile(fileToOpen);  
   }
 
@@ -778,7 +782,10 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
 
   if (writeWeightHisto) {
 
-    TFile fue("weights/gg125_weightsUE.root");
+    sprintf(fileToOpen,"weights/gg125_weightsUE.root");
+    if (mZZcenter > 190.) sprintf(fileToOpen,"weights/gg200_weightsUE.root");
+    if (mZZcenter > 390.) sprintf(fileToOpen,"weights/gg400_weightsUE.root");
+    TFile fue(fileToOpen);
     TH1F* wei = (TH1F*)fue.Get("wei");
 
     sprintf(fileToSave,"weights/weightHisto_%dGeV_%dTeV_%s.root",int(mZZcenter),LHCsqrts,typeSyst.c_str());
