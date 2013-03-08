@@ -31,7 +31,7 @@
 
 // #include "PDFs/RooTsallis.h"
 // #include "PDFs/RooTsallis2.h"
-#include "PDFs/RooTsallis3.h" 
+#include "PDFs/RooModifTsallis.h" 
 
 using namespace RooFit;
 
@@ -566,11 +566,11 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
   fexps.setVal(0.1);   // fexps.setConstant(kTRUE);
  
   
-  RooTsallis3* rt = new RooTsallis3("rt","rt",*pts,mv,nv,n2v,bbv,bb2v,Tv,fexpv);
+  RooModifTsallis* rt = new RooModifTsallis("rt","rt",*pts,mv,nv,n2v,bbv,bb2v,Tv,fexpv);
   ws->import(*rt);
-  RooTsallis3* rt2 = new RooTsallis3("rt2","rt2",*pts,ms,ns,n2s,bbs,bb2s,Ts,fexps);
+  RooModifTsallis* rt2 = new RooModifTsallis("rt2","rt2",*pts,ms,ns,n2s,bbs,bb2s,Ts,fexps);
   ws->import(*rt2);
-  RooTsallis3* rt3 = new RooTsallis3("rt3","rt3",*pt,m,n,n2,bb,bb2,T,fexp);
+  RooModifTsallis* rt3 = new RooModifTsallis("rt3","rt3",*pt,m,n,n2,bb,bb2,T,fexp);
   ws->import(*rt3);
   /* ws->factory("Gaussian::gau(pt,mean[3.,2.,15.],sigma[2.,0.1,10.])");
   ws->factory("Chebychev::che(pt,{a0[0.5,0.,1.],a1[0.5,0.,1.]})");
@@ -766,7 +766,7 @@ void fitPtSyst(float mZZcenter = 126., float mZZspread = 5.,
   else sprintf(fileToSave,"figs/fitSigBkg_%dGeV_%dTeV_all.pdf",int(mZZcenter),LHCsqrts);
   can.SaveAs(fileToSave);
   
-  RooTsallis3* rt4 = new RooTsallis3("rt4","rt4",*ws->var("pts"),*ws->var("m"),*ws->var("n"),*ws->var("n2"),*ws->var("bb"), 
+  RooModifTsallis* rt4 = new RooModifTsallis("rt4","rt4",*ws->var("pts"),*ws->var("m"),*ws->var("n"),*ws->var("n2"),*ws->var("bb"), 
                           *ws->var("bb2"),*ws->var("T"),*ws->var("fexp"));
   ws->import(*rt4);
 

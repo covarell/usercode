@@ -31,7 +31,7 @@
 
 // #include "PDFs/RooTsallis.h"
 // #include "PDFs/RooTsallis2.h"
-#include "PDFs/RooTsallis3.h" 
+#include "PDFs/RooModifTsallis.h" 
 
 using namespace RooFit;
 
@@ -274,7 +274,7 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   }
  
   
-  RooTsallis3* rt3 = new RooTsallis3("rt3","rt3",*ptoverm,m,n,n2,bb,bb2,T,fexp);
+  RooModifTsallis* rt3 = new RooModifTsallis("rt3","rt3",*ptoverm,m,n,n2,bb,bb2,T,fexp);
   // ws->import(*rt3);
 
   // fit
@@ -393,7 +393,7 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   RooRealVar bb2up("bb2up","bibi2",0.02, 0.0005, 10.0);
   RooRealVar fexpup("fexpup","f_exp",0.02, 0.0, 1.0);
  
-  RooTsallis3* rt3up = new RooTsallis3("rt3up","rt3up",*ptoverm,mup,nup,n2up,bbup,bb2up,Tup,fexpup);
+  RooModifTsallis* rt3up = new RooModifTsallis("rt3up","rt3up",*ptoverm,mup,nup,n2up,bbup,bb2up,Tup,fexpup);
   // ws->import(*rt3up);
  
   RooRealVar mdown("mdown","emme", 1.,0.01, 30.);
@@ -404,7 +404,7 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   RooRealVar bb2down("bb2down","bibi2",0.02, 0.0005, 10.0);
   RooRealVar fexpdown("fexpdown","f_exp",0.02, 0.0, 1.0);
 
-  RooTsallis3* rt3down = new RooTsallis3("rt3down","rt3down",*ptoverm,mdown,ndown,n2down,bbdown,bb2down,Tdown,fexpdown);
+  RooModifTsallis* rt3down = new RooModifTsallis("rt3down","rt3down",*ptoverm,mdown,ndown,n2down,bbdown,bb2down,Tdown,fexpdown);
   // ws->import(*rt3down);
 
   RooPlot *frame = ptoverm->frame();

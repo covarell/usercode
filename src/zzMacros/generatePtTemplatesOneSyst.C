@@ -27,7 +27,7 @@
 #endif
 
 #include "RooRealVar.h"
-#include "RooModifTsallis.h"
+#include "PDFs/RooModifTsallis.h"
 //----------> SET INPUT VARIABLES in Config.h
 #include "Config.h"
 //<----------
