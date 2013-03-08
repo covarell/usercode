@@ -1,0 +1,157 @@
+FIT PT/M DISTRIBUTIONS AND PRODUCE PT/M VS. M TEMPLATES  
+-------------------------------------------------------
+
+To use these instructions please create in you workdir some subdirectories
+called text/, figs/, selRootFiles/, and weights/.
+
+************************************
+1) PRODUCING SEVERAL KIND OF WEIGHTS
+************************************
+
+pT weights are needed in many cases. At the moment we use the following sets
+of weights:
+
+---> FOR GGF:
+1) UE weights: numerator = Pythia pT histogram with full simulation
+               denominator = Pythia pT histogram with only PS activated, no UE, no hadronization, no decays
+When 1) is applied to a HRes histogram (obtained at PS-level only) it will 
+produce a spectrum including UE.
+
+2) HRes weights: numerator = HRes pT histos corrected by 1) 
+                 denominator = generated pT from POWHEG samples
+When 2) is applied to CJLST samples it will produce a spectrum as predicted 
+by HRes.
+
+3) top-mass weights: numerator = generated POWHEG pT with finite top mass
+                     denominator = generated POWHEG pT with infinite top mass  
+When 3) is applied to the result of 2) it will produce the HRes spectrum 
+corrected by top-mass effect.
+
+---> FOR WH/ZH:
+4-5) NLO weights: numerator = POWHEG pT from e.g. H->bb for WH/ZH
+                  denominator = Pythia pT from WH/ZH -> ZZ samples
+When 4-5) is applied to CJLST samples it will produce a spectrum as predicted 
+by POWHEG.
+
+For obtaining numerator and denominator histograms:
+- move all files called LHE* in a CMSSW directory
+- compile with scram
+- cmsRun lheeventTransAndAna_cfg.py if the source sample is pure hard 
+events (i.e. from a LHE file)
+- cmsRun lhepythiaeventAna_cfg.py if the source sample is already hadronized
+(i.e. from an EDM file)
+N.B. For this last choice, you need samples before any selection! So you often
+need to go back to the AODSIM and use crab.
+
+Finally run 
+.x produceWeightHistos.C("<numeratorFile.root>","<denominatorFile.root","resultingWeightFile.root")
+
+*************************************
+2) PRODUCE CJLST HISTOS AND RUN FITS
+*************************************
+
+They usually need to be run for each MC sample and each mass point. In several
+cases a correction can be assumed to be valid for a certain mass range and
+not repeated for every single mass point: in case you have finer description,
+edit the macros to change these approximations.
+
+Every fitting macro requires this syntax in ROOT:
+.L PDFs/RooModifTsallis.cc+
+.L <theFitMacro.C>+
+<theFitMacro>(<arguments>)
+
+*For ggF only* first obtain the HRes spectrum with its uncertainties:
+fitPtSyst(<mZZcenter>,<mZZspread>,<LHCsqrts>,false,true,false,<typeSyst>)
+
+mZZcenter = the mass point (e.g. 125.)
+mZZspread = the mZZ spread where the histogram is integrated (signal histograms
+are filled at just one bin usually, so this is irrelevant)
+LHCsqrts = 7 or 8
+typeSyst = "Default" for default spectrum, or an alternative naming for Pt_sig
+histograms (e.g. "up" or "down" in Chris' files)
+
+Weights of type 2) will be produced in the directory weights/, provided you 
+have given sensible weights of type 1) in input to this macro.
+
+Second, produce all histos for default and systematic pT spectrum. This is
+achieved with:
+studyPtSyst(<mass>,<whichtype>,<overM>,<7TeV>,false) 
+
+mass = the mass point (e.g. 125)
+whichtype = complicated, see after the header in the macro! Corresponds to 
+producing default spectra (whichtype = 0), signal systematics (whichtype < 0)
+and background systematics (whichtype > 0). 
+overM = true -> produce pT/m histos, false -> produce pT histos
+7TeV = true -> 7 TeV, false -> 8 TeV
+
+Notice that you can run or createAllSystHistosWithSlices.C (overM = false)
+or createAllSystHistosPtMWithSlices.C (overM = true) to do everything in one
+go and in the correct order, but be sure to know what you're doing.
+
+Finally run fits on this spectra:
+fitPtOverMCJLST(<mass>,<LHCsqrts>,<whichsample>,<correctErrors>,<showErrorPDFs>,<systString>)
+
+mass, LHCsqrts = see above
+whichsample =
+// 0 - gg Signal
+// 1 - VBF Signal
+// 2 - ZZ
+// 3 - ZX
+// 4 - ggZZ
+// 5 - WH
+// 6 - ZH
+// 7 - ttH
+correctErrors = if true, run 200 toy experiments to find correct errors on 
+Tsallis parameters. It only matters for defaults fits, not systematics.
+showErrorPDFs = will draw alternative PDFs for systematic effects. 
+It only matters for systematic fits, not default.
+systString = it can be "Default" (to be run first for all samples), or 
+a systematic name as given by studyPtSyst.C. You can inspect ROOT files in
+selRootFiles to know these names.
+
+*************************************
+3) PRODUCE TEMPLATES
+*************************************
+
+For samples that show a dependence of pT/m over mZZ the templates will not be
+constant. So first fit Tsallis parameters as a function of mZZ:
+
+source changeCinZero.csh
+and in ROOT:
+.x fitParsPtCJLST(<LHCsqrts>,<whichsample>) 
+
+LHCsqrts = 7 or 8
+whichsample =
+// 0 - gg Signal
+// 1 - VBF Signal
+// 2 - ZZ
+// 3 - ZX
+// 4 - ggZZ
+// 5 - WH
+// 6 - ZH
+// 7 - ttH
+  
+If you change the systematics, do change also inside this macro.
+
+copy ALL text files to a directory called tsallisPars/.
+
+Every template-generating macro requires this syntax in ROOT:
+.L PDFs/RooModifTsallis.cc+
+.x <theTemplateMacro.C>+
+
+- generatePtTemplatesOneSyst.C will generate constant templates over mZZ (i.e.
+take the shape at 125 and replicate everywhere)
+- generateComplicatedPtTemplates.C will generate variable templates over mZZ,
+using the result of the previous step (not really needed for all).
+- generateComplicatedPtTemplates7TeV.C will generate variable templates over mZZ,
+using and approximation for 7 TeV templates once the 8 TeV ones are ready.
+
+
+
+
+
+ 
+
+
+
+ 
