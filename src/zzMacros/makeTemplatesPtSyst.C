@@ -23,10 +23,10 @@ using namespace std;
 static const int massRanges = 4;
 static const int melaRanges = 3;
 
-// static const int nWeightResum = 6;
-// int massResum[nWeightResum] = {125,200,400,600,800,1000};
-static const int nWeightResum = 2;
-int massResum[nWeightResum] = {125,400};
+static const int nWeightResum = 6;
+int massResum[nWeightResum] = {125,200,400,600,800,1000};
+// static const int nWeightResum = 2;
+//int massResum[nWeightResum] = {125,400};
 
 static const int nWeightNLOvh = 3;
 int massNLOvh[nWeightNLOvh] = {115,125,140};
@@ -36,9 +36,18 @@ float ptVar(float pt, float m, int overM = 0) {
      return pt;	*/
   if (overM == 0) return pt;
   else if (overM == 1) return pt/m;
-  else if (log(pt/m) < -5.5) return -5.4999;
-  else if (log(pt/m) > 1.5) return 1.4999;
-  return log(pt/m);
+  else if (overM == 2) {
+    if (log(pt/m) < -5.5) return -5.4999;
+    if (log(pt/m) > 1.5) return 1.4999;
+    return log(pt/m);
+  } else if (overM == 3) {
+    if (pt > 203) return 202.999;
+    return pt;
+  } else {
+    if (log(pt) > 6.0) return 5.9999;
+    if (log(pt) < 0.4) return 0.4001;
+    return log(pt);  
+  }
 }
 
 bool notVBFtagged(float njets) {
@@ -74,10 +83,18 @@ void adjustHistogram(TH2F* hist) {
     }
     } */
 
+  // fill empty bins
+  for(int i=1; i<=hist->GetNbinsX(); i++){    
+    for(int j=1; j<=hist->GetNbinsX(); j++){
+      if (hist->GetBinContent(i,j) <= 0.) hist->SetBinContent(i,j,10E-10);
+    }
+  }
+  
+
   // normalize slices
   double norm;
   TH1F* tempProj;
-  
+ 
   for(int i=1; i<=hist->GetNbinsX(); i++){
     
     tempProj = (TH1F*)hist->ProjectionY("tempProj",i,i);
@@ -156,7 +173,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
   // COSTANT BINNING (DEFAULT WITH LOG) 
 
-  static const int ptmbins = 20;
+  static const int ptmbins = 20;  // log(pt/m)
   double ptmbinLimits[ptmbins+1] = {-5.5,-5.15,-4.8,-4.45,-4.1,
                                     -3.75,-3.4,
 				    -3.05,-2.7,-2.35,-2.,
@@ -165,14 +182,24 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 				    1.15,1.5};
                                     // constant binning from -5.5 to 1.5
   
-  if (overM == 0) {
+  if (overM == 0) {   // pt large
     for (Int_t j = 0; j < ptmbins+1; j++) { 
       ptmbinLimits[j] = 41.0*(ptmbinLimits[j] + 5.5);
     }
   }
-  else if (overM == 1) {
+  else if (overM == 1) {  // pt/m
     for (Int_t j = 0; j < ptmbins+1; j++) { 
       ptmbinLimits[j] = 0.325*(ptmbinLimits[j] + 5.5);
+    }
+  }
+  else if (overM == 3) {   // pt small
+    for (Int_t j = 0; j < ptmbins+1; j++) { 
+      ptmbinLimits[j] = 29.*(ptmbinLimits[j] + 5.5);
+    }
+  }
+  else if (overM == 4) {  // log(pt)
+    for (Int_t j = 0; j < ptmbins+1; j++) { 
+      ptmbinLimits[j] = 0.8*(ptmbinLimits[j] + 6.0);
     }
   }
  
@@ -934,9 +961,13 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   char UcasePt[8] = "PT";
   if (overM == 1) sprintf(UcasePt,"PToverM");
   else if (overM == 2) sprintf(UcasePt,"lnPToverM");
+  else if (overM == 3) sprintf(UcasePt,"PTRestricted");
+  else if (overM == 4) sprintf(UcasePt,"lnPT");
   char LcasePt[8] = "pt";
   if (overM == 1) sprintf(LcasePt,"ptoverm");
   else if (overM == 2) sprintf(LcasePt,"lnptoverm");
+  else if (overM == 3) sprintf(LcasePt,"ptrestricted");
+  else if (overM == 4) sprintf(LcasePt,"lnpt");
 
   TH1F* wHalf[nWeightResum];
   TH1F* wQuar[nWeightResum];
@@ -946,12 +977,34 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   wOne[0] = (TH1F*)f125u.Get("wH");
   TFile f125d("newweights/weightResumDown_125GeV_8TeV.root");
   wQuar[0] = (TH1F*)f125d.Get("wH");
+  TFile f200u("newweights/weightResumUp_200GeV_8TeV.root");
+  wOne[1] = (TH1F*)f200u.Get("wH");
+  TFile f200d("newweights/weightResumDown_200GeV_8TeV.root");
+  wQuar[1] = (TH1F*)f200d.Get("wH");
   TFile f400("newweights/weightResumDef_400GeV_8TeV.root");
-  wHalf[1] = (TH1F*)f400.Get("wH");
+  wHalf[2] = (TH1F*)f400.Get("wH");
   TFile f400u("newweights/weightResumUp_400GeV_8TeV.root");
-  wOne[1] = (TH1F*)f400u.Get("wH");
+  wOne[2] = (TH1F*)f400u.Get("wH");
   TFile f400d("newweights/weightResumDown_400GeV_8TeV.root");
-  wQuar[1] = (TH1F*)f400d.Get("wH");
+  wQuar[2] = (TH1F*)f400d.Get("wH");
+  TFile f600("newweights/weightResumDef_600GeV_8TeV.root");
+  wHalf[3] = (TH1F*)f600.Get("wH");
+  TFile f600u("newweights/weightResumUp_600GeV_8TeV.root");
+  wOne[3] = (TH1F*)f600u.Get("wH");
+  TFile f600d("newweights/weightResumDown_600GeV_8TeV.root");
+  wQuar[3] = (TH1F*)f600d.Get("wH");
+  TFile f800("newweights/weightResumDef_800GeV_8TeV.root");
+  wHalf[4] = (TH1F*)f800.Get("wH");
+  TFile f800u("newweights/weightResumUp_800GeV_8TeV.root");
+  wOne[4] = (TH1F*)f800u.Get("wH");
+  TFile f800d("newweights/weightResumDown_800GeV_8TeV.root");
+  wQuar[4] = (TH1F*)f800d.Get("wH");
+  TFile f1000("newweights/weightResumDef_1000GeV_8TeV.root");
+  wHalf[5] = (TH1F*)f1000.Get("wH");
+  TFile f1000u("newweights/weightResumUp_1000GeV_8TeV.root");
+  wOne[5] = (TH1F*)f1000u.Get("wH");
+  TFile f1000d("newweights/weightResumDown_1000GeV_8TeV.root");
+  wQuar[5] = (TH1F*)f1000d.Get("wH");
   
   sprintf(nameFile,"newweights/ggH125_POWHEG_btMassErrors.root");
   TFile pwhgNoMass(nameFile);
@@ -1254,10 +1307,11 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   
   if (whichtype == 0) {
     
-    if (overM == 0) sprintf(nameFile2,"p_{T} [GeV/c]");
+    if (overM == 0 || overM == 3) sprintf(nameFile2,"p_{T} [GeV/c]");
     else if (overM == 1) sprintf(nameFile2,"p_{T}/m_{4l}");
-    else sprintf(nameFile2,"ln(p_{T}/m_{4l})");
-
+    else if (overM == 2) sprintf(nameFile2,"ln(p_{T}/m_{4l})");
+    else sprintf(nameFile2,"ln(p_{T}/(GeV/c))");
+   
     TH2F* ptkdgg = new TH2F("ptkdgg","pt vs mela",16,0.,1.,ptmbins,ptmbinLimits);
     ptkdgg->Sumw2();
     TH2F* ptmhgg = new TH2F("ptmhgg","pt vs m",16,100.,180.,ptmbins,ptmbinLimits);
@@ -2007,9 +2061,10 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     projmass2[k]->Scale(1./projmass2[k]->Integral());
     projmassvbf[k]->Scale(1./projmassvbf[k]->Integral());
 
-    if (overM == 0) sprintf(nameFile,"p_{T} [GeV/c]");
+    if (overM == 0 || overM == 3) sprintf(nameFile,"p_{T} [GeV/c]");
     else if (overM == 1) sprintf(nameFile,"p_{T}/m_{4l}");
-    else sprintf(nameFile,"ln(p_{T}/m_{4l})");
+    else if (overM == 2) sprintf(nameFile,"ln(p_{T}/m_{4l})");
+    else sprintf(nameFile,"ln(p_{T}/(GeV/c))");
 
     projmass[k]->SetMarkerColor(1);    projmass[k]->SetLineColor(1);    projmass[k]->SetLineWidth(2);
     projmass1[k]->SetMarkerColor(2);   projmass1[k]->SetLineColor(2);   projmass1[k]->SetLineWidth(2);
