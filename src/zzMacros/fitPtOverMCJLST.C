@@ -240,8 +240,8 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     }
   } else if (whichtype == 3) {
     m.setVal(1.411);   // m.setConstant(kTRUE);
-    n.setVal(5.756);    // n.setConstant(kTRUE);
-    n2.setVal(0.8738);   // n2.setConstant(kTRUE);
+    n.setVal(3.4523);     n.setConstant(kTRUE);
+    n2.setVal(0.6910);    n2.setConstant(kTRUE);
     bb.setVal(0.00039);  // bb.setConstant(kTRUE);
     T.setVal(0.118);   // T.setConstant(kTRUE);
     bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
@@ -348,7 +348,8 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
     cant.cd(5);   bb2Hist->Draw();
     cant.cd(6);   fexpHist->Draw();
     cant.cd(7);   THist->Draw();
-    cant.SaveAs("figs/testToys.pdf");
+    // cant.SaveAs("figs/testToys.pdf");
+    cant.SaveAs("newfigs/testToys.pdf");
 
     if (fit->floatParsFinal().find("m")) m.setError(mHist->GetRMS());
     if (fit->floatParsFinal().find("n")) n.setError(nHist->GetRMS());
@@ -515,7 +516,8 @@ void fitPtOverMCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1,
   sprintf(fileToSave,"#chi^{2}/n_{DoF} = %4.1f/%d",chi2,nFullBins - nFitPar);
   if (chi2 < 1000.) t->DrawLatex(0.80,0.86,fileToSave);
 
-  sprintf(fileToSave,"figs/fitPTOverMCJLST_%s%d_%dTeV_%s.pdf",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
+  // sprintf(fileToSave,"figs/fitPTOverMCJLST_%s%d_%dTeV_%s.pdf",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
+  sprintf(fileToSave,"newfigs/fitPTOverMCJLST_%s%d_%dTeV_%s.pdf",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
   can.SaveAs(fileToSave);
 
 }

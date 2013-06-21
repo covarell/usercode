@@ -198,31 +198,14 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   }
 
   TChain* crTree = new TChain(nameFile);
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root"); 
-  if (also7TeV) {
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root");
+  if (!also7TeV) {
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRZLLTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRZLLTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRZLLTree.root"); 
+  } else {
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CRZLLTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CRZLLTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CRZLLTree.root"); 
   }
 
   TChain* crosTree = new TChain(nameFile);
@@ -275,6 +258,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   float wgg, wVBF, wzz, wggzz, wzj, wvh;
   float ptgg, ptVBF, ptzz, ptggzz, ptdata, ptcr, ptzj, ptvh;
   int njgg, njVBF, njzz, njggzz, njdata, njcr, njzj, njvh;
+  float pScr, pBcr;
+  
   float nlogg = -999.;
   float nloVBF = -999.;
   float nlozz = -999.; 
@@ -332,9 +317,13 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 
   crTree->SetBranchAddress("ZZMass",&mcr);
   crTree->SetBranchAddress("ZZPt",&ptcr);
-  crTree->SetBranchAddress("NJets",&njcr);
+  crTree->SetBranchAddress("NJets30",&njcr);
   if (withNLOMela) crTree->SetBranchAddress("melaLDWithPtY",&nlocr);
-  else crTree->SetBranchAddress("ZZLD",&nlocr);
+  else {
+    crTree->SetBranchAddress("p0plus_VAJHU",&pScr);
+    crTree->SetBranchAddress("bkg_VAMCFM",&pBcr);
+    nlocr = pScr/(pScr+pBcr);
+  }
 
   crosTree->SetBranchAddress("ZZMass",&mcros);
 
@@ -404,8 +393,8 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
   TCanvas can("can","The canvas",5.,5.,600.,700.); 
   can.Divide(1,2);
 
-  int nbins2 = 160;
-  float theMax = 400.;
+  int nbins2 = 90;
+  float theMax = 300.;
   if (overM == true) {
     if (mass < 150) theMax = 3.2;
     else theMax = int(377.3/sqrt(mass-10.91))/10.;
@@ -952,7 +941,7 @@ void studyPtSyst(int mass = 125, int whichtype = 1, bool overM = false,
 
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
-      if (mcr < massLimits[massRanges] && mcr > massLimits[0] && ptcr < 400. && notVBFtagged(njcr)) {
+      if (mcr < 250. && mcr > 100. && ptcr < 400. && notVBFtagged(njcr)) {    // ATTENSION: in the full mass range...
 	pth2->Fill(ptVar(ptcr,mcr,overM));
         nloh->Fill(nlocr);
         ptkdcr->Fill(nlocr,ptVar(ptcr,mcr,overM));

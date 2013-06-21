@@ -17,6 +17,10 @@
 #include <TF1.h>
 #include <TProfile.h>
 #include <TChain.h>
+#include <RooRealVar.h>
+
+#include "PDFs/RooModifTsallis.h" 
+
 
 using namespace std;
 
@@ -72,24 +76,45 @@ void evalBinMigration(TH2F* def, TH2F* var, char fileName[200], bool syst = true
   return;
 }
 
-void adjustHistogram(TH2F* hist) {
-  
-  // transform in prob. dens.  
-  /* for (Int_t iBin = 1; iBin <= hist->GetNbinsX() ; ++iBin) {
-    for (Int_t iBiny = 1; iBiny <= hist->GetNbinsY() ; ++iBiny) {
-      float a = hist->GetXaxis()->GetBinWidth(iBin)*hist->GetYaxis()->GetBinWidth(iBiny);
-      hist->SetBinContent(iBin,iBiny,hist->GetBinContent(iBin,iBiny)/a);
-      // if (hist->GetBinContent(iBin,iBiny) <= 0 ) hist->SetBinContent(iBin,iBiny,0.000001);
-    }
-    } */
+void adjustHistogram(TH2F* hist,
+                     bool reBin = false, float limit1 = 800., float limit2 = 1500.,
+                     bool expandtoInf = false, float highlimit = 250.,
+                     bool expandtoLow = false, float lowlimit = 120.) {
 
-  // fill empty bins
-  for(int i=1; i<=hist->GetNbinsX(); i++){    
-    for(int j=1; j<=hist->GetNbinsX(); j++){
-      if (hist->GetBinContent(i,j) <= 0.) hist->SetBinContent(i,j,10E-10);
+  // fill with larger bins if not enough events
+  TH2F* histL = (TH2F*)hist->Clone();
+  TH2F* histXL = (TH2F*)hist->Clone();
+  if (reBin) {
+    histL->RebinX(10);
+    histXL->RebinX(50);
+    int BinUno = hist->GetXaxis()->FindBin(limit1);
+    int BinDue = hist->GetXaxis()->FindBin(limit2);
+    for(int i=BinUno; i<=BinDue; i++){
+      int binL = histL->GetXaxis()->FindBin(hist->GetXaxis()->GetBinCenter(i));
+      for(int j=1; j<=hist->GetNbinsY(); j++){
+	hist->SetBinContent(i,j,histL->GetBinContent(binL,j));
+        hist->SetBinError(i,j,histL->GetBinError(binL,j)*sqrt(5.));
+      }
+    }
+    for(int i=BinDue+1; i <= hist->GetNbinsX(); i++){
+      int binXL = histXL->GetXaxis()->FindBin(hist->GetXaxis()->GetBinCenter(i));
+      for(int j=1; j<=hist->GetNbinsY(); j++){
+	hist->SetBinContent(i,j,histXL->GetBinContent(binXL,j));
+        hist->SetBinError(i,j,histXL->GetBinError(binXL,j)*sqrt(50.));
+      }
     }
   }
-  
+
+  hist->Smooth(1,"k5b"); 
+
+  // fill empty bins  
+  double floor = ((hist->Integral())/(hist->GetNbinsX()*hist->GetNbinsY()))*0.001;
+  for(int i = 1; i <= hist->GetNbinsX(); i++) {
+    for(int j = 1; j <= hist->GetNbinsY(); j++) {
+      double orig = hist->GetBinContent(i,j);
+      hist->SetBinContent(i,j,(orig+floor));
+    }
+  } 
 
   // normalize slices
   double norm;
@@ -101,12 +126,32 @@ void adjustHistogram(TH2F* hist) {
     norm = tempProj->Integral();
  
     if (norm>0) { // Avoid introducing NaNs in the histogram
-      for(int j=1; j<=hist->GetNbinsX(); j++){
+      for(int j=1; j<=hist->GetNbinsY(); j++){
 	hist->SetBinContent(i,j,hist->GetBinContent(i,j)/norm);
       }
     }
 
   }
+
+  // expand to regions where there are really no events
+  if (expandtoInf) {
+    int lastBin = hist->GetXaxis()->FindBin(highlimit);
+    for(int i=lastBin+1; i<=hist->GetNbinsX(); i++){
+      for(int j=1; j<=hist->GetNbinsY(); j++){
+	hist->SetBinContent(i,j,hist->GetBinContent(lastBin,j));
+      }
+    }
+  }
+
+  if (expandtoLow) {
+    int firstBin = hist->GetXaxis()->FindBin(lowlimit);
+    for(int i=1; i<=firstBin-1; i++){
+      for(int j=1; j<=hist->GetNbinsY(); j++){
+	hist->SetBinContent(i,j,hist->GetBinContent(firstBin,j));
+      }
+    }
+  }
+
   return;
 }
 
@@ -114,7 +159,7 @@ int returnClosestMass(const int n, int* theArray, double mass) {
 
   double theMin = 999999.;
   int whichOne = -1;
-  for (Int_t i = 1; i < n ; ++i) {
+  for (Int_t i = 0; i < n ; ++i) {
     if (fabs(mass - (float)theArray[i]) < theMin) {
       theMin = fabs(mass - (float)theArray[i]);
       whichOne = i;
@@ -146,60 +191,39 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   // 6 - PDF : ZZ
   // 7 - scales : ZZ
 
-  // VARIABLE BINNING (DO NOT USE)
-  /* static const int ptmbins = 20;
-   double ptmbinLimits[ptmbins+1] = {0.,.05,.1,.2,.3,.4,.5,.6,.7,
-                                     .8,.9,1.0,1.1,1.2,1.3,1.4,1.5,
-                                      1.75,2.0,2.25,2.5};
-
-  if (!overM) {
-    for (Int_t j = 0; j < ptmbins; j++) { 
-      ptmbinLimits[j] *= 125.;
-    }
-  }
- 
-  static const int mbins = 102;
-  double mbinLimits[mbins+1];
-
-  for (Int_t i1 = 0; i1 < 41; i1++) { // 100-180 in 2 GeV steps
-    mbinLimits[i1] = 100.+i1*2.;
-  }
-  for (Int_t i2 = 41; i2 < 83; i2++) {  // 180-600 in 10 GeV steps
-    mbinLimits[i2] = 190.+(i2-41)*10.;
-  } 
-  for (Int_t i3 = 83; i3 < mbins+1; i3++) {  // 600-XXX in 50 GeV steps
-    mbinLimits[i3] = 650.+(i3-83)*50.;
-    } */ 
-
   // COSTANT BINNING (DEFAULT WITH LOG) 
 
-  static const int ptmbins = 20;  // log(pt/m)
-  double ptmbinLimits[ptmbins+1] = {-5.5,-5.15,-4.8,-4.45,-4.1,
-                                    -3.75,-3.4,
-				    -3.05,-2.7,-2.35,-2.,
-				    -1.65,-1.3,-0.95,-0.6,
-				    -0.25,0.1,0.45,0.8,
-				    1.15,1.5};
+  static const int ptmbins = 50;  // log(pt/m)
+  double ptmbinLimits[ptmbins+1] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+				    0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+				    0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+				    0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+				    0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
                                     // constant binning from -5.5 to 1.5
   
   if (overM == 0) {   // pt large
     for (Int_t j = 0; j < ptmbins+1; j++) { 
-      ptmbinLimits[j] = 41.0*(ptmbinLimits[j] + 5.5);
+      ptmbinLimits[j] = j*8.;
     }
   }
   else if (overM == 1) {  // pt/m
     for (Int_t j = 0; j < ptmbins+1; j++) { 
-      ptmbinLimits[j] = 0.325*(ptmbinLimits[j] + 5.5);
+      ptmbinLimits[j] = j*0.06;
+    }
+  }
+  else if (overM == 2) {  // log(pt/m)
+    for (Int_t j = 0; j < ptmbins+1; j++) { 
+      ptmbinLimits[j] = j*0.14 - 1.5;
     }
   }
   else if (overM == 3) {   // pt small
     for (Int_t j = 0; j < ptmbins+1; j++) { 
-      ptmbinLimits[j] = 29.*(ptmbinLimits[j] + 5.5);
+      ptmbinLimits[j] = j*4.;
     }
   }
   else if (overM == 4) {  // log(pt)
     for (Int_t j = 0; j < ptmbins+1; j++) { 
-      ptmbinLimits[j] = 0.8*(ptmbinLimits[j] + 6.0);
+      ptmbinLimits[j] = j*0.112 + 0.4;
     }
   }
  
@@ -208,6 +232,20 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
   for (Int_t i1 = 0; i1 < 751; i1++) { // all in 2 GeV steps
     mbinLimits[i1] = 100.+i1*2.;
+  }
+
+  static const int mbins2 = 150;
+  double mbinLimits2[mbins2+1];
+
+  for (Int_t i1 = 0; i1 < 151; i1++) { // all in 10 GeV steps
+    mbinLimits2[i1] = 100.+i1*10.;
+  }
+
+  static const int mbins3 = 30;
+  double mbinLimits3[mbins3+1];
+
+  for (Int_t i1 = 0; i1 < 31; i1++) { // all in 50 GeV steps
+    mbinLimits3[i1] = 100.+i1*50.;
   }
 
   bool withNLOMela = false;
@@ -224,668 +262,849 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   // READ TREES
   TChain* ggTree = new TChain(nameFile);
   if (also7TeV) {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
     if (moreFiles) {
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H210.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
     }
   } else {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H125.root");  ggTree->Add(nameFile2);
     if (moreFiles) {      
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H145.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H124.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H550.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H700.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H450.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H116.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H130.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H350.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H300.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H128.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H325.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H475.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H200.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H117.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H950.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H250.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H170.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H160.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H900.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H127.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H800.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H1000.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H500.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H135.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H375.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H190.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H119.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H129.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H180.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H750.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H275.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H118.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H650.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H121.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H120.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H122.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H220.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H400.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H850.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H115.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H525.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H150.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H600.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H123.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H575.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H425.root");  ggTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_H140.root");  ggTree->Add(nameFile2);
     } 
   }
   
   TChain* VBFTree = new TChain(nameFile);
   if (also7TeV) {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH125.root");    VBFTree->Add(nameFile2);
     if (moreFiles) {
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH115.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH210.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_VBFH230.root");  VBFTree->Add(nameFile2);
     }
   } else {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH125.root");  VBFTree->Add(nameFile2);
     if (moreFiles) {
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
-      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH200.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH150.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH128.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH135.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH700.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH950.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH650.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH500.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH300.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH600.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH450.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH375.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH250.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH850.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH275.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH525.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH750.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH350.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH126.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH160.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH116.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH220.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH117.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH575.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH190.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH425.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH325.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH475.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH121.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH145.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH127.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH122.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH129.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH130.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH119.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH1000.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH120.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH550.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH400.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH170.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH140.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH180.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH118.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH900.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH124.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH800.root");  VBFTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data//Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_VBFH123.root");  VBFTree->Add(nameFile2);
     }
   }
 
-  TChain* VHTree = new TChain(nameFile);
+  TChain* WHTree = new TChain(nameFile);
   if (also7TeV) {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
     if (moreFiles) {
-      
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
     }
   } else {
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
-    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_VH125.root");   VHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH125.root");   WHTree->Add(nameFile2);
     if (moreFiles) {
-      
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH110.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH115.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH120.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH126.root");   WHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH130.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH140.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH150.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH160.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH180.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_WH200.root");   WHTree->Add(nameFile2);
     }
   }
   
+  TChain* ZHTree = new TChain(nameFile);
+  if (also7TeV) {
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    if (moreFiles) {
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+    }
+  } else {
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH125.root");   ZHTree->Add(nameFile2);
+    if (moreFiles) {
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH110.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH115.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH120.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH126.root");   ZHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH130.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH140.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH150.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH160.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH180.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZH200.root");   ZHTree->Add(nameFile2);
+    }
+  }
+
+  TChain* ttHTree = new TChain(nameFile);
+  if (also7TeV) {
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    if (moreFiles) {
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+    }
+  } else {
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH125.root");   ttHTree->Add(nameFile2);
+    if (moreFiles) {
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH110.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH115.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH120.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH126.root");   ttHTree->Add(nameFile2); 
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH130.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH140.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH150.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH160.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH180.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+      sprintf(nameFile2,"root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ttH200.root");   ttHTree->Add(nameFile2);
+    }
+  }
+
   TChain* zzTree = new TChain(nameFile);
   if (also7TeV) {
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_ZZTo4e.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_ZZTo2e2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_ZZTo4tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_ZZTo4mu.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_ZZTo2mu2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_ZZTo4tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZZTo4e.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZZTo4mu.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ZZTo4tau.root");
   } else {
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4e.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo2e2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4mu.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo2mu2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
-    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4e.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4mu.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo4tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2mu.root"); 
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2e2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo2mu2tau.root");
+    zzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo4tau.root");
   }
   
   TChain* ggzzTree = new TChain(nameFile);
   if (also7TeV) {
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4e/HZZ4lTree_ggZZ4l.root");
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/4mu/HZZ4lTree_ggZZ4l.root");
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/2mu2e/HZZ4lTree_ggZZ2l2l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4e/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/4mu/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/2mu2e/HZZ4lTree_ggZZ2l2l.root");
   } else {
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4e/HZZ4lTree_ggZZ4l.root");
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/4mu/HZZ4lTree_ggZZ4l.root");
-    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/2mu2e/HZZ4lTree_ggZZ2l2l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4e/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/4mu/HZZ4lTree_ggZZ4l.root");
+    ggzzTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/2mu2e/HZZ4lTree_ggZZ2l2l.root");
   }
   
   TChain* dataTree = new TChain(nameFile);
   if (also7TeV) {
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/data/HZZ4lTree_DoubleEle.root");
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/data/HZZ4lTree_DoubleMu.root");
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/data/HZZ4lTree_DoubleOr.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/data/HZZ4lTree_DoubleEle.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/data/HZZ4lTree_DoubleMu.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/data/HZZ4lTree_DoubleOr.root");
   } else {
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
-    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root"); 
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
+    dataTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root"); 
   }
 
   TChain* crTree = new TChain(nameFile);
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
-  crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root"); 
-  if (also7TeV) {
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMssTree.root");
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEssTree.root");	
-    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMssTree.root");
+  if (!also7TeV) {
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRZLLTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRZLLTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRZLLTree.root"); 
+  } else {
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CRZLLTree.root");
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CRZLLTree.root");	
+    crTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CRZLLTree.root"); 
   }
 
   TChain* crosTree = new TChain(nameFile);
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
-  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
+  crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
   if (also7TeV) {
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
-    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEEEosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CREEMMosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMEEosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleEle_CRMMMMosTree.root");
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CREEMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleMu_CRMMMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CREEMMosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMEEosTree.root");	
+    crosTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR/CR/HZZ4lTree_DoubleOr_CRMMMMosTree.root");	
   }
 
   TChain* crzjTree = new TChain(nameFile);
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEEEssTree.root");
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEMMssTree.root");
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMEEssTree.root");
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMMMssTree.root");
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEMMssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMMMssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEMMssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMMMssTree.root");
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEMMssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMEEssTree.root");	
-  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/241112/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEEEssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CREEMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMEEssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50NoB_CRMMMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10NoB_CRMMMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M10B_CRMMMMssTree.root");
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CREEMMssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMEEssTree.root");	
+  crzjTree->Add("root://lxcms02//data/Higgs/rootuplesOut/130613b/PRODFSR_8TeV/CR/HZZ4lTree_DYJetsToLLTuneZ2M50B_CRMMMMssTree.root");
 
-  float mgg, mVBF, mzz, mggzz, mdata, mcr, mcros, mzj, mvh;
-  float wgg, wVBF, wzz, wggzz, wzj, wvh;
-  float ptgg, ptVBF, ptzz, ptggzz, ptdata, ptcr, ptzj, ptvh;
-  int njgg, njVBF, njzz, njggzz, njdata, njcr, njzj, njvh;
+  float mgg, mVBF, mzz, mggzz, mdata, mcr, mcros, mzj, mwh, mzh, mtth;
+  float wgg, wVBF, wzz, wggzz, wzj, wwh, wzh, wtth;
+  float ptgg, ptVBF, ptzz, ptggzz, ptdata, ptcr, ptzj, ptwh, ptzh, pttth;
+  int njgg, njVBF, njzz, njggzz, njdata, njcr, njzj, njwh, njzh, njtth;
+  float pSgg, pSVBF, pSzz, pSggzz, pSdata, pScr, pSzj, pSwh, pSzh, pStth;
+  float pBgg, pBVBF, pBzz, pBggzz, pBdata, pBcr, pBzj, pBwh, pBzh, pBtth;
   float nlogg = -999.;
   float nloVBF = -999.;
   float nlozz = -999.; 
@@ -893,69 +1112,129 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   float nlodata = -999.; 
   float nlocr = -999.; 
   float nlozj = -999.; 
-  float nlovh = -999.; 
-  float genptgg, genptvh, genptvbf;
-  int gprIdvh; 
+  float nlowh = -999.; 
+  float nlozh = -999.;
+  float nlotth = -999.; 
+  float genptgg, genptwh, genptzh, genpttth, genptvbf;
+  int gprIdwh; 
 
   ggTree->SetBranchAddress("ZZMass",&mgg);
   ggTree->SetBranchAddress("MC_weight",&wgg);
   ggTree->SetBranchAddress("ZZPt",&ptgg);
-  ggTree->SetBranchAddress("NJets",&njgg);
+  ggTree->SetBranchAddress("NJets30",&njgg);
   ggTree->SetBranchAddress("GenHPt",&genptgg);
   if (withNLOMela) ggTree->SetBranchAddress("melaLDWithPtY",&nlogg);
-  else ggTree->SetBranchAddress("ZZLD",&nlogg);
+  else {
+    ggTree->SetBranchAddress("p0plus_VAJHU",&pSgg);
+    ggTree->SetBranchAddress("bkg_VAMCFM",&pBgg);
+    nlogg = pSgg/(pSgg+pBgg);
+  }
 
   VBFTree->SetBranchAddress("ZZMass",&mVBF);
   VBFTree->SetBranchAddress("MC_weight",&wVBF);
   VBFTree->SetBranchAddress("ZZPt",&ptVBF);
-  VBFTree->SetBranchAddress("NJets",&njVBF);
+  VBFTree->SetBranchAddress("NJets30",&njVBF);
   VBFTree->SetBranchAddress("GenHPt",&genptvbf);
   if (withNLOMela) VBFTree->SetBranchAddress("melaLDWithPtY",&nloVBF);
-  else VBFTree->SetBranchAddress("ZZLD",&nloVBF);  
+  else {
+    VBFTree->SetBranchAddress("p0plus_VAJHU",&pSVBF);
+    VBFTree->SetBranchAddress("bkg_VAMCFM",&pBVBF);
+    nloVBF = pSVBF/(pSVBF+pBVBF);
+  }
 
-  VHTree->SetBranchAddress("ZZMass",&mvh);
-  VHTree->SetBranchAddress("MC_weight",&wvh);
-  VHTree->SetBranchAddress("ZZPt",&ptvh);
-  VHTree->SetBranchAddress("NJets",&njvh);
-  VHTree->SetBranchAddress("genProcessId",&gprIdvh);
-  VHTree->SetBranchAddress("GenHPt",&genptvh);
-  if (withNLOMela) VHTree->SetBranchAddress("melaLDWithPtY",&nlovh);
-  else VHTree->SetBranchAddress("ZZLD",&nlovh);
+  ZHTree->SetBranchAddress("ZZMass",&mzh);
+  ZHTree->SetBranchAddress("MC_weight",&wzh);
+  ZHTree->SetBranchAddress("ZZPt",&ptzh);
+  ZHTree->SetBranchAddress("NJets30",&njzh);
+  // ZHTree->SetBranchAddress("genProcessId",&gprIdzh);
+  ZHTree->SetBranchAddress("GenHPt",&genptzh);
+  if (withNLOMela) ZHTree->SetBranchAddress("melaLDWithPtY",&nlozh);
+  else {
+    ZHTree->SetBranchAddress("p0plus_VAJHU",&pSzh);
+    ZHTree->SetBranchAddress("bkg_VAMCFM",&pBzh);
+    nlozh = pSzh/(pSzh+pBzh);
+  }
+
+  ttHTree->SetBranchAddress("ZZMass",&mtth);
+  ttHTree->SetBranchAddress("MC_weight",&wtth);
+  ttHTree->SetBranchAddress("ZZPt",&pttth);
+  ttHTree->SetBranchAddress("NJets30",&njtth);
+  // ttHTree->SetBranchAddress("genProcessId",&gprIdtth);
+  ttHTree->SetBranchAddress("GenHPt",&genpttth);
+  if (withNLOMela) ttHTree->SetBranchAddress("melaLDWithPtY",&nlotth);
+  else {
+    ttHTree->SetBranchAddress("p0plus_VAJHU",&pStth);
+    ttHTree->SetBranchAddress("bkg_VAMCFM",&pBtth);
+    nlotth = pStth/(pStth+pBtth);
+  }
+
+  WHTree->SetBranchAddress("ZZMass",&mwh);
+  WHTree->SetBranchAddress("MC_weight",&wwh);
+  WHTree->SetBranchAddress("ZZPt",&ptwh);
+  WHTree->SetBranchAddress("NJets30",&njwh);
+  // WHTree->SetBranchAddress("genProcessId",&gprIdwh);
+  WHTree->SetBranchAddress("GenHPt",&genptwh);
+  if (withNLOMela) WHTree->SetBranchAddress("melaLDWithPtY",&nlowh);
+  else {
+    WHTree->SetBranchAddress("p0plus_VAJHU",&pSwh);
+    WHTree->SetBranchAddress("bkg_VAMCFM",&pBwh);
+    nlowh = pSwh/(pSwh+pBwh);
+  }
 
   zzTree->SetBranchAddress("ZZMass",&mzz);
   zzTree->SetBranchAddress("MC_weight",&wzz);
   zzTree->SetBranchAddress("ZZPt",&ptzz);
-  zzTree->SetBranchAddress("NJets",&njzz);
+  zzTree->SetBranchAddress("NJets30",&njzz);
   if (withNLOMela) zzTree->SetBranchAddress("melaLDWithPtY",&nlozz);
-  else zzTree->SetBranchAddress("ZZLD",&nlozz);
+  else {
+    zzTree->SetBranchAddress("p0plus_VAJHU",&pSzz);
+    zzTree->SetBranchAddress("bkg_VAMCFM",&pBzz);
+    nlozz = pSzz/(pSzz+pBzz);
+  }
 
   ggzzTree->SetBranchAddress("ZZMass",&mggzz);
   ggzzTree->SetBranchAddress("MC_weight",&wggzz);
   ggzzTree->SetBranchAddress("ZZPt",&ptggzz);
-  ggzzTree->SetBranchAddress("NJets",&njggzz);
+  ggzzTree->SetBranchAddress("NJets30",&njggzz);
   if (withNLOMela) ggzzTree->SetBranchAddress("melaLDWithPtY",&nloggzz);
-  else ggzzTree->SetBranchAddress("ZZLD",&nloggzz);
+  else {
+    ggzzTree->SetBranchAddress("p0plus_VAJHU",&pSggzz);
+    ggzzTree->SetBranchAddress("bkg_VAMCFM",&pBggzz);
+    nloggzz = pSggzz/(pSggzz+pBggzz);
+  }
 
   dataTree->SetBranchAddress("ZZMass",&mdata);
   dataTree->SetBranchAddress("ZZPt",&ptdata);
-  dataTree->SetBranchAddress("NJets",&njdata);
+  dataTree->SetBranchAddress("NJets30",&njdata);
   if (withNLOMela) dataTree->SetBranchAddress("melaLDWithPtY",&nlodata);
-  else dataTree->SetBranchAddress("ZZLD",&nlodata);
+  else {
+    dataTree->SetBranchAddress("p0plus_VAJHU",&pSdata);
+    dataTree->SetBranchAddress("bkg_VAMCFM",&pBdata);
+    nlodata = pSdata/(pSdata+pBdata);
+  }
 
   crTree->SetBranchAddress("ZZMass",&mcr);
   crTree->SetBranchAddress("ZZPt",&ptcr);
-  crTree->SetBranchAddress("NJets",&njcr);
+  crTree->SetBranchAddress("NJets30",&njcr);
   if (withNLOMela) crTree->SetBranchAddress("melaLDWithPtY",&nlocr);
-  else crTree->SetBranchAddress("ZZLD",&nlocr);
+  else {
+    crTree->SetBranchAddress("p0plus_VAJHU",&pScr);
+    crTree->SetBranchAddress("bkg_VAMCFM",&pBcr);
+    nlocr = pScr/(pScr+pBcr);
+  }
 
   crosTree->SetBranchAddress("ZZMass",&mcros);
 
   crzjTree->SetBranchAddress("ZZMass",&mzj);
   crzjTree->SetBranchAddress("MC_weight",&wzj);
   crzjTree->SetBranchAddress("ZZPt",&ptzj);
-  crzjTree->SetBranchAddress("NJets",&njzj);
+  crzjTree->SetBranchAddress("NJets30",&njzj);
   if (withNLOMela) crzjTree->SetBranchAddress("melaLDWithPtY",&nlozj);
-  else crzjTree->SetBranchAddress("ZZLD",&nlozj);
+  else {
+    crzjTree->SetBranchAddress("p0plus_VAJHU",&pSzj);
+    crzjTree->SetBranchAddress("bkg_VAMCFM",&pBzj);
+    nlozj = pSzj/(pSzj+pBzj);
+  }
 
   char nameSyst[200]; 
   char UcasePt[8] = "PT";
@@ -1019,8 +1298,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   TFile f140w("newweights/wh140_weightsNLO.root");
   wNLO[2] = (TH1F*)f140w.Get("wei");
 
-  // cout << wNLO[1]->GetEntries() << endl;
-
   TCanvas can2("can2","The 2nd canvas",15.,15.,700.,500.); 
   TCanvas can("can","The canvas",5.,5.,600.,700.); 
   can.Divide(1,2);
@@ -1043,19 +1320,19 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"pthMela%d",i);
     pthMela[i] = new TH2F(nameFile,"pt",mbins,mbinLimits,ptmbins,ptmbinLimits);
     pthMela[i]->Sumw2();
-  }
+   }
 
   // vbf
   TH2F* ptvbf = new TH2F("ptvbf","pt",mbins,mbinLimits,ptmbins,ptmbinLimits);
   ptvbf->Sumw2();
-  
+   
   TH2F* ptvbfMass[massRanges];
   TH2F* ptvbfMela[melaRanges];
-  for (int i = 0; i < massRanges; i++) {
+   for (int i = 0; i < massRanges; i++) {
     sprintf(nameFile,"ptvbfMass%d",i);
     ptvbfMass[i] = new TH2F(nameFile,"pt",mbins,mbinLimits,ptmbins,ptmbinLimits);
     ptvbfMass[i]->Sumw2();
-  }
+   }
   for (int i = 0; i < melaRanges; i++) {
     sprintf(nameFile,"ptvbfMela%d",i);
     ptvbfMela[i] = new TH2F(nameFile,"pt",mbins,mbinLimits,ptmbins,ptmbinLimits);
@@ -1065,6 +1342,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   // zz
   TH2F* pth1 = new TH2F("pth1","pt",mbins,mbinLimits,ptmbins,ptmbinLimits);
   pth1->Sumw2();
+
   TH2F* pth1Mass[massRanges];
   TH2F* pth1Mela[melaRanges];
   for (int i = 0; i < massRanges; i++) {
@@ -1100,16 +1378,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
  
   if (whichtype == -7) {
 
-    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
-      VHTree->GetEntry(iEvt);
-      if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
-	if (gprIdvh == 26) {
-          int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mvh);   
-	  int theBin = wNLO[theHist]->FindBin(genptvh);
-	  pth->Fill(mvh,ptVar(ptvh,mvh,overM),wvh*wNLO[theHist]->GetBinContent(theBin));
-	  pth2->Fill(mvh,ptVar(ptvh,mvh,overM),wvh);
-	  ptvbf->Fill(mvh,ptVar(ptvh,mvh,overM),wvh);
-	}
+    for (Int_t iEvt = 0; iEvt < ZHTree->GetEntries() ; ++iEvt) {
+      ZHTree->GetEntry(iEvt);
+      if (mzh < massLimits[massRanges] && mzh > massLimits[0] && ptzh < 400. && notVBFtagged(njzh)) {
+	int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mzh);   
+	int theBin = wNLO[theHist]->FindBin(genptzh);
+	pth->Fill(mzh,ptVar(ptzh,mzh,overM),wzh*wNLO[theHist]->GetBinContent(theBin));
+	pth2->Fill(mzh,ptVar(ptzh,mzh,overM),wzh);
+   	ptvbf->Fill(mzh,ptVar(ptzh,mzh,overM),wzh);
       }
     } 
     
@@ -1119,16 +1395,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   
   if (whichtype == -6) {
     
-    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
-      VHTree->GetEntry(iEvt);
-      if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
-	if (gprIdvh == 24) {
-          int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mvh);   
-	  int theBin = wNLO[theHist]->FindBin(genptvh);
-	  pth->Fill(mvh,ptVar(ptvh,mvh,overM),wvh*wNLO[theHist]->GetBinContent(theBin));
-	  pth2->Fill(mvh,ptVar(ptvh,mvh,overM),wvh);
-	  ptvbf->Fill(mvh,ptVar(ptvh,mvh,overM),wvh);
-	}
+    for (Int_t iEvt = 0; iEvt < WHTree->GetEntries() ; ++iEvt) {
+      WHTree->GetEntry(iEvt);
+      if (mwh < massLimits[massRanges] && mwh > massLimits[0] && ptwh < 400. && notVBFtagged(njwh)) {
+	int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mwh);   
+	int theBin = wNLO[theHist]->FindBin(genptwh);
+	pth->Fill(mwh,ptVar(ptwh,mwh,overM),wwh*wNLO[theHist]->GetBinContent(theBin));
+	pth2->Fill(mwh,ptVar(ptwh,mwh,overM),wwh);
+   	ptvbf->Fill(mwh,ptVar(ptwh,mwh,overM),wwh);
       }
     } 
     
@@ -1174,7 +1448,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 	  if (fabs(ratiopdf[i]->GetBinContent(theBin) - 1.) > fabs(thisDiff - 1.)) thisDiff = ratiopdf[i]->GetBinContent(theBin);
 	}
 	ptvbf->Fill(mVBF,ptVar(ptVBF,mVBF,overM),wVBF*thisDiff);
-        // cout << "thisDiff PDF-VBF = " << thisDiff << endl;   
+	// cout << "thisDiff PDF-VBF = " << thisDiff << endl;   
       }
     } 
 
@@ -1247,7 +1521,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
       	newW = wbtMass->GetBinContent(wbtMass->FindBin(genptgg));
 	pth->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW);
 	pth2->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*newW);
-	ptvbf->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*newW);
+ 	ptvbf->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*newW);
       }
     } 
     
@@ -1258,12 +1532,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
       ggTree->GetEntry(iEvt);
       if (mgg < massLimits[massRanges] && mgg > massLimits[0] && ptgg < 400. && notVBFtagged(njgg)) {
-        int theHist = returnClosestMass(nWeightResum,massResum,mgg); 
+        int theHist = returnClosestMass(nWeightResum,massResum,mgg);
+        if (iEvt%10000 == 1) cout << "check gg: " << theHist << " " << mgg;  
 	int theBin = wQuar[theHist]->FindBin(genptgg);
 	float oldW = 1.;
         if (mgg > 400) oldW = wHalf[theHist]->GetBinContent(theBin);
 	pth->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW);
 	pth1->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*wQuar[theHist]->GetBinContent(theBin));
+        if (iEvt%10000 == 1) cout << " " << wQuar[theHist]->GetBinContent(theBin) << " " << endl;
 	pth2->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*wOne[theHist]->GetBinContent(theBin));
 	ptvbf->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW*wQuar[theHist]->GetBinContent(theBin));
       }
@@ -1345,19 +1621,19 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth->SetName(nameFile);
     // pth->Scale(1./pth->Integral());
-    adjustHistogram(pth);   pth->Write();
+    adjustHistogram(pth,true,600.,1000.);   pth->Write();
     for (int i = 0; i < massRanges; i++) {
       sprintf(nameFile,"%sH_Mass%d-%d",LcasePt,int(massLimits[i]),int(massLimits[i+1]));
       pthMass[i]->SetName(nameFile);
       // pthMass[i]->Scale(1./pthMass[i]->Integral());
-      adjustHistogram(pthMass[i]);   pthMass[i]->Write();
+      adjustHistogram(pthMass[i],true,600.,1000.);   pthMass[i]->Write();
     }
     for (int i = 0; i < melaRanges; i++) {
       if (i == melaRanges - 1) sprintf(nameFile,"%sH_Mela0%d-10",LcasePt,int(melaLimits[i]*10));
       else sprintf(nameFile,"%sH_Mela0%d-0%d",LcasePt,int(melaLimits[i]*10),int(melaLimits[i+1]*10));
       pthMela[i]->SetName(nameFile);
       // pthMela[i]->Scale(1./pthMela[i]->Integral());
-      adjustHistogram(pthMela[i]);   pthMela[i]->Write();
+      adjustHistogram(pthMela[i],true,600.,1000.);   pthMela[i]->Write();
     }
     
     ptmhgg->SetName("ptVsM");   ptmhgg->Write();
@@ -1407,19 +1683,19 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     ptvbf->SetName(nameFile);
     // ptvbf->Scale(1./ptvbf->Integral());
-    adjustHistogram(ptvbf);   ptvbf->Write();
+    adjustHistogram(ptvbf,true,600.,1000.);   ptvbf->Write();
     for (int i = 0; i < massRanges; i++) {
       sprintf(nameFile,"%sH_Mass%d-%d",LcasePt,int(massLimits[i]),int(massLimits[i+1]));
       ptvbfMass[i]->SetName(nameFile);
       // ptvbfMass[i]->Scale(1./ptvbfMass[i]->Integral());
-      adjustHistogram(ptvbfMass[i]);   ptvbfMass[i]->Write();
+      adjustHistogram(ptvbfMass[i],true,600.,1000.);   ptvbfMass[i]->Write();
     }
     for (int i = 0; i < melaRanges; i++) {
       if (i == melaRanges - 1) sprintf(nameFile,"%sH_Mela0%d-10",LcasePt,int(melaLimits[i]*10));
       else sprintf(nameFile,"%sH_Mela0%d-0%d",LcasePt,int(melaLimits[i]*10),int(melaLimits[i+1]*10));
       ptvbfMela[i]->SetName(nameFile);
       // ptvbfMela[i]->Scale(1./ptvbfMela[i]->Integral());
-      adjustHistogram(ptvbfMela[i]);   ptvbfMela[i]->Write();
+      adjustHistogram(ptvbfMela[i],true,600.,1000.);   ptvbfMela[i]->Write();
     }
     
     ptmhvbf->SetName("ptVsM");   ptmhvbf->Write();
@@ -1470,19 +1746,19 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth1->SetName(nameFile);
     // pth1->Scale(1./pth1->Integral());
-    adjustHistogram(pth1);   pth1->Write();
+    adjustHistogram(pth1,true,500.,700.);   pth1->Write();
     for (int i = 0; i < massRanges; i++) {
       sprintf(nameFile,"%sH_Mass%d-%d",LcasePt,int(massLimits[i]),int(massLimits[i+1]));
       pth1Mass[i]->SetName(nameFile);
       // pth1Mass[i]->Scale(1./pth1Mass[i]->Integral());
-      adjustHistogram(pth1Mass[i]);   pth1Mass[i]->Write();
+      adjustHistogram(pth1Mass[i],true,500.,700.);   pth1Mass[i]->Write();
     }
     for (int i = 0; i < melaRanges; i++) {
       if (i == melaRanges - 1) sprintf(nameFile,"%sH_Mela0%d-10",LcasePt,int(melaLimits[i]*10));
       else sprintf(nameFile,"%sH_Mela0%d-0%d",LcasePt,int(melaLimits[i]*10),int(melaLimits[i+1]*10));
       pth1Mela[i]->SetName(nameFile);
       // pth1Mela[i]->Scale(1./pth1Mela[i]->Integral());
-      adjustHistogram(pth1Mela[i]);   pth1Mela[i]->Write();
+      adjustHistogram(pth1Mela[i],true,500.,700.);   pth1Mela[i]->Write();
     }
     
     ptmhzz->SetName("ptVsM");   ptmhzz->Write();
@@ -1512,11 +1788,96 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
       if (mcr < massLimits[massRanges] && mcr > massLimits[0] && ptcr < 400. && notVBFtagged(njcr)) {
-	pth2->Fill(mcr,ptVar(ptcr,mcr,overM));
+	// pth2->Fill(mcr,ptVar(ptcr,mcr,overM));
         ptkdcr->Fill(nlocr,ptVar(ptcr,mcr,overM));
       }
       ptmhcr->Fill(mcr,ptVar(ptcr,mcr,overM));
     } 
+
+    // Read template from fit!
+    char thePar[10];
+    char equalS[1];
+    char dashS[1];
+    char pmS[3];
+    char theLimit1[10];
+    char theLimit2[10];
+    float fitted, error;
+    
+    if (also7TeV) sprintf(nameFile,"text/paramsPTOverMCJLST_zx125_7TeV_Default.txt");
+    else sprintf(nameFile,"text/paramsPTOverMCJLST_zx125_8TeV_Default.txt");
+ 
+    ifstream theFile(nameFile);
+  
+    float bbdef, bbup;
+    float Tdef, Tup;
+    float bbduedef, bbdueup;
+    float fexpdef, fexpup;
+    float ndef, nup;
+    float mdef, mup;
+    float nduedef, ndueup;
+
+    // first store defaults for 125 (in a random array)
+    while (theFile >> thePar >> equalS >> fitted >> pmS >> error >> theLimit1 >> dashS >> theLimit2) {
+    
+      if (!strcmp(thePar,"bbup") || !strcmp(thePar,"bb") ) { bbdef = fitted; bbup = fitted + error; }
+      if (!strcmp(thePar,"Tup") || !strcmp(thePar,"T") ) { Tdef = fitted; Tup = fitted + error; }
+      if (!strcmp(thePar,"bb2up") || !strcmp(thePar,"bb2") )  { bbduedef = fitted; bbdueup = fitted + error; }
+      if (!strcmp(thePar,"fexpup") || !strcmp(thePar,"fexp") ) { fexpdef = fitted; fexpup = fitted + error; }
+      if (!strcmp(thePar,"nup") || !strcmp(thePar,"n") ) { ndef = fitted; nup = fitted + error; }
+      if (!strcmp(thePar,"mup") || !strcmp(thePar,"m") ) { mdef = fitted; mup = fitted + error; }
+      if (!strcmp(thePar,"n2up") || !strcmp(thePar,"n2") )  { nduedef = fitted; ndueup = fitted + error; }
+    }
+
+    RooRealVar* ptoverm = new RooRealVar("ptoverm","p_{T}/M^{4l}",0.,4.);
+
+    RooRealVar mupVar("mupVar","emme", 1.,-1000000.,1000000.);
+    RooRealVar nupVar("nupVar","enne", 0.93, -1000000.,1000000.);
+    RooRealVar n2upVar("n2upVar","enne2", 0.75, -1000000.,1000000.);
+    RooRealVar bbupVar("bbupVar","bibi",0.02, -1000000.,1000000.);
+    RooRealVar TupVar("TupVar","tti",0.2,-1000000.,1000000.);
+    RooRealVar bb2upVar("bb2upVar","bibi2",0.02, -1000000.,1000000.);
+    RooRealVar fexpupVar("fexpupVar","f_exp",0.02, -1000000.,1000000.);
+    
+    RooModifTsallis* rtup = new RooModifTsallis("rtup","rtup",*ptoverm,
+			    mupVar,nupVar,n2upVar,bbupVar,bb2upVar,TupVar,fexpupVar);   
+
+    mupVar.setVal(mdef);
+    nupVar.setVal(ndef);
+    n2upVar.setVal(nduedef);
+    bbupVar.setVal(bbdef);
+    TupVar.setVal(Tdef);
+    bb2upVar.setVal(bbduedef);
+    fexpupVar.setVal(fexpdef);
+
+    for(int i=1; i<=pth2->GetNbinsX(); i++){    
+      for(int j=1; j<=pth2->GetNbinsY(); j++){
+	if (pth2->GetXaxis()->GetBinCenter(i) < 200.) {
+	  ptoverm->setVal(pth2->GetYaxis()->GetBinCenter(j)/pth2->GetXaxis()->GetBinCenter(i));
+	} else {
+	  ptoverm->setVal(pth2->GetYaxis()->GetBinCenter(j)/200.);
+	}
+	pth2->SetBinContent(i,j,rtup->getVal());
+      }
+    }
+
+    mupVar.setVal(mup);
+    nupVar.setVal(nup);
+    n2upVar.setVal(ndueup);
+    bbupVar.setVal(bbup);
+    TupVar.setVal(Tup);
+    bb2upVar.setVal(bbdueup);
+    fexpupVar.setVal(fexpup);
+
+    for(int i=1; i<=pth2->GetNbinsX(); i++){    
+      for(int j=1; j<=pth2->GetNbinsY(); j++){
+        if (pth2->GetXaxis()->GetBinCenter(i) < 200.) {
+	  ptoverm->setVal(pth2->GetYaxis()->GetBinCenter(j)/pth2->GetXaxis()->GetBinCenter(i));
+	} else {
+	  ptoverm->setVal(pth2->GetYaxis()->GetBinCenter(j)/200.);
+	}
+	pth2->SetBinError(i,j,fabs(rtup->getVal()-pth2->GetBinContent(i,j)));
+      }
+    }
 
     sprintf(nameFile,"selRootFiles/%s_zx_TEMPL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"selRootFiles/%s_zx_TEMPL_7TeV.root",UcasePt);
@@ -1547,8 +1908,10 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     for (Int_t iEvt = 0; iEvt < ggzzTree->GetEntries() ; ++iEvt) {
       ggzzTree->GetEntry(iEvt);
+      if (iEvt%1000 == 1) cout << "Entering ggZZ event " << iEvt << endl;
       if (mggzz < massLimits[massRanges] && mggzz > massLimits[0] && ptggzz < 400. && notVBFtagged(njggzz)) {
 	pth3->Fill(mggzz,ptVar(ptggzz,mggzz,overM),wggzz);
+        if (iEvt%1000 == 1) cout << "Filling ggZZ event  " << iEvt << endl;
       }
     } 
 
@@ -1558,7 +1921,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth3->SetName(nameFile);
     // pth3->Scale(1./pth3->Integral());
-    adjustHistogram(pth3);   pth3->Write();
+    adjustHistogram(pth3,true,300.,600.);   pth3->Write();
     // evalBinMigration(pth3,pth3,"",false);
     f4.Close();
     can2.cd();   gPad->SetLogx();
@@ -1570,18 +1933,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"newfigs/%s_ggzzDefaultTemplate_%dTeV.pdf",LcasePt,sqrts);
     can2.SaveAs(nameFile); 
 
-    for (Int_t iEvt = 0; iEvt < VHTree->GetEntries() ; ++iEvt) {
-      VHTree->GetEntry(iEvt);
-      if (mvh < massLimits[massRanges] && mvh > massLimits[0] && ptvh < 400. && notVBFtagged(njvh)) {
-        int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mvh);  
-      	int theBin = wNLO[theHist]->FindBin(genptvh);
-      	if (gprIdvh == 24) {
-	  pth4->Fill(mvh,ptVar(ptvh,mvh,overM),wvh*wNLO[theHist]->GetBinContent(theBin));
-	} else if (gprIdvh == 26) {
-	  pth5->Fill(mvh,ptVar(ptvh,mvh,overM),wvh*wNLO[theHist]->GetBinContent(theBin));
-	} else {
-	  pth6->Fill(mvh,ptVar(ptvh,mvh,overM),wvh);
-	}
+    for (Int_t iEvt = 0; iEvt < WHTree->GetEntries() ; ++iEvt) {
+      WHTree->GetEntry(iEvt);
+      if (iEvt%1000 == 1) cout << "Entering WH event " << iEvt << endl;
+      if (mwh < massLimits[massRanges] && mwh > massLimits[0] && ptwh < 400. && notVBFtagged(njwh)) {
+        int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mwh);  
+      	int theBin = wNLO[theHist]->FindBin(genptwh);
+	pth4->Fill(mwh,ptVar(ptwh,mwh,overM),wwh*wNLO[theHist]->GetBinContent(theBin));
+        if (iEvt%1000 == 1) cout << "Filling WH event " << iEvt << endl;
       }
     } 
     
@@ -1591,7 +1950,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth4->SetName(nameFile);
     // pth4->Scale(1./pth4->Integral());
-    adjustHistogram(pth4);   pth4->Write();
+    adjustHistogram(pth4,false,0.,0.,true,200.,true,110.);   pth4->Write();
     // evalBinMigration(pth4,pth4,"",false);
     f5.Close();
     can2.cd();   gPad->SetLogx();
@@ -1603,13 +1962,22 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"newfigs/%s_whDefaultTemplate_%dTeV.pdf",LcasePt,sqrts);
     can2.SaveAs(nameFile); 
 
+    for (Int_t iEvt = 0; iEvt < ZHTree->GetEntries() ; ++iEvt) {
+      ZHTree->GetEntry(iEvt);
+      if (mzh < massLimits[massRanges] && mzh > massLimits[0] && ptzh < 400. && notVBFtagged(njzh)) {
+        int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mzh);  
+      	int theBin = wNLO[theHist]->FindBin(genptzh);
+	pth5->Fill(mzh,ptVar(ptzh,mzh,overM),wzh*wNLO[theHist]->GetBinContent(theBin));	
+      }
+    } 
+
     sprintf(nameFile,"selRootFiles/%s_zh_TEMPL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"selRootFiles/%s_zh_TEMPL_7TeV.root",UcasePt);
     TFile f6(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth5->SetName(nameFile);
     // pth5->Scale(1./pth5->Integral());
-    adjustHistogram(pth5);   pth5->Write();
+    adjustHistogram(pth5,false,0.,0.,true,250.,true,110.);   pth5->Write();
     // evalBinMigration(pth5,pth5,"",false);
     f6.Close();
     can2.cd();   gPad->SetLogx();
@@ -1621,13 +1989,20 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"newfigs/%s_zhDefaultTemplate_%dTeV.pdf",LcasePt,sqrts);
     can2.SaveAs(nameFile); 
 
+    for (Int_t iEvt = 0; iEvt < ttHTree->GetEntries() ; ++iEvt) {
+      ttHTree->GetEntry(iEvt);
+      if (mtth < massLimits[massRanges] && mtth > massLimits[0] && pttth < 400. && notVBFtagged(njtth)) {
+	pth6->Fill(mtth,ptVar(pttth,mtth,overM),wtth);
+      }
+    } 
+
     sprintf(nameFile,"selRootFiles/%s_tth_TEMPL_8TeV.root",UcasePt);
     if (also7TeV) sprintf(nameFile,"selRootFiles/%s_tth_TEMPL_7TeV.root",UcasePt);
     TFile f7(nameFile,"RECREATE");
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth6->SetName(nameFile);
     // pth6->Scale(1./pth6->Integral());
-    adjustHistogram(pth6);   pth6->Write();
+    adjustHistogram(pth6,true,10.,10.,true,200.);   pth6->Write();
     // evalBinMigration(pth6,pth6,"",false);
     f7.Close();
     can2.cd();   gPad->SetLogx();
@@ -2111,30 +2486,47 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   can2.cd();   gPad->SetLogx();   
   sprintf(nameFile,"%sH_%s",LcasePt,nameSyst);
      
-  adjustHistogram(pth);
-  adjustHistogram(pth1);
-  adjustHistogram(pth2);
-  adjustHistogram(ptvbf); 
-
   // cout << whichtype << " " << nameFile << endl;
-  if (whichtype == -4 || whichtype == -5 || whichtype == 6 || whichtype == 7) {
+  if (whichtype == -4 || whichtype == -5) { 
     ptvbf->SetName(nameFile);
-    ptvbf->Write();
-    ptvbf->Draw("COLZ");
-  } else if (whichtype == -3 || whichtype == 3 || whichtype == 4 || whichtype == 5) {
+    adjustHistogram(ptvbf,true,600.,1000.);
+    ptvbf->Write();  ptvbf->Draw("COLZ");
+  } else if (whichtype == 6 || whichtype == 7) {
+    ptvbf->SetName(nameFile);
+    adjustHistogram(ptvbf,true,600.,1000.);
+    ptvbf->Write(); ptvbf->Draw("COLZ");
+  } else if (whichtype == -3 ) {    
     pth->SetName(nameFile);
+    adjustHistogram(pth,true,600.,1000.);
     pth->Write();
     pth->Draw("COLZ");
-  } else if (whichtype == -2 || whichtype == -6 || whichtype == -7) {
+  } else if (whichtype == 3 || whichtype == 4 || whichtype == 5) {
+    pth->SetName(nameFile);
+    adjustHistogram(pth,true,500.,700.);
+    pth->Write();
+    pth->Draw("COLZ");
+  } else if (whichtype == -2) {
+    sprintf(nameFile2,"%sUp",nameFile);
+    pth2->SetName(nameFile2);
+    adjustHistogram(pth2,true,600.,1000.);
+    pth2->Write();
+    pth2->Draw("COLZ");
+    sprintf(nameFile2,"%sDown",nameFile);
+    pth1->SetName(nameFile2);
+    adjustHistogram(pth1,true,600.,1000.);
+    pth1->Write();
+  } else if (whichtype == -6) { 
     pth2->SetName(nameFile);
+    adjustHistogram(pth2,false,0.,0.,true,200.,true,110.);
+    pth2->Write();
+    pth2->Draw("COLZ");
+  } else if (whichtype == -7) {
+    pth2->SetName(nameFile);
+    adjustHistogram(pth2,false,0.,0.,true,250.,true,110.);
     pth2->Write();
     pth2->Draw("COLZ");
   }
-  /* sprintf(nameFile,"%sH_Default",LcasePt);
-  TH1F* def = (TH1F*)f1.Get(nameFile);
-  if (whichtype == -4 || whichtype == -5 || whichtype == 6 || whichtype == 7) evalBinMigration(def,ptvbf,nameSyst,true);
-  else if (whichtype == -3 || whichtype == 3 ||  whichtype == 4 || whichtype == 5) evalBinMigration(def,pth,nameSyst,true);
-  else if (whichtype == -2 || whichtype == -6 || whichtype == -7) evalBinMigration(def,pth2,nameSyst,true); */
+ 
   f1.Close();
   sprintf(nameFile,"newfigs/%s_%s%sTemplate_%dTeV.gif",LcasePt,whichSample,nameSyst,sqrts);
   can2.SaveAs(nameFile);

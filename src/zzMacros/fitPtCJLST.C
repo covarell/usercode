@@ -31,7 +31,7 @@
 
 // #include "PDFs/RooTsallis.h"
 // #include "PDFs/RooTsallis2.h"
-#include "PDFs/RooTsallis3.h" 
+#include "PDFs/RooModifTsallis.h" 
 
 using namespace RooFit;
 
@@ -120,156 +120,176 @@ RooDataHist* withSmartBinning(TH1F* source, RooRealVar* var, float min, float ma
   return result;
 }
 
-void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1, 
-		bool correctErrors = false, string changeParName = "",
-		string systString = "Default")
+void fitPtCJLST(int mass = 125, int LHCsqrts = 7, int whichtype = 1, 
+		     bool correctErrors = false, /* string changeParName = "", */
+		     bool showErrorPDFs = false, string systString = "Default")
 
 // whichtype
 // 0 - gg Signal
 // 1 - VBF Signal
 // 2 - ZZ
 // 3 - ZX
-
-// So far only for 125 GeV...
+// 4 - ggZZ
+// 5 - WH
+// 6 - ZH
+// 7 - ttH
 
 {
 
-  string nameSample[4] = {"gg","vbf","zz","zx"};
-  float maxType[4] = {300.,400.,250.,200.};   // GeV
-  float rebinType[4] = {1,2,1,1};
-  
-  char fileToOpen[200];
-  sprintf(fileToOpen,"PT_%s_SEL_%dTeV.root",nameSample[whichtype].c_str(),LHCsqrts);
-  if (whichtype == 3) sprintf(fileToOpen,"PT_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
+  string changeParName = "";
+  if (systString == "Default") changeParName = "up";
 
-  RooRealVar* pt = new RooRealVar("pt","p_{T}^{H}",0.,maxType[whichtype],"GeV/c");
+  string nameSample[8] = {"gg","vbf","zz","zx","ggzz","wh","zh","tth"};
+  float maxType[8] = {200.,400.,200.,200.,200.,400.,400.,500.};   
+  float rebinType[8] = {1,2,1,1,3,10,10,40};
+  
+  for (int t = 0; t < 8; t++) {
+    if (mass > 150) maxType[t] = int(117.90*maxType[t]/sqrt(mass-10.91))/10.;
+  }
+
+  char fileToOpen[200];
+  sprintf(fileToOpen,"selRootFiles/PT_%s%d_SEL_%dTeV.root",nameSample[whichtype].c_str(),mass,LHCsqrts);
+  // if (whichtype == 3) sprintf(fileToOpen,"PTOVERM_%s_SEL_allTeV.root",nameSample[whichtype].c_str());
+
+  RooRealVar* ptoverm = new RooRealVar("ptoverm","p_{T}",0.,maxType[whichtype],"GeV/c");
  
   TFile input(fileToOpen);
+  // if (systString == "Mass" || systString == "Mela") {
+  //  sprintf(fileToOpen,"ptovermH_%sUp",systString.c_str());
+  // } else {
   sprintf(fileToOpen,"ptH_%s",systString.c_str());
-  TH1F* ptH = (TH1F*)input.Get(fileToOpen);
+  //}
+  TH1F* ptovermH = (TH1F*)input.Get(fileToOpen);
   
-  if (rebinType[whichtype] > 1) ptH->Rebin(rebinType[whichtype]);
-  if (maxType[whichtype] < ptH->GetBinLowEdge(ptH->GetNbinsX() + 1) - ptH->GetBinWidth(1)) {
-    int theBin = ptH->FindBin(maxType[whichtype]);
-    ptH->GetXaxis()->SetRange(1,theBin-1);
+  if (rebinType[whichtype] > 1) ptovermH->Rebin(rebinType[whichtype]);
+  if (maxType[whichtype] < ptovermH->GetBinLowEdge(ptovermH->GetNbinsX() + 1) - ptovermH->GetBinWidth(1)) {
+    int theBin = ptovermH->FindBin(maxType[whichtype]);
+    ptovermH->GetXaxis()->SetRange(1,theBin-1);
   }
 
   gROOT->ProcessLine(".L mytdrstyle.C");
   gROOT->ProcessLine("setTDRStyle()");
   
   // cout << endl << "Signal " << endl;   
-  pt->setBins(ptH->GetNbinsX());
+  ptoverm->setBins(ptovermH->GetNbinsX());
 
-  RooDataHist* rdh = new RooDataHist("rdh","Some dataset",RooArgList(*pt),Import(*ptH,kFALSE));
+  RooDataHist* rdh = new RooDataHist("rdh","Some dataset",RooArgList(*ptoverm),Import(*ptovermH,kFALSE));
  
   // fit definitions
-  RooWorkspace *ws = new RooWorkspace("ws");
+  // RooWorkspace *ws = new RooWorkspace("ws");
 
-  RooRealVar m("m","emme", 110.,10., 1200.);
-  RooRealVar n("n","enne", 0.93, 0.5, 15.);
+  RooRealVar m("m","emme", 1.,10., 400.);
+  RooRealVar n("n","enne", 0.93, 0.05, 15.);
   RooRealVar n2("n2","enne2", 0.75, 0.5, 15.);
-  RooRealVar bb("bb","bibi",0.02, 0.0005, 0.1);
-  RooRealVar T("T","tti",0.2,0.000005,1.);
-  RooRealVar bb2("bb2","bibi2",0.02, 0.0005, 0.1);
+  RooRealVar bb("bb","bibi",0.02, 0.000005, 20.0);
+  RooRealVar T("T","tti",0.2,0.00000005,1.);
+  RooRealVar bb2("bb2","bibi2",0.02, 0.0005, 10.0);
   RooRealVar fexp("fexp","f_exp",0.02, 0.0, 1.0);
-  if (whichtype == 2) {
+  if (whichtype == 0) {
     if (LHCsqrts == 8) {
-      m.setVal(79.885);   // m.setConstant(kTRUE);    
-      bb.setVal(0.020); // bb.setConstant(kTRUE);
-      n2.setVal(1.0678);  // n2.setConstant(kTRUE);
-      n.setVal(1.010);    // n.setConstant(kTRUE);
+      m.setVal(3.319);   // m.setConstant(kTRUE);
+      n.setVal(0.7606);    if (systString != "Default" || mass != 125) n.setConstant(kTRUE); 
+      n2.setVal(0.8061);   n2.setConstant(kTRUE);
+      bb.setVal(3.728);   // bb.setConstant(kTRUE);
+      T.setVal(0.00333);   // T.setConstant(kTRUE);
+      bb2.setVal(1.7172);    // bb2.setConstant(kTRUE);
+      fexp.setVal(0.002144);   if (systString != "Default" || mass != 125) fexp.setConstant(kTRUE);
+    } else {
+      m.setVal(0.061);   // m.setConstant(kTRUE);
+      n.setVal(1.6141);   if (systString == "Resummation" || systString == "TopMass")  n.setConstant(kTRUE);
+      n2.setVal(1.3294);   n2.setConstant(kTRUE);
+      bb.setVal(4.2761);   // bb.setConstant(kTRUE);
+      T.setVal(0.0361);   // T.setConstant(kTRUE);
+      bb2.setVal(1.6643);   bb2.setConstant(kTRUE);
+      fexp.setVal(0.0004);   // fexp.setConstant(kTRUE);
+    }
+  } else if (whichtype == 1) {
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);   n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(0.02048);   bb.setConstant(kTRUE);
+    T.setVal(0.16115);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE); // T.setConstant(kTRUE);
+    bb2.setVal(1.0024);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.005);   fexp.setConstant(kTRUE);
+    if (mass > 300) {
+      fexp.setVal(0.0);   fexp.setConstant(kFALSE);
+    }
+    if (mass > 500) {
+      bb2.setVal(5.0);  //  bb2.setConstant(kFALSE);
+    }
+    if (mass > 500) {
+      bb.setVal(15.0);  //  bb.setConstant(kFALSE);
+    }
+  } else if (whichtype == 2) {
+    if (LHCsqrts == 8) {
+      m.setVal(1.0476);   // m.setConstant(kTRUE);    
+      bb.setVal(3.3088);  // if (mass != 140) bb.setConstant(kTRUE);
+      n2.setVal(0.7146);   n2.setConstant(kTRUE);
+      n.setVal(0.9518);      n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.088077);   T.setConstant(kTRUE);
+      T.setVal(0.0021889);    if (systString.find("Mela") != string::npos || mass != 140) T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     } else {
-      m.setVal(83.54);   // m.setConstant(kTRUE);    
-      bb.setVal(0.020); // bb.setConstant(kTRUE);
-      n2.setVal(1.0803);  // n2.setConstant(kTRUE);
-      n.setVal(1.0207);   //  n.setConstant(kTRUE);
+      m.setVal(1.028);   // m.setConstant(kTRUE);    
+      bb.setVal(2.91); // bb.setConstant(kTRUE);
+      n2.setVal(0.7146);  n2.setConstant(kTRUE);
+      n.setVal(0.9518);     n.setConstant(kTRUE);
       bb2.setVal(100000.);  bb2.setConstant(kTRUE);
-      T.setVal(0.22341);    T.setConstant(kTRUE);
+      T.setVal(0.002248);   if (systString.find("Mela") != string::npos) T.setConstant(kTRUE);
       fexp.setVal(0.0);    fexp.setConstant(kTRUE);
     }
-  }
-  else if (whichtype == 1) {
-    m.setVal(235.3);   // m.setConstant(kTRUE);
-    n.setVal(1.1705);   // n.setConstant(kTRUE);
-    n2.setVal(4.086);   n2.setConstant(kTRUE);
-    bb.setVal(0.0294); // bb.setConstant(kTRUE);
-    T.setVal(0.0000703);    T.setConstant(kTRUE);
-    bb2.setVal(0.0203);   bb2.setConstant(kTRUE);
-    fexp.setVal(0.100);   fexp.setConstant(kTRUE);
-  }
-  else if (whichtype == 3) {
-    m.setVal(653.8);   // m.setConstant(kTRUE);
-    n.setVal(0.8367);   n.setConstant(kTRUE);
-    n2.setVal(2.985);   n2.setConstant(kTRUE);
-    bb.setVal(0.0562); // bb.setConstant(kTRUE);
-    T.setVal(0.0000938);   // T.setConstant(kTRUE);
-    bb2.setVal(0.01037);   bb2.setConstant(kTRUE);
-    fexp.setVal(0.100);   fexp.setConstant(kTRUE);
+  } else if (whichtype == 3) {
+    m.setVal(100.411);   // m.setConstant(kTRUE);
+    n.setVal(5.756);    n.setConstant(kTRUE);
+    n2.setVal(0.8738);   n2.setConstant(kTRUE);
+    bb.setVal(0.00039);  // bb.setConstant(kTRUE);
+    T.setVal(0.118);   // T.setConstant(kTRUE);
+    bb2.setVal(0.000224);    // bb2.setConstant(kTRUE);
+    fexp.setVal(0.3);  fexp.setConstant(kTRUE);
+  } else if (whichtype == 4) {
+    m.setVal(10.411);   // m.setConstant(kTRUE);
+    n.setVal(5.756);    // n.setConstant(kTRUE);
+    n2.setVal(0.8738);   // n2.setConstant(kTRUE);
+    bb.setVal(0.00039);  // bb.setConstant(kTRUE);
+    T.setVal(0.118);   // T.setConstant(kTRUE);
+    bb2.setVal(0.0224);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.);   fexp.setConstant(kTRUE);
+  } else if (whichtype == 5 && LHCsqrts == 8) {
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);    n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(3.897);   bb.setConstant(kTRUE);
+    T.setVal(0.1009);  // T.setConstant(kTRUE);
+    bb2.setVal(1.0224);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   } else {
-    if (LHCsqrts == 8) {
-      m.setVal(591.06);   // m.setConstant(kTRUE);
-      n.setVal(0.6048);   // if (systString == "Default") n.setConstant(kTRUE);
-      n2.setVal(0.9086);   n2.setConstant(kTRUE);
-      bb.setVal(0.0280);   // bb.setConstant(kTRUE);
-      T.setVal(0.0866);   // T.setConstant(kTRUE);
-      bb2.setVal(0.00657);   bb2.setConstant(kTRUE);
-      fexp.setVal(0.0849);   // if (systString == "Default") fexp.setConstant(kTRUE);
-    } else {
-      if (systString == "Resummation") m.setMax(800.);
-      m.setVal(456.99);   // m.setConstant(kTRUE);
-      n.setVal(1.068);   // n.setConstant(kTRUE);
-      n2.setVal(0.9649);   n2.setConstant(kTRUE);
-      bb.setVal(0.0149);   // bb.setConstant(kTRUE);
-      T.setVal(0.2330);   // T.setConstant(kTRUE);
-      bb2.setVal(0.00253);    bb2.setConstant(kTRUE);
-      fexp.setVal(0.0202);   fexp.setConstant(kTRUE);
-    }
+    // cout << "Entro qui" << endl;
+    m.setVal(1.006);   // m.setConstant(kTRUE);
+    n.setVal(10.939);    n.setConstant(kTRUE);
+    n2.setVal(1.1448);   n2.setConstant(kTRUE);
+    bb.setVal(0.0129);  bb.setConstant(kTRUE);
+    T.setVal(0.1009);    // T.setConstant(kTRUE);
+    bb2.setVal(1.0224);   bb2.setConstant(kTRUE);
+    fexp.setVal(0.01);   fexp.setConstant(kTRUE);
   }
+ 
   
-  RooTsallis3* rt3 = new RooTsallis3("rt3","rt3",*pt,m,n,n2,bb,bb2,T,fexp);
-  ws->import(*rt3);
+  RooModifTsallis* rt3 = new RooModifTsallis("rt3","rt3",*ptoverm,m,n,n2,bb,bb2,T,fexp);
+  // ws->import(*rt3);
 
   // fit
-  RooFitResult* fit = ws->pdf("rt3")->fitTo(*rdh,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));  
+  RooFitResult* fit = rt3->fitTo(*rdh,Minos(0),Save(1),SumW2Error(kTRUE),NumCPU(1));  
 
-  RooPlot *frame = pt->frame();
-
-  char reducestr[300];
-  sprintf(reducestr,"pt > %f && pt < %f",pt->getMin(),pt->getMax());
-  
-  rdh->plotOn(frame,DataError(RooAbsData::SumW2),Cut(reducestr));
-  ws->pdf("rt3")->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
-  RooHist *hpull = frame->pullHist();
-  float chi2 = 0.;
-
-  double *ypulls = hpull->GetY();
-  unsigned int nBins = rdh->numEntries();
-  unsigned int nFullBins = 0;
-  for (unsigned int i = 0; i < nBins; i++) {
-    cout << "Pull of bin " << i << " = " << ypulls[i] << endl;
-    if (fabs(ypulls[i]) < 5.0) chi2 += ypulls[i]*ypulls[i]; 
-    cout << "Partial chi2 = " << chi2 << endl;
-    if (fabs(ypulls[i]) > 0.0001 && fabs(ypulls[i]) < 5.0) nFullBins++;
-  }
-  for (unsigned int i = 0; i < nBins; i++) {
-    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
-    hpull->SetPointError(i,0.,0.,0.,0.);
-  } 
-  int nFitPar = fit->floatParsFinal().getSize() - 1;
+  float mVal = m.getVal();   
+  float nVal = n.getVal();
+  float n2Val = n2.getVal();
+  float bbVal = bb.getVal();
+  float bb2Val = bb2.getVal();
+  float fexpVal = fexp.getVal();
+  float TVal = T.getVal();
 
   if (correctErrors) {
     // Tsallis errors not reliable, use toy MC
-
-    float mVal = m.getVal();
-    float nVal = n.getVal();
-    float n2Val = n2.getVal();
-    float bbVal = bb.getVal();
-    float bb2Val = bb2.getVal();
-    float fexpVal = fexp.getVal();
-    float TVal = T.getVal();
 
     TH1F* mHist = new TH1F("mHist","m",21,-0.5*mVal,0.5*mVal);
     TH1F* nHist = new TH1F("nHist","n",21,-0.2*nVal,0.2*nVal);
@@ -278,6 +298,13 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
     TH1F* bb2Hist = new TH1F("bb2Hist","bb2",21,-0.2*bb2Val,0.2*bb2Val);
     TH1F* fexpHist = new TH1F("fexpHist","fexp",21,-0.2*fexpVal-0.000001,0.2*fexpVal+0.000001);
     TH1F* THist = new TH1F("THist","T",21,-0.5*TVal,0.5*TVal);
+    mHist->GetXaxis()->SetTitle("m-m_{gen}");
+    nHist->GetXaxis()->SetTitle("n-n_{gen}");
+    n2Hist->GetXaxis()->SetTitle("n2-n2_{gen}");
+    bbHist->GetXaxis()->SetTitle("bb-bb_{gen}");
+    bb2Hist->GetXaxis()->SetTitle("bb2-bb2_{gen}");
+    THist->GetXaxis()->SetTitle("T-T_{gen}");
+    fexpHist->GetXaxis()->SetTitle("fexp-fexp_{gen}");
 
     for (unsigned int iToy = 0; iToy < 200; iToy++) {
 
@@ -298,8 +325,8 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
       RooRandom::randomGenerator()->SetSeed(seed+iToy);
       cout << "####" << endl << endl;
 
-      RooDataSet *dataToy = rt3->generate(RooArgSet(*pt),ptH->GetEntries());
-      RooDataHist *dataToyH = new RooDataHist("dataToyH","toy",RooArgSet(*pt),*dataToy);
+      RooDataSet *dataToy = rt3->generate(RooArgSet(*ptoverm),ptovermH->GetEntries());
+      RooDataHist *dataToyH = new RooDataHist("dataToyH","toy",RooArgSet(*ptoverm),*dataToy);
       
       rt3->fitTo(*dataToyH,Minos(0),SumW2Error(kTRUE),NumCPU(1));  
   
@@ -307,7 +334,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
       if (fit->floatParsFinal().find("n")) nHist->Fill(n.getVal()-nVal);
       if (fit->floatParsFinal().find("n2")) n2Hist->Fill(n2.getVal()-n2Val);
       if (fit->floatParsFinal().find("bb")) bbHist->Fill(bb.getVal()-bbVal);
-      if (fit->floatParsFinal().find("bb2")) bbHist->Fill(bb2.getVal()-bb2Val);
+      if (fit->floatParsFinal().find("bb2")) bb2Hist->Fill(bb2.getVal()-bb2Val);
       if (fit->floatParsFinal().find("fexp")) fexpHist->Fill(fexp.getVal()-fexpVal);
       if (fit->floatParsFinal().find("T")) THist->Fill(T.getVal()-TVal);
     }
@@ -321,7 +348,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
     cant.cd(5);   bb2Hist->Draw();
     cant.cd(6);   fexpHist->Draw();
     cant.cd(7);   THist->Draw();
-    cant.SaveAs("figs/testToys.pdf");
+    cant.SaveAs("newfigs/testToys.pdf");
 
     if (fit->floatParsFinal().find("m")) m.setError(mHist->GetRMS());
     if (fit->floatParsFinal().find("n")) n.setError(nHist->GetRMS());
@@ -332,11 +359,19 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
     if (fit->floatParsFinal().find("T")) T.setError(THist->GetRMS());
   }
 
+  m.setVal(mVal);
+  n.setVal(nVal);
+  n2.setVal(n2Val);
+  bb.setVal(bbVal);
+  bb2.setVal(bb2Val);
+  fexp.setVal(fexpVal);
+  T.setVal(TVal);
+
   char fileToSave[200];
-  if (changeParName != "") 
-    sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str(),changeParName.c_str()); 
-  else 
-    sprintf(fileToSave,"text/paramsCJLST_%s_%dTeV_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
+  // if (changeParName != "") 
+  //  sprintf(fileToSave,"text/paramsPTOverMCJLST_%s_%dTeV_%s_%s.txt",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str(),changeParName.c_str()); 
+  // else 
+  sprintf(fileToSave,"text/paramsPTOverMCJLST_%s%d_%dTeV_%s.txt",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
   ofstream os1(fileToSave);
   if (changeParName != "") {
     sprintf(fileToSave,"m%s",changeParName.c_str());  m.SetName(fileToSave);
@@ -349,6 +384,99 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
   }
   (RooArgSet(m,n,n2,bb,bb2,fexp,T)).writeToStream(os1,false);
   os1.close();
+
+  RooRealVar mup("mup","emme", 1.,0.01, 30.);
+  RooRealVar nup("nup","enne", 0.93, 0.5, 15.);
+  RooRealVar n2up("n2up","enne2", 0.75, 0.5, 15.);
+  RooRealVar bbup("bbup","bibi",0.02, 0.00005, 20.0);
+  RooRealVar Tup("Tup","tti",0.2,0.00000005,1.);
+  RooRealVar bb2up("bb2up","bibi2",0.02, 0.0005, 10.0);
+  RooRealVar fexpup("fexpup","f_exp",0.02, 0.0, 1.0);
+ 
+  RooModifTsallis* rt3up = new RooModifTsallis("rt3up","rt3up",*ptoverm,mup,nup,n2up,bbup,bb2up,Tup,fexpup);
+  // ws->import(*rt3up);
+ 
+  RooRealVar mdown("mdown","emme", 1.,0.01, 30.);
+  RooRealVar ndown("ndown","enne", 0.93, 0.5, 15.);
+  RooRealVar n2down("n2down","enne2", 0.75, 0.5, 15.);
+  RooRealVar bbdown("bbdown","bibi",0.02, 0.00005, 20.0);
+  RooRealVar Tdown("Tdown","tti",0.2,0.00000005,1.);
+  RooRealVar bb2down("bb2down","bibi2",0.02, 0.0005, 10.0);
+  RooRealVar fexpdown("fexpdown","f_exp",0.02, 0.0, 1.0);
+
+  RooModifTsallis* rt3down = new RooModifTsallis("rt3down","rt3down",*ptoverm,mdown,ndown,n2down,bbdown,bb2down,Tdown,fexpdown);
+  // ws->import(*rt3down);
+
+  RooPlot *frame = ptoverm->frame();
+
+  char reducestr[300];
+  sprintf(reducestr,"ptoverm > %f && ptoverm < %f",ptoverm->getMin(),ptoverm->getMax());
+  
+  rdh->plotOn(frame,DataError(RooAbsData::SumW2),Cut(reducestr));
+  static RooHist *hpull;
+  float chi2 = 0.;
+
+  if (changeParName == "") {
+    sprintf(fileToSave,"text/paramsPTOverMCJLST_%s%d_%dTeV_Default.txt",nameSample[whichtype].c_str(),mass,LHCsqrts);
+    ifstream is1(fileToSave);
+    (RooArgSet(mup,nup,n2up,bbup,bb2up,fexpup,Tup)).readFromStream(is1,false);
+
+    mdown.setVal(fabs(3*mup.getVal() - 2*m.getVal()));
+    ndown.setVal(fabs(3*nup.getVal() - 2*n.getVal()));
+    n2down.setVal(fabs(3*n2up.getVal() - 2*n2.getVal()));
+    bbdown.setVal(fabs(3*bbup.getVal() - 2*bb.getVal()));
+    Tdown.setVal(fabs(3*Tup.getVal() - 2*T.getVal()));
+    bb2down.setVal(fabs(3*bb2up.getVal() - 2*bb2.getVal()));
+    fexpdown.setVal(fabs(3*fexpup.getVal() - 2*fexp.getVal()));
+
+    if (showErrorPDFs) {
+      rt3->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      hpull = frame->pullHist();
+      rt3up->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      if (systString.find("Mela") == string::npos) rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    } else {
+      rt3->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      hpull = frame->pullHist();
+    }
+  } else {
+    mup.setVal(m.getVal() + m.getError());   cout << "mup = " << mup.getVal() << endl;
+    nup.setVal(n.getVal() + n.getError());
+    n2up.setVal(n2.getVal() + n2.getError());
+    bbup.setVal(bb.getVal() + bb.getError());
+    Tup.setVal(T.getVal() + T.getError());
+    bb2up.setVal(bb2.getVal() + bb2.getError());
+    fexpup.setVal(fexp.getVal() + fexp.getError());
+
+    mdown.setVal(m.getVal() - m.getError());  cout << "mdown = " << mdown.getVal() << endl;
+    ndown.setVal(n.getVal() - n.getError());
+    n2down.setVal(n2.getVal() - n2.getError());
+    bbdown.setVal(bb.getVal() - bb.getError());
+    Tdown.setVal(T.getVal() - T.getError());
+    bb2down.setVal(bb2.getVal() - bb2.getError());
+    fexpdown.setVal(fexp.getVal() - fexp.getError());
+
+    rt3->plotOn(frame,LineColor(kBlue),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    hpull = frame->pullHist();
+    if (showErrorPDFs) {
+      rt3up->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+      rt3down->plotOn(frame,LineColor(kRed),LineStyle(kDashed),Normalization(rdh->sumEntries(),RooAbsReal::NumEvent));
+    }
+  }
+
+  double *ypulls = hpull->GetY();
+  unsigned int nBins = rdh->numEntries();
+  unsigned int nFullBins = 0;
+  for (unsigned int i = 0; i < nBins; i++) {
+    cout << "Pull of bin " << i << " = " << ypulls[i] << endl;
+    if (fabs(ypulls[i]) < 5.0) chi2 += ypulls[i]*ypulls[i]; 
+    cout << "Partial chi2 = " << chi2 << endl;
+    if (fabs(ypulls[i]) > 0.0001 && fabs(ypulls[i]) < 5.0) nFullBins++;
+  }
+  for (unsigned int i = 0; i < nBins; i++) {
+    if (fabs(ypulls[i]) < 0.0001) ypulls[i] = 999.; 
+    hpull->SetPointError(i,0.,0.,0.,0.);
+  } 
+  int nFitPar = fit->floatParsFinal().getSize() - 1;
 
   TCanvas can("can","The canvas",5.,5.,500.,900.); 
   can.Divide(1,3);
@@ -363,7 +491,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
   frame->Draw();
   // gPad->SetLogy(); 
   // Htest->Draw();
-  sprintf(fileToSave,"%s - %d TeV",nameSample[whichtype].c_str(),LHCsqrts);
+  sprintf(fileToSave,"%s %d GeV at %d TeV",nameSample[whichtype].c_str(),mass,LHCsqrts);
   t->DrawLatex(0.6,0.8,fileToSave); 
 
   can.cd(2);
@@ -371,7 +499,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
   gPad->SetTopMargin(0.0);
   frame->Draw();
  
-  RooPlot* pull = pt->frame(Title("Pull Distribution")) ;
+  RooPlot* pull = ptoverm->frame(Title("Pull Distribution")) ;
   pull->GetYaxis()->SetTitle("Pull");
   /* pull->SetLabelSize(0.08,"XYZ");
   pull->SetTitleSize(0.08,"XYZ");
@@ -387,7 +515,7 @@ void fitPtCJLST(int LHCsqrts = 7, int whichtype = 1,
   sprintf(fileToSave,"#chi^{2}/n_{DoF} = %4.1f/%d",chi2,nFullBins - nFitPar);
   if (chi2 < 1000.) t->DrawLatex(0.80,0.86,fileToSave);
 
-  sprintf(fileToSave,"figs/fitCJLST_%s_%dTeV_%s.pdf",nameSample[whichtype].c_str(),LHCsqrts,systString.c_str());
+  sprintf(fileToSave,"newfigs/fitPTCJLST_%s%d_%dTeV_%s.pdf",nameSample[whichtype].c_str(),mass,LHCsqrts,systString.c_str());
   can.SaveAs(fileToSave);
 
 }
