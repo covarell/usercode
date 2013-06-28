@@ -93,7 +93,7 @@ void adjustHistogram(TH2F* hist,
       int binL = histL->GetXaxis()->FindBin(hist->GetXaxis()->GetBinCenter(i));
       for(int j=1; j<=hist->GetNbinsY(); j++){
 	hist->SetBinContent(i,j,histL->GetBinContent(binL,j));
-        hist->SetBinError(i,j,histL->GetBinError(binL,j)*sqrt(5.));
+        hist->SetBinError(i,j,histL->GetBinError(binL,j)*sqrt(10.));
       }
     }
     for(int i=BinDue+1; i <= hist->GetNbinsX(); i++){
@@ -128,6 +128,7 @@ void adjustHistogram(TH2F* hist,
     if (norm>0) { // Avoid introducing NaNs in the histogram
       for(int j=1; j<=hist->GetNbinsY(); j++){
 	hist->SetBinContent(i,j,hist->GetBinContent(i,j)/norm);
+        hist->SetBinError(i,j,hist->GetBinError(i,j)/norm); 
       }
     }
 
@@ -232,20 +233,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
   for (Int_t i1 = 0; i1 < 751; i1++) { // all in 2 GeV steps
     mbinLimits[i1] = 100.+i1*2.;
-  }
-
-  static const int mbins2 = 150;
-  double mbinLimits2[mbins2+1];
-
-  for (Int_t i1 = 0; i1 < 151; i1++) { // all in 10 GeV steps
-    mbinLimits2[i1] = 100.+i1*10.;
-  }
-
-  static const int mbins3 = 30;
-  double mbinLimits3[mbins3+1];
-
-  for (Int_t i1 = 0; i1 < 31; i1++) { // all in 50 GeV steps
-    mbinLimits3[i1] = 100.+i1*50.;
   }
 
   bool withNLOMela = false;
@@ -1127,7 +1114,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     ggTree->SetBranchAddress("p0plus_VAJHU",&pSgg);
     ggTree->SetBranchAddress("bkg_VAMCFM",&pBgg);
-    nlogg = pSgg/(pSgg+pBgg);
   }
 
   VBFTree->SetBranchAddress("ZZMass",&mVBF);
@@ -1139,7 +1125,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     VBFTree->SetBranchAddress("p0plus_VAJHU",&pSVBF);
     VBFTree->SetBranchAddress("bkg_VAMCFM",&pBVBF);
-    nloVBF = pSVBF/(pSVBF+pBVBF);
   }
 
   ZHTree->SetBranchAddress("ZZMass",&mzh);
@@ -1152,7 +1137,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     ZHTree->SetBranchAddress("p0plus_VAJHU",&pSzh);
     ZHTree->SetBranchAddress("bkg_VAMCFM",&pBzh);
-    nlozh = pSzh/(pSzh+pBzh);
   }
 
   ttHTree->SetBranchAddress("ZZMass",&mtth);
@@ -1165,7 +1149,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     ttHTree->SetBranchAddress("p0plus_VAJHU",&pStth);
     ttHTree->SetBranchAddress("bkg_VAMCFM",&pBtth);
-    nlotth = pStth/(pStth+pBtth);
   }
 
   WHTree->SetBranchAddress("ZZMass",&mwh);
@@ -1178,7 +1161,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     WHTree->SetBranchAddress("p0plus_VAJHU",&pSwh);
     WHTree->SetBranchAddress("bkg_VAMCFM",&pBwh);
-    nlowh = pSwh/(pSwh+pBwh);
   }
 
   zzTree->SetBranchAddress("ZZMass",&mzz);
@@ -1189,7 +1171,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     zzTree->SetBranchAddress("p0plus_VAJHU",&pSzz);
     zzTree->SetBranchAddress("bkg_VAMCFM",&pBzz);
-    nlozz = pSzz/(pSzz+pBzz);
   }
 
   ggzzTree->SetBranchAddress("ZZMass",&mggzz);
@@ -1200,7 +1181,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     ggzzTree->SetBranchAddress("p0plus_VAJHU",&pSggzz);
     ggzzTree->SetBranchAddress("bkg_VAMCFM",&pBggzz);
-    nloggzz = pSggzz/(pSggzz+pBggzz);
   }
 
   dataTree->SetBranchAddress("ZZMass",&mdata);
@@ -1210,7 +1190,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     dataTree->SetBranchAddress("p0plus_VAJHU",&pSdata);
     dataTree->SetBranchAddress("bkg_VAMCFM",&pBdata);
-    nlodata = pSdata/(pSdata+pBdata);
   }
 
   crTree->SetBranchAddress("ZZMass",&mcr);
@@ -1220,7 +1199,6 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
   else {
     crTree->SetBranchAddress("p0plus_VAJHU",&pScr);
     crTree->SetBranchAddress("bkg_VAMCFM",&pBcr);
-    nlocr = pScr/(pScr+pBcr);
   }
 
   crosTree->SetBranchAddress("ZZMass",&mcros);
@@ -1590,7 +1568,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
    
     TH2F* ptkdgg = new TH2F("ptkdgg","pt vs mela",16,0.,1.,ptmbins,ptmbinLimits);
     ptkdgg->Sumw2();
-    TH2F* ptmhgg = new TH2F("ptmhgg","pt vs m",16,100.,180.,ptmbins,ptmbinLimits);
+    TH2F* ptmhgg = new TH2F("ptmhgg","pt vs m",16,100.,1000.,ptmbins,ptmbinLimits);
     ptmhgg->Sumw2();
     
     for (Int_t iEvt = 0; iEvt < ggTree->GetEntries() ; ++iEvt) {
@@ -1602,6 +1580,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 	  oldW = wHalf[theHist]->GetBinContent(wHalf[theHist]->FindBin(genptgg));
 	}
 	pth->Fill(mgg,ptVar(ptgg,mgg,overM),wgg*oldW);
+        nlogg = pSgg/(pSgg+pBgg);
         ptkdgg->Fill(nlogg,ptVar(ptgg,mgg,overM),wgg*oldW); 
 	for (int i = 0; i < melaRanges; i++) {
 	  if (nlogg > melaLimits[i] && nlogg < melaLimits[i+1]) 
@@ -1657,13 +1636,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     TH2F* ptkdvbf = new TH2F("ptkdvbf","pt vs mela",16,0.,1.,ptmbins,ptmbinLimits);
     ptkdvbf->Sumw2();
-    TH2F* ptmhvbf = new TH2F("ptmhvbf","pt vs m",16,100.,180.,ptmbins,ptmbinLimits);
+    TH2F* ptmhvbf = new TH2F("ptmhvbf","pt vs m",16,100.,1000.,ptmbins,ptmbinLimits);
     ptmhvbf->Sumw2(); 
 
     for (Int_t iEvt = 0; iEvt < VBFTree->GetEntries() ; ++iEvt) {
       VBFTree->GetEntry(iEvt);
       if (mVBF < massLimits[massRanges] && mVBF > massLimits[0] && ptVBF < 400. && notVBFtagged(njVBF)) {
 	ptvbf->Fill(mVBF,ptVar(ptVBF,mVBF,overM),wVBF);
+        nloVBF = pSVBF/(pSVBF+pBVBF);
         ptkdvbf->Fill(nloVBF,ptVar(ptVBF,mVBF,overM),wVBF);
 	for (int i = 0; i < melaRanges; i++) {
 	if (nloVBF > melaLimits[i] && nloVBF < melaLimits[i+1]) 
@@ -1719,7 +1699,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     TH2F* ptkdzz = new TH2F("ptkdzz","pt vs mela",16,0.,1.,ptmbins,ptmbinLimits);
     ptkdzz->Sumw2();
-    TH2F* ptmhzz = new TH2F("ptmhzz","pt vs m",16,100.,180.,ptmbins,ptmbinLimits);
+    TH2F* ptmhzz = new TH2F("ptmhzz","pt vs m",16,100.,1000.,ptmbins,ptmbinLimits);
     ptmhzz->Sumw2();
 
     for (Int_t iEvt = 0; iEvt < zzTree->GetEntries() ; ++iEvt) {
@@ -1727,6 +1707,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
       if (mzz < massLimits[massRanges] && mzz > massLimits[0] && ptzz < 400. && notVBFtagged(njzz)) {
 	pth1->Fill(mzz,ptVar(ptzz,mzz,overM),wzz);
 	ptvbf->Fill(mzz,ptVar(ptzz,mzz,overM),wzz);
+        nlozz = pSzz/(pSzz+pBzz);
         ptkdzz->Fill(nlozz,ptVar(ptzz,mzz,overM),wzz);
 	for (int i = 0; i < melaRanges; i++) {
 	  if (nlozz > melaLimits[i] && nlozz < melaLimits[i+1]) 
@@ -1782,13 +1763,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     TH2F* ptkdcr = new TH2F("ptkdcr","pt vs mela",16,0.,1.,ptmbins,ptmbinLimits);
     ptkdcr->Sumw2();
-    TH2F* ptmhcr = new TH2F("ptmhcr","pt vs m",16,100.,180.,ptmbins,ptmbinLimits);
+    TH2F* ptmhcr = new TH2F("ptmhcr","pt vs m",16,100.,250.,ptmbins,ptmbinLimits);
     ptmhcr->Sumw2();
 
     for (Int_t iEvt = 0; iEvt < crTree->GetEntries() ; ++iEvt) {
       crTree->GetEntry(iEvt);
       if (mcr < massLimits[massRanges] && mcr > massLimits[0] && ptcr < 400. && notVBFtagged(njcr)) {
 	// pth2->Fill(mcr,ptVar(ptcr,mcr,overM));
+        nlocr = pScr/(pScr+pBcr);
         ptkdcr->Fill(nlocr,ptVar(ptcr,mcr,overM));
       }
       ptmhcr->Fill(mcr,ptVar(ptcr,mcr,overM));
@@ -1876,6 +1858,7 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 	  ptoverm->setVal(pth2->GetYaxis()->GetBinCenter(j)/200.);
 	}
 	pth2->SetBinError(i,j,fabs(rtup->getVal()-pth2->GetBinContent(i,j)));
+        if (i < 100) cout << "ZX: " << i << " " << j << " " << pth2->GetBinContent(i,j) << " " << pth2->GetBinError(i,j) << endl;
       }
     }
 
@@ -1885,7 +1868,14 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
     sprintf(nameFile,"%sH_Default",LcasePt);   
     pth2->SetName(nameFile);
     // pth2->Scale(1./pth2->Integral());
-    adjustHistogram(pth2);   pth2->Write();
+    adjustHistogram(pth2);   
+    for(int i=1; i<=pth2->GetNbinsX(); i++){    
+      for(int j=1; j<=pth2->GetNbinsY(); j++){
+        if (i < 100) cout << "ZX: " << i << " " << j << " " << pth2->GetBinContent(i,j) << " " << pth2->GetBinError(i,j) << endl;
+      }
+    }
+
+    pth2->Write();
 
     ptmhcr->SetName("ptVsM");   ptmhcr->Write();
     TProfile* tpcr = (TProfile*)ptmhcr->ProfileX();
@@ -1908,10 +1898,10 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     for (Int_t iEvt = 0; iEvt < ggzzTree->GetEntries() ; ++iEvt) {
       ggzzTree->GetEntry(iEvt);
-      if (iEvt%1000 == 1) cout << "Entering ggZZ event " << iEvt << endl;
+      // if (iEvt%1000 == 1) cout << "Entering ggZZ event " << iEvt << endl;
       if (mggzz < massLimits[massRanges] && mggzz > massLimits[0] && ptggzz < 400. && notVBFtagged(njggzz)) {
 	pth3->Fill(mggzz,ptVar(ptggzz,mggzz,overM),wggzz);
-        if (iEvt%1000 == 1) cout << "Filling ggZZ event  " << iEvt << endl;
+        // if (iEvt%1000 == 1) cout << "Filling ggZZ event  " << iEvt << endl;
       }
     } 
 
@@ -1935,12 +1925,12 @@ void makeTemplatesPtSyst(char* = "2mu2e", int whichtype = 1,
 
     for (Int_t iEvt = 0; iEvt < WHTree->GetEntries() ; ++iEvt) {
       WHTree->GetEntry(iEvt);
-      if (iEvt%1000 == 1) cout << "Entering WH event " << iEvt << endl;
+      // if (iEvt%1000 == 1) cout << "Entering WH event " << iEvt << endl;
       if (mwh < massLimits[massRanges] && mwh > massLimits[0] && ptwh < 400. && notVBFtagged(njwh)) {
         int theHist = returnClosestMass(nWeightNLOvh,massNLOvh,mwh);  
       	int theBin = wNLO[theHist]->FindBin(genptwh);
 	pth4->Fill(mwh,ptVar(ptwh,mwh,overM),wwh*wNLO[theHist]->GetBinContent(theBin));
-        if (iEvt%1000 == 1) cout << "Filling WH event " << iEvt << endl;
+        // if (iEvt%1000 == 1) cout << "Filling WH event " << iEvt << endl;
       }
     } 
     
