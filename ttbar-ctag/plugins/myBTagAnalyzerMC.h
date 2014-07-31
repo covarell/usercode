@@ -44,6 +44,8 @@
 #include "SimDataFormats/JetMatching/interface/JetFlavourMatching.h"
 #include "SimDataFormats/JetMatching/interface/JetFlavour.h"
 #include "DataFormats/BTauReco/interface/TaggingVariable.h"
+#include "DataFormats/BTauReco/interface/TrackIPTagInfo.h"
+#include "DataFormats/BTauReco/interface/SecondaryVertexTagInfo.h"
 
 #include "DQMOffline/RecoB/interface/CorrectJet.h"
 #include "DQMOffline/RecoB/interface/MatchJet.h"
@@ -102,6 +104,7 @@ class myBTagAnalyzerMC : public edm::EDAnalyzer {
 		      reco::Vertex primaryVertex, edm::Handle<reco::ConversionCollection> hConversions, edm::Handle<reco::BeamSpot> beamSpotHandle, const IsoDepositVals * electronIsoVals, float rho, bool fully);
   float MuonPFIso(reco::MuonRef muon, bool highpt);
   float ElectronPFIso(reco::GsfElectronRef electron, const IsoDepositVals * electronIsoVals, float rho);
+  float trackMom(float pt, float eta);
 
   AcceptJet jetSelector;   // Decides if jet and parton satisfy kinematic cuts.
   std::vector<double> etaRanges, ptRanges;
@@ -112,6 +115,7 @@ class myBTagAnalyzerMC : public edm::EDAnalyzer {
   edm::InputTag tagLabel;
   edm::InputTag tagInfoLabel1;
   edm::InputTag tagInfoLabel2;
+  edm::InputTag tagInfoLabel3;
 
   bool eventInitialized;
   CorrectJet jetCorrector;

@@ -1,13 +1,17 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Utilities/interface/Exception.h"
-#include "Validation/RecoB/plugins/myBTagAnalyzerMC.h"
-#include "DQMOffline/RecoB/interface/JetTagPlotter.h"
-#include "DQMOffline/RecoB/interface/TagInfoPlotterFactory.h"
+
+//#include "DQMOffline/RecoB/interface/JetTagPlotter.h"
+//#include "DQMOffline/RecoB/interface/TagInfoPlotterFactory.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputer.h"
+#include "RecoBTau/JetTagComputer/interface/JetTagComputerRecord.h"
 #include "DataFormats/Common/interface/View.h"
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "Validation/RecoB/plugins/myBTagAnalyzerMC.h"
 
 using namespace reco;
 using namespace edm;
@@ -70,6 +74,7 @@ myBTagAnalyzerMC::myBTagAnalyzerMC(const edm::ParameterSet& pSet) :
   tagLabel = moduleConfig.getParameter<InputTag>("tagLabel");
   tagInfoLabel1 = moduleConfig.getParameter<InputTag>("tagInfoLabel1");
   tagInfoLabel2 = moduleConfig.getParameter<InputTag>("tagInfoLabel2");
+  tagInfoLabel3 = moduleConfig.getParameter<InputTag>("tagInfoLabel3");
 
 }
 
@@ -237,6 +242,11 @@ float myBTagAnalyzerMC::ElectronPFIso(reco::GsfElectronRef electron, const IsoDe
   float zero = 0.;
   float iso = (chargedHadronIso + max(zero, neutralHadronIso + photonIso - rho*Aeff))/electron->pt();
   return iso;
+}
+
+float myBTagAnalyzerMC::trackMom(float pt, float eta) {
+  float theta = 2*atan(exp(-eta));
+  return pt/sin(theta);
 }
 
 void myBTagAnalyzerMC::analyze(const edm::Event& iEvent, 
@@ -446,25 +456,9 @@ void myBTagAnalyzerMC::analyze(const edm::Event& iEvent,
   edm::Handle< View<BaseTagInfo> > tagInfoHandle2;
   iEvent.getByLabel(tagInfoLabel2, tagInfoHandle2);
   tagInfoHandles.push_back(tagInfoHandle2);
-
-  /* edm::ProductID jetProductID;
-  unsigned int nTagInfos = 0;
-  for (unsigned int iInputTags = 0; iInputTags < nInputTags; ++iInputTags) {
-    edm::Handle< View<BaseTagInfo> > & tagInfoHandle = tagInfoHandles[iInputTags];
-    if (iInputTags == 0) iEvent.getByLabel(tagInfoLabel1, tagInfoHandle);
-    else iEvent.getByLabel(tagInfoLabel2, tagInfoHandle);
-    // LogDebug("Info") << "Found " << size << " B candidates in collection " << inputTags[iInputTags];
-    
-     edm::ProductID thisProductID = (size > 0) ? (*tagInfoHandle)[0].jet().id() : edm::ProductID();
-    if (iInputTags == 0) {
-      jetProductID = thisProductID;
-      nTagInfos = size;
-    } else if (jetProductID != thisProductID)
-      throw cms::Exception("Configuration") << "TagInfos are referencing a different jet collection." << endl;
-    else if (nTagInfos != size)
-    throw cms::Exception("Configuration") << "TagInfo collections are having a different size." << endl; 
-  }
-  unsigned int size = tagInfoHandle->size(); */
+  edm::Handle< View<BaseTagInfo> > tagInfoHandle3;
+  iEvent.getByLabel(tagInfoLabel3, tagInfoHandle3);
+  // tagInfoHandles.push_back(tagInfoHandle3);
   
   edm::RefToBase<Jet> jetRef;
   for (unsigned int iTagInfo = 0; iTagInfo < nInputTags; iTagInfo++) {
@@ -492,15 +486,13 @@ void myBTagAnalyzerMC::analyze(const edm::Event& iEvent,
       }
       
       // cout << "*** loop on TagInfo " << theJet << endl;
+
+      // const JetTagComputer::TagInfoHelper helper(baseTagInfo);
+      // const TaggingVariableList& vars = computer->taggingVariables(helper);
+
       const reco::TaggingVariableList &vars = baseTagInfo.taggingVariables();
-      if (vars.checkTag(getTaggingVariableName("jetNTracks"))) 
-	m_jetNTrks[theJet] = vars.get(getTaggingVariableName("jetNTracks"));
-      if (vars.checkTag(getTaggingVariableName("vertexNTracks")))
+      if (vars.checkTag(getTaggingVariableName("vertexNTracks"))) 
 	m_jetNTrksSV[theJet] = vars.get(getTaggingVariableName("vertexNTracks"));
-      if (vars.checkTag(getTaggingVariableName("vertexMass"))) 
-	m_jetMassSV[theJet] = vars.get(getTaggingVariableName("vertexMass"));	
-      if (vars.checkTag(getTaggingVariableName("vertexEnergyRatio"))) 
-	m_jetESVOverE[theJet] = vars.get(getTaggingVariableName("vertexEnergyRatio"));
       if (vars.checkTag(getTaggingVariableName("trackEtaRel"))) {
 	std::vector<float> theTrackRaps = vars.getList(getTaggingVariableName("trackEtaRel"), false);
 	float ave = 0.;
@@ -510,6 +502,40 @@ void myBTagAnalyzerMC::analyze(const edm::Event& iEvent,
 	ave = ave / theTrackRaps.size();
 	m_jetAveTrkEtaRel[theJet] = ave;
       }
+
+      float jetw = 0.;
+      float jetecc = 0.;
+      float sumpt = 0.;
+      const reco::TrackIPTagInfo * tptagInfo = dynamic_cast<const reco::TrackIPTagInfo *>(&baseTagInfo);
+      if (tptagInfo) {
+	 std::vector<std::size_t> sortedIndices = tptagInfo->sortedIndexes(reco::TrackIPTagInfo::IP2DSig);
+	 reco::TrackRefVector sortedTracks = tptagInfo->sortedTracks(sortedIndices);
+	 m_jetNTrks[theJet] = sortedIndices.size();
+	 for(unsigned int n=0; n != sortedIndices.size(); ++n) {
+	    const reco::TrackRef& track = sortedTracks[n];
+	    math::PtEtaPhiELorentzVector trackp4 = math::PtEtaPhiELorentzVector(track->pt(),track->eta(),track->phi(),trackMom(track->pt(),track->eta()) );
+	    jetw += ROOT::Math::VectorUtil::DeltaR(jetWithFlavour.first.p4(),trackp4)*track->pt();
+	    jetecc += pow(ROOT::Math::VectorUtil::DeltaR(jetWithFlavour.first.p4(),trackp4),2)*track->pt();
+	    sumpt += track->pt();
+	 }
+         m_jetWidth[theJet] = jetw/sumpt;
+         m_jetEccent[theJet] = sqrt(jetecc/sumpt);  
+      }
+
+      math::PtEtaPhiELorentzVector alltracks = math::PtEtaPhiELorentzVector(0.,0.,0.,0.);
+      float energyalltracks = 0.;
+      const reco::SecondaryVertexTagInfo * svtagInfo = dynamic_cast<const reco::SecondaryVertexTagInfo *>(&baseTagInfo);
+      if (svtagInfo) {
+	 const reco::TrackRefVector vertexTracks = svtagInfo->vertexTracks();
+	 for(unsigned int n=0; n != vertexTracks.size(); ++n) {
+	    const reco::TrackRef& track = vertexTracks[n];
+	    math::PtEtaPhiELorentzVector trackp4 = math::PtEtaPhiELorentzVector(track->pt(),track->eta(),track->phi(),trackMom(track->pt(),track->eta()) );
+	    alltracks += trackp4;
+	    energyalltracks += trackMom(track->pt(),track->eta()) ;
+	 }
+         m_jetMassSV[theJet] = alltracks.M();
+         m_jetESVOverE[theJet] = energyalltracks/jetWithFlavour.first.energy();  
+      } 	    
     } 
   }
 
