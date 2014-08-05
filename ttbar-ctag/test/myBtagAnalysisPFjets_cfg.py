@@ -28,6 +28,19 @@ process.load("Validation.RecoB.rerunBtag_cfi")
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 
+process.myPartons.withLeptons = False
+
+process.flavourByRef = cms.EDProducer("JetPartonMatcher",
+    jets = cms.InputTag("ak5PFJets"),
+    coneSizeToAssociate = cms.double(0.3),
+    partons = cms.InputTag("myPartons")
+)
+
+process.flavourByVal = cms.EDProducer("JetFlavourIdentifier",
+    srcByReference = cms.InputTag("flavourByRef"),
+    physicsDefinition = cms.bool(False)
+)
+
 from DQMOffline.RecoB.bTagCommon_cff import *
 from DQMOffline.RecoB.bTagCombinedSVAnalysis_cff import *
 
@@ -58,7 +71,8 @@ process.bTagValidation = cms.EDAnalyzer("myBTagAnalyzerMC",
     xsec = cms.double(225.197),
     lumi = cms.double(19702.),
 )
-process.bTagValidation.jetMCSrc = 'AK5byValAlgo'
+#process.bTagValidation.jetMCSrc = 'AK5byValAlgo'
+process.bTagValidation.jetMCSrc = 'flavourByVal'
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
@@ -67,12 +81,14 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
 )
 
+
 process.plots = cms.Path( process.pfParticleSelectionSequence *
                           process.eleIsoSequence *
                           process.newJetTracksAssociator *
                           process.newJetBtagging *
                           process.myPartons *
-                          process.AK5Flavour *
+                          process.flavourByRef *
+                          process.flavourByVal *
                           process.bTagValidation)
 #process.dqmEnv.subSystemFolder = 'BTAG'
 #process.dqmSaver.producer = 'DQM'
@@ -83,7 +99,7 @@ process.plots = cms.Path( process.pfParticleSelectionSequence *
 #process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string('ttbar_ntuple_test.root')
+        fileName = cms.string('ttbar_ntuple_testPFjets.root')
 )
 
 process.PoolSource.fileNames = [
