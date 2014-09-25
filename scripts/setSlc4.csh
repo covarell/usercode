@@ -1,1 +1,1 @@
-setenv SCRAM_ARCH slc5_ia32_gcc434
+setenv SCRAM_ARCH slc5_amd64_gcc434

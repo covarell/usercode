@@ -6,8 +6,8 @@ $workdir = ".";
 $thispart = "/";
 
 # produce a long file
-system("du -h >> tmpfile");
-open(INFILE,"tmpfile") or die "cannot open tmpfile";;
+system("du -h >> /tmp/tmpfile");
+open(INFILE,"/tmp/tmpfile") or die "cannot open tmpfile";;
 @log=<INFILE>;
 close(INFILE);
 
@@ -23,5 +23,5 @@ foreach $line (@log) {
     }
 }
 
-system("rm -f tmpfile");
+system("rm -f /tmp/tmpfile");
  

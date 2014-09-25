@@ -1,0 +1,9 @@
+latex $*
+latex $*
+dvips -Ppdf -z -G0 $* -o $*.ps
+ps2pdf -sPAPERSIZE=a4 $*.ps
+rm $*.log
+rm *.aux
+rm $*.dvi
+rm $*.ps
+

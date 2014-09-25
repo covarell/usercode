@@ -6,18 +6,18 @@ $workdir = ".";
 $thisdata = $ARGV[0];
 $thispart = $ARGV[1];
                  
-system("rfdir ${thisdata} >> tmpfile");
+system("cmsLs ${thisdata} >> tmpfile");
 open(INFILE,"tmpfile") or die "cannot open tmpfile";;
 @log=<INFILE>;
 close(INFILE);
 
 $fileno = 0;
 
-# find missing files
+# find extra files
 foreach $line (@log) {
   if ($line =~  m/(${thispart})/) {
       my $filenobefore = $fileno;
-      my $partline = substr($line,67);
+      my $partline = substr($line,43);
       my $rightmarker = rindex($partline,'t') - length($partline) + 1;
       my $filename = substr($partline,0,$rightmarker);
       chomp($filename);
@@ -28,8 +28,8 @@ foreach $line (@log) {
       # print("$ok \n");
       if ($fileno == $filenobefore) {
          print("A crab duplicate! \n");
-	 print("rfrm ${thisdata}/${filename} \n");
-	 system("rfrm ${thisdata}/${filename} \n");
+	 print("cmsRm ${filename} \n");
+	 system("cmsRm ${filename} \n");
       }
   };
 };

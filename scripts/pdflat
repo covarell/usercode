@@ -1,0 +1,8 @@
+pdflatex $*
+bibtex $*
+pdflatex $*
+pdflatex $*
+rm $*.log
+rm *.aux
+rm *.bbl
+rm *.blg
