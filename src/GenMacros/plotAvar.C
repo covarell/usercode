@@ -32,6 +32,14 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar8n->SetMinimum(1.);
   // theVar8n->Sumw2();
 
+  TFile py8p("pythia8_power.root");
+  TH1F* theVar8p = (TH1F*)py8p.Get(whichVar.Data());
+  
+  theVar8p->SetLineWidth(3); 
+  theVar8p->SetLineColor(kMagenta+2);
+  theVar8p->SetMinimum(1.);
+  // theVar8n->Sumw2();
+
   TFile py8("pythia8_EV.root");
   TH1F* theVar8 = (TH1F*)py8.Get(whichVar.Data());
   
@@ -53,8 +61,9 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   aa.AddEntry(theVar6, "PYTHIA 6", "l");
   aa.AddEntry(theVar8n, "PYTHIA 8 no e.v.", "l");
   aa.AddEntry(theVar8, "PYTHIA 8 e.v.", "l");
+  aa.AddEntry(theVar8p, "PYTHIA 8 power", "l");
 
-  int imax = 2;
+  int imax = 3;
   float theMax = -1.;
   if (theVar6->GetMaximum() > theMax) {
     imax = 0;   theMax = theVar6->GetMaximum();
@@ -62,33 +71,46 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   if (theVar8n->GetMaximum() > theMax) {
     imax = 1;   theMax = theVar8n->GetMaximum();
   }
-  if (theVar8->GetMaximum() > theMax) imax = 2;
+  if (theVar8p->GetMaximum() > theMax) { 
+    imax = 2;   theMax = theVar8p->GetMaximum();
+  }
+  if (theVar8->GetMaximum() > theMax) imax = 3;
 
-  if (imax = 0) {
+  if (imax == 0) {
     theVar6->Draw();
     theVar8->Draw("same");
     theVar8n->Draw("same");
-  } else if (imax = 1);
+    theVar8p->Draw("same");
+  } else if (imax == 1) {
     theVar8n->Draw();
     theVar6->Draw("same");
     theVar8->Draw("same");
-  else {
+    theVar8p->Draw("same");
+  } else if (imax == 2) {
+    theVar8p->Draw();
+    theVar6->Draw("same");
+    theVar8->Draw("same");
+    theVar8n->Draw("same");
+  } else {
     theVar8->Draw();
     theVar8n->Draw("same");
     theVar6->Draw("same");
+    theVar8p->Draw("same");
   }
   if (log) gPad->SetLogy();
   aa.Draw("same");   
 
   pad2->cd();
   TH1F* flatline = theDiff(theVar8,theVar8);
-  flatline->SetMinimum(-0.1);
-  flatline->SetMaximum(0.1);
+  flatline->SetMinimum(-0.2);
+  flatline->SetMaximum(0.2);
   flatline->Draw();
   TH1F* comp8 = theDiff(theVar8,theVar8n);
   comp8->Draw("same");
   TH1F* comp6 = theDiff(theVar8,theVar6);
   comp6->Draw("same");
+  TH1F* comp8p = theDiff(theVar8,theVar8p);
+  comp8p->Draw("same");
 
   char namefile[100];
   sprintf(namefile,"~/www/powheg/emissionVetoTest/%s.gif",whichVar.Data());
