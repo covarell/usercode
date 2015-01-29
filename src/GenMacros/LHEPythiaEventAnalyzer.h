@@ -28,15 +28,22 @@ class LHEPythiaEventAnalyzer : public edm::EDAnalyzer
      //
      std::string fOutputFileName ;
      std::string theSrc ;
+     int         whichWeight;
      TFile*      fOutputFile ;
      // bool        isVBF;
      // int         lookFor;
 
+     TH1D*       mZ;
      TH1D*       pTZ ;	   
      TH1D*       nJets ;
      TH1D*       pTjet1 ;
      TH1D*       pTjet2 ;
      TH1D*       pTjet3 ;
+     TH1D*       pTZ_lowmass ;	   
+     TH1D*       nJets_lowmass ;
+     TH1D*       pTjet1_lowmass ;
+     TH1D*       pTjet2_lowmass ;
+     TH1D*       pTjet3_lowmass ;
     
      GreaterByPt<reco::GenJet> pTComparator_;
      int         nevent, neventpt0 ;

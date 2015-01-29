@@ -10,9 +10,9 @@ TH1F* theDiff(TH1F* ref, TH1F* con) {
   return result;
 }
 
-void plotAvar(TString whichVar = "pTZ", bool log = false) {
+void plotAvar2(TString whichVar = "pTZ", bool log = false) {
   
-  TFile py6("multMGOld.root");
+  TFile py6("njetsMGOld.root");
   TH1F* theVar6 = (TH1F*)py6.Get(whichVar.Data());
   
   gROOT->ProcessLine(".L ~/myscripts/tdrstyle.C");
@@ -26,7 +26,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar6->Sumw2();
   theVar6->Scale(1./theVar6->Integral());
   
-  /* TFile py8n("multMGNew.root");
+  /* TFile py8n("njetsMGNew.root");
   TH1F* theVar8n = (TH1F*)py8n.Get(whichVar.Data());
   
   theVar8n->SetLineWidth(3); 
@@ -36,7 +36,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar8n->Sumw2();
   theVar8n->Scale(1./theVar8n->Integral());  */
 
-  /* TFile py8p("multMGJosh_cteq.root");
+  /* TFile py8p("njetsMGJosh_cteq.root");
   TH1F* theVar8p = (TH1F*)py8p.Get(whichVar.Data());
   
   theVar8p->SetLineWidth(3); 
@@ -46,7 +46,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar8p->Sumw2();
   theVar8p->Scale(1./theVar8p->Integral());  */
 
-  TFile py8("multMGJosh_nnpdf2norwgt.root");
+  TFile py8("njetsMGJosh_nnpdf2norwgt.root");
   TH1F* theVar8 = (TH1F*)py8.Get(whichVar.Data());
   
   theVar8->SetLineWidth(3); 
@@ -56,7 +56,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar8->Sumw2();
   theVar8->Scale(1./theVar8->Integral());
 
-  TFile py56("multMGJosh_nnpdf3norwgt.root");
+  TFile py56("njetsMGJosh_nnpdf3norwgt.root");
   TH1F* theVar56 = (TH1F*)py56.Get(whichVar.Data());
   
   theVar56->SetLineWidth(3); 
@@ -67,7 +67,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   theVar56->Scale(1./theVar56->Integral());
  
 
-  TFile pynorw("multMGJosh_cteqnorwgt.root");
+  TFile pynorw("njetsMGJosh_cteqnorwgt.root");
   TH1F* theVarnorw = (TH1F*)pynorw.Get(whichVar.Data());
   
   theVarnorw->SetLineWidth(3); 
@@ -86,13 +86,13 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
 
   pad1->cd(); 
 
-  TLegend aa(0.55,0.65,0.95,0.95,"Z+jets multiplicity (ME LEVEL)");
-  aa.AddEntry(theVar6, "MG5 (CTEQ6L)", "l");
+  TLegend aa(0.55,0.65,0.95,0.95,"Z+jets (HADRONIZATION LEVEL)");
+  aa.AddEntry(theVar6, "MG5+py6 (CTEQ6L)", "l");
   // aa.AddEntry(theVar8n, "MG5_aMC (NNPDF2.3 from GenVal)", "l");
   // aa.AddEntry(theVar8p, "MG5_aMC (CTEQ6L)", "l");
-  aa.AddEntry(theVar8, "MG5_aMC (NNPDF2.3 no reweighting)", "l");
-  aa.AddEntry(theVar56, "MG5_aMC (NNPDF3.0 no reweighting)", "l");
-  aa.AddEntry(theVarnorw, "MG5_aMC (CTEQ6L no reweighting)", "l");
+  aa.AddEntry(theVar8, "MG5_aMC+py8 (NNPDF2.3 no reweighting)", "l");
+  aa.AddEntry(theVar56, "MG5_aMC+py8 (NNPDF3.0 no reweighting)", "l");
+  aa.AddEntry(theVarnorw, "MG5_aMC+py8 (CTEQ6L no reweighting)", "l");
 
   int imax = 5;
   float theMax = -1.;
@@ -178,7 +178,7 @@ void plotAvar(TString whichVar = "pTZ", bool log = false) {
   char namefile[100];
   if (log) 
     sprintf(namefile,"~/www/multiplTest/%s_errors_log.gif",whichVar.Data());
-  else sprintf(namefile,"~/www/multiplTest/%s._errors.gif",whichVar.Data());
+  else sprintf(namefile,"~/www/multiplTest/%s_errors.gif",whichVar.Data());
   c1.SaveAs(namefile);
   
   
