@@ -47,6 +47,8 @@ class LHEPythiaEventAnalyzer : public edm::EDAnalyzer
     
      GreaterByPt<reco::GenJet> pTComparator_;
      int         nevent, neventpt0 ;
+     edm::EDGetTokenT< LHEEventProduct > lhep_token;
+     edm::EDGetTokenT<std::vector<reco::GenParticle> > genp_token;
    
 };
 

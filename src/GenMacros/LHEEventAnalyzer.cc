@@ -45,7 +45,8 @@ LHEEventAnalyzer::LHEEventAnalyzer( const ParameterSet& pset )
 {
 
    nevent = 0;
- 
+   lhep_token = consumes< LHEEventProduct >(InputTag(theSrc));
+   
    fOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
    // fHist2muMass  = new TH1D(  "Hist2muMass", "2-mu inv. mass", 100,  60., 120. ) ;  
 
@@ -73,7 +74,7 @@ void LHEEventAnalyzer::analyze( const Event& e, const EventSetup& )
    int npart = 0;
 
    Handle< LHEEventProduct > EvtHandle ;
-   e.getByLabel( theSrc , EvtHandle ) ;
+   e.getByToken( lhep_token , EvtHandle ) ;
 
    float weight = EvtHandle->hepeup().XWGTUP;
    if (whichWeight >= 0) weight *= EvtHandle->weights()[whichWeight].wgt/EvtHandle->originalXWGTUP(); 

@@ -32,7 +32,7 @@
  
 #include "FWCore/Framework/interface/MakerMacros.h"
 
-#include "Configuration/GenProduction/test/LHEPythiaEventAnalyzer.h"
+#include "Configuration/GenProd/test/LHEPythiaEventAnalyzer.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 
@@ -48,6 +48,9 @@ LHEPythiaEventAnalyzer::LHEPythiaEventAnalyzer( const ParameterSet& pset )
      //lookFor( pset.getUntrackedParameter<int>("lookForGenProcID",0) ),
      fOutputFile(0)
 {
+
+  lhep_token = consumes< LHEEventProduct >(InputTag(theSrc));
+  genp_token = consumes<std::vector<reco::GenParticle> >(InputTag("genParticles"));
 }
 
 void LHEPythiaEventAnalyzer::beginJob()
@@ -58,8 +61,8 @@ void LHEPythiaEventAnalyzer::beginJob()
 
    fOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" ) ;
    // fHist2muMass  = new TH1D(  "Hist2muMass", "2-mu inv. mass", 100,  60., 120. ) ;  
-   mZ = new TH1D("mZ", "mass of Z boson", 21, 0., 140.) ;
-   pTZ = new TH1D("pTZ", "pT of Z boson", 21, 0., 140.) ;
+   mZ = new TH1D("mZ", "invariant mass of WH", 90, 100., 1000.) ;
+   pTZ = new TH1D("pTZ", "pT of Higgs boson", 90, 0., 900.) ;
    nJets = new TH1D("nJets", "# of GenJets with pT > 20", 7, -0.5, 6.5) ; 
    pTjet1 = new TH1D("pTjet1", "pT of leading GenJet", 18, 10., 100.) ;
    pTjet2 = new TH1D("pTjet2", "pT of second leading GenJet", 18, 10., 100.) ;
@@ -90,29 +93,41 @@ void LHEPythiaEventAnalyzer::analyze( const Event& e, const EventSetup& )
    nevent++;
 
    edm::Handle< LHEEventProduct > EvtHandle ;
-   e.getByLabel( theSrc , EvtHandle ) ;
+   e.getByToken( lhep_token , EvtHandle ) ;
 
    float weight = EvtHandle->hepeup().XWGTUP;
    if (whichWeight >= 0) weight *= EvtHandle->weights()[whichWeight].wgt/EvtHandle->originalXWGTUP(); 
 
    edm::Handle<std::vector<reco::GenParticle> > genParticles;
-   e.getByLabel(std::string("genParticles"), genParticles);
+   e.getByToken(genp_token, genParticles);
    TLorentzVector mu[2];
    int iMu = 0;
 
-   for(std::vector<reco::GenParticle>::const_iterator genParticle=genParticles->begin(); genParticle!=genParticles->end(); ++genParticle){
-     if( abs(genParticle->pdgId())==13 && genParticle->status()==1 && genParticle->pt() > 10.) {
+   for(std::vector<reco::GenParticle>::const_iterator genParticle=genParticles->end(); genParticle!=genParticles->begin(); --genParticle){
+     // last in the collection
+     if( abs(genParticle->pdgId())==24) {
+       mu[iMu].SetPxPyPzE(genParticle->px(),genParticle->py(),
+                          genParticle->pz(),genParticle->energy());
+       pTZ->Fill(sqrt(genParticle->px()*genParticle->px() + genParticle->py()*genParticle->py()), weight);
+       iMu++;
+       if (iMu == 1) break;
+     }
+   }
+
+   for(std::vector<reco::GenParticle>::const_iterator genParticle=genParticles->end(); genParticle!=genParticles->begin(); --genParticle){
+     // last in the collection
+     if( genParticle->pdgId()==25 ) {
        mu[iMu].SetPxPyPzE(genParticle->px(),genParticle->py(),
                           genParticle->pz(),genParticle->energy());
        iMu++;
        if (iMu == 2) break;
      }
    }
+
    TLorentzVector mumu = mu[0] + mu[1];
    
-   if (iMu == 2) {
-     mZ->Fill(mumu.M(),weight);
-     bool lowmass = mumu.M() < 70.;
+   if (iMu == 2) mZ->Fill(mumu.M(),weight);
+     /* bool lowmass = mumu.M() < 70.;
      if (lowmass) pTZ_lowmass->Fill(mumu.Perp(),weight);
      else pTZ->Fill(mumu.Perp(),weight);
      
@@ -144,7 +159,7 @@ void LHEPythiaEventAnalyzer::analyze( const Event& e, const EventSetup& )
        if (genJetsSorted->size() > 1) pTjet2->Fill(genJetsSorted->at(1).pt(),weight);
        if (genJetsSorted->size() > 2) pTjet3->Fill(genJetsSorted->at(2).pt(),weight);
      }
-   }
+     } */
    return ;   
 }
 

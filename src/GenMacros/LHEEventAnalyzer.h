@@ -31,6 +31,8 @@ class LHEEventAnalyzer : public edm::EDAnalyzer
      TH1D*        mult;
  
      int nevent;
+     edm::EDGetTokenT< LHEEventProduct > lhep_token;
+     // edm::EDGetTokenT<std::vector<reco::GenParticle> > genp_token;
      
 };
 
