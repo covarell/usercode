@@ -6,7 +6,7 @@ process = cms.Process("ANALYSIS")
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(500000)
@@ -283,7 +283,8 @@ process.source = cms.Source("LHESource",
 )
 
 # Other statements
-process.GlobalTag.globaltag = 'START50_V13::All'
+from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:mc', '')
 
 process.Test = cms.EDAnalyzer("LHEEventAnalyzer",
     HistOutFile = cms.untracked.string('multMGOld.root'),
