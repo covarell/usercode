@@ -1,0 +1,15 @@
+<use   name="FWCore/Utilities"/>
+<use   name="boost"/>
+<use   name="hepmc"/>
+<use   name="root"/>
+<lib   name="GenVector"/>
+<flags   EDM_PLUGIN="1"/>
+<library   file="HMesonGammaAnalyzer.cc" name="HMesonGammaAnalyzer">
+  <use   name="FWCore/Framework"/>
+  <use   name="SimDataFormats/GeneratorProducts"/>
+  <use   name="CommonTools/Utils"/>
+  <use   name="DataFormats/HLTReco"/>
+  <use   name="DataFormats/Common"/>
+  <use   name="FWCore/Common"/>
+  <use   name="DataFormats/PatCandidates"/>
+</library>
