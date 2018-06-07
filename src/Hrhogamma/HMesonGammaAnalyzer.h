@@ -9,6 +9,7 @@
 // forward declarations
 class TFile;
 class TH1D;
+class TEfficiency;
 
 class HMesonGammaAnalyzer : public edm::EDAnalyzer
 {
@@ -42,17 +43,13 @@ class HMesonGammaAnalyzer : public edm::EDAnalyzer
       TH1D*       Minv ;
       TH1D*       Minv_passHLT ;
       TH1D*       pTgamma ;
-      TH1D*       pTgamma_passHLT ;
-      TH1D*       effpTgamma ;
+      TEfficiency* effpTgamma ;
       TH1D*       pTmeson ;
-      TH1D*       pTmeson_passHLT ;
-      TH1D*       effpTmeson ;
+      TEfficiency* effpTmeson ;
       TH1D*       etagamma ;
-      TH1D*       etagamma_passHLT ;
-      TH1D*       effetagamma ;
+      TEfficiency* effetagamma ;
       TH1D*       etameson ;
-      TH1D*       etameson_passHLT ;
-      TH1D*       effetameson ;
+      TEfficiency* effetameson ;
       
       GreaterByPt<pat::Photon> pTComparator_;
       

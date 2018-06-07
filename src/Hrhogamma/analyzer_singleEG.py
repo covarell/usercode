@@ -39,7 +39,7 @@ process.goodPrimaryVertices = cms.EDFilter("VertexSelector",
 process.goodPhotons = cms.EDFilter("PATPhotonRefSelector",
    src = cms.InputTag("slimmedPhotons"),
    # cut = cms.string("pt>35 && (( abs(eta)<1.4442 && hadronicOverEm < 0.035 && sigmaIetaIeta < 0.0103) || ( 1.566<abs(eta)<2 && hadronicOverEm < 0.027 && sigmaIetaIeta < 0.0271))"),   ### Soffi
-   cut = cms.string("pt>35 && r9 > 0.9 && hadronicOverEm < 0.05"),   
+   cut = cms.string("pt>35 && abs(eta) < 2.1 && r9 > 0.9 && hadronicOverEm < 0.05"),   
 #   filter = cms.bool(True)
 )
 

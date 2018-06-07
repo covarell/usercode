@@ -29,6 +29,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TF1.h"
+#include "TEfficiency.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
 #include "TObjArray.h"
@@ -124,32 +125,16 @@ void HMesonGammaAnalyzer::beginJob()
 
    // pt-eta
    pTgamma = new TH1D("pTgamma", "pT of gamma",20,15.,200.) ;
-   pTgamma_passHLT = new TH1D("pTgamma_passHLT",  "pT of gamma",20,15.,200.) ;
    pTmeson = new TH1D("pTmeson", "pT of gamma",20,15.,200.) ;
-   pTmeson_passHLT = new TH1D("pTmeson_passHLT",  "pT of gamma",20,15.,200.) ;
    etagamma = new TH1D("etagamma", "pT of gamma",20,-2.6,2.6) ;
-   etagamma_passHLT = new TH1D("etagamma_passHLT",  "pT of gamma",20,-2.6,2.6) ;
    etameson = new TH1D("etameson", "pT of gamma",20,-2.6,2.6) ;
-   etameson_passHLT = new TH1D("etameson_passHLT",  "pT of gamma",20,-2.6,2.6) ;
-   
-   pTgamma->Sumw2();
-   pTgamma_passHLT->Sumw2();
-   pTmeson->Sumw2();
-   pTmeson_passHLT->Sumw2();
-   etagamma->Sumw2();
-   etagamma_passHLT->Sumw2();
-   etameson->Sumw2();
-   etameson_passHLT->Sumw2();
-   
+       
    // trigger efficiencies vs. pT-eta
-   effpTgamma = (TH1D*)pTgamma->Clone();
-   effpTgamma->SetName("effpTgamma");    effpTgamma->SetTitle("effpTgamma"); 
-   effpTmeson = (TH1D*)pTmeson->Clone();
-   effpTmeson->SetName("effpTmeson");    effpTmeson->SetTitle("effpTmeson"); 
-   effetagamma = (TH1D*)etagamma->Clone();
-   effetagamma->SetName("effetagamma");    effetagamma->SetTitle("effetagamma"); 
-   effetameson = (TH1D*)etameson->Clone();
-   effetameson->SetName("effetameson");    effetameson->SetTitle("effetameson"); 
+   effpTgamma = new TEfficiency("effpTgamma","my efficiency;pT;#epsilon",20,15.,200.);
+   effpTmeson = new TEfficiency("effpTmeson","my efficiency;pT;#epsilon",20,15.,200.);
+   effetagamma = new TEfficiency("effetagamma","my efficiency;eta;#epsilon",20,-2.6,2.6);
+   effetameson = new TEfficiency("effetameson","my efficiency;eta;#epsilon",20,-2.6,2.6);
+
    // counters
    nevents = 0; 
    neventsGammaMatch = 0;
@@ -217,7 +202,10 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
    std::sort(selPhotons.begin(), selPhotons.end(), pTComparator_);
    pat::Photon thePhoton = selPhotons[0];    // largest pT
    neventsGammaPass++;
-
+   pTgamma->Fill(thePhoton.pt());
+   etagamma->Fill(thePhoton.eta());
+   
+   bool thisGammaMatch = false;
    // trigger matches
    for (pat::TriggerObjectStandAlone obj : *triggerObjects) { // note: not "const &" since we want to call unpackPathNames
       bool lastFilterOK = false;
@@ -226,9 +214,11 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
       for (unsigned h = 0; h < obj.filterLabels().size(); ++h) if (obj.filterLabels()[h] == "hltEG35R9Id90HE10IsoMTrackIsoFilter") lastFilterOK = true;
       if (!lastFilterOK) continue;
       if (obj.collection() == "hltEgammaCandidates::HLT" && deltaR(thePhoton.eta(),thePhoton.phi(),obj.eta(),obj.phi()) < 0.3) {
-	neventsGammaMatch++; break;
+	neventsGammaMatch++;  thisGammaMatch = true;  break;
       }
    }	
+   effpTgamma->Fill(thisGammaMatch,thePhoton.pt());
+   effetagamma->Fill(thisGammaMatch,thePhoton.eta());
 
    // Merge tracks and "lost tracks" (???)
    std::vector<pat::PackedCandidate> allTracks;
@@ -267,7 +257,7 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
 
        // rho0 cuts
        if (meson.M() < 0.5 || meson.M() > 1.0) continue;   //rho0 mass
-       if (meson.Pt() < 35. || fabs(meson.Rapidity()) > 2.5 ) continue;   //rho0 pT
+       if (meson.Pt() < 35. || fabs(meson.Rapidity()) > 2.1 ) continue;   //rho0 pT
      
        // rho0 isolation
        float absIso = 0.;
@@ -292,8 +282,11 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
 
    if (theMesonPt < 1.) return;
    neventsTauPass++;
+   pTmeson->Fill(theMeson.Pt());
+   etameson->Fill(theMeson.Eta());
 
    // trigger matches
+   bool thisTauMatch = false;
    for (pat::TriggerObjectStandAlone obj : *triggerObjects) { // note: not "const &" since we want to call unpackPathNames
       bool lastFilterOK = false;
       obj.unpackPathNames(*triggerNames);
@@ -301,10 +294,11 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
       for (unsigned h = 0; h < obj.filterLabels().size(); ++h) if (obj.filterLabels()[h] == "hltOverlapFilterPhoton35MediumChargedIsoPFTau35") lastFilterOK = true;
       if (!lastFilterOK) continue;
       if (obj.collection() == "hltSelectedPFTausTrackFindingMediumChargedIsolation::HLT" && deltaR(theMeson.Eta(),theMeson.Phi(),obj.eta(),obj.phi()) < 0.3) {
-	neventsTauMatch++;
-	break;
+	neventsTauMatch++;  thisTauMatch = true;  break;
       }
    }	
+   effpTmeson->Fill(thisTauMatch,theMeson.Pt());
+   effetameson->Fill(thisTauMatch,theMeson.Eta());
 
    // redefine photon eta
    float SCx = thePhoton.superCluster()->x();
@@ -318,27 +312,13 @@ void HMesonGammaAnalyzer::analyze( const Event& e, const EventSetup& )
 
    TLorentzVector higgs = theMeson + gamma;
    Minv->Fill(higgs.M());
-   pTgamma->Fill(gamma.Pt());
-   pTmeson->Fill(theMeson.Pt());
-   etagamma->Fill(gamma.Eta());
-   etameson->Fill(theMeson.Eta());
-   if ( trigRes->accept(itr) ) {
-     Minv_passHLT->Fill(higgs.M());
-     pTgamma_passHLT->Fill(gamma.Pt());
-     pTmeson_passHLT->Fill(theMeson.Pt());
-     etagamma_passHLT->Fill(gamma.Eta());
-     etameson_passHLT->Fill(theMeson.Eta());
-   }
-   
+   if ( trigRes->accept(itr) ) Minv_passHLT->Fill(higgs.M());
+
    return ;   
 }
 
 void HMesonGammaAnalyzer::endJob()
 {
-  effpTgamma->Divide(pTgamma_passHLT,pTgamma);
-  effpTmeson->Divide(pTmeson_passHLT,pTmeson);
-  effetagamma->Divide(etagamma_passHLT,etagamma);
-  effetameson->Divide(etameson_passHLT,etameson);
 
   TObjArray Hlist(0);
   Hlist.Add(MTktk);
