@@ -38,33 +38,34 @@ process.goodPrimaryVertices = cms.EDFilter("VertexSelector",
 # photons mediumID, no isolation yet
 process.goodPhotons = cms.EDFilter("PATPhotonRefSelector",
    src = cms.InputTag("slimmedPhotons"),
-   cut = cms.string("pt>35 && (( abs(eta)<1.4442 && hadronicOverEm < 0.035 && sigmaIetaIeta < 0.0103) || ( 1.566<abs(eta)<2.1 && hadronicOverEm < 0.027 && sigmaIetaIeta < 0.0271))"),
-   filter = cms.bool(True)
+   # cut = cms.string("pt>35 && (( abs(eta)<1.4442 && hadronicOverEm < 0.035 && sigmaIetaIeta < 0.0103) || ( 1.566<abs(eta)<2 && hadronicOverEm < 0.027 && sigmaIetaIeta < 0.0271))"),   ### Soffi
+   cut = cms.string("pt>35 && r9 > 0.9 && hadronicOverEm < 0.05"),   
+#   filter = cms.bool(True)
 )
 
 process.source = cms.Source("PoolSource",
      duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
     fileNames = cms.untracked.vstring(
-      "file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_0.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_1.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_10.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_11.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_12.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_13.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_14.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_15.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_16.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_17.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_18.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_19.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_2.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_3.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_4.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_5.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_6.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_7.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_8.root",
-"file:../../../../../Hrhogamma/testMINIAOD_Hrhogamma_9.root",
+      "file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_0.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_1.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_10.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_11.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_12.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_13.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_14.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_15.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_16.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_17.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_18.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_19.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_2.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_3.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_4.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_5.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_6.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_7.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_8.root",
+"file:../../../../../Hrhogamma_singleEG/testMINIAOD_Hrhogamma_9.root",
 
         
     )
@@ -82,10 +83,12 @@ process.hlTrigReport = cms.EDAnalyzer("HLTrigReport",
 )
 
 process.analyzer = cms.EDAnalyzer("HMesonGammaAnalyzer",
-    HistOutFile = cms.untracked.string('HrhogammaPlots.root'),
+    HistOutFile = cms.untracked.string('HrhogammaPlots_singleEG.root'),
     photonSrc = cms.InputTag('goodPhotons'),
     trackSrc = cms.InputTag('packedPFCandidates'),
+    trackSrc2 = cms.InputTag('lostTracks'),
     HLTriggerResults = cms.InputTag("TriggerResults","","HLT"),
+    HLTriggerObjects = cms.InputTag("slimmedPatTrigger"), 
     HLTriggerName = cms.string("HLT_Photon35_TwoProngs35_v1"), 
     hadronMass = cms.double(0.1396) #pi           0.4937  K              
 )

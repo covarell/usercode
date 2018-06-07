@@ -33,6 +33,7 @@ class HMesonGammaAnalyzer : public edm::EDAnalyzer
       std::string fOutputFileName ;
       edm::InputTag thePhotSrc ;
       edm::InputTag theTrkSrc ;
+      edm::InputTag theTrkSrc2 ;
       edm::InputTag trigSrc ;
       std::string thePath ;
 
@@ -40,23 +41,37 @@ class HMesonGammaAnalyzer : public edm::EDAnalyzer
       TH1D*       MTktk ;
       TH1D*       Minv ;
       TH1D*       Minv_passHLT ;
+      TH1D*       pTgamma ;
+      TH1D*       pTgamma_passHLT ;
+      TH1D*       effpTgamma ;
+      TH1D*       pTmeson ;
+      TH1D*       pTmeson_passHLT ;
+      TH1D*       effpTmeson ;
+      TH1D*       etagamma ;
+      TH1D*       etagamma_passHLT ;
+      TH1D*       effetagamma ;
+      TH1D*       etameson ;
+      TH1D*       etameson_passHLT ;
+      TH1D*       effetameson ;
       
       GreaterByPt<pat::Photon> pTComparator_;
       
       edm::EDGetTokenT< std::vector<pat::PackedCandidate> > trk_token;
+      edm::EDGetTokenT< std::vector<pat::PackedCandidate> > trk_token2;
       edm::EDGetToken phot_token;
       edm::EDGetTokenT<edm::ValueMap<float> > phoChargedIsolationToken_; 
       edm::EDGetTokenT<edm::ValueMap<float> > phoNeutralHadronIsolationToken_; 
       edm::EDGetTokenT<edm::ValueMap<float> > phoPhotonIsolationToken_; 
       edm::EDGetTokenT<double> rhoToken_;
       edm::EDGetTokenT<edm::TriggerResults> trigToken_;
+      edm::EDGetTokenT< std::vector<pat::TriggerObjectStandAlone> > triggerObjects_;
       Float_t rho_; // the rho variable
       double hadronMass; // pi or K
 
       TFile* fOutputFile ;
       const edm::TriggerNames* triggerNames;
 
-      int nevents, nevPassPho, nevPassMeson, nevPassIso;
+      int nevents, neventsGammaPass, neventsTauPass, neventsGammaMatch, neventsTauMatch;
 
 };
 
