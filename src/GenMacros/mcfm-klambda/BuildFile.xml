@@ -1,0 +1,12 @@
+<use   name="FWCore/Utilities"/>
+<use   name="boost"/>
+<use   name="hepmc"/>
+<use   name="root"/>
+<lib   name="GenVector"/>
+<flags   EDM_PLUGIN="1"/>
+<library   file="LHEEventAnalyzer.cc" name="LHEEventAnalyzer">
+  <use   name="FWCore/Framework"/>
+  <use   name="SimDataFormats/GeneratorProducts"/>
+  <use   name="CommonTools/Utils"/>
+  <use   name="DataFormats/JetReco"/>
+</library>
