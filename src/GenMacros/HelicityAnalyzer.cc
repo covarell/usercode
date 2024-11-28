@@ -76,6 +76,7 @@ void LHEPythiaEventAnalyzer::analyze( const Event& e, const EventSetup& )
    TLorentzVector mu[2];
 
    for(std::vector<reco::GenParticle>::const_iterator genParticle=genParticles->end(); genParticle!=genParticles->begin(); --genParticle){
+     // std::cout << genParticle->pdgId() << std::endl;
      // last in the collection
      if( genParticle->pdgId()==321 && genParticle->mother() && genParticle->mother()->pdgId()==333) {
        const reco::GenParticle* phi = dynamic_cast<const reco::GenParticle*>(genParticle->mother());
@@ -84,7 +85,6 @@ void LHEPythiaEventAnalyzer::analyze( const Event& e, const EventSetup& )
 			   genParticle->pz(),genParticle->energy());
 	  mu[0].SetPxPyPzE(phi->px(),phi->py(),
 			   phi->pz(),phi->energy());
-	  break;
        }
      }
    }

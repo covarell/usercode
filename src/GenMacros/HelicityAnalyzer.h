@@ -1,7 +1,8 @@
 #ifndef LHEPythiaEventAnalyzer_H
 #define LHEPythiaEventAnalyzer_H
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+// #include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "CommonTools/Utils/interface/PtComparator.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
@@ -9,8 +10,7 @@
 class TFile;
 class TH1D;
 
-class LHEPythiaEventAnalyzer : public edm::EDAnalyzer
-{
+class LHEPythiaEventAnalyzer : public edm::one::EDAnalyzer<> {
 
    public:
    
